@@ -6,7 +6,7 @@ labels: ''
 assignees: ''
 ---
 
-<!-- The content in here will not be show。To forbid duplication，easier search in the feature，before you create an issue，please check the following. If your question is a newer/beginner's，recommend to https://github.com/ctripcorp/apollo/discussions to ask it. -->
+<!-- The content in here will not be show。To forbid duplication，easier search in the feature，before you create an issue，please check the following. If your question is a newer/beginner's，recommend to https://github.com/apolloconfig/apollo-java/discussions to ask it. -->
 
 - [ ] I have checked the [discussions](https://github.com/apolloconfig/apollo-java/discussions)
 - [ ] I have searched the [issues](https://github.com/apolloconfig/apollo-java/issues) of this repository and believe that this is not a duplicate.
