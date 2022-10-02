@@ -6,7 +6,7 @@ labels: ''
 assignees: ''
 ---
 
-<!-- 这段文字不会显示在你的内容中。为了避免重复的信息，方便后续的检索，在提issue之前，请检查如下事项。如果是比较新手级别的问题，推荐到讨论区https://github.com/ctripcorp/apollo/discussions 提问 -->
+<!-- 这段文字不会显示在你的内容中。为了避免重复的信息，方便后续的检索，在提issue之前，请检查如下事项。如果是比较新手级别的问题，推荐到讨论区 https://github.com/apolloconfig/apollo-java/discussions 提问 -->
 
 - [ ] 我已经检查过[discussions](https://github.com/apolloconfig/apollo-java/discussions)
 - [ ] 我已经搜索过[issues](https://github.com/apolloconfig/apollo-java/issues)
