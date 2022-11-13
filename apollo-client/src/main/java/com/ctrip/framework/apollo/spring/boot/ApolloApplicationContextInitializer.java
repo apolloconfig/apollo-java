@@ -25,6 +25,7 @@ import com.ctrip.framework.apollo.core.utils.DeferredLogger;
 import com.ctrip.framework.apollo.spring.config.CachedCompositePropertySource;
 import com.ctrip.framework.apollo.spring.config.ConfigPropertySourceFactory;
 import com.ctrip.framework.apollo.spring.config.PropertySourcesConstants;
+import com.ctrip.framework.apollo.spring.util.PropertySourcesUtil;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Splitter;
@@ -119,10 +120,14 @@ public class ApolloApplicationContextInitializer implements
    * @param environment
    */
   protected void initialize(ConfigurableEnvironment environment) {
-
+    final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     if (environment.getPropertySources().contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME)) {
       //already initialized, replay the logs that were printed before the logging system was initialized
       DeferredLogger.replayTo();
+      if (configUtil.isOverrideSystemProperties()) {
+        // ensure ApolloBootstrapPropertySources is still the first
+        PropertySourcesUtil.ensureBootstrapPropertyPrecedence(environment);
+      }
       return;
     }
 
@@ -131,7 +136,6 @@ public class ApolloApplicationContextInitializer implements
     List<String> namespaceList = NAMESPACE_SPLITTER.splitToList(namespaces);
 
     CompositePropertySource composite;
-    final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     if (configUtil.isPropertyNamesCacheEnabled()) {
       composite = new CachedCompositePropertySource(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
     } else {

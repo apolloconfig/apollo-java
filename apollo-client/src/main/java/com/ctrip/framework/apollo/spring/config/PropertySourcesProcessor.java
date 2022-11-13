@@ -20,8 +20,8 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.build.ApolloInjector;
-import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
+import com.ctrip.framework.apollo.spring.util.PropertySourcesUtil;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.ImmutableSortedSet;
@@ -109,7 +109,7 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
 
       if (configUtil.isOverrideSystemProperties()) {
         // ensure ApolloBootstrapPropertySources is still the first
-        ensureBootstrapPropertyPrecedence(environment);
+        PropertySourcesUtil.ensureBootstrapPropertyPrecedence(environment);
       }
 
       environment.getPropertySources()
@@ -123,21 +123,6 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
       }
       environment.getPropertySources().addFirst(composite);
     }
-  }
-
-  private void ensureBootstrapPropertyPrecedence(ConfigurableEnvironment environment) {
-    MutablePropertySources propertySources = environment.getPropertySources();
-
-    PropertySource<?> bootstrapPropertySource = propertySources
-        .get(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
-
-    // not exists or already in the first place
-    if (bootstrapPropertySource == null || propertySources.precedenceOf(bootstrapPropertySource) == 0) {
-      return;
-    }
-
-    propertySources.remove(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
-    propertySources.addFirst(bootstrapPropertySource);
   }
 
   private void initializeAutoUpdatePropertiesFeature(ConfigurableListableBeanFactory beanFactory) {
