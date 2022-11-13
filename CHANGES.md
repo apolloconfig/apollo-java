@@ -12,7 +12,7 @@ Apollo Java 2.1.0
 * [Add a new API to load items with pagination](https://github.com/apolloconfig/apollo/pull/4468)
 * [fix openapi item with url illegalKey 400 error](https://github.com/apolloconfig/apollo/pull/4549)
 * [Add overloaded shortcut method to register BeanDefinition](https://github.com/apolloconfig/apollo/pull/4574)
-* [fix repair the application registerBeanDefinitions read not appropriate configuration](https://github.com/apolloconfig/apollo-java/pull/3)
+* [fix the application registerBeanDefinitions read not appropriate configuration](https://github.com/apolloconfig/apollo-java/pull/3)
 
 ------------------
 All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/1?closed=1)
