@@ -45,6 +45,7 @@ header:
     - 'NOTICE'
     - 'CNAME'
     - '**/resources/META-INF/services/**'
+    - '**/resources/META-INF/spring/**'
     - 'apollo-core/src/test/resources/META-INF/app-with-utf8bom.properties'
     - 'apollo-core/src/test/resources/properties/server-with-utf8bom.properties'
 
