@@ -14,6 +14,7 @@ Apollo Java 2.1.0
 * [Add overloaded shortcut method to register BeanDefinition](https://github.com/apolloconfig/apollo/pull/4574)
 * [Fix ApolloBootstrapPropertySources precedence issue](https://github.com/apolloconfig/apollo-java/pull/3)
 * [Apollo Client Support Spring Boot 3.0](https://github.com/apolloconfig/apollo-java/pull/4)
+* [apollo-client-config-data support spring boot 3.0](https://github.com/apolloconfig/apollo-java/pull/5)
 
 ------------------
 All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/1?closed=1)
