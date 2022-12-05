@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 
 /**
  * @author vdisk <vdisk@foxmail.com>
@@ -32,9 +33,9 @@ public class ApolloClientWebsocketExtensionInitializer implements ApolloClientEx
 
   private final ConfigurableBootstrapContext bootstrapContext;
 
-  public ApolloClientWebsocketExtensionInitializer(Log log,
+  public ApolloClientWebsocketExtensionInitializer(DeferredLogFactory logFactory,
       ConfigurableBootstrapContext bootstrapContext) {
-    this.log = log;
+    this.log = logFactory.getLog(ApolloClientWebsocketExtensionInitializer.class);
     this.bootstrapContext = bootstrapContext;
   }
 

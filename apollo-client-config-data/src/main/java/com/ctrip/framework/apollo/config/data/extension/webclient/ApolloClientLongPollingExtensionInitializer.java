@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -41,9 +42,9 @@ public class ApolloClientLongPollingExtensionInitializer implements
 
   private final ConfigurableBootstrapContext bootstrapContext;
 
-  public ApolloClientLongPollingExtensionInitializer(Log log,
+  public ApolloClientLongPollingExtensionInitializer(DeferredLogFactory logFactory,
       ConfigurableBootstrapContext bootstrapContext) {
-    this.log = log;
+    this.log = logFactory.getLog(ApolloClientLongPollingExtensionInitializer.class);
     this.bootstrapContext = bootstrapContext;
   }
 

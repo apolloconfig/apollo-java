@@ -34,6 +34,7 @@ import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.PropertySource;
 
@@ -42,10 +43,13 @@ import org.springframework.core.env.PropertySource;
  */
 public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigDataResource>, Ordered {
 
+  private final DeferredLogFactory logFactory;
+
   private final Log log;
 
-  public ApolloConfigDataLoader(Log log) {
-    this.log = log;
+  public ApolloConfigDataLoader(DeferredLogFactory logFactory) {
+    this.logFactory = logFactory;
+    this.log = logFactory.getLog(ApolloConfigDataLoader.class);
   }
 
   @Override
@@ -55,7 +59,7 @@ public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigData
     Binder binder = bootstrapContext.get(Binder.class);
     BindHandler bindHandler = this.getBindHandler(context);
     bootstrapContext.registerIfAbsent(ApolloConfigDataLoaderInitializer.class, InstanceSupplier
-        .from(() -> new ApolloConfigDataLoaderInitializer(this.log, binder, bindHandler,
+        .from(() -> new ApolloConfigDataLoaderInitializer(this.logFactory, binder, bindHandler,
             bootstrapContext)));
     ApolloConfigDataLoaderInitializer apolloConfigDataLoaderInitializer = bootstrapContext
         .get(ApolloConfigDataLoaderInitializer.class);

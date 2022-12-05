@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.util.StringUtils;
 
 /**
@@ -31,8 +32,8 @@ public class ApolloClientSystemPropertyInitializer {
 
   private final Log log;
 
-  public ApolloClientSystemPropertyInitializer(Log log) {
-    this.log = log;
+  public ApolloClientSystemPropertyInitializer(DeferredLogFactory logFactory) {
+    this.log = logFactory.getLog(ApolloClientSystemPropertyInitializer.class);
   }
 
   public void initializeSystemProperty(Binder binder, BindHandler bindHandler) {

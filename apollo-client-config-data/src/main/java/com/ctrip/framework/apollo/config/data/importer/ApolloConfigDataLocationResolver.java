@@ -27,6 +27,7 @@ import org.springframework.boot.context.config.ConfigDataLocationResolver;
 import org.springframework.boot.context.config.ConfigDataLocationResolverContext;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.boot.context.config.Profiles;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.core.Ordered;
 import org.springframework.util.StringUtils;
 
@@ -40,8 +41,8 @@ public class ApolloConfigDataLocationResolver implements
 
   private final Log log;
 
-  public ApolloConfigDataLocationResolver(Log log) {
-    this.log = log;
+  public ApolloConfigDataLocationResolver(DeferredLogFactory logFactory) {
+    this.log = logFactory.getLog(ApolloConfigDataLocationResolver.class);
   }
 
   @Override
