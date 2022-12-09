@@ -35,6 +35,7 @@ import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
@@ -45,6 +46,8 @@ class ApolloConfigDataLoaderInitializer {
 
   private static volatile boolean INITIALIZED = false;
 
+  private final DeferredLogFactory logFactory;
+
   private final Log log;
 
   private final Binder binder;
@@ -53,10 +56,11 @@ class ApolloConfigDataLoaderInitializer {
 
   private final ConfigurableBootstrapContext bootstrapContext;
 
-  public ApolloConfigDataLoaderInitializer(Log log,
+  public ApolloConfigDataLoaderInitializer(DeferredLogFactory logFactory,
       Binder binder, BindHandler bindHandler,
       ConfigurableBootstrapContext bootstrapContext) {
-    this.log = log;
+    this.logFactory = logFactory;
+    this.log = logFactory.getLog(ApolloConfigDataLoaderInitializer.class);
     this.binder = binder;
     this.bindHandler = bindHandler;
     this.bootstrapContext = bootstrapContext;
@@ -98,9 +102,9 @@ class ApolloConfigDataLoaderInitializer {
   }
 
   private void initApolloClientInternal() {
-    new ApolloClientSystemPropertyInitializer(this.log)
+    new ApolloClientSystemPropertyInitializer(this.logFactory)
         .initializeSystemProperty(this.binder, this.bindHandler);
-    new ApolloClientExtensionInitializeFactory(this.log,
+    new ApolloClientExtensionInitializeFactory(this.logFactory,
         this.bootstrapContext).initializeExtension(this.binder, this.bindHandler);
     DeferredLogger.enable();
     ApolloConfigDataInjectorCustomizer.register(ConfigFactory.class,

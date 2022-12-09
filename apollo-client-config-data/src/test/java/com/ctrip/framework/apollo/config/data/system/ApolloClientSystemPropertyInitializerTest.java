@@ -20,7 +20,7 @@ import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitialize
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import org.apache.commons.logging.LogFactory;
+import java.util.function.Supplier;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class ApolloClientSystemPropertyInitializerTest {
     MapConfigurationPropertySource propertySource = new MapConfigurationPropertySource(map);
     Binder binder = new Binder(propertySource);
     ApolloClientSystemPropertyInitializer initializer = new ApolloClientSystemPropertyInitializer(
-        LogFactory.getLog(ApolloClientSystemPropertyInitializerTest.class));
+        Supplier::get);
     initializer.initializeSystemProperty(binder, null);
     for (String propertyName : ApolloApplicationContextInitializer.APOLLO_SYSTEM_PROPERTIES) {
       Assert.assertEquals(map.get(propertyName), System.getProperty(propertyName));
