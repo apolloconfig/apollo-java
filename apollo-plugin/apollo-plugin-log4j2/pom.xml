@@ -25,8 +25,8 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>apollo-log4j2</artifactId>
-    <name>Apollo Log4j2</name>
+    <artifactId>apollo-plugin-log4j2</artifactId>
+    <name>Apollo Plugin Log4j2</name>
     <packaging>jar</packaging>
 
     <dependencies>

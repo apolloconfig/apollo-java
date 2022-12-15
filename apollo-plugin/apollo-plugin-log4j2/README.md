@@ -18,11 +18,11 @@ There are several steps that need to do:
       <artifactId>log4j-core</artifactId>
    </dependency>
    ```
-2. Add `apollo-log4j2` dependency to your classpath
+2. Add `apollo-plugin-log4j2` dependency to your classpath
    ```xml
    <dependency>
        <groupId>com.ctrip.framework.apollo</groupId>
-       <artifactId>apollo-log4j2</artifactId>
+       <artifactId>apollo-plugin-log4j2</artifactId>
    </dependency>
    ```
 3. Create a new namespace `log4j2.xml` (namespace format must be XML) in your apollo application

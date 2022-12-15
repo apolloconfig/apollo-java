@@ -30,7 +30,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>apollo-log4j2</module>
+        <module>apollo-plugin-log4j2</module>
     </modules>
 
 </project>

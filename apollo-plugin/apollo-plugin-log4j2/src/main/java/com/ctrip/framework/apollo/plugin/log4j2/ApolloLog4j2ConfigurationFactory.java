@@ -15,7 +15,7 @@
  *
  */
 
-package com.ctrip.framework.apollo.log4j2;
+package com.ctrip.framework.apollo.plugin.log4j2;
 
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.ConfigService;
