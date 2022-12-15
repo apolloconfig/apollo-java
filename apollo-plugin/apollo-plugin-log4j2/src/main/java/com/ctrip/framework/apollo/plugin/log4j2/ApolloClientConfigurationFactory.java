@@ -37,13 +37,13 @@ import org.apache.logging.log4j.util.Strings;
 /**
  * @author nisiyong
  */
-@Plugin(name = "ApolloLog4j2ConfigurationFactory", category = ConfigurationFactory.CATEGORY)
+@Plugin(name = "ApolloClientConfigurationFactory", category = ConfigurationFactory.CATEGORY)
 @Order(50)
-public class ApolloLog4j2ConfigurationFactory extends ConfigurationFactory {
+public class ApolloClientConfigurationFactory extends ConfigurationFactory {
 
   private final boolean isActive;
 
-  public ApolloLog4j2ConfigurationFactory() {
+  public ApolloClientConfigurationFactory() {
     String enabled = System.getProperty("apollo.log4j2.enabled");
     isActive = Boolean.parseBoolean(enabled);
   }
