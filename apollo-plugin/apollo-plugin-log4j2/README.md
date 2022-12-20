@@ -36,4 +36,4 @@ There are several steps that need to do:
 ## Notice
 
 By default, log4j2 will load the configuration from the classpath.
-This module only affects when you set the system properties `apollo.log4j2.enabled=true` to enable it. 
+This module only affects when you set the system properties `apollo.log4j2.enabled=true` or set the env variable `APOLLO_LOG4J2_ENABLED =true` to enable it. 
