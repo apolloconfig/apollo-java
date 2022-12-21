@@ -26,6 +26,7 @@ import com.ctrip.framework.apollo.spring.property.SpringValue;
 import com.ctrip.framework.apollo.spring.property.SpringValueRegistry;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.ctrip.framework.apollo.util.parser.Parsers;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -47,10 +48,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Apollo Annotation Processor for Spring Application
@@ -74,13 +72,10 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   private Environment environment;
 
-  private final ExpressionParser parser;
-
   public ApolloAnnotationProcessor() {
     configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     placeholderHelper = SpringInjector.getInstance(PlaceholderHelper.class);
     springValueRegistry = SpringInjector.getInstance(SpringValueRegistry.class);
-    parser = new SpelExpressionParser();
   }
 
   @Override
@@ -130,7 +125,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     String[] namespaces = annotation.value();
     String[] annotatedInterestedKeys = annotation.interestedKeys();
     String[] annotatedInterestedKeyPrefixes = annotation.interestedKeyPrefixes();
-    List<String> dynamicNameSpaces = evalSpringExpression(annotation.expression());
+    List<String> dynamicNameSpaces = Parsers.parseNameSpacesSpEL(annotation.expression());
     ConfigChangeListener configChangeListener = changeEvent -> ReflectionUtils.invokeMethod(method, bean, changeEvent);
 
     Set<String> interestedKeys =
@@ -152,28 +147,6 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         config.addChangeListener(configChangeListener, interestedKeys, interestedKeyPrefixes);
       }
     }
-  }
-
-  private List<String> evalSpringExpression(String expression) {
-    List<String> namespaces = new ArrayList<>();
-
-    if (!StringUtils.hasText(expression)) {
-      return namespaces;
-    }
-
-    Object result = parser.parseExpression(expression).getValue(Object.class);
-
-    if (result == null) {
-      return namespaces;
-    }
-
-    if (result.getClass().isArray()) {
-      namespaces.addAll(Arrays.asList((String[]) result));
-    } else if (result.getClass().isInstance(String.class)) {
-      namespaces.add((String) result);
-    }
-
-    return namespaces;
   }
 
   private void processApolloJsonValue(Object bean, String beanName, Field field) {

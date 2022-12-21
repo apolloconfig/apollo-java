@@ -18,10 +18,16 @@ package com.ctrip.framework.apollo.util.parser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.StringUtils;
 
 public class Parsers {
   public static DateParser forDate() {
@@ -30,6 +36,35 @@ public class Parsers {
 
   public static DurationParser forDuration() {
     return DurationParser.INSTANCE;
+  }
+
+  public static final ExpressionParser parser = new SpelExpressionParser();
+
+  /**
+   *
+   * @param expression
+   * @return List of namespaces evaluated from spring expression
+   */
+  public static List<String> parseNameSpacesSpEL(String expression) {
+    List<String> namespaces = new ArrayList<>();
+
+    if (!StringUtils.hasText(expression)) {
+      return namespaces;
+    }
+
+    Object result = parser.parseExpression(expression).getValue(Object.class);
+
+    if (result == null) {
+      return namespaces;
+    }
+
+    if (result.getClass().isArray()) {
+      namespaces.addAll(Arrays.asList((String[]) result));
+    } else if (result.getClass().isInstance(String.class)) {
+      namespaces.add((String) result);
+    }
+
+    return namespaces;
   }
 
   public enum DateParser {
