@@ -74,4 +74,10 @@ public @interface ApolloConfigChangeListener {
    * If neither of {@code interestedKeys} and {@code interestedKeyPrefixes} is specified then the {@code listener} will be notified when whatever key is changed.
    */
   String[] interestedKeyPrefixes() default {};
+
+  /**
+   * Apollo namespace expressions for the config, merged with statically typed namespaces in {@code value}
+   * Expression must be a valid spring expression (SpEL) that evaluates to String or String[]
+   */
+  String expression() default "";
 }
