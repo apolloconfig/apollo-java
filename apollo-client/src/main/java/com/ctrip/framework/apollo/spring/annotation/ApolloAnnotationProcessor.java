@@ -49,8 +49,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Apollo Annotation Processor for Spring Application
@@ -156,9 +156,14 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   private List<String> evalSpringExpression(String expression) {
     List<String> namespaces = new ArrayList<>();
+
+    if (!StringUtils.hasText(expression)) {
+      return namespaces;
+    }
+
     Object result = parser.parseExpression(expression).getValue(Object.class);
 
-    if(result == null) {
+    if (result == null) {
       return namespaces;
     }
 
