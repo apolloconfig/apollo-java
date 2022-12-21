@@ -60,7 +60,7 @@ public class Parsers {
 
     if (result.getClass().isArray()) {
       namespaces.addAll(Arrays.asList((String[]) result));
-    } else if (result.getClass().isInstance(String.class)) {
+    } else if (result.getClass().equals(String.class)) {
       namespaces.add((String) result);
     }
 

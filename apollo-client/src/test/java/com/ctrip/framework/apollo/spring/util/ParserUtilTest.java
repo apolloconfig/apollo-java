@@ -2,6 +2,7 @@ package com.ctrip.framework.apollo.spring.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import org.springframework.expression.spel.SpelEvaluationException;
 
 import static org.junit.Assert.assertTrue;
@@ -18,11 +19,21 @@ import org.junit.runners.JUnit4;
 public class ParserUtilTest {
 
   @Test
-  public void parseNameSpacesSpELValidExpressionTest() {
+  public void parseNameSpacesSpELValidListExpressionTest() {
     String expression = "'foo,bar,test,app'.split(',')";
     List<String> expected = Arrays.asList("foo,bar,test,app".split(","));
     List<String> result = Parsers.parseNameSpacesSpEL(expression);
     assertTrue(result.size() == 4);
+    assertEquals(result, expected);
+  }
+
+  @Test
+  public void parseNameSpacesSpELValidStringExpressionTest() {
+    String expression = "'application'";
+    List<String> expected = new ArrayList<>();
+    expected.add("application");
+    List<String> result = Parsers.parseNameSpacesSpEL(expression);
+    assertTrue(result.size() == 1);
     assertEquals(result, expected);
   }
 
@@ -34,6 +45,7 @@ public class ParserUtilTest {
     result = Parsers.parseNameSpacesSpEL("");
     assertTrue(result.size() == 0);
   }
+
 
   @Test(expected = SpelEvaluationException.class)
   public void parseNameSpacesSpELInvalidExpressionTest() {
