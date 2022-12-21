@@ -156,9 +156,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   private List<String> evalSpringExpression(String expression) {
     List<String> namespaces = new ArrayList<>();
-
-    StandardEvaluationContext context = new StandardEvaluationContext(expression);
-    Object result = parser.parseExpression(expression).getValue(context);
+    Object result = parser.parseExpression(expression).getValue(Object.class);
 
     if(result == null) {
       return namespaces;
