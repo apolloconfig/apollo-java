@@ -44,7 +44,6 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Apollo Annotation Processor for Spring Application
@@ -130,7 +129,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         annotatedInterestedKeyPrefixes.length > 0 ? Sets.newHashSet(annotatedInterestedKeyPrefixes)
             : null;
 
-    if (StringUtils.hasText(commaSeparatedNameSpaces)) {
+    if (commaSeparatedNameSpaces.length() > 0) {
       namespaces = processNameSpacesFromEnv(annotation);
     }
 
