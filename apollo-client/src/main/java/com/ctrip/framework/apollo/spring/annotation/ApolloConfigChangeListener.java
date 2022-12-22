@@ -76,8 +76,7 @@ public @interface ApolloConfigChangeListener {
   String[] interestedKeyPrefixes() default {};
 
   /**
-   * Apollo namespace expressions for the config, merged with statically typed namespaces in {@code value}
-   * Expression must be a valid spring expression (SpEL) that evaluates to String or String[]
+   * Apollo namespaces defined in property file or env, overrides statically typed namespaces in {@code value}
    */
-  String expression() default "";
+  String commaSeparatedNamespacesFromEnv() default "";
 }

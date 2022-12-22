@@ -40,33 +40,6 @@ public class Parsers {
 
   public static final ExpressionParser parser = new SpelExpressionParser();
 
-  /**
-   *
-   * @param expression
-   * @return List of namespaces evaluated from spring expression
-   */
-  public static List<String> parseNameSpacesSpEL(String expression) {
-    List<String> namespaces = new ArrayList<>();
-
-    if (!StringUtils.hasText(expression)) {
-      return namespaces;
-    }
-
-    Object result = parser.parseExpression(expression).getValue(Object.class);
-
-    if (result == null) {
-      return namespaces;
-    }
-
-    if (result.getClass().isArray()) {
-      namespaces.addAll(Arrays.asList((String[]) result));
-    } else if (result.getClass().equals(String.class)) {
-      namespaces.add((String) result);
-    }
-
-    return namespaces;
-  }
-
   public enum DateParser {
     INSTANCE;
 

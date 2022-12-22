@@ -472,13 +472,13 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   }
 
   /**
-   * resolve namespace's name from SpEL (Spring Expression).
+   * resolve namespace's from env (comma separated namespaces)
    */
   @Test
-  public void testApolloConfigChangeListenerWithSpELExpression() {
+  public void testApolloConfigChangeListenerWithNamespacesFromEnv() {
 
-    Config applicationConfig = mock(Config.class);
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    final String commaSeparatedNameSpaces = "app1,app2,app3";
+    System.setProperty(SystemPropertyKeyConstants.TEST_NAMESPACE, commaSeparatedNameSpaces);
 
     Config app1Config = mock(Config.class);
     mockConfig("app1", app1Config);
@@ -489,11 +489,30 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     Config app3Config = mock(Config.class);
     mockConfig("app3", app3Config);
 
-    getSimpleBean(TestApolloConfigChangeListenerWithSpELExpression.class);
+    getSimpleBean(TestApolloConfigChangeListenerWithNameSpacesFromEnv.class);
 
     verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
     verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
     verify(app3Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
+  /**
+   * resolve namespace's from env (comma separated namespaces) overrides the other namespaces
+   */
+  @Test
+  public void testApolloConfigChangeListenerWithNamespacesFromEnvOverrides() {
+
+    Config applicationConfig = mock(Config.class);
+    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+
+    final String commaSeparatedNameSpaces = "app";
+    System.setProperty(SystemPropertyKeyConstants.TEST_NAMESPACE, commaSeparatedNameSpaces);
+
+    Config appConfig = mock(Config.class);
+    mockConfig("app", appConfig);
+
+    getSimpleBean(TestApolloConfigChangeListenerWithNameSpacesFromEnvOverrideValues.class);
+    verify(appConfig, times(1)).addChangeListener(any(ConfigChangeListener.class));
   }
 
   /**
@@ -622,6 +641,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     static final String FROM_SYSTEM_YAML_NAMESPACE = "from.system.yaml.namespace";
     static final String FROM_NAMESPACE_APPLICATION_KEY = "from.namespace.application.key";
     static final String FROM_NAMESPACE_APPLICATION_KEY_YAML = "from.namespace.application.key.yaml";
+
+    static final String TEST_NAMESPACE = "test.namespaces";
   }
 
   @EnableApolloConfig
@@ -697,8 +718,20 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
   @Configuration
   @EnableApolloConfig
-  static class TestApolloConfigChangeListenerWithSpELExpression {
-    @ApolloConfigChangeListener(expression = "'app1,app2,app3'.split(',')")
+  static class TestApolloConfigChangeListenerWithNameSpacesFromEnv {
+
+    @ApolloConfigChangeListener(commaSeparatedNamespacesFromEnv = "${"
+        + SystemPropertyKeyConstants.TEST_NAMESPACE + "}")
+    private void onChange(ConfigChangeEvent changeEvent) {
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class TestApolloConfigChangeListenerWithNameSpacesFromEnvOverrideValues {
+
+    @ApolloConfigChangeListener(value = {"some-namespaces"}, commaSeparatedNamespacesFromEnv = "${"
+        + SystemPropertyKeyConstants.TEST_NAMESPACE + "}")
     private void onChange(ConfigChangeEvent changeEvent) {
     }
   }
