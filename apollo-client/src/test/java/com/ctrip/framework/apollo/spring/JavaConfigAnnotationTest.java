@@ -46,6 +46,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -472,6 +473,31 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   }
 
   /**
+   * resolve namespace's name from SpEL (Spring Expression).
+   */
+  @Test
+  public void testApolloConfigChangeListenerWithSpELExpression() {
+
+    Config applicationConfig = mock(Config.class);
+    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+
+    Config app1Config = mock(Config.class);
+    mockConfig("app1", app1Config);
+
+    Config app2Config = mock(Config.class);
+    mockConfig("app2", app2Config);
+
+    Config app3Config = mock(Config.class);
+    mockConfig("app3", app3Config);
+
+    getSimpleBean(TestApolloConfigChangeListenerWithSpELExpression.class);
+
+    verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app3Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
+  /**
    * resolve namespace's name from system property.
    */
   @Test
@@ -667,6 +693,14 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     @ApolloConfigChangeListener("${simple.application:application}")
     private void onChange(ConfigChangeEvent event) {
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class TestApolloConfigChangeListenerWithSpELExpression {
+    @ApolloConfigChangeListener(expression = "'app1,app2,app3'.split(',')")
+    private void onChange(ConfigChangeEvent changeEvent) {
     }
   }
 
