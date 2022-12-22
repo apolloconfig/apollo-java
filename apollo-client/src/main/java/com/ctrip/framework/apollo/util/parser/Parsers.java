@@ -18,16 +18,10 @@ package com.ctrip.framework.apollo.util.parser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.util.StringUtils;
 
 public class Parsers {
   public static DateParser forDate() {
@@ -38,7 +32,6 @@ public class Parsers {
     return DurationParser.INSTANCE;
   }
 
-  public static final ExpressionParser parser = new SpelExpressionParser();
 
   public enum DateParser {
     INSTANCE;
