@@ -117,10 +117,12 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         method);
 
     ReflectionUtils.makeAccessible(method);
-    String[] namespaces = annotation.value();
+    String commaSeparatedNameSpaces = annotation.commaSeparatedNamespacesFromEnv();
+    String[] namespaces =
+        commaSeparatedNameSpaces.length() > 0 ? processNameSpacesFromEnv(annotation)
+            : annotation.value();
     String[] annotatedInterestedKeys = annotation.interestedKeys();
     String[] annotatedInterestedKeyPrefixes = annotation.interestedKeyPrefixes();
-    String commaSeparatedNameSpaces = annotation.commaSeparatedNamespacesFromEnv();
     ConfigChangeListener configChangeListener = changeEvent -> ReflectionUtils.invokeMethod(method, bean, changeEvent);
 
     Set<String> interestedKeys =
@@ -128,10 +130,6 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     Set<String> interestedKeyPrefixes =
         annotatedInterestedKeyPrefixes.length > 0 ? Sets.newHashSet(annotatedInterestedKeyPrefixes)
             : null;
-
-    if (commaSeparatedNameSpaces.length() > 0) {
-      namespaces = processNameSpacesFromEnv(annotation);
-    }
 
     for (String namespace : namespaces) {
       final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
