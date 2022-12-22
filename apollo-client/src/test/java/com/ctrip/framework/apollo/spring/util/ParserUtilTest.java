@@ -56,7 +56,7 @@ public class ParserUtilTest {
     List<String> result = Parsers.parseNameSpacesSpEL("");
     assertTrue(result.size() == 0);
 
-    result = Parsers.parseNameSpacesSpEL("");
+    result = Parsers.parseNameSpacesSpEL(null);
     assertTrue(result.size() == 0);
   }
 
