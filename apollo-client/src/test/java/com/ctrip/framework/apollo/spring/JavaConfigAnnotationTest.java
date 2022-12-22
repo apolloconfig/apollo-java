@@ -641,7 +641,6 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     static final String FROM_SYSTEM_YAML_NAMESPACE = "from.system.yaml.namespace";
     static final String FROM_NAMESPACE_APPLICATION_KEY = "from.namespace.application.key";
     static final String FROM_NAMESPACE_APPLICATION_KEY_YAML = "from.namespace.application.key.yaml";
-
     static final String TEST_NAMESPACE = "test.namespaces";
   }
 

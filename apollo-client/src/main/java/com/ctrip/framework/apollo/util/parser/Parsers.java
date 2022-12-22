@@ -32,7 +32,6 @@ public class Parsers {
     return DurationParser.INSTANCE;
   }
 
-
   public enum DateParser {
     INSTANCE;
 
