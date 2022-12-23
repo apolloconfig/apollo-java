@@ -93,6 +93,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     System.clearProperty(SystemPropertyKeyConstants.FROM_SYSTEM_YAML_NAMESPACE);
     System.clearProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY);
     System.clearProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY_YAML);
+    System.clearProperty(SystemPropertyKeyConstants.TEST_NAMESPACE);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE);
     super.tearDown();
   }
