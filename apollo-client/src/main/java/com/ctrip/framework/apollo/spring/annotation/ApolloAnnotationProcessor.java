@@ -26,12 +26,14 @@ import com.ctrip.framework.apollo.spring.property.SpringValue;
 import com.ctrip.framework.apollo.spring.property.SpringValueRegistry;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.ctrip.framework.apollo.util.parser.Parsers;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
@@ -128,9 +130,10 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         annotatedInterestedKeyPrefixes.length > 0 ? Sets.newHashSet(annotatedInterestedKeyPrefixes)
             : null;
 
-    for (String namespace : namespaces) {
-      final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
-      Config config = ConfigService.getConfig(resolvedNamespace);
+    Set<String> resolvedNameSpaces = processSpELValues(resolvePropertyValues(namespaces));
+
+    for (String namespace : resolvedNameSpaces) {
+      Config config = ConfigService.getConfig(namespace);
 
       if (interestedKeys == null && interestedKeyPrefixes == null) {
         config.addChangeListener(configChangeListener);
@@ -138,6 +141,32 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         config.addChangeListener(configChangeListener, interestedKeys, interestedKeyPrefixes);
       }
     }
+  }
+
+  private Set<String> processSpELValues(String[] namespaces) {
+    Set<String> result = new HashSet<>();
+
+    for (String namespace : namespaces) {
+      Set<String> resolvedNamespace = Parsers.parseNameSpacesSpEL(namespace);
+      result.addAll(resolvedNamespace);
+    }
+
+    return result;
+  }
+
+  /**
+   * resolve all properties eg - ${prop.val}
+   * @param namespaces
+   * @return Array with expanded properties
+   */
+  private String[] resolvePropertyValues(String[] namespaces) {
+    String[] result = new String[namespaces.length];
+
+    for (int i = 0; i < result.length; i++) {
+      result[i] = this.environment.resolveRequiredPlaceholders(namespaces[i]);
+    }
+
+    return result;
   }
 
   private void processApolloJsonValue(Object bean, String beanName, Field field) {

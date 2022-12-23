@@ -54,7 +54,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ApolloConfigChangeListener {
   /**
-   * Apollo namespace for the config, if not specified then default to application
+   * Apollo namespace for the config, if not specified then default to application.
+   * Accepts Spring Expression Language (SpEL) that evaluates to a valid String, String[], Set<String> or List<String>
    */
   String[] value() default {ConfigConsts.NAMESPACE_APPLICATION};
 

@@ -16,6 +16,21 @@
  */
 package com.ctrip.framework.apollo.spring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigFileChangeListener;
@@ -33,7 +48,9 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -49,24 +66,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -472,6 +471,60 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   }
 
   /**
+   * resolve namespace's from spring expression
+   */
+  @Test
+  public void testApolloConfigChangeListenerWithNamespacesFromSpEL() {
+
+    final String spElExpression = "#{'app1,app2,app3'.split(',')}";
+    System.setProperty(SystemPropertyKeyConstants.TEST_NAMESPACE, spElExpression);
+
+    Config app1Config = mock(Config.class);
+    mockConfig("app1", app1Config);
+
+    Config app2Config = mock(Config.class);
+    mockConfig("app2", app2Config);
+
+    Config app3Config = mock(Config.class);
+    mockConfig("app3", app3Config);
+
+    getSimpleBean(TestApolloConfigChangeListenerWithNameSpacesFromSpEL.class);
+
+    verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app3Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
+  /**
+   * resolve namespace's from spring expression and merge with other namespaces
+   */
+  @Test
+  public void testApolloConfigChangeListenerWithNameSpacesFromSpELAreMergedWithOthers() {
+
+    final String spElExpression = "#{'app1,app2,app3'.split(',')}";
+    System.setProperty(SystemPropertyKeyConstants.TEST_NAMESPACE, spElExpression);
+
+    Config app1Config = mock(Config.class);
+    mockConfig("app1", app1Config);
+
+    Config app2Config = mock(Config.class);
+    mockConfig("app2", app2Config);
+
+    Config app3Config = mock(Config.class);
+    mockConfig("app3", app3Config);
+
+    Config otherConfig = mock(Config.class);
+    mockConfig("other-namespace", otherConfig);
+
+    getSimpleBean(TestApolloConfigChangeListenerWithNameSpacesFromSpELAreMergedWithOthers.class);
+
+    verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app3Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(otherConfig, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
+  /**
    * resolve namespace's name from system property.
    */
   @Test
@@ -597,6 +650,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     static final String FROM_SYSTEM_YAML_NAMESPACE = "from.system.yaml.namespace";
     static final String FROM_NAMESPACE_APPLICATION_KEY = "from.namespace.application.key";
     static final String FROM_NAMESPACE_APPLICATION_KEY_YAML = "from.namespace.application.key.yaml";
+    static final String TEST_NAMESPACE = "test.namespaces";
   }
 
   @EnableApolloConfig
@@ -667,6 +721,24 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     @ApolloConfigChangeListener("${simple.application:application}")
     private void onChange(ConfigChangeEvent event) {
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class TestApolloConfigChangeListenerWithNameSpacesFromSpEL {
+
+    @ApolloConfigChangeListener("${" + SystemPropertyKeyConstants.TEST_NAMESPACE + "}")
+    private void onChange(ConfigChangeEvent changeEvent) {
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class TestApolloConfigChangeListenerWithNameSpacesFromSpELAreMergedWithOthers {
+
+    @ApolloConfigChangeListener({"${" + SystemPropertyKeyConstants.TEST_NAMESPACE + "}", "other-namespace"})
+    private void onChange(ConfigChangeEvent changeEvent) {
     }
   }
 
