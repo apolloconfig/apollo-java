@@ -71,6 +71,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     placeholderHelper = SpringInjector.getInstance(PlaceholderHelper.class);
     springValueRegistry = SpringInjector.getInstance(SpringValueRegistry.class);
+
   }
 
   @Override
