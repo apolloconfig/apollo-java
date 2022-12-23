@@ -32,6 +32,9 @@ import com.google.gson.Gson;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
@@ -121,6 +124,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     String[] namespaces = annotation.value();
     String[] annotatedInterestedKeys = annotation.interestedKeys();
     String[] annotatedInterestedKeyPrefixes = annotation.interestedKeyPrefixes();
+    Set<String> otherNamespaces = processCommaSeparatedNamespaces(annotation.commaSeparatedNamespaces());
     ConfigChangeListener configChangeListener = changeEvent -> ReflectionUtils.invokeMethod(method, bean, changeEvent);
 
     Set<String> interestedKeys =
@@ -129,7 +133,11 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         annotatedInterestedKeyPrefixes.length > 0 ? Sets.newHashSet(annotatedInterestedKeyPrefixes)
             : null;
 
-    for (String namespace : namespaces) {
+    Set<String> allNamespaces = new HashSet<>();
+    allNamespaces.addAll(Arrays.asList(namespaces));
+    allNamespaces.addAll(otherNamespaces);
+
+    for (String namespace : allNamespaces) {
       final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
       Config config = ConfigService.getConfig(resolvedNamespace);
 
@@ -139,6 +147,17 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         config.addChangeListener(configChangeListener, interestedKeys, interestedKeyPrefixes);
       }
     }
+  }
+
+  private Set<String> processCommaSeparatedNamespaces(String expression) {
+    Set<String> result = new HashSet<>();
+    String resolvedNamespaces = this.environment.resolveRequiredPlaceholders(expression);
+
+    if (resolvedNamespaces != null && resolvedNamespaces.length() > 0) {
+      Collections.addAll(result, resolvedNamespaces.split(","));
+    }
+
+    return result;
   }
 
   private void processApolloJsonValue(Object bean, String beanName, Field field) {

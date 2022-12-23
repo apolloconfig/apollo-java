@@ -74,4 +74,9 @@ public @interface ApolloConfigChangeListener {
    * If neither of {@code interestedKeys} and {@code interestedKeyPrefixes} is specified then the {@code listener} will be notified when whatever key is changed.
    */
   String[] interestedKeyPrefixes() default {};
+
+  /**
+   * Comma separated Apollo namespace for the config, merged with the ones in {@code value}
+   */
+  String commaSeparatedNamespaces() default "";
 }
