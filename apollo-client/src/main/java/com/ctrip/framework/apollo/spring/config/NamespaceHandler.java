@@ -22,7 +22,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.core.Ordered;
-import org.springframework.util.StringUtils;
 import org.springframework.util.SystemPropertyUtils;
 import org.w3c.dom.Element;
 
@@ -36,8 +35,8 @@ import com.google.common.base.Strings;
 public class NamespaceHandler extends NamespaceHandlerSupport {
 
 
-  public static final String NAMESPACE_SPLIT_DELIMITER = ",";
-  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_SPLIT_DELIMITER).omitEmptyStrings()
+  public static final String NAMESPACE_DELIMITER = ",";
+  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_DELIMITER).omitEmptyStrings()
       .trimResults();
 
   @Override

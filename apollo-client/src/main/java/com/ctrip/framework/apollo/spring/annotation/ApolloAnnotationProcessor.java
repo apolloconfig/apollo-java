@@ -73,7 +73,6 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     placeholderHelper = SpringInjector.getInstance(PlaceholderHelper.class);
     springValueRegistry = SpringInjector.getInstance(SpringValueRegistry.class);
-
   }
 
   @Override
@@ -157,7 +156,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     for (String namespace : namespaces) {
       final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
 
-      if (resolvedNamespace.contains(NamespaceHandler.NAMESPACE_SPLIT_DELIMITER)) {
+      if (resolvedNamespace.contains(NamespaceHandler.NAMESPACE_DELIMITER)) {
         resolvedNamespaces.addAll(
             NamespaceHandler.parseCommaSeparatedNamespaces(resolvedNamespace));
       } else {
