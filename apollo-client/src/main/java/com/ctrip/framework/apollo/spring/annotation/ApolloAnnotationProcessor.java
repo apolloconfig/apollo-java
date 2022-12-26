@@ -145,6 +145,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
   }
 
   /**
+   * Evaluate and resolve namespaces from env/properties.
+   * Split delimited namespaces
    * @param namespaces
    * @return resolved namespaces
    */
