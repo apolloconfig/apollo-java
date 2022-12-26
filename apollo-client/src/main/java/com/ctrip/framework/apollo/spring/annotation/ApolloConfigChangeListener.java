@@ -75,8 +75,4 @@ public @interface ApolloConfigChangeListener {
    */
   String[] interestedKeyPrefixes() default {};
 
-  /**
-   * Comma separated Apollo namespace for the config, merged with the ones in {@code value}
-   */
-  String commaSeparatedNamespaces() default "";
 }

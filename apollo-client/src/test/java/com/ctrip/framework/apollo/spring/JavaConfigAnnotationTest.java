@@ -474,10 +474,10 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
 
   /**
-   * resolve namespace's from comma sepaarted namespaces
+   * resolve namespace's from comma separated namespaces
    */
   @Test
-  public void testApolloConfigChangeListenerWithNamespacesFromSpEL() {
+  public void testApolloConfigChangeListenerWithCommaSeparatedNameSpaces() {
 
     final String propValue = "app1,app2,app3";
     System.setProperty(SystemPropertyKeyConstants.TEST_NAMESPACE, propValue);
@@ -499,12 +499,12 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   }
 
   /**
-   * resolve namespace's from comma sepaarted namespaces
+   * resolve namespace's from comma separated namespaces
    */
   @Test
   public void testApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue() {
 
-    final String propValue = "app1,app2,app3";
+    final String propValue = "app1,app2";
     System.setProperty(SystemPropertyKeyConstants.TEST_NAMESPACE, propValue);
 
     Config app1Config = mock(Config.class);
@@ -513,9 +513,6 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     Config app2Config = mock(Config.class);
     mockConfig("app2", app2Config);
 
-    Config app3Config = mock(Config.class);
-    mockConfig("app3", app3Config);
-
     Config appConfig = mock(Config.class);
     mockConfig("app", appConfig);
 
@@ -523,7 +520,6 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
     verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
-    verify(app3Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
     verify(appConfig, times(1)).addChangeListener(any(ConfigChangeListener.class));
   }
 
@@ -731,7 +727,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   @EnableApolloConfig
   static class TestApolloConfigChangeListenerWithCommaSeparatedNameSpaces {
 
-    @ApolloConfigChangeListener(commaSeparatedNamespaces = "${" + SystemPropertyKeyConstants.TEST_NAMESPACE + "}")
+    @ApolloConfigChangeListener("${" + SystemPropertyKeyConstants.TEST_NAMESPACE + "}")
     private void onChange(ConfigChangeEvent changeEvent) {
     }
   }
@@ -740,8 +736,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   @EnableApolloConfig
   static class TestApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue {
 
-    @ApolloConfigChangeListener(value = {"app"}, commaSeparatedNamespaces = "${"
-        + SystemPropertyKeyConstants.TEST_NAMESPACE + "}")
+    @ApolloConfigChangeListener(value = {"app", "${" + SystemPropertyKeyConstants.TEST_NAMESPACE + "}"})
     private void onChange(ConfigChangeEvent changeEvent) {
     }
   }
