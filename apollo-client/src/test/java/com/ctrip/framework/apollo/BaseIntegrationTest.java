@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo;
 
 import com.ctrip.framework.apollo.core.ConfigConsts;
+import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +44,7 @@ import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -90,6 +92,7 @@ public abstract class BaseIntegrationTest {
     //as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
     MockInjector.reset();
+    ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     if (server != null && server.isStarted()) {
       server.stop();
