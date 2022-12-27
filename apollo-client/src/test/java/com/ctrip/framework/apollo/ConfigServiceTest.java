@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo;
 
 import static org.junit.Assert.assertEquals;
 
+import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 import com.ctrip.framework.apollo.internals.AbstractConfig;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -50,6 +52,7 @@ public class ConfigServiceTest {
     //as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
     MockInjector.reset();
+    ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
   }
 
   @Test
