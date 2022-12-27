@@ -229,4 +229,12 @@ public class MetaDomainConsts {
       }
     }, REFRESH_INTERVAL_IN_SECOND, REFRESH_INTERVAL_IN_SECOND, TimeUnit.SECONDS);
   }
+
+  // for test only
+  static void reset() {
+    metaServerAddressCache.clear();
+    selectedMetaServerAddressCache.clear();
+    metaServerProviders = null;
+    periodicRefreshStarted.set(false);
+  }
 }
