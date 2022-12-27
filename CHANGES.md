@@ -16,6 +16,6 @@ Apollo Java 2.1.0
 * [Apollo Client Support Spring Boot 3.0](https://github.com/apolloconfig/apollo-java/pull/4)
 * [apollo-client-config-data support spring boot 3.0](https://github.com/apolloconfig/apollo-java/pull/5)
 * [Add apollo-plugin-log4j2 module to support log4j2.xml integration](https://github.com/apolloconfig/apollo-java/pull/6)
-
+* [Provide optional param to inject comma separated namespaces](https://github.com/apolloconfig/apollo-java/pull/11)
 ------------------
 All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/1?closed=1)

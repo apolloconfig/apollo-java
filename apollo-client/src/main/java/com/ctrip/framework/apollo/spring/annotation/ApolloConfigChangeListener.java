@@ -40,6 +40,12 @@ import java.lang.annotation.Target;
  *     //handle change event
  * }
  * <br />
+ *  * //The namespace could also be specified as a placeholder for a comma separated namespaces, e.g. ${app.allNamespaces}, where "all.allNamespaces" = "someNamespace,anotherNamespace,yetAnotherNamespace"
+ *  * &#064;ApolloConfigChangeListener({"${app.allNamespaces}"})
+ *  * private void onChange(ConfigChangeEvent changeEvent) {
+ *  *     //handle change event
+ *  * }
+ *  * <br />
  * //Listener on namespaces of "someNamespace" and "anotherNamespace", will only be notified when "someKey" or "anotherKey" is changed
  * &#064;ApolloConfigChangeListener(value = {"someNamespace","anotherNamespace"}, interestedKeys = {"someKey", "anotherKey"})
  * private void onChange(ConfigChangeEvent changeEvent) {
