@@ -16,8 +16,6 @@
  */
 package com.ctrip.framework.apollo.spring.config;
 
-import java.util.Collections;
-import java.util.List;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -34,9 +32,7 @@ import com.google.common.base.Strings;
  */
 public class NamespaceHandler extends NamespaceHandlerSupport {
 
-
-  public static final String NAMESPACE_DELIMITER = ",";
-  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_DELIMITER).omitEmptyStrings()
+  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(",").omitEmptyStrings()
       .trimResults();
 
   @Override
@@ -82,18 +78,5 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
       }
       PropertySourcesProcessor.addNamespaces(NAMESPACE_SPLITTER.splitToList(namespaces), order);
     }
-  }
-
-  /**
-   * @param namespaces - comma separated string of namespaces
-   * @return List of namespaces
-   */
-  public static List<String> parseCommaSeparatedNamespaces(String namespaces) {
-
-    if (namespaces == null) {
-      return Collections.emptyList();
-    }
-
-    return NAMESPACE_SPLITTER.splitToList(namespaces);
   }
 }

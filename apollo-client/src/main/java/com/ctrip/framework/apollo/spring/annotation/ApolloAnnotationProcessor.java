@@ -28,6 +28,7 @@ import com.ctrip.framework.apollo.spring.property.SpringValueRegistry;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import java.lang.reflect.Field;
@@ -56,6 +57,11 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     EnvironmentAware {
 
   private static final Logger logger = LoggerFactory.getLogger(ApolloAnnotationProcessor.class);
+
+  private static final String NAMESPACE_DELIMITER = ",";
+
+  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_DELIMITER)
+      .omitEmptyStrings().trimResults();
   private static final Gson GSON = new Gson();
 
   private final ConfigUtil configUtil;
@@ -156,9 +162,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     for (String namespace : namespaces) {
       final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
 
-      if (resolvedNamespace.contains(NamespaceHandler.NAMESPACE_DELIMITER)) {
-        resolvedNamespaces.addAll(
-            NamespaceHandler.parseCommaSeparatedNamespaces(resolvedNamespace));
+      if (resolvedNamespace.contains(NAMESPACE_DELIMITER)) {
+        resolvedNamespaces.addAll(NAMESPACE_SPLITTER.splitToList(resolvedNamespace));
       } else {
         resolvedNamespaces.add(resolvedNamespace);
       }
