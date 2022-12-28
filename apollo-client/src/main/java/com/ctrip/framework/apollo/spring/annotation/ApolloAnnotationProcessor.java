@@ -135,7 +135,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         annotatedInterestedKeyPrefixes.length > 0 ? Sets.newHashSet(annotatedInterestedKeyPrefixes)
             : null;
 
-    Set<String> resolvedNamespaces = processResolveNameSpaceValue(namespaces);
+    Set<String> resolvedNamespaces = processResolveNamespaceValue(namespaces);
 
     for (String namespace : resolvedNamespaces) {
       Config config = ConfigService.getConfig(namespace);
@@ -154,7 +154,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
    * @param namespaces
    * @return resolved namespaces
    */
-  private Set<String> processResolveNameSpaceValue(String[] namespaces) {
+  private Set<String> processResolveNamespaceValue(String[] namespaces) {
 
     Set<String> resolvedNamespaces = new HashSet<>();
 
