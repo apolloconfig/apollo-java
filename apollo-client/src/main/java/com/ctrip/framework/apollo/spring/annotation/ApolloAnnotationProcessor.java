@@ -27,11 +27,13 @@ import com.ctrip.framework.apollo.spring.property.SpringValueRegistry;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
@@ -54,6 +56,11 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     EnvironmentAware {
 
   private static final Logger logger = LoggerFactory.getLogger(ApolloAnnotationProcessor.class);
+
+  private static final String NAMESPACE_DELIMITER = ",";
+
+  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_DELIMITER)
+      .omitEmptyStrings().trimResults();
   private static final Gson GSON = new Gson();
 
   private final ConfigUtil configUtil;
@@ -128,9 +135,10 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         annotatedInterestedKeyPrefixes.length > 0 ? Sets.newHashSet(annotatedInterestedKeyPrefixes)
             : null;
 
-    for (String namespace : namespaces) {
-      final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
-      Config config = ConfigService.getConfig(resolvedNamespace);
+    Set<String> resolvedNamespaces = processResolveNamespaceValue(namespaces);
+
+    for (String namespace : resolvedNamespaces) {
+      Config config = ConfigService.getConfig(namespace);
 
       if (interestedKeys == null && interestedKeyPrefixes == null) {
         config.addChangeListener(configChangeListener);
@@ -138,6 +146,29 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         config.addChangeListener(configChangeListener, interestedKeys, interestedKeyPrefixes);
       }
     }
+  }
+
+  /**
+   * Evaluate and resolve namespaces from env/properties.
+   * Split delimited namespaces
+   * @param namespaces
+   * @return resolved namespaces
+   */
+  private Set<String> processResolveNamespaceValue(String[] namespaces) {
+
+    Set<String> resolvedNamespaces = new HashSet<>();
+
+    for (String namespace : namespaces) {
+      final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
+
+      if (resolvedNamespace.contains(NAMESPACE_DELIMITER)) {
+        resolvedNamespaces.addAll(NAMESPACE_SPLITTER.splitToList(resolvedNamespace));
+      } else {
+        resolvedNamespaces.add(resolvedNamespace);
+      }
+    }
+
+    return resolvedNamespaces;
   }
 
   private void processApolloJsonValue(Object bean, String beanName, Field field) {

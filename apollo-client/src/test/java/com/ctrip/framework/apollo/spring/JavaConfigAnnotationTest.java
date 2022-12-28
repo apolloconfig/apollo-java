@@ -63,8 +63,8 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -94,6 +94,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     System.clearProperty(SystemPropertyKeyConstants.FROM_SYSTEM_YAML_NAMESPACE);
     System.clearProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY);
     System.clearProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY_YAML);
+    System.clearProperty(SystemPropertyKeyConstants.DELIMITED_NAMESPACES);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE);
     super.tearDown();
   }
@@ -471,6 +472,57 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     verify(applicationConfig, times(3)).addChangeListener(any(ConfigChangeListener.class));
   }
 
+
+  /**
+   * resolve namespace's from comma separated namespaces
+   */
+  @Test
+  public void testApolloConfigChangeListenerWithCommaSeparatedNameSpaces() {
+
+    final String propValue = "app1,app2,app3";
+    System.setProperty(SystemPropertyKeyConstants.DELIMITED_NAMESPACES, propValue);
+
+    Config app1Config = mock(Config.class);
+    mockConfig("app1", app1Config);
+
+    Config app2Config = mock(Config.class);
+    mockConfig("app2", app2Config);
+
+    Config app3Config = mock(Config.class);
+    mockConfig("app3", app3Config);
+
+    getSimpleBean(TestApolloConfigChangeListenerWithCommaSeparatedNameSpaces.class);
+
+    verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app3Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
+  /**
+   * resolve namespace's from comma separated namespaces
+   */
+  @Test
+  public void testApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue() {
+
+    final String propValue = "app1,app2";
+    System.setProperty(SystemPropertyKeyConstants.DELIMITED_NAMESPACES, propValue);
+
+    Config app1Config = mock(Config.class);
+    mockConfig("app1", app1Config);
+
+    Config app2Config = mock(Config.class);
+    mockConfig("app2", app2Config);
+
+    Config appConfig = mock(Config.class);
+    mockConfig("app", appConfig);
+
+    getSimpleBean(TestApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue.class);
+
+    verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
+    verify(appConfig, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
   /**
    * resolve namespace's name from system property.
    */
@@ -597,6 +649,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     static final String FROM_SYSTEM_YAML_NAMESPACE = "from.system.yaml.namespace";
     static final String FROM_NAMESPACE_APPLICATION_KEY = "from.namespace.application.key";
     static final String FROM_NAMESPACE_APPLICATION_KEY_YAML = "from.namespace.application.key.yaml";
+    static final String DELIMITED_NAMESPACES = "delimited.namespaces";
   }
 
   @EnableApolloConfig
@@ -667,6 +720,24 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     @ApolloConfigChangeListener("${simple.application:application}")
     private void onChange(ConfigChangeEvent event) {
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class TestApolloConfigChangeListenerWithCommaSeparatedNameSpaces {
+
+    @ApolloConfigChangeListener("${" + SystemPropertyKeyConstants.DELIMITED_NAMESPACES + "}")
+    private void onChange(ConfigChangeEvent changeEvent) {
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class TestApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue {
+
+    @ApolloConfigChangeListener(value = {"app", "${" + SystemPropertyKeyConstants.DELIMITED_NAMESPACES + "}"})
+    private void onChange(ConfigChangeEvent changeEvent) {
     }
   }
 
