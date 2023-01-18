@@ -17,5 +17,7 @@ Apollo Java 2.1.0
 * [apollo-client-config-data support spring boot 3.0](https://github.com/apolloconfig/apollo-java/pull/5)
 * [Add apollo-plugin-log4j2 module to support log4j2.xml integration](https://github.com/apolloconfig/apollo-java/pull/6)
 * [Allow users to config comma-separated namespaces for ApolloConfigChangeListener](https://github.com/apolloconfig/apollo-java/pull/11)
+* [Fix beanName2SpringValueDefinitions cache issue](https://github.com/apolloconfig/apollo-java/pull/16)
+
 ------------------
 All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/1?closed=1)

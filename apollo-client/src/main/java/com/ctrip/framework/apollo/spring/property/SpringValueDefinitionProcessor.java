@@ -73,10 +73,8 @@ public class SpringValueDefinitionProcessor implements BeanDefinitionRegistryPos
   }
 
   public static Multimap<String, SpringValueDefinition> getBeanName2SpringValueDefinitions(BeanDefinitionRegistry registry) {
-    Multimap<String, SpringValueDefinition> springValueDefinitions = beanName2SpringValueDefinitions.get(registry);
-    if (springValueDefinitions == null) {
-      springValueDefinitions = LinkedListMultimap.create();
-    }
+    Multimap<String, SpringValueDefinition> springValueDefinitions = beanName2SpringValueDefinitions.computeIfAbsent(
+        registry, k -> LinkedListMultimap.create());
 
     return springValueDefinitions;
   }
