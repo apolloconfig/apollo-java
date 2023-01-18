@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 public class ServiceBootstrap {
+
+  /**
+   * @deprecated use {@link ServiceBootstrap#loadPrimary(Class)} instead
+   */
   public static <S> S loadFirst(Class<S> clazz) {
     Iterator<S> iterator = loadAll(clazz);
     if (!iterator.hasNext()) {

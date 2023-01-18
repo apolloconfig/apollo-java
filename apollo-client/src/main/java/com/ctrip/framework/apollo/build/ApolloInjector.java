@@ -33,7 +33,7 @@ public class ApolloInjector {
       synchronized (lock) {
         if (s_injector == null) {
           try {
-            s_injector = ServiceBootstrap.loadFirst(Injector.class);
+            s_injector = ServiceBootstrap.loadPrimary(Injector.class);
           } catch (Throwable ex) {
             ApolloConfigException exception = new ApolloConfigException("Unable to initialize Apollo Injector!", ex);
             Tracer.logError(exception);
