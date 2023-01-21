@@ -33,9 +33,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
@@ -44,18 +42,25 @@ import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
 public abstract class BaseIntegrationTest {
+  private static final Logger logger = LoggerFactory.getLogger(BaseIntegrationTest.class);
 
-  private static final int PORT = findFreePort();
-  private static final String metaServiceUrl = "http://localhost:" + PORT;
   private static final String someAppName = "someAppName";
   private static final String someInstanceId = "someInstanceId";
-  private static final String configServiceURL = "http://localhost:" + PORT;
+  private int port;
+  private String metaServiceUrl;
+  private String configServiceURL;
   protected static String someAppId;
   protected static String someClusterName;
   protected static String someDataCenter;
@@ -65,15 +70,16 @@ public abstract class BaseIntegrationTest {
   private Server server;
   protected Gson gson = new Gson();
 
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    System.setProperty(ConfigConsts.APOLLO_META_KEY, metaServiceUrl);
-  }
+  @Rule
+  public TestRule watcher = new TestWatcher() {
+    protected void starting(Description description) {
+      logger.info("Starting test: " + description.getMethodName());
+    }
 
-  @AfterClass
-  public static void afterClass() throws Exception {
-    System.clearProperty(ConfigConsts.APOLLO_META_KEY);
-  }
+    protected void finished(Description description) {
+      logger.info("Finished test: " + description.getMethodName());
+    }
+  };
 
   @Before
   public void setUp() throws Exception {
@@ -84,6 +90,12 @@ public abstract class BaseIntegrationTest {
     refreshTimeUnit = TimeUnit.MINUTES;
     propertiesOrderEnabled = false;
 
+    port = findFreePort();
+    metaServiceUrl = configServiceURL =  "http://localhost:" + port;
+
+    System.setProperty(ConfigConsts.APOLLO_META_KEY, metaServiceUrl);
+    ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
+
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
   }
 
@@ -92,6 +104,7 @@ public abstract class BaseIntegrationTest {
     //as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
     MockInjector.reset();
+    System.clearProperty(ConfigConsts.APOLLO_META_KEY);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     if (server != null && server.isStarted()) {
@@ -106,7 +119,7 @@ public abstract class BaseIntegrationTest {
    * @throws Exception
    */
   protected Server startServerWithHandlers(ContextHandler... handlers) throws Exception {
-    server = new Server(PORT);
+    server = new Server(port);
 
     ContextHandlerCollection contexts = new ContextHandlerCollection();
     contexts.setHandlers(handlers);
