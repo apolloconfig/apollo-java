@@ -2,23 +2,9 @@ Changes by Version
 ==================
 Release Notes.
 
-Apollo Java 2.1.0
+Apollo Java 2.2.0
 
 ------------------
-* [Add a config adjust the property source overridden behavior](https://github.com/apolloconfig/apollo/pull/4409)
-* [feat(apollo-client): the spi of config service load balancer client](https://github.com/apolloconfig/apollo/pull/4394)
-* [add cat-client as optional dependency](https://github.com/apolloconfig/apollo/pull/4414)
-* [refactor Functions class with lambda](https://github.com/apolloconfig/apollo/pull/4419)
-* [Add a new API to load items with pagination](https://github.com/apolloconfig/apollo/pull/4468)
-* [fix openapi item with url illegalKey 400 error](https://github.com/apolloconfig/apollo/pull/4549)
-* [Add overloaded shortcut method to register BeanDefinition](https://github.com/apolloconfig/apollo/pull/4574)
-* [Fix ApolloBootstrapPropertySources precedence issue](https://github.com/apolloconfig/apollo-java/pull/3)
-* [Apollo Client Support Spring Boot 3.0](https://github.com/apolloconfig/apollo-java/pull/4)
-* [apollo-client-config-data support spring boot 3.0](https://github.com/apolloconfig/apollo-java/pull/5)
-* [Add apollo-plugin-log4j2 module to support log4j2.xml integration](https://github.com/apolloconfig/apollo-java/pull/6)
-* [Allow users to config comma-separated namespaces for ApolloConfigChangeListener](https://github.com/apolloconfig/apollo-java/pull/11)
-* [Fix beanName2SpringValueDefinitions cache issue](https://github.com/apolloconfig/apollo-java/pull/16)
-* [Add Ordered interface to MessageProducerManager and Injector SPI](https://github.com/apolloconfig/apollo-java/pull/15)
 
 ------------------
-All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/1?closed=1)
+All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/2?closed=1)
