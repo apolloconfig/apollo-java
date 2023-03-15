@@ -52,11 +52,19 @@ public class ExceptionUtil {
         counter--;
         continue;
       }
-      builder.append(" [Cause: ").append(cause.getMessage());
+      builder.append(" [Cause: ")
+              .append(getThrowingClassName(cause))
+              .append("(")
+              .append(cause.getMessage())
+              .append(")");
     }
 
     builder.append(Strings.repeat("]", counter));
 
     return builder.toString();
+  }
+
+  public static String getThrowingClassName(Throwable throwable) {
+    return throwable.getClass().getSimpleName();
   }
 }
