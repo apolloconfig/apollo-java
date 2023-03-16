@@ -53,7 +53,7 @@ public class ExceptionUtil {
         continue;
       }
       builder.append(" [Cause: ")
-              .append(getThrowingClassName(cause))
+              .append(cause.getClass().getSimpleName())
               .append("(")
               .append(cause.getMessage())
               .append(")");
@@ -64,7 +64,4 @@ public class ExceptionUtil {
     return builder.toString();
   }
 
-  public static String getThrowingClassName(Throwable throwable) {
-    return throwable.getClass().getSimpleName();
-  }
 }
