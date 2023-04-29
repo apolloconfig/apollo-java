@@ -81,6 +81,7 @@
     <module>apollo-client</module>
     <module>apollo-client-config-data</module>
     <module>apollo-mockserver</module>
+    <module>apollo-mockserver-junit5</module>
     <module>apollo-openapi</module>
     <module>apollo-plugin</module>
   </modules>
@@ -95,6 +96,11 @@
       <dependency>
         <groupId>com.ctrip.framework.apollo</groupId>
         <artifactId>apollo-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ctrip.framework.apollo</groupId>
+        <artifactId>apollo-mockserver</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--third party -->
