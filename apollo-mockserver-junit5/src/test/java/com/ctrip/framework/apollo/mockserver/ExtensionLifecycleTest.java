@@ -19,16 +19,16 @@ package com.ctrip.framework.apollo.mockserver;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.core.ConfigConsts;
-import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @ExtendWith(MockApolloExtension.class)
 public class ExtensionLifecycleTest {
@@ -46,14 +46,18 @@ public class ExtensionLifecycleTest {
     target = server;
     Config applicationConfig = ConfigService.getAppConfig();
 
-    CompletableFuture<ConfigChangeEvent> future = new CompletableFuture<>();
-    applicationConfig.addChangeListener(future::complete);
+    Semaphore latch = new Semaphore(0);
+    applicationConfig.addChangeListener(event -> latch.release());
 
     assertEquals("value1", applicationConfig.getProperty("key1", null));
     assertEquals("value2", applicationConfig.getProperty("key2", null));
 
     server.addOrModifyProperty(ConfigConsts.NAMESPACE_APPLICATION, "key2", "newValue2");
-    future.get(5, TimeUnit.SECONDS);
+    assertTrue(latch.tryAcquire(5, TimeUnit.SECONDS));
     assertEquals("newValue2", applicationConfig.getProperty("key2", null));
+
+    server.resetOverriddenProperties();
+    assertTrue(latch.tryAcquire(5, TimeUnit.SECONDS));
+    assertEquals("value2", applicationConfig.getProperty("key2", null));
   }
 }
