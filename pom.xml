@@ -81,7 +81,6 @@
     <module>apollo-client</module>
     <module>apollo-client-config-data</module>
     <module>apollo-mockserver</module>
-    <module>apollo-mockserver-junit5</module>
     <module>apollo-openapi</module>
     <module>apollo-plugin</module>
   </modules>
