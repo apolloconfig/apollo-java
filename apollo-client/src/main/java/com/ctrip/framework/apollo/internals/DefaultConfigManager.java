@@ -33,7 +33,9 @@ public class DefaultConfigManager implements ConfigManager {
   private ConfigFactoryManager m_factoryManager;
 
   private Map<String, Config> m_configs = Maps.newConcurrentMap();
+  private Map<String, Object> m_configLocks = Maps.newConcurrentMap();
   private Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
+  private Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
 
   public DefaultConfigManager() {
     m_factoryManager = ApolloInjector.getInstance(ConfigFactoryManager.class);
@@ -44,7 +46,8 @@ public class DefaultConfigManager implements ConfigManager {
     Config config = m_configs.get(namespace);
 
     if (config == null) {
-      synchronized (this) {
+      Object lock = m_configLocks.computeIfAbsent(namespace, key -> new Object());
+      synchronized (lock) {
         config = m_configs.get(namespace);
 
         if (config == null) {
@@ -65,7 +68,8 @@ public class DefaultConfigManager implements ConfigManager {
     ConfigFile configFile = m_configFiles.get(namespaceFileName);
 
     if (configFile == null) {
-      synchronized (this) {
+      Object lock = m_configFileLocks.computeIfAbsent(namespaceFileName, key -> new Object());
+      synchronized (lock) {
         configFile = m_configFiles.get(namespaceFileName);
 
         if (configFile == null) {
