@@ -24,8 +24,12 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApolloOpenApiClientTest {
+
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   @Test
   public void testCreate() {
@@ -64,41 +68,21 @@ public class ApolloOpenApiClientTest {
         .build();
 
     final String appId = "openapi-create-app";
-    OpenAppDTO openAppDTO = new OpenAppDTO();
-    openAppDTO.setName("openapi create app 测试名字");
-    openAppDTO.setAppId(appId);
-    openAppDTO.setOwnerName("user-test-xxx1");
-    openAppDTO.setOwnerEmail("user-test-xxx1@xxx.com");
-    openAppDTO.setOrgId("orgId1");
-    openAppDTO.setOrgName("orgName1");
-//    client.createApp(openAppDTO);
+    {
+      OpenAppDTO openAppDTO = new OpenAppDTO();
+      openAppDTO.setName("openapi create app 测试名字");
+      openAppDTO.setAppId(appId);
+      openAppDTO.setOwnerName("user-test-xxx1");
+      openAppDTO.setOwnerEmail("user-test-xxx1@xxx.com");
+      openAppDTO.setOrgId("orgId1");
+      openAppDTO.setOrgName("orgName1");
+      client.createApp(openAppDTO);
+    }
+
 
     List<OpenAppDTO> list = client.getAppsByIds(Collections.singletonList(appId));
-  }
-
-  @Test
-  @Disabled("only for integration test")
-  public void testCreateAppWithEnv() {
-    String someUrl = "http://localhost:8070";
-    String someToken = "9d0a241e9cb2300f302a875b1195340b2b6f56373cf5ca5d006a3f4e1a46b3ef";
-
-    ApolloOpenApiClient client = ApolloOpenApiClient.newBuilder()
-        .withPortalUrl(someUrl)
-        .withToken(someToken)
-        .withReadTimeout(200 * 1000)
-        .withConnectTimeout(200 * 1000)
-        .build();
-
-    final String appId = "openapi-create-app-in-dev";
-    OpenAppDTO openAppDTO = new OpenAppDTO();
-    openAppDTO.setName("openapi create app 测试名字");
-    openAppDTO.setAppId(appId);
-    openAppDTO.setOwnerName("user-test-xxx1");
-    openAppDTO.setOwnerEmail("user-test-xxx1@xxx.com");
-    openAppDTO.setOrgId("orgId1");
-    openAppDTO.setOrgName("orgName1");
-    client.createApp("dev", openAppDTO);
-
-    List<OpenAppDTO> list = client.getAppsByIds(Collections.singletonList(appId));
+    for (OpenAppDTO openAppDTO : list) {
+      log.info("{}", openAppDTO);
+    }
   }
 }

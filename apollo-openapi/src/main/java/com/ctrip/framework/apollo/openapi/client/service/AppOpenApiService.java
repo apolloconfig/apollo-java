@@ -56,28 +56,6 @@ public class AppOpenApiService extends AbstractOpenApiService implements
   }
 
   @Override
-  public void createApp(String env, OpenAppDTO openAppDTO) {
-    checkNotEmpty(env, "Env");
-    checkNotEmpty(openAppDTO.getAppId(), "App id");
-    checkNotEmpty(openAppDTO.getName(), "App name");
-    OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder()
-        .envPathVal(env)
-        .customResource("apps/create")
-        ;
-
-    try (CloseableHttpResponse response = post(pathBuilder, openAppDTO)) {
-      gson.fromJson(EntityUtils.toString(response.getEntity()), void.class);
-    } catch (Throwable ex) {
-      throw new RuntimeException(String.format(
-          "Create app: %s for appId: %s in env: %s failed",
-          openAppDTO.getName(),
-          openAppDTO.getAppId(),
-          env
-      ), ex);
-    }
-  }
-
-  @Override
   public List<OpenEnvClusterDTO> getEnvClusterInfo(String appId) {
     checkNotEmpty(appId, "App id");
 

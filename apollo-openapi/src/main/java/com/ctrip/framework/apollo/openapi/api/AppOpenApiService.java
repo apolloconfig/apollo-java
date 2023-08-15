@@ -18,7 +18,6 @@ package com.ctrip.framework.apollo.openapi.api;
 
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenEnvClusterDTO;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,10 +26,6 @@ import java.util.List;
 public interface AppOpenApiService {
 
   default void createApp(OpenAppDTO openAppDTO) {
-    throw new UnsupportedOperationException();
-  }
-
-  default void createApp(String env, OpenAppDTO openAppDTO) {
     throw new UnsupportedOperationException();
   }
 

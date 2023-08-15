@@ -69,10 +69,6 @@ public class ApolloOpenApiClient {
     appService.createApp(openAppDTO);
   }
 
-  public void createApp(String env, OpenAppDTO openAppDTO) {
-    appService.createApp(env, openAppDTO);
-  }
-
   /**
    * Get the environment and cluster information
    */
