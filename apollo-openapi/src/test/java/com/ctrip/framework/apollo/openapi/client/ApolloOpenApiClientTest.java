@@ -68,6 +68,7 @@ public class ApolloOpenApiClientTest {
         .build();
 
     final String appId = "openapi-create-app";
+
     {
       OpenAppDTO openAppDTO = new OpenAppDTO();
       openAppDTO.setName("openapi create app 测试名字");
@@ -79,10 +80,10 @@ public class ApolloOpenApiClientTest {
       client.createApp(openAppDTO);
     }
 
-
     List<OpenAppDTO> list = client.getAppsByIds(Collections.singletonList(appId));
     for (OpenAppDTO openAppDTO : list) {
       log.info("{}", openAppDTO);
     }
   }
+
 }
