@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.openapi.dto;
 
+import java.util.Set;
+
 public class OpenAppDTO extends BaseDTO {
 
   private String name;
@@ -29,6 +31,8 @@ public class OpenAppDTO extends BaseDTO {
   private String ownerName;
 
   private String ownerEmail;
+
+  private Set<String> admins;
 
   public String getAppId() {
     return appId;
@@ -52,6 +56,10 @@ public class OpenAppDTO extends BaseDTO {
 
   public String getOwnerName() {
     return ownerName;
+  }
+
+  public Set<String> getAdmins() {
+    return admins;
   }
 
   public void setAppId(String appId) {
@@ -78,6 +86,10 @@ public class OpenAppDTO extends BaseDTO {
     this.ownerName = ownerName;
   }
 
+  public void setAdmins(Set<String> admins) {
+    this.admins = admins;
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("OpenAppDTO{");
@@ -87,6 +99,7 @@ public class OpenAppDTO extends BaseDTO {
     sb.append(", orgName='").append(orgName).append('\'');
     sb.append(", ownerName='").append(ownerName).append('\'');
     sb.append(", ownerEmail='").append(ownerEmail).append('\'');
+    sb.append(", admins='").append(admins).append('\'');
     sb.append(", dataChangeCreatedBy='").append(dataChangeCreatedBy).append('\'');
     sb.append(", dataChangeLastModifiedBy='").append(dataChangeLastModifiedBy).append('\'');
     sb.append(", dataChangeCreatedTime=").append(dataChangeCreatedTime);

@@ -20,7 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -67,7 +69,7 @@ public class ApolloOpenApiClientTest {
         .withConnectTimeout(200 * 1000)
         .build();
 
-    final String appId = "openapi-create-app";
+    final String appId = "openapi-create-app1";
 
     {
       OpenAppDTO openAppDTO = new OpenAppDTO();
@@ -77,6 +79,9 @@ public class ApolloOpenApiClientTest {
       openAppDTO.setOwnerEmail("user-test-xxx1@xxx.com");
       openAppDTO.setOrgId("orgId1");
       openAppDTO.setOrgName("orgName1");
+      openAppDTO.setAdmins(new HashSet<>(Arrays.asList(
+          "user-test-xxx2", "user3"
+      )));
       client.createApp(openAppDTO);
     }
 
