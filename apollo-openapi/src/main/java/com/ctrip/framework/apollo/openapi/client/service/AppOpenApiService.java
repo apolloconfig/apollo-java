@@ -44,7 +44,7 @@ public class AppOpenApiService extends AbstractOpenApiService implements
     checkNotEmpty(openAppDTO.getAppId(), "App id");
     checkNotEmpty(openAppDTO.getName(), "App name");
     OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder()
-        .customResource("apps/create");
+        .customResource("apps");
 
     try (CloseableHttpResponse response = post(pathBuilder, openAppDTO)) {
       gson.fromJson(EntityUtils.toString(response.getEntity()), void.class);
