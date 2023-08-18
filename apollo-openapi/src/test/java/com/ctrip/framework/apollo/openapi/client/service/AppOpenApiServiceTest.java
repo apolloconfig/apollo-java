@@ -17,11 +17,18 @@
 package com.ctrip.framework.apollo.openapi.client.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,5 +71,61 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
     when(statusLine.getStatusCode()).thenReturn(500);
 
     appOpenApiService.getEnvClusterInfo(someAppId);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateAppEmptyAppId() throws Exception {
+    OpenAppDTO openAppDTO = new OpenAppDTO();
+    appOpenApiService.createApp(openAppDTO);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateAppEmptyAppName() throws Exception {
+    OpenAppDTO openAppDTO = new OpenAppDTO();
+    openAppDTO.setAppId("appId1");
+    appOpenApiService.createApp(openAppDTO);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateAppFail() throws Exception {
+    OpenAppDTO openAppDTO = new OpenAppDTO();
+    openAppDTO.setAppId("appId1");
+    openAppDTO.setName("name1");
+    openAppDTO.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
+
+    when(statusLine.getStatusCode()).thenReturn(400);
+
+    appOpenApiService.createApp(openAppDTO);
+  }
+
+
+  @Test
+  public void testCreateAppSuccess() throws Exception {
+    OpenAppDTO openAppDTO = new OpenAppDTO();
+    openAppDTO.setAppId("appId1");
+    openAppDTO.setName("name1");
+    openAppDTO.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
+
+    when(statusLine.getStatusCode()).thenReturn(200);
+    {
+      BasicHttpEntity httpEntity = new BasicHttpEntity();
+      httpEntity.setContentLength(0L);
+      httpEntity.setContent(new ByteArrayInputStream(new byte[0]));
+      when(someHttpResponse.getEntity()).thenReturn(httpEntity);
+    }
+
+    appOpenApiService.createApp(openAppDTO);
+
+    verify(someHttpResponse, atLeastOnce()).getEntity();
+    verify(httpClient, atLeastOnce()).execute(argThat(request -> {
+      if (!"POST".equals(request.getMethod())) {
+        return false;
+      }
+      if (!request.getURI().toString().endsWith("apps")) {
+        return false;
+      }
+      return true;
+    }));
+
   }
 }
