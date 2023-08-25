@@ -120,6 +120,10 @@ public class ApolloApplicationContextInitializer implements
    * @param environment
    */
   protected void initialize(ConfigurableEnvironment environment) {
+      
+    // should always initialize system properties like app.id in the first place
+    initializeSystemProperty(configurableEnvironment);
+      
     final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     if (environment.getPropertySources().contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME)) {
       //already initialized, replay the logs that were printed before the logging system was initialized
