@@ -65,8 +65,8 @@ public class ApolloOpenApiClient {
     releaseService = new ReleaseOpenApiService(client, baseUrl, GSON);
   }
 
-  public void createApp(OpenAppDTO openAppDTO) {
-    appService.createApp(openAppDTO);
+  public void createApp(OpenCreateAppDTO req) {
+    appService.createApp(req);
   }
 
   /**

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
+import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -75,36 +76,36 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
   @Test(expected = RuntimeException.class)
   public void testCreateAppEmptyAppId() throws Exception {
-    OpenAppDTO openAppDTO = new OpenAppDTO();
-    appOpenApiService.createApp(openAppDTO);
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    appOpenApiService.createApp(req);
   }
 
   @Test(expected = RuntimeException.class)
   public void testCreateAppEmptyAppName() throws Exception {
-    OpenAppDTO openAppDTO = new OpenAppDTO();
-    openAppDTO.setAppId("appId1");
-    appOpenApiService.createApp(openAppDTO);
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setAppId("appId1");
+    appOpenApiService.createApp(req);
   }
 
   @Test(expected = RuntimeException.class)
   public void testCreateAppFail() throws Exception {
-    OpenAppDTO openAppDTO = new OpenAppDTO();
-    openAppDTO.setAppId("appId1");
-    openAppDTO.setName("name1");
-    openAppDTO.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setAppId("appId1");
+    req.setName("name1");
+    req.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
 
     when(statusLine.getStatusCode()).thenReturn(400);
 
-    appOpenApiService.createApp(openAppDTO);
+    appOpenApiService.createApp(req);
   }
 
 
   @Test
   public void testCreateAppSuccess() throws Exception {
-    OpenAppDTO openAppDTO = new OpenAppDTO();
-    openAppDTO.setAppId("appId1");
-    openAppDTO.setName("name1");
-    openAppDTO.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setAppId("appId1");
+    req.setName("name1");
+    req.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
 
     when(statusLine.getStatusCode()).thenReturn(200);
     {
@@ -114,7 +115,7 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
       when(someHttpResponse.getEntity()).thenReturn(httpEntity);
     }
 
-    appOpenApiService.createApp(openAppDTO);
+    appOpenApiService.createApp(req);
 
     verify(someHttpResponse, atLeastOnce()).getEntity();
     verify(httpClient, atLeastOnce()).execute(argThat(request -> {

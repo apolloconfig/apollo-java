@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.openapi.client;
 
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
+import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -53,17 +54,17 @@ class ApolloOpenApiClientIntegrationTest {
     final String appId = "openapi-create-app1";
 
     {
-      OpenAppDTO openAppDTO = new OpenAppDTO();
-      openAppDTO.setName("openapi create app 测试名字");
-      openAppDTO.setAppId(appId);
-      openAppDTO.setOwnerName("user-test-xxx1");
-      openAppDTO.setOwnerEmail("user-test-xxx1@xxx.com");
-      openAppDTO.setOrgId("orgId1");
-      openAppDTO.setOrgName("orgName1");
-      openAppDTO.setAdmins(new HashSet<>(Arrays.asList(
+      OpenCreateAppDTO req = new OpenCreateAppDTO();
+      req.setName("openapi create app 测试名字");
+      req.setAppId(appId);
+      req.setOwnerName("user-test-xxx1");
+      req.setOwnerEmail("user-test-xxx1@xxx.com");
+      req.setOrgId("orgId1");
+      req.setOrgName("orgName1");
+      req.setAdmins(new HashSet<>(Arrays.asList(
           "user-test-xxx2", "user3"
       )));
-      client.createApp(openAppDTO);
+      client.createApp(req);
     }
 
     List<OpenAppDTO> list = client.getAppsByIds(Collections.singletonList(appId));

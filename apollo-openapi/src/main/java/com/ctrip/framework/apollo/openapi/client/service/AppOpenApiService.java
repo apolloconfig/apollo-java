@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.openapi.client.service;
 
 import com.ctrip.framework.apollo.openapi.client.url.OpenApiPathBuilder;
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
+import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenEnvClusterDTO;
 import com.google.common.base.Joiner;
 import com.google.gson.Gson;
@@ -40,18 +41,18 @@ public class AppOpenApiService extends AbstractOpenApiService implements
   }
 
   @Override
-  public void createApp(OpenAppDTO openAppDTO) {
-    checkNotEmpty(openAppDTO.getAppId(), "App id");
-    checkNotEmpty(openAppDTO.getName(), "App name");
+  public void createApp(OpenCreateAppDTO req) {
+    checkNotEmpty(req.getAppId(), "App id");
+    checkNotEmpty(req.getName(), "App name");
     OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder()
         .customResource("apps");
 
-    try (CloseableHttpResponse response = post(pathBuilder, openAppDTO)) {
+    try (CloseableHttpResponse response = post(pathBuilder, req)) {
       gson.fromJson(EntityUtils.toString(response.getEntity()), void.class);
     } catch (Throwable ex) {
       throw new RuntimeException(
-          String.format("Create app: %s for appId: %s failed", openAppDTO.getName(),
-              openAppDTO.getAppId()), ex);
+          String.format("Create app: %s for appId: %s failed", req.getName(),
+              req.getAppId()), ex);
     }
   }
 
