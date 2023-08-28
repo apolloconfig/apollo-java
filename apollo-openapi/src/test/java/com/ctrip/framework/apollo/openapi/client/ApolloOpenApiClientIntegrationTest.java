@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.openapi.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.ctrip.framework.apollo.openapi.dto.NamespaceReleaseDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
@@ -76,6 +77,7 @@ class ApolloOpenApiClientIntegrationTest {
       req.setOrgName("orgNameFromOpenapi");
       req.setAdmins(new HashSet<>(Arrays.asList(admins)));
       req.setAssignAppRoleToSelf(assignAppRoleToSelf);
+      log.info("create app {}, ownerName {} assignAppRoleToSelf {}", appId, ownerName, assignAppRoleToSelf);
       client.createApp(req);
     }
   }
@@ -93,6 +95,40 @@ class ApolloOpenApiClientIntegrationTest {
     log.info("{}", openAppDTO);
     assertEquals(appId, openAppDTO.getAppId());
     assertEquals(ownerName, openAppDTO.getOwnerName());
+  }
+
+
+  @Test
+  @Disabled("only for integration test")
+  public void testCreateAppButHaveNoAppRole() {
+    // create app
+    final String appIdSuffix = LocalDateTime.now().format(
+        DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss")
+    );
+    final String appId = "openapi-create-app-" + appIdSuffix;
+    final String ownerName = "test-create-release1";
+    createApp(appId, ownerName, false, "user-test-xxx1", "user-test-xxx2");
+
+    {
+      List<OpenAppDTO> list = client.getAppsByIds(Collections.singletonList(appId));
+      assertEquals(1, list.size());
+      OpenAppDTO openAppDTO = list.get(0);
+      log.info("{}", openAppDTO);
+      assertEquals(appId, openAppDTO.getAppId());
+      assertEquals(ownerName, openAppDTO.getOwnerName());
+    }
+
+    // create namespace
+    final String namespaceName = "openapi-create-namespace";
+    {
+      OpenAppNamespaceDTO dto = new OpenAppNamespaceDTO();
+      dto.setName(namespaceName);
+      dto.setAppId(appId);
+      dto.setComment("create from openapi");
+      dto.setDataChangeCreatedBy(ownerName);
+      log.info("create namespace {} should fail because have no app role", namespaceName);
+      assertThrows(RuntimeException.class, () -> client.createAppNamespace(dto));
+    }
   }
 
   @Test
@@ -123,6 +159,7 @@ class ApolloOpenApiClientIntegrationTest {
       dto.setAppId(appId);
       dto.setComment("create from openapi");
       dto.setDataChangeCreatedBy(ownerName);
+      log.info("create namespace {}", namespaceName);
       client.createAppNamespace(dto);
     }
 
@@ -154,6 +191,7 @@ class ApolloOpenApiClientIntegrationTest {
       dto.setReleaseTitle("openapi-release");
       dto.setReleasedBy(ownerName);
       dto.setReleaseComment("test openapi release in " + LocalDateTime.now());
+      log.info("release namespace {}", namespaceName);
       client.publishNamespace(appId, env, clusterName, namespaceName, dto);
     }
 
@@ -171,8 +209,6 @@ class ApolloOpenApiClientIntegrationTest {
       assertEquals("v2", map.get("k2"));
       log.info("create app {} namespace {} and release {} success", appId, namespaceName, map);
     }
-
-
   }
 
 }
