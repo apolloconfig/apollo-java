@@ -27,12 +27,26 @@ public class OpenCreateAppDTO extends OpenAppDTO {
    */
   private Set<String> admins;
 
+  /**
+   * when {@code assignAppRoleToSelf} is true,
+   * you can do anything with the app by current token!
+   */
+  private boolean assignAppRoleToSelf;
+
   public Set<String> getAdmins() {
     return admins;
   }
 
   public void setAdmins(Set<String> admins) {
     this.admins = admins;
+  }
+
+  public boolean isAssignAppRoleToSelf() {
+    return assignAppRoleToSelf;
+  }
+
+  public void setAssignAppRoleToSelf(boolean assignAppRoleToSelf) {
+    this.assignAppRoleToSelf = assignAppRoleToSelf;
   }
 
   @Override
@@ -45,6 +59,7 @@ public class OpenCreateAppDTO extends OpenAppDTO {
     sb.append(", ownerName='").append(getOwnerName()).append('\'');
     sb.append(", ownerEmail='").append(getOwnerEmail()).append('\'');
     sb.append(", admins='").append(admins).append('\'');
+    sb.append(", assignAppRoleToSelf='").append(assignAppRoleToSelf).append('\'');
     sb.append(", dataChangeCreatedBy='").append(dataChangeCreatedBy).append('\'');
     sb.append(", dataChangeLastModifiedBy='").append(dataChangeLastModifiedBy).append('\'');
     sb.append(", dataChangeCreatedTime=").append(dataChangeCreatedTime);

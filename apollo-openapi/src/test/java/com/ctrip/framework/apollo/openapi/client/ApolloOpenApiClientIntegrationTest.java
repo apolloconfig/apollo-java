@@ -26,6 +26,7 @@ import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenNamespaceDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenReleaseDTO;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +65,7 @@ class ApolloOpenApiClientIntegrationTest {
         .build();
   }
 
-  void createApp(String appId, String ownerName, String ... admins) {
+  void createApp(String appId, String ownerName, boolean assignAppRoleToSelf, String ... admins) {
     {
       OpenCreateAppDTO req = new OpenCreateAppDTO();
       req.setName("openapi create app 测试名字 " + appId);
@@ -74,6 +75,7 @@ class ApolloOpenApiClientIntegrationTest {
       req.setOrgId("orgIdFromOpenapi");
       req.setOrgName("orgNameFromOpenapi");
       req.setAdmins(new HashSet<>(Arrays.asList(admins)));
+      req.setAssignAppRoleToSelf(assignAppRoleToSelf);
       client.createApp(req);
     }
   }
@@ -83,7 +85,7 @@ class ApolloOpenApiClientIntegrationTest {
   public void testCreateApp() {
     final String appId = "openapi-create-app1";
     final String ownerName = "user-test-xxx1";
-    createApp(appId, ownerName, "user-test-xxx2", "user3");
+    createApp(appId, ownerName, false, "user-test-xxx2", "user3");
 
     List<OpenAppDTO> list = client.getAppsByIds(Collections.singletonList(appId));
     assertEquals(1, list.size());
@@ -97,9 +99,12 @@ class ApolloOpenApiClientIntegrationTest {
   @Disabled("only for integration test")
   public void testCreateAppThenCreateNamespaceThenRelease() {
     // create app
-    final String appId = "openapi-create-app1";
+    final String appIdSuffix = LocalDateTime.now().format(
+        DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss")
+    );
+    final String appId = "openapi-create-app-" + appIdSuffix;
     final String ownerName = "test-create-release1";
-    createApp(appId, ownerName, "user-test-xxx1", "user-test-xxx2");
+    createApp(appId, ownerName, true, "user-test-xxx1", "user-test-xxx2");
 
     {
       List<OpenAppDTO> list = client.getAppsByIds(Collections.singletonList(appId));
@@ -127,6 +132,7 @@ class ApolloOpenApiClientIntegrationTest {
       OpenItemDTO itemDTO = new OpenItemDTO();
       itemDTO.setKey("k1");
       itemDTO.setValue("v1");
+      itemDTO.setDataChangeCreatedBy(ownerName);
       client.createOrUpdateItem(
           appId, env, clusterName, namespaceName, itemDTO
       );
@@ -136,6 +142,7 @@ class ApolloOpenApiClientIntegrationTest {
       OpenItemDTO itemDTO = new OpenItemDTO();
       itemDTO.setKey("k2");
       itemDTO.setValue("v2");
+      itemDTO.setDataChangeCreatedBy(ownerName);
       client.createOrUpdateItem(
           appId, env, clusterName, namespaceName, itemDTO
       );
@@ -162,7 +169,9 @@ class ApolloOpenApiClientIntegrationTest {
       assertEquals(2, map.size());
       assertEquals("v1", map.get("k1"));
       assertEquals("v2", map.get("k2"));
+      log.info("create app {} namespace {} and release {} success", appId, namespaceName, map);
     }
+
 
   }
 
