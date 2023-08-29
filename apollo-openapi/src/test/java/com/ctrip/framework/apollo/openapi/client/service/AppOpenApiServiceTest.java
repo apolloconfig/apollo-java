@@ -75,23 +75,36 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
   }
 
   @Test(expected = RuntimeException.class)
+  public void testCreateAppNullApp() throws Exception {
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    appOpenApiService.createApp(req);
+  }
+
+  @Test(expected = RuntimeException.class)
   public void testCreateAppEmptyAppId() throws Exception {
     OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setApp(new OpenAppDTO());
     appOpenApiService.createApp(req);
   }
 
   @Test(expected = RuntimeException.class)
   public void testCreateAppEmptyAppName() throws Exception {
+    OpenAppDTO app = new OpenAppDTO();
+    app.setAppId("appId1");
+
     OpenCreateAppDTO req = new OpenCreateAppDTO();
-    req.setAppId("appId1");
+    req.setApp(app);
     appOpenApiService.createApp(req);
   }
 
   @Test(expected = RuntimeException.class)
   public void testCreateAppFail() throws Exception {
+    OpenAppDTO app = new OpenAppDTO();
+    app.setAppId("appId1");
+    app.setName("name1");
+
     OpenCreateAppDTO req = new OpenCreateAppDTO();
-    req.setAppId("appId1");
-    req.setName("name1");
+    req.setApp(app);
     req.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
 
     when(statusLine.getStatusCode()).thenReturn(400);
@@ -102,9 +115,12 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
   @Test
   public void testCreateAppSuccess() throws Exception {
+    OpenAppDTO app = new OpenAppDTO();
+    app.setAppId("appId1");
+    app.setName("name1");
+
     OpenCreateAppDTO req = new OpenCreateAppDTO();
-    req.setAppId("appId1");
-    req.setName("name1");
+    req.setApp(app);
     req.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
 
     when(statusLine.getStatusCode()).thenReturn(200);

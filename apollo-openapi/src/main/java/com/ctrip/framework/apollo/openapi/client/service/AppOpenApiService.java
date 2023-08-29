@@ -42,8 +42,10 @@ public class AppOpenApiService extends AbstractOpenApiService implements
 
   @Override
   public void createApp(OpenCreateAppDTO req) {
-    checkNotEmpty(req.getAppId(), "App id");
-    checkNotEmpty(req.getName(), "App name");
+    OpenAppDTO app = req.getApp();
+    checkNotNull(app, "App");
+    checkNotEmpty(app.getAppId(), "App id");
+    checkNotEmpty(app.getName(), "App name");
     OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder()
         .customResource("apps");
 
@@ -51,8 +53,8 @@ public class AppOpenApiService extends AbstractOpenApiService implements
       gson.fromJson(EntityUtils.toString(response.getEntity()), void.class);
     } catch (Throwable ex) {
       throw new RuntimeException(
-          String.format("Create app: %s for appId: %s failed", req.getName(),
-              req.getAppId()), ex);
+          String.format("Create app: %s for appId: %s failed", app.getName(),
+              app.getAppId()), ex);
     }
   }
 

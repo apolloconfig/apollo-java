@@ -18,7 +18,7 @@ package com.ctrip.framework.apollo.openapi.dto;
 
 import java.util.Set;
 
-public class OpenCreateAppDTO extends OpenAppDTO {
+public class OpenCreateAppDTO {
 
   /**
    * The application owner has project administrator permission by default.
@@ -32,6 +32,8 @@ public class OpenCreateAppDTO extends OpenAppDTO {
    * you can do anything with the app by current token!
    */
   private boolean assignAppRoleToSelf;
+
+  private OpenAppDTO app;
 
   public Set<String> getAdmins() {
     return admins;
@@ -49,21 +51,20 @@ public class OpenCreateAppDTO extends OpenAppDTO {
     this.assignAppRoleToSelf = assignAppRoleToSelf;
   }
 
+  public OpenAppDTO getApp() {
+    return app;
+  }
+
+  public void setApp(OpenAppDTO app) {
+    this.app = app;
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("OpenCreateAppDTO{");
-    sb.append("name='").append(getName()).append('\'');
-    sb.append(", appId='").append(getAppId()).append('\'');
-    sb.append(", orgId='").append(getOrgId()).append('\'');
-    sb.append(", orgName='").append(getOrgName()).append('\'');
-    sb.append(", ownerName='").append(getOwnerName()).append('\'');
-    sb.append(", ownerEmail='").append(getOwnerEmail()).append('\'');
+    sb.append("assignAppRoleToSelf='").append(assignAppRoleToSelf).append('\'');
     sb.append(", admins='").append(admins).append('\'');
-    sb.append(", assignAppRoleToSelf='").append(assignAppRoleToSelf).append('\'');
-    sb.append(", dataChangeCreatedBy='").append(dataChangeCreatedBy).append('\'');
-    sb.append(", dataChangeLastModifiedBy='").append(dataChangeLastModifiedBy).append('\'');
-    sb.append(", dataChangeCreatedTime=").append(dataChangeCreatedTime);
-    sb.append(", dataChangeLastModifiedTime=").append(dataChangeLastModifiedTime);
+    sb.append(", app=").append(app);
     sb.append('}');
     return sb.toString();
   }

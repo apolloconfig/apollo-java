@@ -25,7 +25,6 @@ import com.ctrip.framework.apollo.openapi.dto.OpenAppNamespaceDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenNamespaceDTO;
-import com.ctrip.framework.apollo.openapi.dto.OpenReleaseDTO;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -68,13 +67,15 @@ class ApolloOpenApiClientIntegrationTest {
 
   void createApp(String appId, String ownerName, boolean assignAppRoleToSelf, String ... admins) {
     {
+      OpenAppDTO app = new OpenAppDTO();
+      app.setName("openapi create app 测试名字 " + appId);
+      app.setAppId(appId);
+      app.setOwnerName(ownerName);
+      app.setOwnerEmail(ownerName + "@apollo.apollo");
+      app.setOrgId("orgIdFromOpenapi");
+      app.setOrgName("orgNameFromOpenapi");
       OpenCreateAppDTO req = new OpenCreateAppDTO();
-      req.setName("openapi create app 测试名字 " + appId);
-      req.setAppId(appId);
-      req.setOwnerName(ownerName);
-      req.setOwnerEmail(ownerName + "@apollo.apollo");
-      req.setOrgId("orgIdFromOpenapi");
-      req.setOrgName("orgNameFromOpenapi");
+      req.setApp(app);
       req.setAdmins(new HashSet<>(Arrays.asList(admins)));
       req.setAssignAppRoleToSelf(assignAppRoleToSelf);
       log.info("create app {}, ownerName {} assignAppRoleToSelf {}", appId, ownerName, assignAppRoleToSelf);
