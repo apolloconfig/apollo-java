@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.ctrip.framework.apollo.openapi.dto.NamespaceReleaseDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenAppNamespaceDTO;
+import com.ctrip.framework.apollo.openapi.dto.OpenClusterDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenNamespaceDTO;
@@ -134,7 +135,7 @@ class ApolloOpenApiClientIntegrationTest {
 
   @Test
   @Disabled("only for integration test")
-  public void testCreateAppThenCreateNamespaceThenRelease() {
+  public void testCreateAppThenCreateClusterCreateNamespaceThenRelease() {
     // create app
     final String appIdSuffix = LocalDateTime.now().format(
         DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss")
@@ -150,6 +151,17 @@ class ApolloOpenApiClientIntegrationTest {
       log.info("{}", openAppDTO);
       assertEquals(appId, openAppDTO.getAppId());
       assertEquals(ownerName, openAppDTO.getOwnerName());
+    }
+
+    // create cluster
+    final String clusterName = "cluster-openapi";
+    {
+      OpenClusterDTO dto = new OpenClusterDTO();
+      dto.setAppId(appId);
+      dto.setName(clusterName);
+      dto.setDataChangeCreatedBy(ownerName);
+      log.info("create cluster {}", clusterName);
+      client.createCluster(env, dto);
     }
 
     // create namespace
