@@ -21,27 +21,19 @@ import java.util.Set;
 public class OpenCreateAppDTO {
 
   /**
+   * when {@code assignAppRoleToSelf} is true,
+   * you can do anything with the app by current token!
+   */
+  private boolean assignAppRoleToSelf;
+
+  /**
    * The application owner has project administrator permission by default.
    * <p>
    * Administrators can create namespace, cluster, and assign user permissions
    */
   private Set<String> admins;
 
-  /**
-   * when {@code assignAppRoleToSelf} is true,
-   * you can do anything with the app by current token!
-   */
-  private boolean assignAppRoleToSelf;
-
   private OpenAppDTO app;
-
-  public Set<String> getAdmins() {
-    return admins;
-  }
-
-  public void setAdmins(Set<String> admins) {
-    this.admins = admins;
-  }
 
   public boolean isAssignAppRoleToSelf() {
     return assignAppRoleToSelf;
@@ -49,6 +41,14 @@ public class OpenCreateAppDTO {
 
   public void setAssignAppRoleToSelf(boolean assignAppRoleToSelf) {
     this.assignAppRoleToSelf = assignAppRoleToSelf;
+  }
+
+  public Set<String> getAdmins() {
+    return admins;
+  }
+
+  public void setAdmins(Set<String> admins) {
+    this.admins = admins;
   }
 
   public OpenAppDTO getApp() {
