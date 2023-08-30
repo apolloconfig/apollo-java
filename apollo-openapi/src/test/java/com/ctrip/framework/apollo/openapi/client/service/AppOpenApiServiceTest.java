@@ -17,11 +17,19 @@
 package com.ctrip.framework.apollo.openapi.client.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
+import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,5 +72,77 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
     when(statusLine.getStatusCode()).thenReturn(500);
 
     appOpenApiService.getEnvClusterInfo(someAppId);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateAppNullApp() throws Exception {
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    appOpenApiService.createApp(req);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateAppEmptyAppId() throws Exception {
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setApp(new OpenAppDTO());
+    appOpenApiService.createApp(req);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateAppEmptyAppName() throws Exception {
+    OpenAppDTO app = new OpenAppDTO();
+    app.setAppId("appId1");
+
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setApp(app);
+    appOpenApiService.createApp(req);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testCreateAppFail() throws Exception {
+    OpenAppDTO app = new OpenAppDTO();
+    app.setAppId("appId1");
+    app.setName("name1");
+
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setApp(app);
+    req.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
+
+    when(statusLine.getStatusCode()).thenReturn(400);
+
+    appOpenApiService.createApp(req);
+  }
+
+
+  @Test
+  public void testCreateAppSuccess() throws Exception {
+    OpenAppDTO app = new OpenAppDTO();
+    app.setAppId("appId1");
+    app.setName("name1");
+
+    OpenCreateAppDTO req = new OpenCreateAppDTO();
+    req.setApp(app);
+    req.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
+
+    when(statusLine.getStatusCode()).thenReturn(200);
+    {
+      BasicHttpEntity httpEntity = new BasicHttpEntity();
+      httpEntity.setContentLength(0L);
+      httpEntity.setContent(new ByteArrayInputStream(new byte[0]));
+      when(someHttpResponse.getEntity()).thenReturn(httpEntity);
+    }
+
+    appOpenApiService.createApp(req);
+
+    verify(someHttpResponse, atLeastOnce()).getEntity();
+    verify(httpClient, atLeastOnce()).execute(argThat(request -> {
+      if (!"POST".equals(request.getMethod())) {
+        return false;
+      }
+      if (!request.getURI().toString().endsWith("apps")) {
+        return false;
+      }
+      return true;
+    }));
+
   }
 }
