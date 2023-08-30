@@ -318,8 +318,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpGet get = request.getValue();
 
-    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items?size=%s&page=%s",
-            someBaseUrl, someEnv, someAppId, someCluster, someNamespace, size, page), get.getURI().toString());
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items?page=%s&size=%s",
+            someBaseUrl, someEnv, someAppId, someCluster, someNamespace, page, size), get.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)
