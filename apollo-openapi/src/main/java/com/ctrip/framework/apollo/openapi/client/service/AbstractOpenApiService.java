@@ -97,6 +97,10 @@ abstract class AbstractOpenApiService {
     throw new ApolloOpenApiException(status.getStatusCode(), status.getReasonPhrase(), message);
   }
 
+  protected void checkNotNull(Object value, String name) {
+    Preconditions.checkArgument(null != value, name + " should not be null");
+  }
+
   protected void checkNotEmpty(String value, String name) {
     Preconditions.checkArgument(!Strings.isNullOrEmpty(value), name + " should not be null or empty");
   }
