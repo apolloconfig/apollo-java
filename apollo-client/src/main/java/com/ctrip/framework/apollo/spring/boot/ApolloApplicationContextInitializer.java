@@ -120,8 +120,8 @@ public class ApolloApplicationContextInitializer implements
    * @param environment
    */
   protected void initialize(ConfigurableEnvironment environment) {
-      
-    // should always initialize system properties like app.id in the first place
+
+    // need to initialize system properties like app.id again in case they are configured in external data sources like spring cloud config
     initializeSystemProperty(environment);
       
     final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
