@@ -24,6 +24,7 @@ import com.ctrip.framework.apollo.enums.PropertyChangeType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.model.ConfigChange;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
+import com.ctrip.framework.apollo.spring.property.AutoUpdateConfigChangeListener;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.ctrip.framework.apollo.util.ConfigUtil;
@@ -43,6 +44,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
@@ -492,12 +494,16 @@ public abstract class AbstractConfig implements Config {
   }
 
   private void notifyAsync(final ConfigChangeListener listener, final ConfigChangeEvent changeEvent) {
+    CountDownLatch latch = new CountDownLatch(1);
     m_executorService.submit(new Runnable() {
       @Override
       public void run() {
         String listenerName = listener.getClass().getName();
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigChangeListener", listenerName);
         try {
+          if(!(listener instanceof AutoUpdateConfigChangeListener)){
+            latch.await();
+          }
           listener.onChange(changeEvent);
           transaction.setStatus(Transaction.SUCCESS);
         } catch (Throwable ex) {
@@ -505,6 +511,7 @@ public abstract class AbstractConfig implements Config {
           Tracer.logError(ex);
           logger.error("Failed to invoke config change listener {}", listenerName, ex);
         } finally {
+          latch.countDown();
           transaction.complete();
         }
       }
