@@ -191,7 +191,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     boolean accessible = field.isAccessible();
     field.setAccessible(true);
     ReflectionUtils
-            .setField(field, bean, parseJsonValue((String) propertyValue, field.getGenericType(), datePattern));
+        .setField(field, bean, parseJsonValue((String) propertyValue, field.getGenericType(), datePattern));
     field.setAccessible(accessible);
 
     if (configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()) {
