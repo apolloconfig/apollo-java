@@ -23,6 +23,10 @@ public class NullProviderManager implements ProviderManager {
   public static final NullProvider provider = new NullProvider();
 
   @Override
+  public void initialize(){
+  }
+
+  @Override
   public String getProperty(String name, String defaultValue) {
     return defaultValue;
   }
