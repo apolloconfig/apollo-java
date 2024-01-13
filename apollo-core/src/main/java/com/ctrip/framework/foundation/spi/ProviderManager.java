@@ -25,9 +25,9 @@ public interface ProviderManager extends Ordered {
 
   <T extends Provider> T provider(Class<T> clazz);
 
-  void initialize();
+    default void initialize() {}
 
-  @Override
+    @Override
   default int getOrder() {
     return Ordered.LOWEST_PRECEDENCE;
   }

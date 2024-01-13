@@ -5,6 +5,10 @@ Release Notes.
 Apollo Java 2.2.0
 
 ------------------
+* [新增com.ctrip.framework.foundation.spi.ProviderManager.initialize方法，
+  在使用自定义的ProviderManager实现时，
+  不再因自动初始化com.ctrip.framework.foundation.internals.DefaultProviderManager
+  和com.ctrip.framework.foundation.internals.NullProviderManager，而打印干扰日志](https://github.com/apolloconfig/apollo-java/pull/50)
 * [refactor(apollo-client): Optimize the exception message when failing to retrieve configuration information.](https://github.com/apolloconfig/apollo-java/pull/22)
 * [Add JUnit5 extension support for apollo mock server.](https://github.com/apolloconfig/apollo-java/pull/25)
 * [Support concurrent loading of Config for different namespaces.](https://github.com/apolloconfig/apollo-java/pull/31)
