@@ -25,7 +25,10 @@ public interface ProviderManager extends Ordered {
 
   <T extends Provider> T provider(Class<T> clazz);
 
-    default void initialize() {}
+  /**
+   * @since 2.3.0
+   */
+  default void initialize() {}
 
     @Override
   default int getOrder() {
