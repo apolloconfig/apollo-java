@@ -30,7 +30,7 @@ public interface ProviderManager extends Ordered {
    */
   default void initialize() {}
 
-    @Override
+  @Override
   default int getOrder() {
     return Ordered.LOWEST_PRECEDENCE;
   }
