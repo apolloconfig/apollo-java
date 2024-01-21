@@ -28,8 +28,10 @@ import com.ctrip.framework.apollo.PropertiesCompatibleConfigFile;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.spring.annotation.ApolloJsonValue;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -396,6 +398,9 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     String dateFormatJson2 = "{\"startTime\":\"2024-01-20T16:51:48\",\"endTime\":\"2024-01-20T16:51:48\"}";
     String dateFormatJson3 = "{\"startTime\":\"2024/01/20\",\"endTime\":\"2024/01/20\"}";
 
+    String someDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(someDateFormat, Locale.US);
+
     Config config = mock(Config.class);
     when(config.getProperty(eq(DATE_FORMAT_JSON_PROPERTY1), Mockito.nullable(String.class))).thenReturn(dateFormatJson1);
     when(config.getProperty(eq(DATE_FORMAT_JSON_PROPERTY2), Mockito.nullable(String.class))).thenReturn(dateFormatJson2);
@@ -406,9 +411,9 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
         AppConfig12.class);
 
     TestJsonDatePropertyBean datePropertyBean = context.getBean(TestJsonDatePropertyBean.class);
-    assertNotNull(datePropertyBean.getPattern1());
-    assertNotNull(datePropertyBean.getPattern2());
-    assertNotNull(datePropertyBean.getPattern3());
+    assertEquals("2024-01-20 00:00:00.000", simpleDateFormat.format(datePropertyBean.getPattern1().getStartTime()));
+    assertEquals("2024-01-20 16:51:48.000", simpleDateFormat.format(datePropertyBean.getPattern2().getStartTime()));
+    assertEquals("2024-01-20 00:00:00.000", simpleDateFormat.format(datePropertyBean.getPattern3().getStartTime()));
   }
 
   @Test(expected = BeanCreationException.class)

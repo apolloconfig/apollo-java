@@ -20,6 +20,7 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.property.PlaceholderHelper;
 import com.ctrip.framework.apollo.spring.property.SpringValue;
@@ -252,11 +253,18 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   private Object parseJsonValue(String json, Type targetType, String datePattern) {
     try {
-      return DATEPATTERN_GSON_MAP.computeIfAbsent(datePattern, (pattern) -> new GsonBuilder().setDateFormat(pattern).create()).fromJson(json, targetType);
+      return DATEPATTERN_GSON_MAP.computeIfAbsent(datePattern, this::buildGson).fromJson(json, targetType);
     } catch (Throwable ex) {
       logger.error("Parsing json '{}' to type {} failed!", json, targetType, ex);
       throw ex;
     }
+  }
+
+  private Gson buildGson(String datePattern) {
+    if (StringUtils.isBlank(datePattern)) {
+      return new Gson();
+    }
+    return new GsonBuilder().setDateFormat(datePattern).create();
   }
 
   @Override

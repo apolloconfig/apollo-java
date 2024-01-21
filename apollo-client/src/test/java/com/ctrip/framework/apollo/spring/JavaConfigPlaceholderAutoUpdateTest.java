@@ -873,7 +873,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     assertEquals(someDate, bean.getDateProperty());
     assertEquals("astring", bean.getJsonBeanList().get(0).getA());
     assertEquals(10, bean.getJsonBeanList().get(0).getB());
-    assertNotNull(bean.getJsonDateBean().getStartTime());
+    assertEquals("2024-01-20 00:00:00.000", simpleDateFormat.format(bean.getJsonDateBean().getStartTime()));
 
     Properties newProperties = new Properties();
     newProperties.setProperty("intProperty", String.valueOf(someNewInt));
@@ -906,7 +906,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     assertEquals(someNewDate, bean.getDateProperty());
     assertEquals("newString", bean.getJsonBeanList().get(0).getA());
     assertEquals(20, bean.getJsonBeanList().get(0).getB());
-    assertNotNull(bean.getJsonDateBean().getStartTime());
+    assertEquals("2024-02-21 00:00:00.000", simpleDateFormat.format(bean.getJsonDateBean().getStartTime()));
   }
 
   @Test

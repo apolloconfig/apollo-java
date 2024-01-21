@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.spring.property;
 
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.annotation.ApolloJsonValue;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
@@ -135,12 +136,18 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
 
   private Object parseJsonValue(String json, Type targetType, String datePattern) {
     try {
-      return datePatternGsonMap.computeIfAbsent(datePattern, (pattern) -> new GsonBuilder().setDateFormat(datePattern).create())
-              .fromJson(json, targetType);
+      return datePatternGsonMap.computeIfAbsent(datePattern, this::buildGson).fromJson(json, targetType);
     } catch (Throwable ex) {
       logger.error("Parsing json '{}' to type {} failed!", json, targetType, ex);
       throw ex;
     }
+  }
+
+  private Gson buildGson(String datePattern) {
+    if (StringUtils.isBlank(datePattern)) {
+      return new Gson();
+    }
+    return new GsonBuilder().setDateFormat(datePattern).create();
   }
 
   private boolean testTypeConverterHasConvertIfNecessaryWithFieldParameter() {
