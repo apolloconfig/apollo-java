@@ -31,7 +31,8 @@ public class DefaultProviderManager implements ProviderManager {
   private static final Logger logger = LoggerFactory.getLogger(DefaultProviderManager.class);
   private Map<Class<? extends Provider>, Provider> m_providers = new LinkedHashMap<>();
 
-  public DefaultProviderManager() {
+  @Override
+  public void initialize() {
     // Load per-application configuration, like app id, from classpath://META-INF/app.properties
     Provider applicationProvider = new DefaultApplicationProvider();
     applicationProvider.initialize();
