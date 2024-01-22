@@ -34,10 +34,10 @@ import com.google.gson.Gson;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
@@ -66,7 +66,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_DELIMITER)
       .omitEmptyStrings().trimResults();
-  private static final Map<String, Gson> DATEPATTERN_GSON_MAP = new HashMap<>();
+  private static final Map<String, Gson> DATEPATTERN_GSON_MAP = new ConcurrentHashMap<>();
 
   private final ConfigUtil configUtil;
   private final PlaceholderHelper placeholderHelper;

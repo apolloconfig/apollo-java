@@ -28,11 +28,11 @@ import com.google.gson.Gson;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.GsonBuilder;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -65,7 +65,7 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
     this.typeConverterHasConvertIfNecessaryWithFieldParameter = testTypeConverterHasConvertIfNecessaryWithFieldParameter();
     this.placeholderHelper = SpringInjector.getInstance(PlaceholderHelper.class);
     this.springValueRegistry = SpringInjector.getInstance(SpringValueRegistry.class);
-    this.datePatternGsonMap = new HashMap<>();
+    this.datePatternGsonMap = new ConcurrentHashMap<>();
     this.configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
@@ -114,7 +114,7 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
 
     if (springValue.isJson()) {
       ApolloJsonValue apolloJsonValue = springValue.getField().getAnnotation(ApolloJsonValue.class);
-      String datePattern = apolloJsonValue != null ? apolloJsonValue.datePattern() : "";
+      String datePattern = apolloJsonValue != null ? apolloJsonValue.datePattern() : StringUtils.EMPTY;
       value = parseJsonValue((String) value, springValue.getGenericType(), datePattern);
     } else {
       if (springValue.isField()) {
