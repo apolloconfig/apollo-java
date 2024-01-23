@@ -18,7 +18,9 @@ package com.ctrip.framework.apollo.spring.property;
 
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
+import com.ctrip.framework.apollo.spring.annotation.ApolloJsonValue;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
@@ -26,7 +28,11 @@ import com.google.gson.Gson;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+
+import com.google.gson.GsonBuilder;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -52,14 +58,14 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
   private TypeConverter typeConverter;
   private final PlaceholderHelper placeholderHelper;
   private final SpringValueRegistry springValueRegistry;
-  private final Gson gson;
+  private final Map<String, Gson> datePatternGsonMap;
   private final ConfigUtil configUtil;
 
   public AutoUpdateConfigChangeListener() {
     this.typeConverterHasConvertIfNecessaryWithFieldParameter = testTypeConverterHasConvertIfNecessaryWithFieldParameter();
     this.placeholderHelper = SpringInjector.getInstance(PlaceholderHelper.class);
     this.springValueRegistry = SpringInjector.getInstance(SpringValueRegistry.class);
-    this.gson = new Gson();
+    this.datePatternGsonMap = new ConcurrentHashMap<>();
     this.configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
@@ -107,7 +113,9 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
         .resolvePropertyValue(beanFactory, springValue.getBeanName(), springValue.getPlaceholder());
 
     if (springValue.isJson()) {
-      value = parseJsonValue((String) value, springValue.getGenericType());
+      ApolloJsonValue apolloJsonValue = springValue.getField().getAnnotation(ApolloJsonValue.class);
+      String datePattern = apolloJsonValue != null ? apolloJsonValue.datePattern() : StringUtils.EMPTY;
+      value = parseJsonValue((String) value, springValue.getGenericType(), datePattern);
     } else {
       if (springValue.isField()) {
         // org.springframework.beans.TypeConverter#convertIfNecessary(java.lang.Object, java.lang.Class, java.lang.reflect.Field) is available from Spring 3.2.0+
@@ -126,13 +134,20 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
     return value;
   }
 
-  private Object parseJsonValue(String json, Type targetType) {
+  private Object parseJsonValue(String json, Type targetType, String datePattern) {
     try {
-      return gson.fromJson(json, targetType);
+      return datePatternGsonMap.computeIfAbsent(datePattern, this::buildGson).fromJson(json, targetType);
     } catch (Throwable ex) {
       logger.error("Parsing json '{}' to type {} failed!", json, targetType, ex);
       throw ex;
     }
+  }
+
+  private Gson buildGson(String datePattern) {
+    if (StringUtils.isBlank(datePattern)) {
+      return new Gson();
+    }
+    return new GsonBuilder().setDateFormat(datePattern).create();
   }
 
   private boolean testTypeConverterHasConvertIfNecessaryWithFieldParameter() {

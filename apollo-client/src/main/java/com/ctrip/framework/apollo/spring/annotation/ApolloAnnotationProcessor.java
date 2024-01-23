@@ -20,6 +20,7 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.property.PlaceholderHelper;
 import com.ctrip.framework.apollo.spring.property.SpringValue;
@@ -34,8 +35,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -61,7 +66,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_DELIMITER)
       .omitEmptyStrings().trimResults();
-  private static final Gson GSON = new Gson();
+  private static final Map<String, Gson> DATEPATTERN_GSON_MAP = new ConcurrentHashMap<>();
 
   private final ConfigUtil configUtil;
   private final PlaceholderHelper placeholderHelper;
@@ -178,6 +183,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     }
 
     String placeholder = apolloJsonValue.value();
+    String datePattern = apolloJsonValue.datePattern();
     Object propertyValue = this.resolvePropertyValue(beanName, placeholder);
     if (propertyValue == null) {
       return;
@@ -186,7 +192,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     boolean accessible = field.isAccessible();
     field.setAccessible(true);
     ReflectionUtils
-        .setField(field, bean, parseJsonValue((String) propertyValue, field.getGenericType()));
+        .setField(field, bean, parseJsonValue((String) propertyValue, field.getGenericType(), datePattern));
     field.setAccessible(accessible);
 
     if (configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()) {
@@ -206,6 +212,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     }
 
     String placeHolder = apolloJsonValue.value();
+    String datePattern = apolloJsonValue.datePattern();
     Object propertyValue = this.resolvePropertyValue(beanName, placeHolder);
     if (propertyValue == null) {
       return;
@@ -218,7 +225,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
     boolean accessible = method.isAccessible();
     method.setAccessible(true);
-    ReflectionUtils.invokeMethod(method, bean, parseJsonValue((String) propertyValue, types[0]));
+    ReflectionUtils.invokeMethod(method, bean, parseJsonValue((String) propertyValue, types[0], datePattern));
     method.setAccessible(accessible);
 
     if (configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()) {
@@ -244,13 +251,20 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     return propertyValue;
   }
 
-  private Object parseJsonValue(String json, Type targetType) {
+  private Object parseJsonValue(String json, Type targetType, String datePattern) {
     try {
-      return GSON.fromJson(json, targetType);
+      return DATEPATTERN_GSON_MAP.computeIfAbsent(datePattern, this::buildGson).fromJson(json, targetType);
     } catch (Throwable ex) {
       logger.error("Parsing json '{}' to type {} failed!", json, targetType, ex);
       throw ex;
     }
+  }
+
+  private Gson buildGson(String datePattern) {
+    if (StringUtils.isBlank(datePattern)) {
+      return new Gson();
+    }
+    return new GsonBuilder().setDateFormat(datePattern).create();
   }
 
   @Override

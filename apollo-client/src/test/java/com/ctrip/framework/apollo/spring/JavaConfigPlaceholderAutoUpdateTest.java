@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.spring;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.ctrip.framework.apollo.build.MockInjector;
@@ -25,6 +26,7 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.internals.SimpleConfig;
 import com.ctrip.framework.apollo.internals.YamlConfigFile;
 import com.ctrip.framework.apollo.spring.JavaConfigPlaceholderTest.JsonBean;
+import com.ctrip.framework.apollo.spring.JavaConfigPlaceholderTest.JsonDateBean;
 import com.ctrip.framework.apollo.spring.XmlConfigPlaceholderTest.TestXmlBean;
 import com.ctrip.framework.apollo.spring.annotation.ApolloJsonValue;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
@@ -830,6 +832,8 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     String someNewString = "someNewString";
     String someJsonProperty = "[{\"a\":\"astring\", \"b\":10},{\"a\":\"astring2\", \"b\":20}]";
     String someNewJsonProperty = "[{\"a\":\"newString\", \"b\":20},{\"a\":\"astring2\", \"b\":20}]";
+    String someJsonDateProperty = "{\"startTime\":\"2024/01/20\",\"endTime\":\"2024/01/20\"}";;
+    String someNewJsonDateProperty = "{\"startTime\":\"2024/02/21\",\"endTime\":\"2024/02/21\"}";;
 
     String someDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
     Date someDate = assembleDate(2018, 2, 23, 20, 1, 2, 123);
@@ -849,6 +853,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     properties.setProperty("dateFormat", someDateFormat);
     properties.setProperty("dateProperty", simpleDateFormat.format(someDate));
     properties.setProperty("jsonProperty", someJsonProperty);
+    properties.setProperty("jsonDateProperty", someJsonDateProperty);
 
     SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
 
@@ -868,6 +873,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     assertEquals(someDate, bean.getDateProperty());
     assertEquals("astring", bean.getJsonBeanList().get(0).getA());
     assertEquals(10, bean.getJsonBeanList().get(0).getB());
+    assertEquals("2024-01-20 00:00:00.000", simpleDateFormat.format(bean.getJsonDateBean().getStartTime()));
 
     Properties newProperties = new Properties();
     newProperties.setProperty("intProperty", String.valueOf(someNewInt));
@@ -882,6 +888,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     newProperties.setProperty("dateFormat", someDateFormat);
     newProperties.setProperty("dateProperty", simpleDateFormat.format(someNewDate));
     newProperties.setProperty("jsonProperty", someNewJsonProperty);
+    newProperties.setProperty("jsonDateProperty", someNewJsonDateProperty);
 
     config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
@@ -899,6 +906,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     assertEquals(someNewDate, bean.getDateProperty());
     assertEquals("newString", bean.getJsonBeanList().get(0).getA());
     assertEquals(20, bean.getJsonBeanList().get(0).getB());
+    assertEquals("2024-02-21 00:00:00.000", simpleDateFormat.format(bean.getJsonDateBean().getStartTime()));
   }
 
   @Test
@@ -1311,6 +1319,9 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     @ApolloJsonValue("${jsonProperty}")
     private List<JsonBean> jsonBeanList;
 
+    @ApolloJsonValue(value = "${jsonDateProperty}", datePattern = "yyyy/MM/dd")
+    private JsonDateBean jsonDateBean;
+
     public int getIntProperty() {
       return intProperty;
     }
@@ -1353,6 +1364,10 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
 
     public List<JsonBean> getJsonBeanList() {
       return jsonBeanList;
+    }
+
+    public JsonDateBean getJsonDateBean() {
+      return jsonDateBean;
     }
   }
 
