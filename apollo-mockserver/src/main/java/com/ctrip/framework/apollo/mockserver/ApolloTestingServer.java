@@ -44,7 +44,7 @@ import java.util.Set;
 
 public class ApolloTestingServer implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmbeddedApollo.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApolloTestingServer.class);
     private static final Type notificationType = new TypeToken<List<ApolloConfigNotification>>() {
     }.getType();
 
