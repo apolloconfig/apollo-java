@@ -21,6 +21,7 @@ import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.utils.ResourceUtils;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.internals.ConfigServiceLocator;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Joiner;
@@ -41,11 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class ApolloTestingServer implements AutoCloseable {
 
@@ -159,23 +156,30 @@ public class ApolloTestingServer implements AutoCloseable {
         return GSON.toJson(apolloConfig);
     }
 
-    private Properties loadPropertiesOfNamespace(String namespace) {
+    private Object getCustomizedCacheRoot(String namespace) {
         Object customizedCacheRoot = null;
         try {
-            CONFIG_UTIL_LOCATOR_CLEAR.invoke(CONFIG_UTIL_LOCATOR);
+            customizedCacheRoot = CONFIG_UTIL_LOCATOR_CLEAR.invoke(CONFIG_UTIL_LOCATOR);
         } catch (Exception e) {
             logger.error("invoke config util locator clear failed.", e);
+        }
+        return customizedCacheRoot;
+    }
+
+    private Properties loadPropertiesOfNamespace(String namespace) {
+        Object customizedCacheRoot = getCustomizedCacheRoot(namespace);
+        if (Objects.isNull(customizedCacheRoot)) {
             String filename = String.format("mockdata-%s.properties", namespace);
             logger.debug("load {} from {}", namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
+
+        Properties prop = new Properties();
         String appId = CONFIG_UTIL_LOCATOR.getAppId();
         String cluster = CONFIG_UTIL_LOCATOR.getCluster();
         String baseDir = String.format("%s/%s/%s/", customizedCacheRoot, appId, "config-cache");
         String fileName = String.format("%s.properties", Joiner.on("+").join(appId, cluster, namespace));
         File file = new File(baseDir, fileName);
-
-        Properties prop = new Properties();
         try (FileInputStream fis = new FileInputStream(file)) {
             prop.load(fis);
         } catch (IOException e) {
