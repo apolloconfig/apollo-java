@@ -21,7 +21,6 @@ import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.utils.ResourceUtils;
-import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.internals.ConfigServiceLocator;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Joiner;
@@ -38,11 +37,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Objects;
 
 public class ApolloTestingServer implements AutoCloseable {
 
@@ -156,7 +159,7 @@ public class ApolloTestingServer implements AutoCloseable {
         return GSON.toJson(apolloConfig);
     }
 
-    private Object getCustomizedCacheRoot(String namespace) {
+    private Object getCustomizedCacheRoot() {
         Object customizedCacheRoot = null;
         try {
             customizedCacheRoot = CONFIG_UTIL_LOCATOR_CLEAR.invoke(CONFIG_UTIL_LOCATOR);
@@ -167,13 +170,16 @@ public class ApolloTestingServer implements AutoCloseable {
     }
 
     private Properties loadPropertiesOfNamespace(String namespace) {
-        Object customizedCacheRoot = getCustomizedCacheRoot(namespace);
+        Object customizedCacheRoot = getCustomizedCacheRoot();
         if (Objects.isNull(customizedCacheRoot)) {
             String filename = String.format("mockdata-%s.properties", namespace);
             logger.debug("load {} from {}", namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
+        return loadOnCustomizedCacheRoot(namespace, customizedCacheRoot);
+    }
 
+    private Properties loadOnCustomizedCacheRoot(String namespace, Object customizedCacheRoot) {
         Properties prop = new Properties();
         String appId = CONFIG_UTIL_LOCATOR.getAppId();
         String cluster = CONFIG_UTIL_LOCATOR.getCluster();

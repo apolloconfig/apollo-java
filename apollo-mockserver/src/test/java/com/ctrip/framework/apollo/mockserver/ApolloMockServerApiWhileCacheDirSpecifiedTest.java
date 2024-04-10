@@ -1,0 +1,64 @@
+/*
+ * Copyright 2022 Apollo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package com.ctrip.framework.apollo.mockserver;
+
+import com.ctrip.framework.apollo.Config;
+import com.ctrip.framework.apollo.ConfigService;
+import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
+import com.ctrip.framework.apollo.core.ConfigConsts;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.File;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
+public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
+
+  @ClassRule
+  public static EmbeddedApollo embeddedApollo = new EmbeddedApollo();
+
+  @Test
+  public void testLoadOnCustomizedCacheRoot() throws Exception {
+    String someCacheDir = "src/test/resources/config-cache";
+    String someAppId = "someAppId";
+    String someNamespace = "someNamespace";
+    String someKey = "someKey";
+    String someValue = "someValue";
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR, someCacheDir);
+
+    ConfigUtil configUtil = spy(new ConfigUtil());
+    doReturn(someAppId).when(configUtil).getAppId();
+    Object customizedCacheRoot = ReflectionTestUtils.invokeMethod(configUtil, "getCustomizedCacheRoot", new Object[]{});
+    assertEquals(someCacheDir, customizedCacheRoot);
+
+    File someBaseDir = new File(someCacheDir + "/" + someAppId + "/config-cache");
+    someBaseDir.mkdirs();
+    File file = new File(someBaseDir, String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
+            .join(someAppId, "default", someNamespace)));
+    Files.write( someKey + "=" + someValue, file, Charsets.UTF_8);
+    Config config = ConfigService.getConfig(someNamespace);
+    assertEquals(someValue, config.getProperty(someKey, null));
+  }
+}

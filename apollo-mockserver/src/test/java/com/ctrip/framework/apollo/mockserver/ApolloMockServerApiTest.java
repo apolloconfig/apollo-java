@@ -19,18 +19,28 @@ package com.ctrip.framework.apollo.mockserver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigService;
+import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
+import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
 import com.google.common.util.concurrent.SettableFuture;
 
+import java.io.File;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class ApolloMockServerApiTest {
 
@@ -45,6 +55,30 @@ public class ApolloMockServerApiTest {
 
     assertEquals("value1", applicationConfig.getProperty("key1", null));
     assertEquals("value2", applicationConfig.getProperty("key2", null));
+  }
+
+  //@Test
+  public void testLoadOnCustomizedCacheRoot() throws Exception {
+    String someCacheDir = "src/test/resources/config-cache";
+    String someAppId = "someAppId";
+    String someNamespace = "someNamespace";
+    String someKey = "someKey";
+    String someValue = "someValue";
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR, someCacheDir);
+
+    ConfigUtil configUtil = spy(new ConfigUtil());
+    doReturn(someAppId).when(configUtil).getAppId();
+    Object customizedCacheRoot = ReflectionTestUtils.invokeMethod(configUtil, "getCustomizedCacheRoot", new Object[]{});
+    assertEquals(someCacheDir, customizedCacheRoot);
+
+    File someBaseDir = new File(someCacheDir + "/" + someAppId + "/config-cache/");
+    someBaseDir.mkdir();
+    File file = new File(someBaseDir, String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
+            .join(someAppId, "default", someNamespace)));
+    Files.write( someKey + "=" + someValue, file, Charsets.UTF_8);
+    Config config = ConfigService.getConfig(someNamespace);
+    assertEquals(someValue, config.getProperty(someKey, null));
+    someBaseDir.deleteOnExit();
   }
 
   @Test
