@@ -22,6 +22,8 @@ import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.utils.ResourceUtils;
 import com.ctrip.framework.apollo.internals.ConfigServiceLocator;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -33,6 +35,9 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -51,6 +56,9 @@ public class ApolloTestingServer implements AutoCloseable {
     private static Method CONFIG_SERVICE_LOCATOR_CLEAR;
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
+    private static Method CONFIG_UTIL_LOCATOR_CLEAR;
+    private static ConfigUtil CONFIG_UTIL_LOCATOR;
+
     private static final Gson GSON = new Gson();
     private final Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace = Maps.newConcurrentMap();
     private final Map<String, Set<String>> deletedKeysOfNamespace = Maps.newConcurrentMap();
@@ -67,6 +75,10 @@ public class ApolloTestingServer implements AutoCloseable {
             CONFIG_SERVICE_LOCATOR = ApolloInjector.getInstance(ConfigServiceLocator.class);
             CONFIG_SERVICE_LOCATOR_CLEAR = ConfigServiceLocator.class.getDeclaredMethod("initConfigServices");
             CONFIG_SERVICE_LOCATOR_CLEAR.setAccessible(true);
+
+            CONFIG_UTIL_LOCATOR = ApolloInjector.getInstance(ConfigUtil.class);
+            CONFIG_UTIL_LOCATOR_CLEAR = ConfigUtil.class.getDeclaredMethod("getCustomizedCacheRoot");
+            CONFIG_UTIL_LOCATOR_CLEAR.setAccessible(true);
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
         }
@@ -135,8 +147,7 @@ public class ApolloTestingServer implements AutoCloseable {
     }
 
     private String loadConfigFor(String namespace) {
-        String filename = String.format("mockdata-%s.properties", namespace);
-        final Properties prop = ResourceUtils.readConfigFile(filename, new Properties());
+        final Properties prop = loadPropertiesOfNamespace(namespace);
         Map<String, String> configurations = Maps.newHashMap();
         for (String propertyName : prop.stringPropertyNames()) {
             configurations.put(propertyName, prop.getProperty(propertyName));
@@ -146,6 +157,32 @@ public class ApolloTestingServer implements AutoCloseable {
         Map<String, String> mergedConfigurations = mergeOverriddenProperties(namespace, configurations);
         apolloConfig.setConfigurations(mergedConfigurations);
         return GSON.toJson(apolloConfig);
+    }
+
+    private Properties loadPropertiesOfNamespace(String namespace) {
+        Object customizedCacheRoot = null;
+        try {
+            CONFIG_UTIL_LOCATOR_CLEAR.invoke(CONFIG_UTIL_LOCATOR);
+        } catch (Exception e) {
+            logger.error("invoke config util locator clear failed.", e);
+            String filename = String.format("mockdata-%s.properties", namespace);
+            logger.debug("load {} from {}", namespace, filename);
+            return ResourceUtils.readConfigFile(filename, new Properties());
+        }
+        String appId = CONFIG_UTIL_LOCATOR.getAppId();
+        String cluster = CONFIG_UTIL_LOCATOR.getCluster();
+        String baseDir = String.format("%s/%s/%s/", customizedCacheRoot, appId, "config-cache");
+        String fileName = String.format("%s.properties", Joiner.on("+").join(appId, cluster, namespace));
+        File file = new File(baseDir, fileName);
+
+        Properties prop = new Properties();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            prop.load(fis);
+        } catch (IOException e) {
+            logger.error("load {} from {}{} failed.", namespace, baseDir, fileName);
+        }
+        logger.debug("load {} from {}{}", namespace, baseDir, fileName);
+        return prop;
     }
 
     private String mockLongPollBody(String notificationsStr) {
