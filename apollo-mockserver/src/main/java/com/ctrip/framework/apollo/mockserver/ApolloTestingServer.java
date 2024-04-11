@@ -57,7 +57,7 @@ public class ApolloTestingServer implements AutoCloseable {
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
     private static Method CONFIG_UTIL_LOCATOR_CLEAR;
-    private static ConfigUtil CONFIG_UTIL_LOCATOR;
+    private static volatile ConfigUtil CONFIG_UTIL_LOCATOR;
 
     private static final Gson GSON = new Gson();
     private final Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace = Maps.newConcurrentMap();

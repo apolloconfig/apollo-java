@@ -23,12 +23,15 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.io.Files;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
@@ -55,9 +58,14 @@ public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
 
     File someBaseDir = new File(someCacheDir + "/" + someAppId + "/config-cache");
     someBaseDir.mkdirs();
-    File file = new File(someBaseDir, String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
-            .join(someAppId, "default", someNamespace)));
-    Files.write( someKey + "=" + someValue, file, Charsets.UTF_8);
+    File file = new File(someBaseDir, String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(
+            someAppId, "default", someNamespace)));
+    try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), Charsets.UTF_8)) {
+      writer.write(someKey + "=" + someValue);
+    }finally {
+      file.deleteOnExit();
+      someBaseDir.deleteOnExit();
+    }
     Config config = ConfigService.getConfig(someNamespace);
     assertEquals(someValue, config.getProperty(someKey, null));
   }
