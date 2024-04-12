@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -57,7 +58,10 @@ public class ApolloTestingServer implements AutoCloseable {
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
     private static Method CONFIG_UTIL_LOCATOR_CLEAR;
-    private static volatile ConfigUtil CONFIG_UTIL_LOCATOR;
+    private static ConfigUtil CONFIG_UTIL_LOCATOR;
+
+    private static Method RESOURCES_UTILS_LOCATOR_CLEAR;
+    private static ResourceUtils RESOURCES_UTILS_LOCATOR;
 
     private static final Gson GSON = new Gson();
     private final Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace = Maps.newConcurrentMap();
@@ -79,6 +83,11 @@ public class ApolloTestingServer implements AutoCloseable {
             CONFIG_UTIL_LOCATOR = ApolloInjector.getInstance(ConfigUtil.class);
             CONFIG_UTIL_LOCATOR_CLEAR = ConfigUtil.class.getDeclaredMethod("getDefaultLocalCacheDir");
             CONFIG_UTIL_LOCATOR_CLEAR.setAccessible(true);
+
+            RESOURCES_UTILS_LOCATOR = ApolloInjector.getInstance(ResourceUtils.class);
+            RESOURCES_UTILS_LOCATOR_CLEAR = ResourceUtils.class.getDeclaredMethod("loadConfigFileFromDefaultSearchLocations",
+                    new Class[] {String.class});
+            RESOURCES_UTILS_LOCATOR_CLEAR.setAccessible(true);
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
         }
@@ -170,12 +179,18 @@ public class ApolloTestingServer implements AutoCloseable {
     }
 
     private Properties loadPropertiesOfNamespace(String namespace) {
-        String defaultLocalCacheDir = getDefaultLocalCacheDir();
-        if (Objects.isNull(defaultLocalCacheDir)) {
-            String filename = String.format("mockdata-%s.properties", namespace);
+        String filename = String.format("mockdata-%s.properties", namespace);
+        Object mockdataPropertiesExits = null;
+        try {
+            mockdataPropertiesExits = RESOURCES_UTILS_LOCATOR_CLEAR.invoke(RESOURCES_UTILS_LOCATOR, filename);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("invoke resources util locator clear failed.", e);
+        }
+        if (!Objects.isNull(mockdataPropertiesExits)) {
             logger.debug("load {} from {}", namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
+        String defaultLocalCacheDir = getDefaultLocalCacheDir();
         return loadDefaultLocalCacheDir(namespace, defaultLocalCacheDir);
     }
 
