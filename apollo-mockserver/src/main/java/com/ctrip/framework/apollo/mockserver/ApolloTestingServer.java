@@ -77,7 +77,7 @@ public class ApolloTestingServer implements AutoCloseable {
             CONFIG_SERVICE_LOCATOR_CLEAR.setAccessible(true);
 
             CONFIG_UTIL_LOCATOR = ApolloInjector.getInstance(ConfigUtil.class);
-            CONFIG_UTIL_LOCATOR_CLEAR = ConfigUtil.class.getDeclaredMethod("getCustomizedCacheRoot");
+            CONFIG_UTIL_LOCATOR_CLEAR = ConfigUtil.class.getDeclaredMethod("getDefaultLocalCacheDir");
             CONFIG_UTIL_LOCATOR_CLEAR.setAccessible(true);
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
@@ -159,39 +159,38 @@ public class ApolloTestingServer implements AutoCloseable {
         return GSON.toJson(apolloConfig);
     }
 
-    private Object getCustomizedCacheRoot() {
-        Object customizedCacheRoot = null;
+    private String getDefaultLocalCacheDir() {
+        Object defaultLocalCacheDir = null;
         try {
-            customizedCacheRoot = CONFIG_UTIL_LOCATOR_CLEAR.invoke(CONFIG_UTIL_LOCATOR);
+            defaultLocalCacheDir = CONFIG_UTIL_LOCATOR_CLEAR.invoke(CONFIG_UTIL_LOCATOR);
         } catch (Exception e) {
             logger.error("invoke config util locator clear failed.", e);
         }
-        return customizedCacheRoot;
+        return (String) defaultLocalCacheDir;
     }
 
     private Properties loadPropertiesOfNamespace(String namespace) {
-        Object customizedCacheRoot = getCustomizedCacheRoot();
-        if (Objects.isNull(customizedCacheRoot)) {
+        String defaultLocalCacheDir = getDefaultLocalCacheDir();
+        if (Objects.isNull(defaultLocalCacheDir)) {
             String filename = String.format("mockdata-%s.properties", namespace);
             logger.debug("load {} from {}", namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
-        return loadOnCustomizedCacheRoot(namespace, customizedCacheRoot);
+        return loadDefaultLocalCacheDir(namespace, defaultLocalCacheDir);
     }
 
-    private Properties loadOnCustomizedCacheRoot(String namespace, Object customizedCacheRoot) {
+    private Properties loadDefaultLocalCacheDir(String namespace, String defaultLocalCacheDir) {
         Properties prop = new Properties();
         String appId = CONFIG_UTIL_LOCATOR.getAppId();
         String cluster = CONFIG_UTIL_LOCATOR.getCluster();
-        String baseDir = String.format("%s/%s/%s/", customizedCacheRoot, appId, "config-cache");
         String fileName = String.format("%s.properties", Joiner.on("+").join(appId, cluster, namespace));
-        File file = new File(baseDir, fileName);
+        File file = new File(defaultLocalCacheDir, fileName);
         try (FileInputStream fis = new FileInputStream(file)) {
             prop.load(fis);
         } catch (IOException e) {
-            logger.error("load {} from {}{} failed.", namespace, baseDir, fileName);
+            logger.error("load {} from {}{} failed.", namespace, defaultLocalCacheDir, fileName);
         }
-        logger.debug("load {} from {}{}", namespace, baseDir, fileName);
+        logger.debug("load {} from {}{}", namespace, defaultLocalCacheDir, fileName);
         return prop;
     }
 

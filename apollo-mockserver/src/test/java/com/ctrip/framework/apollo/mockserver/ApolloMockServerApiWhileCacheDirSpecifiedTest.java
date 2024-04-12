@@ -30,8 +30,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
@@ -43,7 +41,7 @@ public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
   public static EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
   @Test
-  public void testLoadOnCustomizedCacheRoot() throws Exception {
+  public void testLoadDefaultLocalCacheDir() throws Exception {
     String someCacheDir = "src/test/resources/config-cache";
     String someAppId = "someAppId";
     String someNamespace = "someNamespace";
@@ -53,20 +51,19 @@ public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
 
     ConfigUtil configUtil = spy(new ConfigUtil());
     doReturn(someAppId).when(configUtil).getAppId();
-    Object customizedCacheRoot = ReflectionTestUtils.invokeMethod(configUtil, "getCustomizedCacheRoot", new Object[]{});
-    assertEquals(someCacheDir, customizedCacheRoot);
+    String defaultLocalCacheDir = ReflectionTestUtils.invokeMethod(configUtil, "getDefaultLocalCacheDir", new Object[]{});
+    assertEquals(someCacheDir + "/" + someAppId, defaultLocalCacheDir);
 
-    File someBaseDir = new File(someCacheDir + "/" + someAppId + "/config-cache");
+    File someBaseDir = new File(defaultLocalCacheDir);
     someBaseDir.mkdirs();
     File file = new File(someBaseDir, String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(
             someAppId, "default", someNamespace)));
     try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), Charsets.UTF_8)) {
       writer.write(someKey + "=" + someValue);
-    }finally {
-      file.deleteOnExit();
-      someBaseDir.deleteOnExit();
     }
     Config config = ConfigService.getConfig(someNamespace);
     assertEquals(someValue, config.getProperty(someKey, null));
+    file.deleteOnExit();
+    someBaseDir.deleteOnExit();
   }
 }
