@@ -22,8 +22,8 @@ import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.utils.ResourceUtils;
 import com.ctrip.framework.apollo.internals.ConfigServiceLocator;
+import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -57,11 +56,12 @@ public class ApolloTestingServer implements AutoCloseable {
     private static Method CONFIG_SERVICE_LOCATOR_CLEAR;
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
-    private static Method CONFIG_UTIL_LOCATOR_CLEAR;
     private static ConfigUtil CONFIG_UTIL_LOCATOR;
 
     private static Method RESOURCES_UTILS_LOCATOR_CLEAR;
     private static ResourceUtils RESOURCES_UTILS_LOCATOR;
+
+    private static Method LOCAL_FILE_CACHE_LOCATOR_CLEAR;
 
     private static final Gson GSON = new Gson();
     private final Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace = Maps.newConcurrentMap();
@@ -81,13 +81,15 @@ public class ApolloTestingServer implements AutoCloseable {
             CONFIG_SERVICE_LOCATOR_CLEAR.setAccessible(true);
 
             CONFIG_UTIL_LOCATOR = ApolloInjector.getInstance(ConfigUtil.class);
-            CONFIG_UTIL_LOCATOR_CLEAR = ConfigUtil.class.getDeclaredMethod("getDefaultLocalCacheDir");
-            CONFIG_UTIL_LOCATOR_CLEAR.setAccessible(true);
 
             RESOURCES_UTILS_LOCATOR = ApolloInjector.getInstance(ResourceUtils.class);
             RESOURCES_UTILS_LOCATOR_CLEAR = ResourceUtils.class.getDeclaredMethod("loadConfigFileFromDefaultSearchLocations",
                     new Class[] {String.class});
             RESOURCES_UTILS_LOCATOR_CLEAR.setAccessible(true);
+
+            LOCAL_FILE_CACHE_LOCATOR_CLEAR = LocalFileConfigRepository.class.getDeclaredMethod("loadFromLocalCacheFile",
+                    new Class[]{File.class, String.class});
+            LOCAL_FILE_CACHE_LOCATOR_CLEAR.setAccessible(true);
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
         }
@@ -168,16 +170,6 @@ public class ApolloTestingServer implements AutoCloseable {
         return GSON.toJson(apolloConfig);
     }
 
-    private String getDefaultLocalCacheDir() {
-        Object defaultLocalCacheDir = null;
-        try {
-            defaultLocalCacheDir = CONFIG_UTIL_LOCATOR_CLEAR.invoke(CONFIG_UTIL_LOCATOR);
-        } catch (Exception e) {
-            logger.error("invoke config util locator clear failed.", e);
-        }
-        return (String) defaultLocalCacheDir;
-    }
-
     private Properties loadPropertiesOfNamespace(String namespace) {
         String filename = String.format("mockdata-%s.properties", namespace);
         Object mockdataPropertiesExits = null;
@@ -190,22 +182,15 @@ public class ApolloTestingServer implements AutoCloseable {
             logger.debug("load {} from {}", namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
-        String defaultLocalCacheDir = getDefaultLocalCacheDir();
-        return loadDefaultLocalCacheDir(namespace, defaultLocalCacheDir);
-    }
 
-    private Properties loadDefaultLocalCacheDir(String namespace, String defaultLocalCacheDir) {
         Properties prop = new Properties();
-        String appId = CONFIG_UTIL_LOCATOR.getAppId();
-        String cluster = CONFIG_UTIL_LOCATOR.getCluster();
-        String fileName = String.format("%s.properties", Joiner.on("+").join(appId, cluster, namespace));
-        File file = new File(defaultLocalCacheDir, fileName);
-        try (FileInputStream fis = new FileInputStream(file)) {
-            prop.load(fis);
-        } catch (IOException e) {
-            logger.error("load {} from {}{} failed.", namespace, defaultLocalCacheDir, fileName);
+        try {
+            LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(namespace);
+            prop = (Properties)LOCAL_FILE_CACHE_LOCATOR_CLEAR.invoke(localFileConfigRepository,
+                    new Object[]{new File(CONFIG_UTIL_LOCATOR.getDefaultLocalCacheDir()), namespace});
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("invoke local file cache locator clear failed.", e);
         }
-        logger.debug("load {} from {}{}", namespace, defaultLocalCacheDir, fileName);
         return prop;
     }
 
