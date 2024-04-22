@@ -56,12 +56,10 @@ public class ApolloTestingServer implements AutoCloseable {
     private static Method CONFIG_SERVICE_LOCATOR_CLEAR;
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
-    private static ConfigUtil CONFIG_UTIL_LOCATOR;
+    private static ConfigUtil CONFIG_UTIL;
 
-    private static Method RESOURCES_UTILS_LOCATOR_CLEAR;
-    private static ResourceUtils RESOURCES_UTILS_LOCATOR;
-
-    private static Method LOCAL_FILE_CACHE_LOCATOR_CLEAR;
+    private static Method RESOURCES_UTILS_CLEAR;
+    private static ResourceUtils RESOURCES_UTILS;
 
     private static final Gson GSON = new Gson();
     private final Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace = Maps.newConcurrentMap();
@@ -80,16 +78,12 @@ public class ApolloTestingServer implements AutoCloseable {
             CONFIG_SERVICE_LOCATOR_CLEAR = ConfigServiceLocator.class.getDeclaredMethod("initConfigServices");
             CONFIG_SERVICE_LOCATOR_CLEAR.setAccessible(true);
 
-            CONFIG_UTIL_LOCATOR = ApolloInjector.getInstance(ConfigUtil.class);
+            CONFIG_UTIL = ApolloInjector.getInstance(ConfigUtil.class);
 
-            RESOURCES_UTILS_LOCATOR = ApolloInjector.getInstance(ResourceUtils.class);
-            RESOURCES_UTILS_LOCATOR_CLEAR = ResourceUtils.class.getDeclaredMethod("loadConfigFileFromDefaultSearchLocations",
+            RESOURCES_UTILS = ApolloInjector.getInstance(ResourceUtils.class);
+            RESOURCES_UTILS_CLEAR = ResourceUtils.class.getDeclaredMethod("loadConfigFileFromDefaultSearchLocations",
                     new Class[] {String.class});
-            RESOURCES_UTILS_LOCATOR_CLEAR.setAccessible(true);
-
-            LOCAL_FILE_CACHE_LOCATOR_CLEAR = LocalFileConfigRepository.class.getDeclaredMethod("loadFromLocalCacheFile",
-                    new Class[]{File.class, String.class});
-            LOCAL_FILE_CACHE_LOCATOR_CLEAR.setAccessible(true);
+            RESOURCES_UTILS_CLEAR.setAccessible(true);
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
         }
@@ -174,7 +168,7 @@ public class ApolloTestingServer implements AutoCloseable {
         String filename = String.format("mockdata-%s.properties", namespace);
         Object mockdataPropertiesExits = null;
         try {
-            mockdataPropertiesExits = RESOURCES_UTILS_LOCATOR_CLEAR.invoke(RESOURCES_UTILS_LOCATOR, filename);
+            mockdataPropertiesExits = RESOURCES_UTILS_CLEAR.invoke(RESOURCES_UTILS, filename);
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("invoke resources util locator clear failed.", e);
         }
@@ -183,15 +177,8 @@ public class ApolloTestingServer implements AutoCloseable {
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
 
-        Properties prop = new Properties();
-        try {
-            LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(namespace);
-            prop = (Properties)LOCAL_FILE_CACHE_LOCATOR_CLEAR.invoke(localFileConfigRepository,
-                    new Object[]{new File(CONFIG_UTIL_LOCATOR.getDefaultLocalCacheDir()), namespace});
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            logger.error("invoke local file cache locator clear failed.", e);
-        }
-        return prop;
+        LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(namespace);
+        return localFileConfigRepository.getConfig();
     }
 
     private String mockLongPollBody(String notificationsStr) {

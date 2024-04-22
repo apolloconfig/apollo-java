@@ -20,6 +20,7 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
+import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -29,6 +30,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 
 import static org.junit.Assert.*;
@@ -54,7 +56,13 @@ public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
     String defaultLocalCacheDir = ReflectionTestUtils.invokeMethod(configUtil, "getDefaultLocalCacheDir", new Object[]{});
     assertEquals(someCacheDir + "/" + someAppId, defaultLocalCacheDir);
 
-    File someBaseDir = new File(defaultLocalCacheDir);
+    // LocalFileConfigRepository.CONFIG_DIR
+    LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(someNamespace);
+    Field FIELD_CONFIG_DIR = localFileConfigRepository.getClass().getDeclaredField("CONFIG_DIR");
+    FIELD_CONFIG_DIR.setAccessible(true);
+    String configDir = (String) FIELD_CONFIG_DIR.get(localFileConfigRepository);
+
+    File someBaseDir = new File(defaultLocalCacheDir, configDir);
     someBaseDir.mkdirs();
     File file = new File(someBaseDir, String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(
             someAppId, "default", someNamespace)));
