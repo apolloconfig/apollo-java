@@ -35,7 +35,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -176,9 +175,7 @@ public class ApolloTestingServer implements AutoCloseable {
             logger.debug("load {} from {}", namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
-
-        LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(namespace);
-        return localFileConfigRepository.getConfig();
+        return new LocalFileConfigRepository(namespace).getConfig();
     }
 
     private String mockLongPollBody(String notificationsStr) {
