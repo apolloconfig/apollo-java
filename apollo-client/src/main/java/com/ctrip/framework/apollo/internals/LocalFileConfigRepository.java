@@ -71,7 +71,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     this.setLocalCacheDir(findLocalCacheDir(), false);
     this.setUpstreamRepository(upstream);
-    this.trySync();
+    // this.trySync();
   }
 
   void setLocalCacheDir(File baseDir, boolean syncImmediately) {
