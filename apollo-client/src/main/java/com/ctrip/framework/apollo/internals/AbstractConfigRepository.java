@@ -73,4 +73,9 @@ public abstract class AbstractConfigRepository implements ConfigRepository {
       }
     }
   }
+
+  @Override
+  public void initialize() {
+    this.sync();
+  }
 }

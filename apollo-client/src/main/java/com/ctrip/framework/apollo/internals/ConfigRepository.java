@@ -53,4 +53,9 @@ public interface ConfigRepository {
    * @return the config's source type
    */
   ConfigSourceType getSourceType();
+
+  /**
+   * Initialize the repository.
+   */
+  void initialize();
 }

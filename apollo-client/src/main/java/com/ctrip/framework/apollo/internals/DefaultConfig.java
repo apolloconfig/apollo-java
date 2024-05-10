@@ -71,6 +71,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   private void initialize() {
     try {
+      m_configRepository.initialize();
       updateConfig(m_configRepository.getConfig(), m_configRepository.getSourceType());
     } catch (Throwable ex) {
       Tracer.logError(ex);
