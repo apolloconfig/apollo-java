@@ -142,6 +142,13 @@
         <version>1.2.0</version>
         <scope>test</scope>
       </dependency>
+      <!-- mock server -->
+      <dependency>
+        <groupId>org.mock-server</groupId>
+        <artifactId>mockserver-netty</artifactId>
+        <version>5.15.0</version>
+        <scope>test</scope>
+      </dependency>
       <!-- declare Spring BOMs in order -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
