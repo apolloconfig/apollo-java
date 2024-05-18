@@ -320,7 +320,7 @@ public class RemoteConfigRepositoryTest {
 
     final ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor = ArgumentCaptor
         .forClass(HttpRequest.class);
-    verify(httpClient, atLeast(2)).doGet(httpRequestArgumentCaptor.capture(), eq(ApolloConfig.class));
+    verify(httpClient, atLeast(1)).doGet(httpRequestArgumentCaptor.capture(), eq(ApolloConfig.class));
 
     HttpRequest request = httpRequestArgumentCaptor.getValue();
 

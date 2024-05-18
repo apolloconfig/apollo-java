@@ -16,11 +16,10 @@
  */
 package com.ctrip.framework.apollo.integration;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ctrip.framework.apollo.MockedConfigService;
 import com.ctrip.framework.apollo.util.OrderedProperties;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,12 +33,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ctrip.framework.apollo.BaseIntegrationTest;
@@ -70,7 +66,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
   private String someOtherNamespace;
   private RemoteConfigLongPollService remoteConfigLongPollService;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
 
@@ -86,7 +82,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
   }
 
   @Override
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
     recursiveDelete(configDir);
@@ -117,8 +113,8 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     String someNonExistedKey = "someNonExistedKey";
     String someDefaultValue = "someDefaultValue";
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.of(someKey, someValue));
-    ContextHandler handler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    startServerWithHandlers(handler);
+    MockedConfigService mockedConfigService = newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
 
@@ -138,8 +134,8 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     configurations.put(someKey1, someValue1);
     configurations.put(someKey2, someValue2);
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.copyOf(configurations));
-    ContextHandler handler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    startServerWithHandlers(handler);
+    MockedConfigService mockedConfigService = newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
 
@@ -160,8 +156,8 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     createLocalCachePropertyFile(properties);
 
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.of(someKey, anotherValue));
-    ContextHandler handler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    startServerWithHandlers(handler);
+    MockedConfigService mockedConfigService = newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
 
@@ -193,8 +189,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     configurations.put(someKey1, anotherValue1);
     configurations.put(someKey2, someValue2);
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.copyOf(configurations));
-    ContextHandler handler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    startServerWithHandlers(handler);
+
+    newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
 
@@ -211,9 +208,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testGetConfigWithNoLocalFileAndRemoteConfigError() throws Exception {
-    ContextHandler handler =
-        mockConfigServerHandler(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
-    startServerWithHandlers(handler);
+
+    newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
 
     Config config = ConfigService.getAppConfig();
 
@@ -231,9 +228,8 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     properties.put(someKey, someValue);
     createLocalCachePropertyFile(properties);
 
-    ContextHandler handler =
-        mockConfigServerHandler(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
-    startServerWithHandlers(handler);
+    newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
 
     Config config = ConfigService.getAppConfig();
     assertEquals(someValue, config.getProperty(someKey, null));
@@ -253,9 +249,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     properties.put(someKey2, someValue2);
     createLocalCachePropertyFile(properties);
 
-    ContextHandler handler =
-        mockConfigServerHandler(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
-    startServerWithHandlers(handler);
+    newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
+
 
     Config config = ConfigService.getAppConfig();
     assertEquals(someValue1, config.getProperty(someKey1, null));
@@ -272,10 +268,11 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     String someKey = "someKey";
     String someValue = "someValue";
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.of(someKey, someValue));
-    ContextHandler configHandler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
     boolean failAtFirstTime = true;
-    ContextHandler metaServerHandler = mockMetaServerHandler(failAtFirstTime);
-    startServerWithHandlers(metaServerHandler, configHandler);
+
+    newMockedConfigService();
+    mockMetaServer(failAtFirstTime);
+    mockConfigs(failAtFirstTime, HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
 
@@ -288,9 +285,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     String someValue = "someValue";
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.of(someKey, someValue));
     boolean failedAtFirstTime = true;
-    ContextHandler handler =
-        mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig, failedAtFirstTime);
-    startServerWithHandlers(handler);
+
+    newMockedConfigService();
+    mockConfigs(failedAtFirstTime, HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
 
@@ -312,8 +309,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     Map<String, String> configurations = Maps.newHashMap();
     configurations.put(someKey, someValue);
     ApolloConfig apolloConfig = assembleApolloConfig(configurations);
-    ContextHandler handler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    startServerWithHandlers(handler);
+
+    newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
     final List<ConfigChangeEvent> changeEvents = Lists.newArrayList();
@@ -339,12 +337,12 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     });
 
     apolloConfig.getConfigurations().put(someKey, anotherValue);
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     refreshFinished.get(someRefreshInterval * 5, someRefreshTimeUnit);
 
-    assertThat(
-        "Change event's size should equal to one or there must be some assertion failed in change listener",
-        1, equalTo(changeEvents.size()));
+    assertEquals(1, changeEvents.size(),
+        "Change event's size should equal to one or there must be some assertion failed in change listener");
     assertEquals(anotherValue, config.getProperty(someKey, null));
   }
 
@@ -359,14 +357,13 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     Map<String, String> configurations = Maps.newHashMap();
     configurations.put(someKey, someValue);
     ApolloConfig apolloConfig = assembleApolloConfig(configurations);
-    ContextHandler configHandler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    ContextHandler pollHandler =
-        mockPollNotificationHandler(pollTimeoutInMS, HttpServletResponse.SC_OK,
-            Lists.newArrayList(
-                new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId)),
-            false);
 
-    startServerWithHandlers(configHandler, pollHandler);
+    MockedConfigService mockedConfigService = newMockedConfigService();
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
+    mockedConfigService.mockLongPollNotifications(pollTimeoutInMS, HttpServletResponse.SC_OK,
+            Lists.newArrayList(
+                new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId))
+        );
 
     Config config = ConfigService.getAppConfig();
     assertEquals(someValue, config.getProperty(someKey, null));
@@ -381,6 +378,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     });
 
     apolloConfig.getConfigurations().put(someKey, anotherValue);
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     longPollFinished.get(pollTimeoutInMS * 20, TimeUnit.MILLISECONDS);
 
@@ -399,14 +397,10 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     Map<String, String> configurations = Maps.newHashMap();
     configurations.put(someKey, someValue);
     ApolloConfig apolloConfig = assembleApolloConfig(configurations);
-    ContextHandler configHandler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    ContextHandler pollHandler =
-        mockPollNotificationHandler(pollTimeoutInMS, HttpServletResponse.SC_OK,
-            Lists.newArrayList(
-                new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId)),
-            false);
 
-    startServerWithHandlers(configHandler, pollHandler);
+    MockedConfigService mockedConfigService = newMockedConfigService();
+    // todo mockMetaServer();
+    mockConfigs(true, HttpServletResponse.SC_OK, apolloConfig);
 
     Config someOtherConfig = ConfigService.getConfig(someOtherNamespace);
     Config config = ConfigService.getAppConfig();
@@ -415,6 +409,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
 
     final SettableFuture<Boolean> longPollFinished = SettableFuture.create();
 
+    // add change listener first
     config.addChangeListener(new ConfigChangeListener() {
       @Override
       public void onChange(ConfigChangeEvent changeEvent) {
@@ -422,7 +417,16 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
       }
     });
 
+    // change the config on remote
     apolloConfig.getConfigurations().put(someKey, anotherValue);
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
+
+    // notify
+    mockedConfigService.mockLongPollNotifications(
+        false, pollTimeoutInMS, HttpServletResponse.SC_OK,
+        Lists.newArrayList(
+            new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId))
+    );
 
     longPollFinished.get(5000, TimeUnit.MILLISECONDS);
 
@@ -444,15 +448,8 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     Map<String, String> configurations = Maps.newHashMap();
     configurations.put(someKey, someValue);
     ApolloConfig apolloConfig = assembleApolloConfig(configurations);
-    ContextHandler configHandler = mockConfigServerHandler(HttpServletResponse.SC_OK, apolloConfig);
-    ContextHandler pollHandler =
-        mockPollNotificationHandler(pollTimeoutInMS, HttpServletResponse.SC_OK,
-            Lists.newArrayList(
-                new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId),
-                new ApolloConfigNotification(someOtherNamespace, someNotificationId)),
-            false);
-
-    startServerWithHandlers(configHandler, pollHandler);
+    MockedConfigService mockedConfigService = newMockedConfigService();
+    mockConfigs(true, HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
     Config someOtherConfig = ConfigService.getConfig(someOtherNamespace);
@@ -462,6 +459,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     final SettableFuture<Boolean> longPollFinished = SettableFuture.create();
     final SettableFuture<Boolean> someOtherNamespacelongPollFinished = SettableFuture.create();
 
+    // add change listener first
     config.addChangeListener(new ConfigChangeListener() {
       @Override
       public void onChange(ConfigChangeEvent changeEvent) {
@@ -475,7 +473,17 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
       }
     });
 
+    // change the config on remote
     apolloConfig.getConfigurations().put(someKey, anotherValue);
+    mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
+
+    // notify
+    mockedConfigService.mockLongPollNotifications(
+        false, pollTimeoutInMS, HttpServletResponse.SC_OK,
+        Lists.newArrayList(
+            new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId),
+            new ApolloConfigNotification(someOtherNamespace, someNotificationId))
+    );
 
     longPollFinished.get(5000, TimeUnit.MILLISECONDS);
     someOtherNamespacelongPollFinished.get(5000, TimeUnit.MILLISECONDS);
@@ -483,67 +491,6 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     assertEquals(anotherValue, config.getProperty(someKey, null));
     assertEquals(anotherValue, someOtherConfig.getProperty(someKey, null));
 
-  }
-
-  private ContextHandler mockPollNotificationHandler(final long pollResultTimeOutInMS,
-      final int statusCode,
-      final List<ApolloConfigNotification> result,
-      final boolean failedAtFirstTime) {
-    ContextHandler context = new ContextHandler("/notifications/v2");
-    context.setHandler(new AbstractHandler() {
-      AtomicInteger counter = new AtomicInteger(0);
-
-      @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request,
-          HttpServletResponse response) throws IOException, ServletException {
-        if (failedAtFirstTime && counter.incrementAndGet() == 1) {
-          response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          baseRequest.setHandled(true);
-          return;
-        }
-
-        try {
-          TimeUnit.MILLISECONDS.sleep(pollResultTimeOutInMS);
-        } catch (InterruptedException e) {
-        }
-
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(statusCode);
-        response.getWriter().println(gson.toJson(result));
-        baseRequest.setHandled(true);
-      }
-    });
-
-    return context;
-  }
-
-  private ContextHandler mockConfigServerHandler(final int statusCode, final ApolloConfig result,
-      final boolean failedAtFirstTime) {
-    ContextHandler context = new ContextHandler("/configs/*");
-    context.setHandler(new AbstractHandler() {
-      AtomicInteger counter = new AtomicInteger(0);
-
-      @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request,
-          HttpServletResponse response) throws IOException, ServletException {
-        if (failedAtFirstTime && counter.incrementAndGet() == 1) {
-          response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          baseRequest.setHandled(true);
-          return;
-        }
-
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(statusCode);
-        response.getWriter().println(gson.toJson(result));
-        baseRequest.setHandled(true);
-      }
-    });
-    return context;
-  }
-
-
-  private ContextHandler mockConfigServerHandler(int statusCode, ApolloConfig result) {
-    return mockConfigServerHandler(statusCode, result, false);
   }
 
   private ApolloConfig assembleApolloConfig(Map<String, String> configurations) {

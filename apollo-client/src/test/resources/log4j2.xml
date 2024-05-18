@@ -28,6 +28,8 @@
         <logger name="com.ctrip.framework.apollo" additivity="false" level="trace">
             <AppenderRef ref="Async" level="WARN"/>
         </logger>
+        <!-- MockServer change level="INFO" for http detail -->
+        <logger name="org.mockserver.log" level="WARN"/>
         <root level="INFO">
             <AppenderRef ref="Async"/>
         </root>
