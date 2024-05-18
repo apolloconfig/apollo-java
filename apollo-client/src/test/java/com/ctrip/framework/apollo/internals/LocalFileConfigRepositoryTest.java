@@ -187,7 +187,7 @@ public class LocalFileConfigRepositoryTest {
         new LocalFileConfigRepository(someNamespace, upstreamRepo);
 
     assertEquals(ConfigSourceType.LOCAL, localFileConfigRepository.getSourceType());
-    localFileConfigRepository.trySync();
+    localFileConfigRepository.initialize();
     assertEquals(someSourceType, localFileConfigRepository.getSourceType());
 
     localFileConfigRepository.setLocalCacheDir(someBaseDir, true);
