@@ -57,5 +57,5 @@ public interface ConfigRepository {
   /**
    * Initialize the repository.
    */
-  void initialize();
+  default void initialize() {}
 }
