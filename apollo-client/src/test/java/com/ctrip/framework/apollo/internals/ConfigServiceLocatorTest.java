@@ -16,17 +16,21 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
+import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import java.util.List;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 public class ConfigServiceLocatorTest {
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     System.clearProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE);
     System.clearProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE);
@@ -47,6 +51,8 @@ public class ConfigServiceLocatorTest {
 
     assertEquals(someConfigServiceUrl.trim(), result.get(0).getHomepageUrl());
     assertEquals(anotherConfigServiceUrl.trim(), result.get(1).getHomepageUrl());
+
+    assertNull(configServiceLocator.m_executorService, "thread pool should be null");
   }
 
   @Test
@@ -65,5 +71,19 @@ public class ConfigServiceLocatorTest {
 
     assertEquals(someConfigServiceUrl.trim(), result.get(0).getHomepageUrl());
     assertEquals(anotherConfigServiceUrl.trim(), result.get(1).getHomepageUrl());
+
+    assertNull(configServiceLocator.m_executorService, "thread pool should be null");
+  }
+
+  @Test
+  public void giveNoUsableConfigServiceThenThrowExceptionQuickly() {
+    ConfigServiceLocator configServiceLocator = Mockito.spy(
+        new ConfigServiceLocator()
+    );
+    // speed up test case
+    Mockito.doNothing().when(configServiceLocator).updateConfigServices();
+    assertThrows(ApolloConfigException.class, () -> {
+      configServiceLocator.getConfigServices();
+    });
   }
 }
