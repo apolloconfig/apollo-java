@@ -21,35 +21,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.MockedConfigService;
 import com.ctrip.framework.apollo.util.OrderedProperties;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ctrip.framework.apollo.BaseIntegrationTest;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigService;
-import com.ctrip.framework.apollo.build.ApolloInjector;
-import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
-import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
-import com.ctrip.framework.apollo.internals.RemoteConfigLongPollService;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -60,51 +46,9 @@ import com.google.common.util.concurrent.SettableFuture;
  */
 public class ConfigIntegrationTest extends BaseIntegrationTest {
 
-  private String someReleaseKey;
-  private File configDir;
-  private String defaultNamespace;
-  private String someOtherNamespace;
-  private RemoteConfigLongPollService remoteConfigLongPollService;
+  private final String someReleaseKey = "1";
 
-  @BeforeEach
-  public void setUp() throws Exception {
-    super.setUp();
-
-    defaultNamespace = ConfigConsts.NAMESPACE_APPLICATION;
-    someOtherNamespace = "someOtherNamespace";
-    someReleaseKey = "1";
-    configDir = new File(ClassLoaderUtil.getClassPath() + "config-cache");
-    if (configDir.exists()) {
-      configDir.delete();
-    }
-    configDir.mkdirs();
-    remoteConfigLongPollService = ApolloInjector.getInstance(RemoteConfigLongPollService.class);
-  }
-
-  @Override
-  @AfterEach
-  public void tearDown() throws Exception {
-    ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
-    recursiveDelete(configDir);
-    super.tearDown();
-  }
-
-  private void recursiveDelete(File file) {
-    if (!file.exists()) {
-      return;
-    }
-    if (file.isDirectory()) {
-      for (File f : file.listFiles()) {
-        recursiveDelete(f);
-      }
-    }
-    try {
-      Files.deleteIfExists(file.toPath());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-  }
+  private final String someOtherNamespace = "someOtherNamespace";
 
   @Test
   public void testGetConfigWithNoLocalFileButWithRemoteConfig() throws Exception {
@@ -399,7 +343,6 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     ApolloConfig apolloConfig = assembleApolloConfig(configurations);
 
     MockedConfigService mockedConfigService = newMockedConfigService();
-    // todo mockMetaServer();
     mockConfigs(true, HttpServletResponse.SC_OK, apolloConfig);
 
     Config someOtherConfig = ConfigService.getConfig(someOtherNamespace);
@@ -502,16 +445,4 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     return apolloConfig;
   }
 
-  private File createLocalCachePropertyFile(Properties properties) throws IOException {
-    File file = new File(configDir, assembleLocalCacheFileName());
-    try (FileOutputStream in = new FileOutputStream(file)) {
-      properties.store(in, "Persisted by ConfigIntegrationTest");
-    }
-    return file;
-  }
-
-  private String assembleLocalCacheFileName() {
-    return String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
-        .join(someAppId, someClusterName, defaultNamespace));
-  }
 }

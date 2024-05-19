@@ -16,12 +16,21 @@
  */
 package com.ctrip.framework.apollo;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
+import com.ctrip.framework.apollo.internals.RemoteConfigLongPollService;
+import com.google.common.base.Joiner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import com.ctrip.framework.apollo.build.MockInjector;
@@ -39,7 +48,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Jason Song(song_s@ctrip.com)
  */
 public abstract class BaseIntegrationTest {
-  private static final Logger logger = LoggerFactory.getLogger(BaseIntegrationTest.class);
+  protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private static final String someAppName = "someAppName";
   private static final String someInstanceId = "someInstanceId";
@@ -54,6 +63,13 @@ public abstract class BaseIntegrationTest {
   protected static boolean propertiesOrderEnabled;
   private MockedConfigService mockedConfigService;
   protected Gson gson = new Gson();
+
+  protected final String defaultNamespace = ConfigConsts.NAMESPACE_APPLICATION;
+
+  private File configDir;
+
+  private RemoteConfigLongPollService remoteConfigLongPollService;
+
 
   protected MockedConfigService newMockedConfigService() {
     this.mockedConfigService = new MockedConfigService(port);
@@ -108,6 +124,13 @@ public abstract class BaseIntegrationTest {
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
+
+    configDir = new File(ClassLoaderUtil.getClassPath() + "config-cache");
+    if (configDir.exists()) {
+      configDir.delete();
+    }
+    configDir.mkdirs();
+    remoteConfigLongPollService = ApolloInjector.getInstance(RemoteConfigLongPollService.class);
   }
 
   @AfterEach
@@ -122,6 +145,26 @@ public abstract class BaseIntegrationTest {
       mockedConfigService.close();
       mockedConfigService = null;
     }
+
+    recursiveDelete(configDir);
+    ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
+  }
+
+  private void recursiveDelete(File file) {
+    if (!file.exists()) {
+      return;
+    }
+    if (file.isDirectory()) {
+      for (File f : file.listFiles()) {
+        recursiveDelete(f);
+      }
+    }
+    try {
+      Files.deleteIfExists(file.toPath());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
   }
 
   protected void setRefreshInterval(int refreshInterval) {
@@ -134,6 +177,38 @@ public abstract class BaseIntegrationTest {
 
   protected void setPropertiesOrderEnabled(boolean propertiesOrderEnabled) {
     BaseIntegrationTest.propertiesOrderEnabled = propertiesOrderEnabled;
+  }
+
+  protected void createLocalCachePropertyFile(Properties properties) {
+    createLocalCachePropertyFile(defaultNamespace, properties);
+  }
+
+  protected void createLocalCachePropertyFile(String namespace, Properties properties) {
+    String filename = assembleLocalCacheFileName(namespace);
+    File file = new File(configDir, filename);
+    try (FileOutputStream in = new FileOutputStream(file)) {
+      properties.store(in, "Persisted by " + this.getClass().getSimpleName());
+    } catch (IOException e) {
+      throw new IllegalStateException("fail to save " + namespace + " to file", e);
+    }
+  }
+
+  private String assembleLocalCacheFileName(String namespace) {
+    return String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
+        .join(someAppId, someClusterName, namespace));
+  }
+
+  protected ApolloConfig assembleApolloConfig(
+      String namespace,
+      String releaseKey,
+      Map<String, String> configurations
+  ) {
+    ApolloConfig apolloConfig =
+        new ApolloConfig(someAppId, someClusterName, namespace, releaseKey);
+
+    apolloConfig.setConfigurations(configurations);
+
+    return apolloConfig;
   }
 
   public static class MockConfigUtil extends ConfigUtil {
