@@ -76,8 +76,6 @@ public class ConfigServiceLocatorTest {
     ConfigServiceLocator configServiceLocator = Mockito.spy(
         new ConfigServiceLocator()
     );
-    // speed up test case
-    Mockito.doNothing().when(configServiceLocator).updateConfigServices();
     assertThrows(ApolloConfigException.class, () -> {
       configServiceLocator.getConfigServices();
     });

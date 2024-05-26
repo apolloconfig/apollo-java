@@ -161,7 +161,13 @@ public class ConfigServiceLocator {
    */
   public List<ServiceDTO> getConfigServices() {
     if (m_configServices.get().isEmpty()) {
-      updateConfigServices();
+      m_executorService.submit(() -> this.tryUpdateConfigServices());
+      // quick fail
+      throw new ApolloConfigException(
+          "No available config service, "
+              + "server side maybe crash or network cannot connect to server from this ip, "
+              + "one of meta service url is " + assembleMetaServiceUrl()
+      );
     }
 
     return m_configServices.get();
