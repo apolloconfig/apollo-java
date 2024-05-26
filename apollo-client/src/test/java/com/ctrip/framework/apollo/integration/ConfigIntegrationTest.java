@@ -57,7 +57,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     String someNonExistedKey = "someNonExistedKey";
     String someDefaultValue = "someDefaultValue";
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.of(someKey, someValue));
-    MockedConfigService mockedConfigService = newMockedConfigService();
+    newMockedConfigService();
     mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
@@ -78,7 +78,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     configurations.put(someKey1, someValue1);
     configurations.put(someKey2, someValue2);
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.copyOf(configurations));
-    MockedConfigService mockedConfigService = newMockedConfigService();
+    newMockedConfigService();
     mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
@@ -100,7 +100,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     createLocalCachePropertyFile(properties);
 
     ApolloConfig apolloConfig = assembleApolloConfig(ImmutableMap.of(someKey, anotherValue));
-    MockedConfigService mockedConfigService = newMockedConfigService();
+    newMockedConfigService();
     mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     Config config = ConfigService.getAppConfig();
