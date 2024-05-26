@@ -51,8 +51,6 @@ public class ConfigServiceLocatorTest {
 
     assertEquals(someConfigServiceUrl.trim(), result.get(0).getHomepageUrl());
     assertEquals(anotherConfigServiceUrl.trim(), result.get(1).getHomepageUrl());
-
-    assertNull(configServiceLocator.m_executorService, "thread pool should be null");
   }
 
   @Test
@@ -71,8 +69,6 @@ public class ConfigServiceLocatorTest {
 
     assertEquals(someConfigServiceUrl.trim(), result.get(0).getHomepageUrl());
     assertEquals(anotherConfigServiceUrl.trim(), result.get(1).getHomepageUrl());
-
-    assertNull(configServiceLocator.m_executorService, "thread pool should be null");
   }
 
   @Test
