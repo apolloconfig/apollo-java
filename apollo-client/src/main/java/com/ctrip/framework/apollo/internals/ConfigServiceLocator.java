@@ -200,6 +200,11 @@ public class ConfigServiceLocator {
     String url = assembleMetaServiceUrl();
 
     HttpRequest request = new HttpRequest(url);
+    // speed up http request
+    int mixTimeout = Math.min(m_configUtil.getConnectTimeout(), m_configUtil.getReadTimeout());
+    request.setConnectTimeout(mixTimeout);
+    request.setReadTimeout(mixTimeout);
+
     int maxRetries = 2;
     Throwable exception = null;
 
