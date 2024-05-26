@@ -24,7 +24,6 @@ import com.ctrip.framework.apollo.core.dto.ServiceDTO;
 import com.ctrip.framework.apollo.internals.RemoteConfigLongPollService;
 import com.google.common.base.Joiner;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -66,8 +65,6 @@ public abstract class BaseIntegrationTest {
   protected final String defaultNamespace = ConfigConsts.NAMESPACE_APPLICATION;
 
   private File configDir;
-
-  private RemoteConfigLongPollService remoteConfigLongPollService;
 
 
   protected MockedConfigService newMockedConfigService() {
@@ -129,11 +126,13 @@ public abstract class BaseIntegrationTest {
       configDir.delete();
     }
     configDir.mkdirs();
-    remoteConfigLongPollService = ApolloInjector.getInstance(RemoteConfigLongPollService.class);
   }
 
   @AfterEach
   public void tearDown() throws Exception {
+    // get the instance will trigger long poll task execute, so move it from setup to tearDown
+    RemoteConfigLongPollService remoteConfigLongPollService
+        = ApolloInjector.getInstance(RemoteConfigLongPollService.class);
     ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
     recursiveDelete(configDir);
 
