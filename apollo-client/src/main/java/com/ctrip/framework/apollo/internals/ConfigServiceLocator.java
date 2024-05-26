@@ -22,7 +22,6 @@ import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.core.utils.DeprecatedPropertyNotifyUtil;
 import com.ctrip.framework.foundation.Foundation;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -30,6 +29,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
@@ -54,11 +54,9 @@ public class ConfigServiceLocator {
   private static final Logger logger = DeferredLoggerFactory.getLogger(ConfigServiceLocator.class);
   private HttpClient m_httpClient;
   private ConfigUtil m_configUtil;
-  private final AtomicReference<List<ServiceDTO>> m_configServices = new AtomicReference<>(
-      Collections.emptyList());
-  private static final Type m_responseType = new TypeToken<List<ServiceDTO>>() {
-  }.getType();
-  ScheduledExecutorService m_executorService;
+  private AtomicReference<List<ServiceDTO>> m_configServices;
+  private Type m_responseType;
+  private ScheduledExecutorService m_executorService;
   private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
   private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
 
@@ -66,21 +64,15 @@ public class ConfigServiceLocator {
    * Create a config service locator.
    */
   public ConfigServiceLocator() {
-  }
-
-  /**
-   * only init once.
-   */
-  private void initialize() {
-    if (m_httpClient == null) {
-      synchronized (this) {
-        if (m_httpClient == null) {
-          m_httpClient = ApolloInjector.getInstance(HttpClient.class);
-          m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-          initConfigServices();
-        }
-      }
-    }
+    List<ServiceDTO> initial = Lists.newArrayList();
+    m_configServices = new AtomicReference<>(initial);
+    m_responseType = new TypeToken<List<ServiceDTO>>() {
+    }.getType();
+    m_httpClient = ApolloInjector.getInstance(HttpClient.class);
+    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    this.m_executorService = Executors.newScheduledThreadPool(1,
+        ApolloThreadFactory.create("ConfigServiceLocator", true));
+    initConfigServices();
   }
 
   private void initConfigServices() {
@@ -168,14 +160,8 @@ public class ConfigServiceLocator {
    * @return the services dto
    */
   public List<ServiceDTO> getConfigServices() {
-    initialize();
     if (m_configServices.get().isEmpty()) {
-      // quick fail
-      throw new ApolloConfigException(
-          "No available config service, "
-              + "server side maybe crash or network cannot connect to server from this ip, "
-          + "one of meta service url is " + assembleMetaServiceUrl()
-      );
+      updateConfigServices();
     }
 
     return m_configServices.get();
@@ -192,8 +178,6 @@ public class ConfigServiceLocator {
   }
 
   private void schedulePeriodicRefresh() {
-    this.m_executorService = Executors.newScheduledThreadPool(1,
-        ApolloThreadFactory.create("ConfigServiceLocator", true));
     this.m_executorService.scheduleAtFixedRate(
         new Runnable() {
           @Override
@@ -206,7 +190,7 @@ public class ConfigServiceLocator {
         m_configUtil.getRefreshIntervalTimeUnit());
   }
 
-  synchronized void updateConfigServices() {
+  private synchronized void updateConfigServices() {
     String url = assembleMetaServiceUrl();
 
     HttpRequest request = new HttpRequest(url);
