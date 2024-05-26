@@ -62,7 +62,6 @@ public abstract class BaseIntegrationTest {
   protected static TimeUnit refreshTimeUnit;
   protected static boolean propertiesOrderEnabled;
   private MockedConfigService mockedConfigService;
-  protected Gson gson = new Gson();
 
   protected final String defaultNamespace = ConfigConsts.NAMESPACE_APPLICATION;
 
@@ -135,6 +134,9 @@ public abstract class BaseIntegrationTest {
 
   @AfterEach
   public void tearDown() throws Exception {
+    ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
+    recursiveDelete(configDir);
+
     //as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
     MockInjector.reset();
@@ -145,9 +147,6 @@ public abstract class BaseIntegrationTest {
       mockedConfigService.close();
       mockedConfigService = null;
     }
-
-    recursiveDelete(configDir);
-    ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
   }
 
   private void recursiveDelete(File file) {
