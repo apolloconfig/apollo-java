@@ -131,6 +131,7 @@ public class RemoteConfigRepositoryTest {
   @After
   public void tearDown() throws Exception {
     MockInjector.reset();
+    remoteConfigLongPollService.stopLongPollingRefresh();
   }
 
   @Test
@@ -150,7 +151,6 @@ public class RemoteConfigRepositoryTest {
 
     assertEquals(configurations, config);
     assertEquals(ConfigSourceType.REMOTE, remoteConfigRepository.getSourceType());
-    remoteConfigLongPollService.stopLongPollingRefresh();
   }
 
   @Test
@@ -178,7 +178,6 @@ public class RemoteConfigRepositoryTest {
     assertTrue(config instanceof OrderedProperties);
     assertEquals(configurations, config);
     assertEquals(ConfigSourceType.REMOTE, remoteConfigRepository.getSourceType());
-    remoteConfigLongPollService.stopLongPollingRefresh();
 
     String[] actualArrays = config.keySet().toArray(new String[]{});
     String[] expectedArrays = {"someKey", "someKey2"};
@@ -215,7 +214,6 @@ public class RemoteConfigRepositoryTest {
 
     assertEquals(configurations, config);
     assertEquals(ConfigSourceType.REMOTE, remoteConfigRepository.getSourceType());
-    remoteConfigLongPollService.stopLongPollingRefresh();
   }
 
   @Test(expected = ApolloConfigException.class)
@@ -267,8 +265,6 @@ public class RemoteConfigRepositoryTest {
     verify(someListener, times(1)).onRepositoryChange(eq(someNamespace), captor.capture());
 
     assertEquals(newConfigurations, captor.getValue());
-
-    remoteConfigLongPollService.stopLongPollingRefresh();
   }
 
   @Test
@@ -352,7 +348,6 @@ public class RemoteConfigRepositoryTest {
             notificationMessages,
             someApolloConfig);
 
-    remoteConfigLongPollService.stopLongPollingRefresh();
     assertTrue(queryConfigUrl
         .contains(
             "http://someServer/configs/someAppId/someCluster+%20&.-_someSign/" + someNamespace));
