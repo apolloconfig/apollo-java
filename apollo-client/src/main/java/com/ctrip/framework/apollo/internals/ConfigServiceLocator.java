@@ -21,15 +21,16 @@ import com.ctrip.framework.apollo.core.ServiceNameConsts;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.core.utils.DeprecatedPropertyNotifyUtil;
 import com.ctrip.framework.foundation.Foundation;
+import com.google.common.util.concurrent.RateLimiter;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
@@ -57,6 +58,13 @@ public class ConfigServiceLocator {
   private AtomicReference<List<ServiceDTO>> m_configServices;
   private Type m_responseType;
   private ScheduledExecutorService m_executorService;
+  /**
+   * forbid submit multiple task to {@link #m_executorService}，
+   * <p>
+   * so use this AtomicBoolean as a signal
+   */
+  protected AtomicBoolean discoveryTaskQueueMark;
+  private RateLimiter m_discoveryRateLimiter;
   private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
   private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
 
@@ -72,6 +80,8 @@ public class ConfigServiceLocator {
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     this.m_executorService = Executors.newScheduledThreadPool(1,
         ApolloThreadFactory.create("ConfigServiceLocator", true));
+    this.discoveryTaskQueueMark = new AtomicBoolean(false);
+    this.m_discoveryRateLimiter = RateLimiter.create(m_configUtil.getDiscoveryQPS());
     initConfigServices();
   }
 
@@ -154,6 +164,25 @@ public class ConfigServiceLocator {
     return configServices;
   }
 
+  void doSubmitUpdateTask() {
+    m_executorService.submit(() -> {
+      boolean needUpdate = this.discoveryTaskQueueMark.getAndSet(false);
+      if (needUpdate) {
+        this.tryUpdateConfigServices();
+      }
+    });
+  }
+
+  void trySubmitUpdateTask() {
+    // forbid multiple submit in a short period
+    boolean needForceAlready = this.discoveryTaskQueueMark.getAndSet(true);
+    if (needForceAlready) {
+      // do not submit because submit already, task running
+    } else {
+      doSubmitUpdateTask();
+    }
+  }
+
   /**
    * Get the config service info from remote meta server.
    *
@@ -161,7 +190,7 @@ public class ConfigServiceLocator {
    */
   public List<ServiceDTO> getConfigServices() {
     if (m_configServices.get().isEmpty()) {
-      m_executorService.submit(() -> this.tryUpdateConfigServices());
+      trySubmitUpdateTask();
       // quick fail
       throw new ApolloConfigException(
           "No available config service, "
@@ -196,14 +225,21 @@ public class ConfigServiceLocator {
         m_configUtil.getRefreshIntervalTimeUnit());
   }
 
+  synchronized boolean tryAcquireForUpdate() {
+    return this.m_discoveryRateLimiter.tryAcquire();
+  }
+
   private synchronized void updateConfigServices() {
+    if (!tryAcquireForUpdate()) {
+      // quick return without wait
+      return;
+    }
     String url = assembleMetaServiceUrl();
 
     HttpRequest request = new HttpRequest(url);
-    // speed up http request
-    int mixTimeout = Math.min(m_configUtil.getConnectTimeout(), m_configUtil.getReadTimeout());
-    request.setConnectTimeout(mixTimeout);
-    request.setReadTimeout(mixTimeout);
+
+    request.setConnectTimeout(m_configUtil.getDiscoveryConnectTimeout());
+    request.setReadTimeout(m_configUtil.getDiscoveryReadTimeout());
 
     int maxRetries = 2;
     Throwable exception = null;

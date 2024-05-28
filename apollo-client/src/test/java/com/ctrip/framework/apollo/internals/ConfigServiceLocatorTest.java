@@ -19,6 +19,7 @@ package com.ctrip.framework.apollo.internals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
@@ -76,8 +77,46 @@ public class ConfigServiceLocatorTest {
     ConfigServiceLocator configServiceLocator = Mockito.spy(
         new ConfigServiceLocator()
     );
+
+    Mockito.doNothing().when(configServiceLocator).doSubmitUpdateTask();
+
+    // trigger once
     assertThrows(ApolloConfigException.class, () -> {
       configServiceLocator.getConfigServices();
     });
+    Mockito.verify(configServiceLocator, Mockito.times(1))
+        .trySubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(1))
+        .doSubmitUpdateTask();
+
+    // trigger 9 times in a short period, but only submit a task
+    for (int i = 0; i < 9; i++) {
+      assertThrows(ApolloConfigException.class, () -> {
+        configServiceLocator.getConfigServices();
+      });
+    }
+    Mockito.verify(configServiceLocator, Mockito.times(10))
+        .trySubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(1))
+        .doSubmitUpdateTask();
+
+    // clear queue
+    {
+      boolean oldValue = configServiceLocator.discoveryTaskQueueMark.getAndSet(false);
+      assertTrue(oldValue);
+    }
+
+    // trigger 10 times in a short period, task will submit again
+    for (int i = 0; i < 10; i++) {
+      assertThrows(ApolloConfigException.class, () -> {
+        configServiceLocator.getConfigServices();
+      });
+    }
+    Mockito.verify(configServiceLocator, Mockito.times(20))
+        .trySubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(2))
+        .doSubmitUpdateTask();
+
   }
+
 }
