@@ -38,6 +38,18 @@ import org.slf4j.LoggerFactory;
 public class ConfigUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigUtil.class);
+
+  /**
+   * qps limit: discovery config service from meta
+   * <p>
+   * 1 times per second
+   */
+  private int discoveryQPS = 1;
+  /** 1 second */
+  private int discoveryConnectTimeout = 1000;
+  /** 1 second */
+  private int discoveryReadTimeout = 1000;
+
   private int refreshInterval = 5;
   private TimeUnit refreshIntervalTimeUnit = TimeUnit.MINUTES;
   private int connectTimeout = 1000; //1 second
@@ -210,24 +222,63 @@ public class ConfigUtil {
     return refreshIntervalTimeUnit;
   }
 
-  private void initQPS() {
-    String customizedLoadConfigQPS = System.getProperty("apollo.loadConfigQPS");
-    if (!Strings.isNullOrEmpty(customizedLoadConfigQPS)) {
+  static Integer getCustomizedIntegerValue(String systemKey) {
+    String customizedValue = System.getProperty(systemKey);
+    if (!Strings.isNullOrEmpty(customizedValue)) {
       try {
-        loadConfigQPS = Integer.parseInt(customizedLoadConfigQPS);
+        return Integer.parseInt(customizedValue);
       } catch (Throwable ex) {
-        logger.error("Config for apollo.loadConfigQPS is invalid: {}", customizedLoadConfigQPS);
+        logger.error("Config for {} is invalid: {}", systemKey, customizedValue);
+      }
+    }
+    return null;
+  }
+
+  private void initQPS() {
+    {
+      Integer value = getCustomizedIntegerValue("apollo.discoveryConnectTimeout");
+      if (null != value) {
+        discoveryConnectTimeout = value;
+      }
+    }
+    {
+      Integer value = getCustomizedIntegerValue("apollo.discoveryReadTimeout");
+      if (null != value) {
+        discoveryReadTimeout = value;
+      }
+    }
+    {
+      Integer value = getCustomizedIntegerValue("apollo.discoveryQPS");
+      if (null != value) {
+        discoveryQPS = value;
       }
     }
 
-    String customizedLongPollQPS = System.getProperty("apollo.longPollQPS");
-    if (!Strings.isNullOrEmpty(customizedLongPollQPS)) {
-      try {
-        longPollQPS = Integer.parseInt(customizedLongPollQPS);
-      } catch (Throwable ex) {
-        logger.error("Config for apollo.longPollQPS is invalid: {}", customizedLongPollQPS);
+    {
+      Integer value = getCustomizedIntegerValue("apollo.loadConfigQPS");
+      if (null != value) {
+        loadConfigQPS = value;
       }
     }
+
+    {
+      Integer value = getCustomizedIntegerValue("apollo.longPollQPS");
+      if (null != value) {
+        longPollQPS = value;
+      }
+    }
+  }
+
+  public int getDiscoveryQPS() {
+    return discoveryQPS;
+  }
+
+  public int getDiscoveryConnectTimeout() {
+    return discoveryConnectTimeout;
+  }
+
+  public int getDiscoveryReadTimeout() {
+    return discoveryReadTimeout;
   }
 
   public int getLoadConfigQPS() {
