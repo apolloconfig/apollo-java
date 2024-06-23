@@ -113,7 +113,9 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
         .resolvePropertyValue(beanFactory, springValue.getBeanName(), springValue.getPlaceholder());
 
     if (springValue.isJson()) {
-      ApolloJsonValue apolloJsonValue = springValue.getField().getAnnotation(ApolloJsonValue.class);
+      ApolloJsonValue apolloJsonValue = springValue.isField() ?
+              springValue.getField().getAnnotation(ApolloJsonValue.class) :
+              springValue.getMethodParameter().getMethodAnnotation(ApolloJsonValue.class);
       String datePattern = apolloJsonValue != null ? apolloJsonValue.datePattern() : StringUtils.EMPTY;
       value = parseJsonValue((String) value, springValue.getGenericType(), datePattern);
     } else {
