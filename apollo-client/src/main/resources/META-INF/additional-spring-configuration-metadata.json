@@ -78,6 +78,13 @@
       "defaultValue": "flase"
     },
     {
+      "name": "apollo.monitor.collect-period",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo metrics collect period",
+      "defaultValue": ""
+    },
+    {
       "name": "apollo.meta",
       "type": "java.net.URI",
       "sourceType": "com.ctrip.framework.apollo.core.ConfigConsts",

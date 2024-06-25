@@ -1,13 +1,16 @@
 package com.ctrip.framework.apollo.metrics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MetricsEvent {
-    private String name;
-    private Object data;
-    private String tag;
+    private final String name;
+    private final String tag;
+    private final Map<String,Object> attachments;
 
     private MetricsEvent(Builder builder) {
         this.name = builder.name;
-        this.data = builder.data;
+        this.attachments = builder.attachment;
         this.tag = builder.tag;
     }
 
@@ -19,8 +22,9 @@ public class MetricsEvent {
         return name;
     }
 
-    public Object getData() {
-        return data;
+    @SuppressWarnings("unchecked")
+    public <T> T getAttachmentValue(String key) {
+        return (T) attachments.get(key);
     }
     public String getTag(){
         return tag;
@@ -28,15 +32,16 @@ public class MetricsEvent {
 
     @Override
     public String toString() {
-        return "MetricsEvent{" +
-            "name='" + name + '\'' +
-            ", object=" + data + "tag=" + tag + "\n" +
-            '}';
+        return  "MetricsEvent{" +
+                "name='" + name + '\'' +
+                ", attachments=" + attachments.toString() +
+                ", tag='" + tag + '\'' +
+                '}';
     }
 
     public static class Builder {
         private String name;
-        private Object data;
+        private final Map<String,Object> attachment = new HashMap<>(3);
         private String tag;
 
         public Builder withName(String name) {
@@ -44,8 +49,8 @@ public class MetricsEvent {
             return this;
         }
 
-        public Builder withData(Object data) {
-            this.data = data;
+        public Builder putAttachment(String k,Object v) {
+            this.attachment.put(k,v);
             return this;
         }
 

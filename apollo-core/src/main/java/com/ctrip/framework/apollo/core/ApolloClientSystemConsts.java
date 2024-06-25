@@ -164,4 +164,5 @@ public class ApolloClientSystemConsts {
 
   public static final String APOLLO_MONITOR_ENABLED = "apollo.monitor.enabled";
   public static final String APOLLO_MONITOR_PROTOCOL = "apollo.monitor.protocol";
+  public static final String APOLLO_MONITOR_COLLECT_PERIOD = "apollo.monitor.collect-period";
 }

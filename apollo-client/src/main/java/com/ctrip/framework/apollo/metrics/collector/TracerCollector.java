@@ -10,8 +10,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.ctrip.framework.apollo.tracer.internals.MetricsMessageProducer.TRACER_ERROR;
-import static com.ctrip.framework.apollo.tracer.internals.MetricsMessageProducer.TRACER_EVENT;
+import static com.ctrip.framework.apollo.metrics.MetricsConstant.NAME_VALUE_PAIRS;
+import static com.ctrip.framework.apollo.metrics.MetricsConstant.STATUS;
+import static com.ctrip.framework.apollo.metrics.MetricsConstant.THROWABLE;
+import static com.ctrip.framework.apollo.metrics.MetricsConstant.TRACER;
+import static com.ctrip.framework.apollo.metrics.MetricsConstant.TRACER_ERROR;
+import static com.ctrip.framework.apollo.metrics.MetricsConstant.TRACER_EVENT;
 
 public class TracerCollector implements MetricsCollector {
     private final List<ApolloConfigException> exceptions = new ArrayList<>();
@@ -32,12 +36,12 @@ public class TracerCollector implements MetricsCollector {
 
     @Override
     public boolean isSupport(String tag) {
-        return TRACER_ERROR.equals(tag) || TRACER_EVENT.equals(tag);
+        return TRACER.equals(tag);
     }
 
     @Override
     public void collect(MetricsEvent event) {
-        switch (event.getTag()) {
+        switch (event.getName()) {
             case TRACER_ERROR:
                 solveError(event);
                 break;
@@ -50,16 +54,14 @@ public class TracerCollector implements MetricsCollector {
     }
 
     private void solveError(MetricsEvent event) {
-        ApolloConfigException exception = (ApolloConfigException) event.getData();
+        ApolloConfigException exception = event.getAttachmentValue(THROWABLE);
         exceptions.add(exception);
     }
 
     @SuppressWarnings("all")
     private void solveEvent(MetricsEvent event) {
-        String data = (String) event.getData();
-        String[] split = data.split(":");
-        String status = split[0];
-        String namespace = split[1];
+        String status = event.getAttachmentValue(STATUS);
+        String namespace = event.getAttachmentValue(NAME_VALUE_PAIRS);
         if (status.equals("404")) {
             namespace404.add(namespace);
         } else if (status.equals("timeout")) {
@@ -69,6 +71,7 @@ public class TracerCollector implements MetricsCollector {
 
     @Override
     public boolean isSamplesUpdated() {
+        //TODO
         return true;
     }
 

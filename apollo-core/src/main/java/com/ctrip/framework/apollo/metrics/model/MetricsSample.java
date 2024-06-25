@@ -9,7 +9,7 @@ public class MetricsSample {
     protected Map<String, String> tags;
 
     public String getName() {
-        return name;
+        return "Apollo_"+name;
     }
 
     public MeterType getType() {

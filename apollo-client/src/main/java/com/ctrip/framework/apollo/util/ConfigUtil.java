@@ -72,6 +72,7 @@ public class ConfigUtil {
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
   private String monitorProtocol = null;
+  private long monitorCollectPeriod = 10;
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -88,8 +89,8 @@ public class ConfigUtil {
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
     initMonitorProtocol();
+    initMonitorCollectPeriod();
   }
-
 
 
     /**
@@ -503,8 +504,26 @@ public class ConfigUtil {
     public String getMonitorProtocol() {
         return monitorProtocol;
     }
+    private void initMonitorCollectPeriod() {
+        String collectPeriod = System.getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_COLLECT_PERIOD);
+        if (Strings.isNullOrEmpty(collectPeriod)) {
+            collectPeriod = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_COLLECT_PERIOD, null);
+        }
+        if (!Strings.isNullOrEmpty(collectPeriod)) {
+            try {
+                monitorCollectPeriod = Long.parseLong(collectPeriod);
+            } catch (Throwable ex) {
+                logger.error("Config for {} is invalid: {}", ApolloClientSystemConsts.APOLLO_MONITOR_COLLECT_PERIOD, collectPeriod);
+            }
+        }
+    }
+    public long getMonitorCollectPeriod() {
+        return monitorCollectPeriod;
+    }
 
-  private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
+
+
+    private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
     String enablePropertyNamesCache = System.getProperty(propertyName);
     if (Strings.isNullOrEmpty(enablePropertyNamesCache)) {
       enablePropertyNamesCache = System.getenv(envName);

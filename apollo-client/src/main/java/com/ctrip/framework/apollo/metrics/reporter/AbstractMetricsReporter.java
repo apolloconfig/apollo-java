@@ -1,9 +1,11 @@
 package com.ctrip.framework.apollo.metrics.reporter;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.metrics.collector.MetricsCollector;
 import com.ctrip.framework.apollo.metrics.model.CounterMetricsSample;
 import com.ctrip.framework.apollo.metrics.model.GaugeMetricsSample;
 import com.ctrip.framework.apollo.metrics.model.MetricsSample;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -18,11 +20,13 @@ public abstract class AbstractMetricsReporter implements MetricsReporter {
     private static final Logger log = LoggerFactory.getLogger(AbstractMetricsReporter.class);
     private static ScheduledExecutorService m_executorService;
     private List<MetricsCollector> collectors;
+    private ConfigUtil m_configUtil;
 
     @Override
     public void init(List<MetricsCollector> collectors) {
         //...
         doInit();
+        m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         this.collectors = collectors;
         initScheduleMetricsCollectSync();
     }
@@ -30,7 +34,6 @@ public abstract class AbstractMetricsReporter implements MetricsReporter {
     protected abstract void doInit();
 
     private void initScheduleMetricsCollectSync() {
-        log.info("Start to schedule metrics collect sync job");
         m_executorService = Executors.newScheduledThreadPool(1);
         m_executorService.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -42,7 +45,7 @@ public abstract class AbstractMetricsReporter implements MetricsReporter {
                     //ignore
                 }
             }
-        }, getInitialDelay(), getPeriod(), TimeUnit.MILLISECONDS);
+        }, 1, m_configUtil.getMonitorCollectPeriod(), TimeUnit.SECONDS);
     }
 
     private void updateMetricsData() {
@@ -55,7 +58,6 @@ public abstract class AbstractMetricsReporter implements MetricsReporter {
                 registerSample(metricsSample);
             }
         }
-
     }
 
     private void registerSample(MetricsSample sample) {
@@ -84,14 +86,6 @@ public abstract class AbstractMetricsReporter implements MetricsReporter {
         String[] labelNames = tags.keySet().toArray(new String[0]);
         String[] labelValues = tags.values().toArray(new String[0]);
         return new String[][] {labelNames, labelValues};
-    }
-
-    protected long getPeriod() {
-        return 5000;
-    }
-
-    protected long getInitialDelay() {
-        return 5000;
     }
 
 }

@@ -11,17 +11,22 @@ import java.util.List;
 public abstract class Metrics {
 
     private static MetricsCollectorManager collectorManager;
+    private static Boolean isMetricsEnabled;
 
-    static {
-        List<MetricsCollectorManager> managers = ServiceBootstrap.loadAllOrdered(MetricsCollectorManager.class);
-        if (!managers.isEmpty()) {
-            collectorManager = managers.get(0);
-        } else {
-            collectorManager = new NopMetricsCollectorManager();
+    private static void init(){
+        collectorManager = new NopMetricsCollectorManager();
+        if (isMetricsEnabled()) {
+            List<MetricsCollectorManager> managers = ServiceBootstrap.loadAllOrdered(MetricsCollectorManager.class);
+            if (!managers.isEmpty()) {
+                collectorManager = managers.get(0);
+            }
         }
     }
 
     public static void push(MetricsEvent event) {
+        if(collectorManager == null){
+            init();
+        }
         for (MetricsCollector collector : collectorManager.getCollectors()) {
             if (collector.isSupport(event.getTag())) {
                 collector.collect(event);
@@ -29,17 +34,17 @@ public abstract class Metrics {
             }
         }
     }
-    public static void push(String tag,Object...data){
-
-    }
 
     public static boolean isMetricsEnabled() {
-        // 1. Get app.id from System Property
-        String enabled = System.getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_ENABLED);
-        if (Boolean.parseBoolean(enabled)) {
-            return true;
+        if(isMetricsEnabled==null) {
+            // 1. Get app.id from System Property
+            String enabled = System.getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_ENABLED);
+            if (Boolean.parseBoolean(enabled)) {
+                return true;
+            }
+            enabled = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_ENABLED, "false");
+            isMetricsEnabled= Boolean.parseBoolean(enabled);
         }
-        enabled = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_ENABLED, "false");
-        return Boolean.parseBoolean(enabled);
+        return isMetricsEnabled;
     }
 }

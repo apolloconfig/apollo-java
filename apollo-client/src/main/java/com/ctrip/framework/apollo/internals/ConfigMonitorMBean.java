@@ -16,6 +16,8 @@ public interface ConfigMonitorMBean {
 
     String getNamespaceUsed();
 
+    String getNamespaceUsedTime();
+
     String getDataWithCurrentMonitoringSystemFormat();
     //more method....
 }

@@ -1,1 +1,1 @@
-com.ctrip.framework.apollo.metrics.DefaultMetricsCollectorManager
+com.ctrip.framework.apollo.internals.DefaultMetricsCollectorManager

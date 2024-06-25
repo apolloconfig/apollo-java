@@ -22,6 +22,7 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.ctrip.framework.apollo.internals.ConfigMonitor;
 import com.ctrip.framework.apollo.internals.ConfigMonitorMBean;
+import com.ctrip.framework.apollo.metrics.Metrics;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigRegistry;
 
@@ -32,12 +33,23 @@ import com.ctrip.framework.apollo.spi.ConfigRegistry;
  */
 public class ConfigService {
   private static final ConfigService s_instance = new ConfigService();
-  private volatile ConfigMonitor m_configMonitor =ApolloInjector.getInstance(ConfigMonitor.class);
+  private volatile ConfigMonitor m_configMonitor;
   private volatile ConfigManager m_configManager;
   private volatile ConfigRegistry m_configRegistry;
 
   private ConfigMonitor getMonitor() {
-    return m_configMonitor;
+      if(!Metrics.isMetricsEnabled()){
+          throw new UnsupportedOperationException("Metrics is not supported");
+      }
+        if (m_configMonitor == null) {
+            synchronized (this) {
+                if (m_configMonitor == null) {
+                    m_configMonitor = ApolloInjector.getInstance(ConfigMonitor.class);
+                }
+            }
+        }
+
+      return m_configMonitor;
   }
   private ConfigManager getManager() {
     if (m_configManager == null) {

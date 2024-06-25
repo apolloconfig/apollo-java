@@ -44,11 +44,10 @@ public class PrometheusMetricReporter extends AbstractMetricsReporter implements
         String[][] tags = getTags(sample);
         Counter counter = (Counter) map.computeIfAbsent(sample.getName(), k -> Counter.build()
             .name(sample.getName())
-            .help("Counter for " + sample.getName())
+            .help("apollo")
             .labelNames(tags[0])
             .register(registry));
         counter.labels(tags[1]).inc(sample.getValue() - counter.get());
-        logger.info("Register counter sample: {}", sample);
     }
 
     @Override
@@ -56,11 +55,10 @@ public class PrometheusMetricReporter extends AbstractMetricsReporter implements
         String[][] tags = getTags(sample);
         Gauge gauge = (Gauge) map.computeIfAbsent(sample.getName(), k -> Gauge.build()
             .name(sample.getName())
-            .help("Gauge for " + sample.getName())
+            .help("apollo")
             .labelNames(tags[0])
             .register(registry));
         gauge.labels(tags[1]).set(sample.getApplyValue());
-        logger.info("Register gauge sample: {}", sample);
     }
 
 

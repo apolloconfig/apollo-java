@@ -1,7 +1,6 @@
 package com.ctrip.framework.apollo.metrics.collector;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
-import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.metrics.MetricsEvent;
 import com.ctrip.framework.apollo.metrics.model.GaugeMetricsSample;
 import com.ctrip.framework.apollo.metrics.model.MetricsSample;
@@ -41,6 +40,7 @@ public class StartUpCollector implements MetricsCollector {
 
     @Override
     public boolean isSamplesUpdated() {
+        //TODO
         return true;
     }
 
@@ -48,8 +48,8 @@ public class StartUpCollector implements MetricsCollector {
     public List<MetricsSample> export() {
         List<MetricsSample> samples = new ArrayList<>();
         HashMap<String, String> tag = new HashMap<>(3);
-        tag.put(ApolloClientSystemConsts.APP_ID, getAppId());
-        tag.put(ApolloClientSystemConsts.APOLLO_CLUSTER, getCluster());
+        tag.put("appId", getAppId());
+        tag.put("Cluster", getCluster());
         tag.put("env", getApolloEnv());
         samples.add(new GaugeMetricsSample<>("startup_parameters", 1, value -> 1, tag));
         return samples;
