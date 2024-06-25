@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
  */
 public class MockedConfigService implements AutoCloseable {
 
+  private static final String META_SERVER_PATH = "/services/config?.*";
+
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private final Gson gson = new Gson();
@@ -95,8 +97,8 @@ public class MockedConfigService implements AutoCloseable {
    * @param serviceDTOList apollo meta server's response
    */
   public void mockMetaServer(boolean failedAtFirstTime, ServiceDTO ... serviceDTOList) {
-    final String path = "/services/config";
-    RequestDefinition requestDefinition = HttpRequest.request("GET").withPath(path);
+    RequestDefinition requestDefinition = HttpRequest.request("GET")
+        .withPath(META_SERVER_PATH);
 
     // need clear
     server.clear(requestDefinition);
@@ -112,6 +114,26 @@ public class MockedConfigService implements AutoCloseable {
     String body = gson.toJson(Lists.newArrayList(serviceDTOList));
     server.when(requestDefinition)
         .respond(HttpResponse.response()
+            .withStatusCode(HttpServletResponse.SC_OK)
+            .withContentType(MediaType.JSON_UTF_8)
+            .withBody(body)
+        );
+  }
+
+  /**
+   * simulate timeout
+   */
+  public void mockMetaSeverWithDelay(long milliseconds, ServiceDTO ... serviceDTOList) {
+    RequestDefinition requestDefinition = HttpRequest.request("GET")
+        .withPath(META_SERVER_PATH);
+
+    // need clear
+    server.clear(requestDefinition);
+
+    String body = gson.toJson(Lists.newArrayList(serviceDTOList));
+    server.when(requestDefinition)
+        .respond(HttpResponse.response()
+            .withDelay(TimeUnit.MILLISECONDS, milliseconds)
             .withStatusCode(HttpServletResponse.SC_OK)
             .withContentType(MediaType.JSON_UTF_8)
             .withBody(body)
