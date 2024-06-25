@@ -209,7 +209,7 @@ public class RemoteConfigLongPollService {
         transaction.setStatus(Transaction.SUCCESS);
       } catch (Throwable ex) {
         lastServiceDto = null;
-        Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+        Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex),"timeout",assembleNamespaces());
         transaction.setStatus(ex);
         long sleepTimeInSecond = m_longPollFailSchedulePolicyInSecond.fail();
         logger.warn(

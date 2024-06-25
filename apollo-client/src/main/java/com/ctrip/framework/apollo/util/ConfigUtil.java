@@ -16,8 +16,6 @@
  */
 package com.ctrip.framework.apollo.util;
 
-import static com.ctrip.framework.apollo.util.factory.PropertiesFactory.APOLLO_PROPERTY_ORDER_ENABLE;
-
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.MetaDomainConsts;
@@ -31,6 +29,8 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.ctrip.framework.apollo.util.factory.PropertiesFactory.APOLLO_PROPERTY_ORDER_ENABLE;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -59,6 +59,7 @@ public class ConfigUtil {
   private boolean propertyNamesCacheEnabled = false;
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
+  private String monitorProtocol = null;
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -74,9 +75,12 @@ public class ConfigUtil {
     initPropertyNamesCacheEnabled();
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
+    initMonitorProtocol();
   }
 
-  /**
+
+
+    /**
    * Get the app id for the current application.
    *
    * @return the app id or ConfigConsts.NO_APPID_PLACEHOLDER if app id is not available
@@ -439,6 +443,15 @@ public class ConfigUtil {
             ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
             overrideSystemProperties);
   }
+    private void initMonitorProtocol() {
+        monitorProtocol = System.getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_PROTOCOL);
+        if (Strings.isNullOrEmpty(monitorProtocol)) {
+            monitorProtocol = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_MONITOR_PROTOCOL, null);
+        }
+    }
+    public String getMonitorProtocol() {
+        return monitorProtocol;
+    }
 
   private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
     String enablePropertyNamesCache = System.getProperty(propertyName);

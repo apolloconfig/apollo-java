@@ -161,4 +161,7 @@ public class ApolloClientSystemConsts {
    * enable apollo overrideSystemProperties
    */
   public static final String APOLLO_OVERRIDE_SYSTEM_PROPERTIES = "apollo.override-system-properties";
+
+  public static final String APOLLO_MONITOR_ENABLED = "apollo.monitor.enabled";
+  public static final String APOLLO_MONITOR_PROTOCOL = "apollo.monitor.protocol";
 }

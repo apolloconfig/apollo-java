@@ -17,27 +17,36 @@
 package com.ctrip.framework.apollo.tracer.internals;
 
 import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
+import com.ctrip.framework.apollo.metrics.Metrics;
 import com.ctrip.framework.apollo.tracer.internals.cat.CatMessageProducer;
 import com.ctrip.framework.apollo.tracer.internals.cat.CatNames;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducerManager;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultMessageProducerManager implements MessageProducerManager {
-  private static MessageProducer producer;
+    private static MessageProducer producer = new MessageProducerComposite(new ArrayList<>());
 
-  public DefaultMessageProducerManager() {
-    if (ClassLoaderUtil.isClassPresent(CatNames.CAT_CLASS)) {
-      producer = new CatMessageProducer();
-    } else {
-      producer = new NullMessageProducerManager().getProducer();
+    public DefaultMessageProducerManager() {
+        List<MessageProducer> producers = new ArrayList<>();
+        if(Metrics.isMetricsEnabled()){
+            producers.add(new MetricsMessageProducer());
+        }
+        if (ClassLoaderUtil.isClassPresent(CatNames.CAT_CLASS)) {
+            producers.add(new CatMessageProducer());
+        }
+        if (producers.isEmpty()) {
+            producer = new NullMessageProducer();
+        }else {
+            producer = new MessageProducerComposite(producers);
+        }
     }
-  }
-
-  @Override
-  public MessageProducer getProducer() {
-    return producer;
-  }
+    @Override
+    public MessageProducer getProducer() {
+        return producer;
+    }
 }

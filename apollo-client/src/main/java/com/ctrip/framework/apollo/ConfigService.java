@@ -20,6 +20,8 @@ import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 import com.ctrip.framework.apollo.internals.ConfigManager;
+import com.ctrip.framework.apollo.internals.ConfigMonitor;
+import com.ctrip.framework.apollo.internals.ConfigMonitorMBean;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigRegistry;
 
@@ -30,10 +32,13 @@ import com.ctrip.framework.apollo.spi.ConfigRegistry;
  */
 public class ConfigService {
   private static final ConfigService s_instance = new ConfigService();
-
+  private volatile ConfigMonitor m_configMonitor =ApolloInjector.getInstance(ConfigMonitor.class);
   private volatile ConfigManager m_configManager;
   private volatile ConfigRegistry m_configRegistry;
 
+  private ConfigMonitor getMonitor() {
+    return m_configMonitor;
+  }
   private ConfigManager getManager() {
     if (m_configManager == null) {
       synchronized (this) {
@@ -79,6 +84,10 @@ public class ConfigService {
 
   public static ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
     return s_instance.getManager().getConfigFile(namespace, configFileFormat);
+  }
+
+  public static ConfigMonitorMBean getConifgMonitor(){
+      return s_instance.getMonitor();
   }
 
   static void setConfig(Config config) {

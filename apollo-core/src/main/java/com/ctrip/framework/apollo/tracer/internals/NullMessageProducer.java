@@ -23,7 +23,7 @@ import com.ctrip.framework.apollo.tracer.spi.Transaction;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class NullMessageProducer implements MessageProducer {
-  private static final Transaction NULL_TRANSACTION = new NullTransaction();
+  protected static final Transaction NULL_TRANSACTION = new NullTransaction();
 
   @Override
   public void logError(Throwable cause) {

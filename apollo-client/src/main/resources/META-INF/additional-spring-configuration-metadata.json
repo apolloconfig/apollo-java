@@ -64,6 +64,20 @@
       "defaultValue": ""
     },
     {
+      "name": "apollo.monitor.protocol",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo metrics protocol",
+      "defaultValue": ""
+    },
+    {
+      "name": "apollo.monitor.enabled",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo metrics enabled",
+      "defaultValue": "flase"
+    },
+    {
       "name": "apollo.meta",
       "type": "java.net.URI",
       "sourceType": "com.ctrip.framework.apollo.core.ConfigConsts",

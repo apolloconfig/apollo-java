@@ -261,7 +261,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
             statusCodeException = new ApolloConfigStatusCodeException(ex.getStatusCode(),
                 message);
           }
-          Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(statusCodeException));
+          Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(statusCodeException),"404",m_namespace);
           transaction.setStatus(statusCodeException);
           exception = statusCodeException;
           if(ex.getStatusCode() == 404) {
