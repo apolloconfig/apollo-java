@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
 
+/**
+ * @author Rawven
+ */
 public class DefaultMetricsCollectorManager implements MetricsCollectorManager {
     private static final Logger logger = DeferredLoggerFactory.getLogger(DefaultMetricsCollectorManager.class);
     private List<MetricsCollector> collectors;
@@ -24,13 +27,15 @@ public class DefaultMetricsCollectorManager implements MetricsCollectorManager {
         ConfigMonitor configMonitor = ApolloInjector.getInstance(ConfigMonitor.class);
         ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         DefaultConfigManager configManager = (DefaultConfigManager) ApolloInjector.getInstance(ConfigManager.class);
-        initialize(configMonitor,configUtil,configManager);
+        initialize(configMonitor, configUtil, configManager);
     }
 
-    private void initialize(ConfigMonitor configMonitor,ConfigUtil configUtil,DefaultConfigManager configManager){
+    private void initialize(ConfigMonitor configMonitor, ConfigUtil configUtil,
+        DefaultConfigManager configManager) {
         TracerCollector traceCollector = new TracerCollector();
-        ConfigCollector configCollector = new ConfigCollector(configManager.m_configs, configManager.m_configLocks, configManager.m_configFiles, configManager.m_configFileLocks);
-        StartUpCollector startUpCollector = new StartUpCollector();
+        ConfigCollector configCollector = new ConfigCollector(configManager.m_configs,
+            configManager.m_configLocks, configManager.m_configFiles, configManager.m_configFileLocks);
+        StartUpCollector startUpCollector = new StartUpCollector(configUtil);
 
         configMonitor.setConfigCollector(configCollector);
         configMonitor.setStartUpCollector(startUpCollector);

@@ -7,7 +7,6 @@ import com.ctrip.framework.apollo.metrics.reporter.MetricsReporter;
 
 /**
  * exposes all collected data through ConfigService
- *
  * @author Rawven
  */
 public class ConfigMonitor implements ConfigMonitorMBean {
@@ -15,8 +14,6 @@ public class ConfigMonitor implements ConfigMonitorMBean {
     private StartUpCollector startUpCollector;
     private TracerCollector tracerCollector;
     private ConfigCollector configCollector;
-
-
 
     @Override
     public String getAppId() {
@@ -69,12 +66,15 @@ public class ConfigMonitor implements ConfigMonitorMBean {
     public void setConfigCollector(ConfigCollector configCollector) {
         this.configCollector = configCollector;
     }
+
     public void setStartUpCollector(StartUpCollector startUpCollector) {
         this.startUpCollector = startUpCollector;
     }
+
     public void setTracerCollector(TracerCollector tracerCollector) {
         this.tracerCollector = tracerCollector;
     }
+
     public void setMetricsReporter(MetricsReporter reporter) {
         this.reporter = reporter;
     }

@@ -1,48 +1,52 @@
 package com.ctrip.framework.apollo.metrics.model;
 
+import static com.ctrip.framework.apollo.metrics.util.MeterType.GAUGE;
+
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
-import static com.ctrip.framework.apollo.metrics.util.MeterType.GAUGE;
-
+/**
+ * @author Rawven
+ */
 public class GaugeMetricsSample<T> extends MetricsSample {
-    private T value;
 
-    private ToDoubleFunction<T> apply;
+  private T value;
 
-    public GaugeMetricsSample(String name, T value, ToDoubleFunction<T> apply) {
-        this.name = name;
-        this.value = value;
-        this.apply = apply;
-        this.type = GAUGE;
-    }
+  private ToDoubleFunction<T> apply;
 
-    public GaugeMetricsSample(String name, T value, ToDoubleFunction<T> apply,
-        Map<String, String> tags) {
-        this.name = name;
-        this.value = value;
-        this.apply = apply;
-        this.type = GAUGE;
-        this.setTag(tags);
-    }
+  public GaugeMetricsSample(String name, T value, ToDoubleFunction<T> apply) {
+    this.name = name;
+    this.value = value;
+    this.apply = apply;
+    this.type = GAUGE;
+  }
 
-    public T getValue() {
-        return value;
-    }
+  public GaugeMetricsSample(String name, T value, ToDoubleFunction<T> apply,
+      Map<String, String> tags) {
+    this.name = name;
+    this.value = value;
+    this.apply = apply;
+    this.type = GAUGE;
+    this.setTag(tags);
+  }
 
-    public void setValue(T value) {
-        this.value = value;
-    }
+  public T getValue() {
+    return value;
+  }
 
-    public ToDoubleFunction<T> getApply() {
-        return this.apply;
-    }
+  public void setValue(T value) {
+    this.value = value;
+  }
 
-    public void setApply(ToDoubleFunction<T> apply) {
-        this.apply = apply;
-    }
+  public ToDoubleFunction<T> getApply() {
+    return this.apply;
+  }
 
-    public double getApplyValue() {
-        return getApply().applyAsDouble(getValue());
-    }
+  public void setApply(ToDoubleFunction<T> apply) {
+    this.apply = apply;
+  }
+
+  public double getApplyValue() {
+    return getApply().applyAsDouble(getValue());
+  }
 }

@@ -162,7 +162,18 @@ public class ApolloClientSystemConsts {
    */
   public static final String APOLLO_OVERRIDE_SYSTEM_PROPERTIES = "apollo.override-system-properties";
 
+  /**
+   * apollo monitor enabled
+   */
   public static final String APOLLO_MONITOR_ENABLED = "apollo.monitor.enabled";
+
+  /**
+   * apollo monitor protocol {JMX,Prometheus}
+   */
   public static final String APOLLO_MONITOR_PROTOCOL = "apollo.monitor.protocol";
+
+  /**
+   * apollo monitor collect period
+   */
   public static final String APOLLO_MONITOR_COLLECT_PERIOD = "apollo.monitor.collect-period";
 }
