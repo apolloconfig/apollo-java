@@ -57,7 +57,7 @@ public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
     assertEquals(someCacheDir + "/" + someAppId, defaultLocalCacheDir);
 
     // LocalFileConfigRepository.CONFIG_DIR
-    LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(someNamespace);
+    LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(someAppId, someNamespace);
     Field FIELD_CONFIG_DIR = localFileConfigRepository.getClass().getDeclaredField("CONFIG_DIR");
     FIELD_CONFIG_DIR.setAccessible(true);
     String configDir = (String) FIELD_CONFIG_DIR.get(localFileConfigRepository);

@@ -77,7 +77,12 @@ public class ConfigService {
     return s_instance.getManager().getConfig(namespace);
   }
 
-  public static ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+  public static Config getConfig(String appId, String namespace) {
+    return s_instance.getManager().getConfig(appId, namespace);
+  }
+
+
+  public static ConfigFile  getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
     return s_instance.getManager().getConfigFile(namespace, configFileFormat);
   }
 
@@ -99,7 +104,17 @@ public class ConfigService {
       }
 
       @Override
+      public Config create(String appId, String namespace) {
+        return config;
+      }
+
+      @Override
       public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+        return null;
+      }
+
+      @Override
+      public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
         return null;
       }
 

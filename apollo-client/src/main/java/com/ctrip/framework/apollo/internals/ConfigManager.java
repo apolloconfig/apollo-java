@@ -31,6 +31,15 @@ public interface ConfigManager {
    */
   Config getConfig(String namespace);
 
+
+  /**
+   * Get the config instance for the namespace and appId specified.
+   * @param appId the appId
+   * @param namespace the namespace
+   * @return the config instance for the appId and namespace
+   */
+  public Config getConfig(String appId,String namespace);
+
   /**
    * Get the config file instance for the namespace specified.
    * @param namespace the namespace
@@ -38,4 +47,14 @@ public interface ConfigManager {
    * @return the config file instance for the namespace
    */
   ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat);
+
+
+  /**
+   * Get the config file instance for the namespace specified.
+   * @param appId the appId
+   * @param namespace the namespace
+   * @param configFileFormat the config file format
+   * @return the config file instance for the appId and namespace
+   */
+  ConfigFile getConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat);
 }

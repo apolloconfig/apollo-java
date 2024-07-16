@@ -133,7 +133,7 @@ public class RemoteConfigLongPollServiceTest {
       }
     }).when(httpClient).doGet(any(HttpRequest.class), eq(responseType));
 
-    remoteConfigLongPollService.submit(someNamespace, someRepository);
+    remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
 
     longPollFinished.get(5000, TimeUnit.MILLISECONDS);
 
@@ -184,7 +184,7 @@ public class RemoteConfigLongPollServiceTest {
       }
     }).when(someRepository).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));
 
-    remoteConfigLongPollService.submit(someNamespace, someRepository);
+    remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
 
     onNotified.get(5000, TimeUnit.MILLISECONDS);
 
@@ -246,7 +246,7 @@ public class RemoteConfigLongPollServiceTest {
       }
     }).when(someRepository).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));
 
-    remoteConfigLongPollService.submit(someNamespace, someRepository);
+    remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
     onNotified.get(5000, TimeUnit.MILLISECONDS);
     remoteConfigLongPollService.stopLongPollingRefresh();
 
@@ -317,10 +317,10 @@ public class RemoteConfigLongPollServiceTest {
       }
     }).when(anotherRepository).onLongPollNotified(Mockito.any(ServiceDTO.class), Mockito.nullable(ApolloNotificationMessages.class));
 
-    remoteConfigLongPollService.submit(someNamespace, someRepository);
+    remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
 
     submitAnotherNamespaceStart.get(5000, TimeUnit.MILLISECONDS);
-    remoteConfigLongPollService.submit(anotherNamespace, anotherRepository);
+    remoteConfigLongPollService.submit(someAppId, anotherNamespace, anotherRepository);
     submitAnotherNamespaceFinish.set(true);
 
     onAnotherRepositoryNotified.get(5000, TimeUnit.MILLISECONDS);
@@ -388,8 +388,8 @@ public class RemoteConfigLongPollServiceTest {
       }
     }).when(anotherRepository).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));
 
-    remoteConfigLongPollService.submit(someNamespace, someRepository);
-    remoteConfigLongPollService.submit(anotherNamespace, anotherRepository);
+    remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
+    remoteConfigLongPollService.submit(someAppId, anotherNamespace, anotherRepository);
 
     someRepositoryNotified.get(5000, TimeUnit.MILLISECONDS);
     anotherRepositoryNotified.get(5000, TimeUnit.MILLISECONDS);
@@ -449,7 +449,7 @@ public class RemoteConfigLongPollServiceTest {
       }
     }).when(someRepository).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));
 
-    remoteConfigLongPollService.submit(someNamespace, someRepository);
+    remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
 
     onNotified.get(5000, TimeUnit.MILLISECONDS);
 

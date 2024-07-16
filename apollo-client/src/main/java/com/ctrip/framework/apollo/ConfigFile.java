@@ -36,6 +36,12 @@ public interface ConfigFile {
   boolean hasContent();
 
   /**
+   * Get the appId of this config file instance
+   * @return the appId
+   */
+  String getAppId();
+
+  /**
    * Get the namespace of this config file instance
    * @return the namespace
    */

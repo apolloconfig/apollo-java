@@ -19,6 +19,7 @@ package com.ctrip.framework.apollo.spi;
 import java.util.Map;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Maps;
 
 /**
@@ -29,12 +30,20 @@ public class DefaultConfigFactoryManager implements ConfigFactoryManager {
 
   private Map<String, ConfigFactory> m_factories = Maps.newConcurrentMap();
 
+  private ConfigUtil m_configUtil;
+
   public DefaultConfigFactoryManager() {
     m_registry = ApolloInjector.getInstance(ConfigRegistry.class);
+    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   @Override
   public ConfigFactory getFactory(String namespace) {
+    return getFactory(m_configUtil.getAppId(), namespace);
+  }
+
+  @Override
+  public ConfigFactory getFactory(String appId, String namespace) {
     // step 1: check hacked factory
     ConfigFactory factory = m_registry.getFactory(namespace);
 
@@ -64,4 +73,6 @@ public class DefaultConfigFactoryManager implements ConfigFactoryManager {
     // factory should not be null
     return factory;
   }
+
+
 }

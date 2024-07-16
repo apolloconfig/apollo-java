@@ -128,7 +128,7 @@ public class SpringValue {
     return isJson;
   }
 
-  boolean isTargetBeanValid() {
+  public boolean isTargetBeanValid() {
     return beanRef.get() != null;
   }
 

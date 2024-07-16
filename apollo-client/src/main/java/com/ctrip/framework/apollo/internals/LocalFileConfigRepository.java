@@ -49,6 +49,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     implements RepositoryChangeListener {
   private static final Logger logger = DeferredLoggerFactory.getLogger(LocalFileConfigRepository.class);
   private static final String CONFIG_DIR = "/config-cache";
+  private final String m_appId;
   private final String m_namespace;
   private File m_baseDir;
   private final ConfigUtil m_configUtil;
@@ -62,11 +63,12 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
    *
    * @param namespace the namespace
    */
-  public LocalFileConfigRepository(String namespace) {
-    this(namespace, null);
+  public LocalFileConfigRepository(String appId, String namespace) {
+    this(appId, namespace, null);
   }
 
-  public LocalFileConfigRepository(String namespace, ConfigRepository upstream) {
+  public LocalFileConfigRepository(String appId, String namespace, ConfigRepository upstream) {
+    m_appId = appId;
     m_namespace = namespace;
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     this.setLocalCacheDir(findLocalCacheDir(), false);
@@ -134,7 +136,18 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     Properties newFileProperties = propertiesFactory.getPropertiesInstance();
     newFileProperties.putAll(newProperties);
     updateFileProperties(newFileProperties, m_upstream.getSourceType());
-    this.fireRepositoryChange(namespace, newProperties);
+    this.fireRepositoryChange(m_appId, namespace, newProperties);
+  }
+
+  @Override
+  public void onRepositoryChange(String appId, String namespace, Properties newProperties) {
+    if (newProperties.equals(m_fileProperties)) {
+      return;
+    }
+    Properties newFileProperties = propertiesFactory.getPropertiesInstance();
+    newFileProperties.putAll(newProperties);
+    updateFileProperties(newFileProperties, m_upstream.getSourceType());
+    this.fireRepositoryChange(appId, namespace, newProperties);
   }
 
   @Override

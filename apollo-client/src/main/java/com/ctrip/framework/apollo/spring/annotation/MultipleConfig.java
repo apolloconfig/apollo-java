@@ -14,21 +14,32 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.internals;
+package com.ctrip.framework.apollo.spring.annotation;
 
-import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
+import java.lang.annotation.*;
 
 /**
- * @author Jason Song(song_s@ctrip.com)
+ * @author Terry.Lam This annotation is used as a supplement to @EnableApolloConfig to fill in
+ * multiple appid
  */
-public class XmlConfigFile extends PlainTextConfigFile {
-  public XmlConfigFile(String appId, String namespace,
-                       ConfigRepository configRepository) {
-    super(appId, namespace, configRepository);
-  }
 
-  @Override
-  public ConfigFileFormat getConfigFileFormat() {
-    return ConfigFileFormat.XML;
-  }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+public @interface MultipleConfig {
+
+  /**
+   * multiple appId
+   * @return
+   */
+  String appId();
+
+
+  String[] namespaces();
+
+  /**
+   * eg. ${apollo.multiple.shop.secret}
+   * @return
+   */
+  String secret() default "";
 }

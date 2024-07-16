@@ -31,10 +31,28 @@ public interface ConfigRegistry {
   void register(String namespace, ConfigFactory factory);
 
   /**
+   * Register the config factory for the namespace specified.
+   *
+   * @param appId the appId
+   * @param namespace the namespace
+   * @param factory   the factory for this appId and namespace
+   */
+  void register(String appId, String namespace, ConfigFactory factory);
+
+  /**
    * Get the registered config factory for the namespace.
    *
    * @param namespace the namespace
    * @return the factory registered for this namespace
    */
   ConfigFactory getFactory(String namespace);
+
+  /**
+   * Get the registered config factory for the namespace.
+   *
+   * @param appId the appId
+   * @param namespace the namespace
+   * @return the factory registered for this appId and namespace
+   */
+  ConfigFactory getFactory(String appId, String namespace);
 }

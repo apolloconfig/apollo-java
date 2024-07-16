@@ -145,7 +145,7 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getStatusCode()).thenReturn(200);
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -171,7 +171,7 @@ public class RemoteConfigRepositoryTest {
       }
     });
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -208,7 +208,7 @@ public class RemoteConfigRepositoryTest {
       }
     }).when(httpClient).doGet(any(HttpRequest.class), any(Class.class));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -221,7 +221,7 @@ public class RemoteConfigRepositoryTest {
 
     when(someResponse.getStatusCode()).thenReturn(500);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     //must stop the long polling before exception occurred
     remoteConfigLongPollService.stopLongPollingRefresh();
@@ -234,7 +234,7 @@ public class RemoteConfigRepositoryTest {
 
     when(someResponse.getStatusCode()).thenReturn(404);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     //must stop the long polling before exception occurred
     remoteConfigLongPollService.stopLongPollingRefresh();
@@ -251,7 +251,7 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
     RepositoryChangeListener someListener = mock(RepositoryChangeListener.class);
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
     remoteConfigRepository.addChangeListener(someListener);
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
@@ -262,7 +262,7 @@ public class RemoteConfigRepositoryTest {
 
     remoteConfigRepository.sync();
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someNamespace), captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
 
     assertEquals(newConfigurations, captor.getValue());
   }
@@ -285,9 +285,9 @@ public class RemoteConfigRepositoryTest {
         return null;
       }
 
-    }).when(someListener).onRepositoryChange(any(String.class), any(Properties.class));
+    }).when(someListener).onRepositoryChange(any(String.class), any(String.class), any(Properties.class));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
     remoteConfigRepository.addChangeListener(someListener);
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
@@ -311,7 +311,7 @@ public class RemoteConfigRepositoryTest {
 
     remoteConfigLongPollService.stopLongPollingRefresh();
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someNamespace), captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
     assertEquals(newConfigurations, captor.getValue());
 
     final ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor = ArgumentCaptor
@@ -339,7 +339,7 @@ public class RemoteConfigRepositoryTest {
     notificationMessages.put(someKey, someNotificationId);
     notificationMessages.put(anotherKey, anotherNotificationId);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
     ApolloConfig someApolloConfig = mock(ApolloConfig.class);
     when(someApolloConfig.getReleaseKey()).thenReturn(someReleaseKey);
 

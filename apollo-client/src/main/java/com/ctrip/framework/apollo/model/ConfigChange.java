@@ -24,6 +24,7 @@ import com.ctrip.framework.apollo.enums.PropertyChangeType;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ConfigChange {
+  private final String appId;
   private final String namespace;
   private final String propertyName;
   private String oldValue;
@@ -32,14 +33,16 @@ public class ConfigChange {
 
   /**
    * Constructor.
+   * @param appId the appId of the key
    * @param namespace the namespace of the key
    * @param propertyName the key whose value is changed
    * @param oldValue the value before change
    * @param newValue the value after change
    * @param changeType the change type
    */
-  public ConfigChange(String namespace, String propertyName, String oldValue, String newValue,
+  public ConfigChange(String appId, String namespace, String propertyName, String oldValue, String newValue,
                       PropertyChangeType changeType) {
+    this.appId = appId;
     this.namespace = namespace;
     this.propertyName = propertyName;
     this.oldValue = oldValue;

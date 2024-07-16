@@ -25,6 +25,7 @@ import java.util.Set;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ConfigChangeEvent {
+  private String m_appId;
   private final String m_namespace;
   private final Map<String, ConfigChange> m_changes;
   /**
@@ -32,11 +33,13 @@ public class ConfigChangeEvent {
    * @param namespace the namespace of this change
    * @param changes the actual changes
    */
-  public ConfigChangeEvent(String namespace,
+  public ConfigChangeEvent(String appId, String namespace,
                            Map<String, ConfigChange> changes) {
+    this.m_appId = appId;
     this.m_namespace = namespace;
     this.m_changes = changes;
   }
+
 
   /**
    * Get the keys changed.
@@ -71,6 +74,14 @@ public class ConfigChangeEvent {
    */
   public boolean isChanged(String key) {
     return m_changes.containsKey(key);
+  }
+
+  /**
+   * Get the appId of this change event.
+   * @return the namespace
+   */
+  public String getAppId() {
+    return m_appId;
   }
 
   /**

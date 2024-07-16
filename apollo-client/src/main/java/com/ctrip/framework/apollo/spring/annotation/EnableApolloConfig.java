@@ -69,4 +69,9 @@ public @interface EnableApolloConfig {
    * @return
    */
   int order() default Ordered.LOWEST_PRECEDENCE;
+
+  /**
+   * Additional appId and namespace configurations. Will not participate in bootstrap
+   */
+  MultipleConfig[] multipleConfig() default {};
 }

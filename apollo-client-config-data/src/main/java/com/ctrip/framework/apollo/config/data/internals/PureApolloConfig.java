@@ -34,9 +34,9 @@ public class PureApolloConfig extends DefaultConfig implements RepositoryChangeL
    * @param namespace        the namespace of this config instance
    * @param configRepository the config repository for this config instance
    */
-  public PureApolloConfig(String namespace,
+  public PureApolloConfig(String appId, String namespace,
       ConfigRepository configRepository) {
-    super(namespace, configRepository);
+    super(appId, namespace, configRepository);
   }
 
   @Override
