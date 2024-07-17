@@ -16,8 +16,11 @@
  */
 package com.ctrip.framework.apollo.spring.property;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.ctrip.framework.apollo.util.ExceptionUtil;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,37 +46,45 @@ public class AutoRefreshConfigurationPropertiesListener implements
 
   private AutowireCapableBeanFactory beanFactory;
   private boolean supportAutowireCapableBeanFactory = false;
+  private final ConfigUtil configUtil;
   private final SpringConfigurationPropertyRegistry springConfigurationPropertyRegistry;
 
   public AutoRefreshConfigurationPropertiesListener() {
     this.springConfigurationPropertyRegistry = SpringInjector.getInstance(
         SpringConfigurationPropertyRegistry.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
 
   @Override
   public void onApplicationEvent(ApolloConfigChangeEvent event) {
-    if (!supportAutowireCapableBeanFactory) {
+    if (!supportAutowireCapableBeanFactory
+        || !configUtil.isAutoRefreshConfigurationPropertiesEnabled()) {
       return;
     }
     Set<String> keys = event.getConfigChangeEvent().changedKeys();
     if (CollectionUtils.isEmpty(keys)) {
       return;
     }
-    Set<String> targetBeanName = new HashSet<>();
-    for (String key : keys) {
-      // 1. check whether the changed key is relevant
-      Collection<String> targetCollection = springConfigurationPropertyRegistry.get(beanFactory,
-          key);
-      if (targetCollection != null) {
-        // ensure each bean refreshed once
-        targetBeanName.addAll(targetCollection);
-      }
-    }
+    // 1. check whether the changed key is relevant
+    Set<String> targetBeanName = collectTargetBeanNames(keys);
     // 2. update the configuration properties
     for (String beanName : targetBeanName) {
       refreshConfigurationProperties(beanFactory, beanName);
     }
+  }
+
+  private Set<String> collectTargetBeanNames(Set<String> keys) {
+    Set<String> targetBeanNames = new HashSet<>();
+    for (String key : keys) {
+      Collection<String> targetCollection = springConfigurationPropertyRegistry.get(beanFactory,
+          key);
+      if (targetCollection != null) {
+        // ensure each bean refreshed once
+        targetBeanNames.addAll(targetCollection);
+      }
+    }
+    return targetBeanNames;
   }
 
   private void refreshConfigurationProperties(AutowireCapableBeanFactory beanFactory,
@@ -82,7 +93,7 @@ public class AutoRefreshConfigurationPropertiesListener implements
       springConfigurationPropertyRegistry.refresh(beanFactory, beanName);
       logger.info("Auto update apollo changed configuration properties successfully, bean: {}",
           beanName);
-    } catch (Throwable ex) {
+    } catch (Exception ex) {
       logger.error("Auto update apollo changed configuration properties failed, {}",
           beanName, ex);
     }
@@ -94,8 +105,8 @@ public class AutoRefreshConfigurationPropertiesListener implements
       this.beanFactory = applicationContext.getAutowireCapableBeanFactory();
       this.supportAutowireCapableBeanFactory = true;
     } catch (IllegalStateException e) {
-      logger.warn(
-          "Failed to init AutoRefreshConfigurationPropertiesListener", e);
+      logger.warn("Failed to initialize AutoRefreshConfigurationPropertiesListener, message:{}",
+          ExceptionUtil.getDetailMessage(e));
     }
   }
 }

@@ -20,6 +20,7 @@ import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.spring.property.SpringConfigurationPropertyRegistry;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.ctrip.framework.apollo.util.ExceptionUtil;
 import java.lang.annotation.Annotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,8 @@ public class SpringConfigurationPropertiesProcessor implements BeanPostProcessor
 
   @Override
   public Object postProcessBeforeInitialization(Object bean, String beanName) {
-    if (!supportAutowireCapableBeanFactory) {
+    if (!supportAutowireCapableBeanFactory
+        || !configUtil.isAutoRefreshConfigurationPropertiesEnabled()) {
       return bean;
     }
     Class<?> clazz = bean.getClass();
@@ -63,19 +65,20 @@ public class SpringConfigurationPropertiesProcessor implements BeanPostProcessor
         ConfigurationProperties.class);
     // match beans with annotated `@ConfigurationProperties` and `@ApolloConfigurationPropertiesRefresh`,
     // or `@ConfigurationProperties` and `@RefreshScope`
-    if (configUtil.isAutoRefreshConfigurationPropertiesEnabled()
-        && configurationPropertiesAnnotation != null) {
-      ApolloConfigurationPropertiesRefresh apolloConfigurationPropertiesRefreshAnnotation = clazz.getDeclaredAnnotation(
-          ApolloConfigurationPropertiesRefresh.class);
-      if (apolloConfigurationPropertiesRefreshAnnotation != null || isRefreshScope(
-          clazz.getDeclaredAnnotations())) {
-        String prefix = configurationPropertiesAnnotation.prefix();
-        // cache prefix and bean name
-        springConfigurationPropertyRegistry.register(this.beanFactory, prefix, beanName);
-        logger.debug("Monitoring bean {}", beanName);
-      }
+    if (configurationPropertiesAnnotation != null && annotatedRefresh(clazz)) {
+      String prefix = configurationPropertiesAnnotation.prefix();
+      // cache prefix and bean name
+      springConfigurationPropertyRegistry.register(this.beanFactory, prefix, beanName);
+      logger.debug("Monitoring bean {}", beanName);
     }
     return bean;
+  }
+
+  private boolean annotatedRefresh(Class<?> clazz) {
+    ApolloConfigurationPropertiesRefresh apolloConfigurationPropertiesRefreshAnnotation = clazz.getDeclaredAnnotation(
+        ApolloConfigurationPropertiesRefresh.class);
+    return apolloConfigurationPropertiesRefreshAnnotation != null || isRefreshScope(
+        clazz.getDeclaredAnnotations());
   }
 
   private boolean isRefreshScope(Annotation[] annotations) {
@@ -93,8 +96,8 @@ public class SpringConfigurationPropertiesProcessor implements BeanPostProcessor
       this.beanFactory = applicationContext.getAutowireCapableBeanFactory();
       this.supportAutowireCapableBeanFactory = true;
     } catch (IllegalStateException e) {
-      logger.warn(
-          "Failed to init SpringConfigurationPropertiesProcessor", e);
+      logger.warn("Failed to initialize SpringConfigurationPropertiesProcessor, message:{}",
+          ExceptionUtil.getDetailMessage(e));
     }
   }
 }

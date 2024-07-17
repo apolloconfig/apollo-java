@@ -31,19 +31,11 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 public class SpringConfigurationPropertyRegistry {
 
   private final Map<AutowireCapableBeanFactory, Multimap<String, String>> registry = Maps.newConcurrentMap();
-  private final Object LOCK = new Object();
 
   public void register(AutowireCapableBeanFactory beanFactory, String prefix,
       String beanName) {
-    if (!registry.containsKey(beanFactory)) {
-      synchronized (LOCK) {
-        if (!registry.containsKey(beanFactory)) {
-          // ensure no repeat bean names in same prefix
-          registry.put(beanFactory, Multimaps.synchronizedSetMultimap(HashMultimap.create()));
-        }
-      }
-    }
-    registry.get(beanFactory).put(prefix, beanName);
+    registry.computeIfAbsent(beanFactory,
+        k -> Multimaps.synchronizedSetMultimap(HashMultimap.create())).put(prefix, beanName);
   }
 
   public Collection<String> get(AutowireCapableBeanFactory beanFactory, String key) {
