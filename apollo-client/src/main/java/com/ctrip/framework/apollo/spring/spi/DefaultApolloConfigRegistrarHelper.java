@@ -19,8 +19,10 @@ package com.ctrip.framework.apollo.spring.spi;
 import com.ctrip.framework.apollo.core.spi.Ordered;
 import com.ctrip.framework.apollo.spring.annotation.ApolloAnnotationProcessor;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
+import com.ctrip.framework.apollo.spring.annotation.SpringConfigurationPropertiesProcessor;
 import com.ctrip.framework.apollo.spring.annotation.SpringValueProcessor;
 import com.ctrip.framework.apollo.spring.config.PropertySourcesProcessor;
+import com.ctrip.framework.apollo.spring.property.AutoRefreshConfigurationPropertiesListener;
 import com.ctrip.framework.apollo.spring.property.AutoUpdateConfigChangeListener;
 import com.ctrip.framework.apollo.spring.property.SpringValueDefinitionProcessor;
 import com.ctrip.framework.apollo.spring.util.BeanRegistrationUtil;
@@ -57,10 +59,12 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
     BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, PropertySourcesPlaceholderConfigurer.class,
             propertySourcesPlaceholderPropertyValues);
     BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, AutoUpdateConfigChangeListener.class);
+    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, AutoRefreshConfigurationPropertiesListener.class);
     BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, PropertySourcesProcessor.class);
     BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, ApolloAnnotationProcessor.class);
     BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, SpringValueProcessor.class);
     BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, SpringValueDefinitionProcessor.class);
+    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, SpringConfigurationPropertiesProcessor.class);
   }
 
   private String[] resolveNamespaces(String[] namespaces) {

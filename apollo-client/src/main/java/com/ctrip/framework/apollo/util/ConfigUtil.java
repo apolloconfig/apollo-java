@@ -66,6 +66,7 @@ public class ConfigUtil {
   private TimeUnit configCacheExpireTimeUnit = TimeUnit.MINUTES;//1 minute
   private long longPollingInitialDelayInMills = 2000;//2 seconds
   private boolean autoUpdateInjectedSpringProperties = true;
+  private boolean autoRefreshConfigurationProperties = true;
   private final RateLimiter warnLogRateLimiter;
   private boolean propertiesOrdered = false;
   private boolean propertyNamesCacheEnabled = false;
@@ -82,6 +83,7 @@ public class ConfigUtil {
     initMaxConfigCacheSize();
     initLongPollingInitialDelayInMills();
     initAutoUpdateInjectedSpringProperties();
+    initAutoRefreshConfigurationProperties();
     initPropertiesOrdered();
     initPropertyNamesCacheEnabled();
     initPropertyFileCacheEnabled();
@@ -438,6 +440,23 @@ public class ConfigUtil {
 
   public boolean isAutoUpdateInjectedSpringPropertiesEnabled() {
     return autoUpdateInjectedSpringProperties;
+  }
+
+  private void initAutoRefreshConfigurationProperties() {
+    // 1. Get from System Property
+    String enableAutoRefresh = System.getProperty("apollo.autoRefreshConfigurationProperties");
+    if (Strings.isNullOrEmpty(enableAutoRefresh)) {
+      // 2. Get from app.properties
+      enableAutoRefresh = Foundation.app()
+          .getProperty("apollo.autoRefreshConfigurationProperties", null);
+    }
+    if (!Strings.isNullOrEmpty(enableAutoRefresh)) {
+      autoRefreshConfigurationProperties = Boolean.parseBoolean(enableAutoRefresh.trim());
+    }
+  }
+
+  public boolean isAutoRefreshConfigurationPropertiesEnabled() {
+    return autoRefreshConfigurationProperties;
   }
 
   private void initPropertiesOrdered() {

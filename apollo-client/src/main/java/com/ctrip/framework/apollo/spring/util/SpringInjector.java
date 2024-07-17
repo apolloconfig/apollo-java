@@ -19,6 +19,7 @@ package com.ctrip.framework.apollo.spring.util;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.spring.config.ConfigPropertySourceFactory;
 import com.ctrip.framework.apollo.spring.property.PlaceholderHelper;
+import com.ctrip.framework.apollo.spring.property.SpringConfigurationPropertyRegistry;
 import com.ctrip.framework.apollo.spring.property.SpringValueRegistry;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.google.inject.AbstractModule;
@@ -64,6 +65,7 @@ public class SpringInjector {
       bind(PlaceholderHelper.class).in(Singleton.class);
       bind(ConfigPropertySourceFactory.class).in(Singleton.class);
       bind(SpringValueRegistry.class).in(Singleton.class);
+      bind(SpringConfigurationPropertyRegistry.class).in(Singleton.class);
     }
   }
 }
