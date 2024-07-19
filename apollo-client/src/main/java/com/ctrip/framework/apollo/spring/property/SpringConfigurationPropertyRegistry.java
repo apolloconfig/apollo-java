@@ -23,22 +23,22 @@ import com.google.common.collect.Multimaps;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.BeanFactory;
 
 /**
  * @author licheng
  */
 public class SpringConfigurationPropertyRegistry {
 
-  private final Map<AutowireCapableBeanFactory, Multimap<String, String>> registry = Maps.newConcurrentMap();
+  private final Map<BeanFactory, Multimap<String, String>> registry = Maps.newConcurrentMap();
 
-  public void register(AutowireCapableBeanFactory beanFactory, String prefix,
+  public void register(BeanFactory beanFactory, String prefix,
       String beanName) {
     registry.computeIfAbsent(beanFactory,
         k -> Multimaps.synchronizedSetMultimap(HashMultimap.create())).put(prefix, beanName);
   }
 
-  public Collection<String> get(AutowireCapableBeanFactory beanFactory, String key) {
+  public Collection<String> get(BeanFactory beanFactory, String key) {
     Multimap<String, String> beanNameMap = registry.get(beanFactory);
     if (beanNameMap == null) {
       return null;
@@ -52,11 +52,4 @@ public class SpringConfigurationPropertyRegistry {
     }
     return targetCollection;
   }
-
-  public void refresh(AutowireCapableBeanFactory beanFactory, String beanName) {
-    Object bean = beanFactory.getBean(beanName);
-    beanFactory.destroyBean(bean);
-    beanFactory.initializeBean(bean, beanName);
-  }
-
 }

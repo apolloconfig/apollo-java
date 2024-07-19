@@ -20,56 +20,46 @@ import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.spring.property.SpringConfigurationPropertyRegistry;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.ctrip.framework.apollo.util.ExceptionUtil;
 import java.lang.annotation.Annotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * Configuration properties processor
  *
  * @author licheng
  */
-public class SpringConfigurationPropertiesProcessor implements BeanPostProcessor,
-    ApplicationContextAware {
+public class SpringConfigurationPropertiesProcessor implements BeanPostProcessor, BeanFactoryAware {
 
-  private static final Logger logger = LoggerFactory.getLogger(
-      SpringConfigurationPropertiesProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(SpringConfigurationPropertiesProcessor.class);
   private static final String REFRESH_SCOPE_NAME = "org.springframework.cloud.context.config.annotation.RefreshScope";
 
   private final ConfigUtil configUtil;
   private final SpringConfigurationPropertyRegistry springConfigurationPropertyRegistry;
-  private AutowireCapableBeanFactory beanFactory;
-  private boolean supportAutowireCapableBeanFactory = false;
+  private BeanFactory beanFactory;
 
   public SpringConfigurationPropertiesProcessor() {
-    springConfigurationPropertyRegistry = SpringInjector.getInstance(
-        SpringConfigurationPropertyRegistry.class);
+    springConfigurationPropertyRegistry = SpringInjector.getInstance(SpringConfigurationPropertyRegistry.class);
     configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   @Override
   public Object postProcessBeforeInitialization(Object bean, String beanName) {
-    if (!supportAutowireCapableBeanFactory
-        || !configUtil.isAutoRefreshConfigurationPropertiesEnabled()) {
-      return bean;
-    }
     Class<?> clazz = bean.getClass();
     ConfigurationProperties configurationPropertiesAnnotation = clazz.getDeclaredAnnotation(
         ConfigurationProperties.class);
     // match beans with annotated `@ConfigurationProperties` and `@ApolloConfigurationPropertiesRefresh`,
     // or `@ConfigurationProperties` and `@RefreshScope`
-    if (configurationPropertiesAnnotation != null && annotatedRefresh(clazz)) {
+    if (configUtil.isAutoRefreshConfigurationPropertiesEnabled() && configurationPropertiesAnnotation != null && annotatedRefresh(clazz)) {
       String prefix = configurationPropertiesAnnotation.prefix();
       // cache prefix and bean name
       springConfigurationPropertyRegistry.register(this.beanFactory, prefix, beanName);
-      logger.debug("Monitoring bean {}", beanName);
+      logger.debug("Monitoring ConfigurationProperties bean {}", beanName);
     }
     return bean;
   }
@@ -91,13 +81,7 @@ public class SpringConfigurationPropertiesProcessor implements BeanPostProcessor
   }
 
   @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    try {
-      this.beanFactory = applicationContext.getAutowireCapableBeanFactory();
-      this.supportAutowireCapableBeanFactory = true;
-    } catch (IllegalStateException e) {
-      logger.warn("Failed to initialize SpringConfigurationPropertiesProcessor, message:{}",
-          ExceptionUtil.getDetailMessage(e));
-    }
+  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    this.beanFactory = beanFactory;
   }
 }

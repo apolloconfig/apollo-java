@@ -20,32 +20,33 @@ import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.ctrip.framework.apollo.util.ExceptionUtil;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * Listen and refresh ConfigurationProperties matching the configuration prefix
+ *
  * @author licheng
- * @see org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()
  */
 public class AutoRefreshConfigurationPropertiesListener implements
     ApplicationListener<ApolloConfigChangeEvent>,
-    ApplicationContextAware {
+    BeanFactoryAware {
 
   private static final Logger logger = LoggerFactory.getLogger(
       AutoRefreshConfigurationPropertiesListener.class);
+  private static final String TEMP_PREFIX = "apollo.refresh.tmp.";
 
-  private AutowireCapableBeanFactory beanFactory;
-  private boolean supportAutowireCapableBeanFactory = false;
+  private BeanFactory beanFactory;
   private final ConfigUtil configUtil;
   private final SpringConfigurationPropertyRegistry springConfigurationPropertyRegistry;
 
@@ -55,22 +56,18 @@ public class AutoRefreshConfigurationPropertiesListener implements
     configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
-
   @Override
   public void onApplicationEvent(ApolloConfigChangeEvent event) {
-    if (!supportAutowireCapableBeanFactory
-        || !configUtil.isAutoRefreshConfigurationPropertiesEnabled()) {
-      return;
-    }
     Set<String> keys = event.getConfigChangeEvent().changedKeys();
-    if (CollectionUtils.isEmpty(keys)) {
+    if (!configUtil.isAutoRefreshConfigurationPropertiesEnabled() || CollectionUtils.isEmpty(
+        keys)) {
       return;
     }
     // 1. check whether the changed key is relevant
     Set<String> targetBeanName = collectTargetBeanNames(keys);
     // 2. update the configuration properties
     for (String beanName : targetBeanName) {
-      refreshConfigurationProperties(beanFactory, beanName);
+      checkValidatorAndRefresh(beanFactory, beanName);
     }
   }
 
@@ -87,10 +84,13 @@ public class AutoRefreshConfigurationPropertiesListener implements
     return targetBeanNames;
   }
 
-  private void refreshConfigurationProperties(AutowireCapableBeanFactory beanFactory,
-      String beanName) {
+  private void checkValidatorAndRefresh(BeanFactory beanFactory, String beanName) {
     try {
-      springConfigurationPropertyRegistry.refresh(beanFactory, beanName);
+      ConfigurationPropertiesBindingPostProcessor postProcessor = beanFactory.getBean(
+          ConfigurationPropertiesBindingPostProcessor.class);
+      Object bean = beanFactory.getBean(beanName);
+      checkValidator(postProcessor, bean, beanName);
+      refresh(postProcessor, bean, beanName);
       logger.info("Auto update apollo changed configuration properties successfully, bean: {}",
           beanName);
     } catch (Exception ex) {
@@ -99,14 +99,23 @@ public class AutoRefreshConfigurationPropertiesListener implements
     }
   }
 
+  private void checkValidator(ConfigurationPropertiesBindingPostProcessor postProcessor,
+      Object bean, String beanName)
+      throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    // `ConfigurationPropertiesBindingPostProcessor#postProcessBeforeInitialization()` can bind and validate ConfigurationProperties
+    // Execution at runtime will result in an error after the bind if the verification fails
+    // Using a temporary object to check validator will not affect the original bean
+    postProcessor.postProcessBeforeInitialization(
+        bean.getClass().getDeclaredConstructor().newInstance(), TEMP_PREFIX + beanName);
+  }
+
+  private void refresh(ConfigurationPropertiesBindingPostProcessor postProcessor, Object bean,
+      String beanName) {
+    postProcessor.postProcessBeforeInitialization(bean, beanName);
+  }
+
   @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    try {
-      this.beanFactory = applicationContext.getAutowireCapableBeanFactory();
-      this.supportAutowireCapableBeanFactory = true;
-    } catch (IllegalStateException e) {
-      logger.warn("Failed to initialize AutoRefreshConfigurationPropertiesListener, message:{}",
-          ExceptionUtil.getDetailMessage(e));
-    }
+  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    this.beanFactory = beanFactory;
   }
 }

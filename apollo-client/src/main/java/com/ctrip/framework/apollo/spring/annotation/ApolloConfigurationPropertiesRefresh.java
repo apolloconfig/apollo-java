@@ -19,7 +19,7 @@ package com.ctrip.framework.apollo.spring.annotation;
 import java.lang.annotation.*;
 
 /**
- * Use this annotation and <code>@ConfiguringProperties<code> to refresh `ConfigurationProperties`.
+ * Use this annotation and <code>@ConfiguringProperties<code> to refresh ConfigurationProperties.
  *
  * <p>Usage example:</p>
  * <pre class="code">
@@ -29,7 +29,6 @@ import java.lang.annotation.*;
  * public class SampleRedisConfig implements InitializingBean {
  *   private int expireSeconds;
  *   private String clusterNodes;
- *   private int commandTimeout;
  *   private Map<String, String> someMap = Maps.newLinkedHashMap();
  *   private List<String> someList = Lists.newLinkedList();
  *   public void setExpireSeconds(int expireSeconds) {
@@ -37,9 +36,6 @@ import java.lang.annotation.*;
  *   }
  *   public void setClusterNodes(String clusterNodes) {
  *     this.clusterNodes = clusterNodes;
- *   }
- *   public void setCommandTimeout(int commandTimeout) {
- *     this.commandTimeout = commandTimeout;
  *   }
  *   public Map<String, String> getSomeMap() {
  *     return someMap;
@@ -50,36 +46,9 @@ import java.lang.annotation.*;
  * }
  * </pre>
  *
- *
- * You may set up data like the following in Apollo: <br /><br /> Properties Sample:
- * application.properties
- * <pre>
- * redis.cache.expireSeconds = 100
- * redis.cache.clusterNodes = 1,2
- * redis.cache.commandTimeout = 50
- * redis.cache.someMap.key1 = a
- * redis.cache.someMap.key2 = b
- * redis.cache.someList[0] = c
- * redis.cache.someList[1] = d
- * </pre>
- *
- * Yaml Sample: application.yaml
- * <pre>
- * redis:
- *   cache:
- *     expireSeconds: 100
- *     clusterNodes: 1,2
- *     commandTimeout: 50
- *     someMap:
- *       key1: a
- *       key2: b
- *     someList:
- *     - c
- *     - d
- * </pre>
- *
  * Ensure <code>apollo.autoRefreshConfigurationProperties</code> should be true.<br />
- * In Spring Cloud environment, <code>@RefreshScope<code> can replace this annotation to refresh `ConfigurationProperties`.
+ * In Spring Cloud environment, <code>org.springframework.cloud.context.config.annotation.RefreshScope<code> can replace this annotation to refresh ConfigurationProperties.
+ * Before refreshing ConfigurationProperties, all validators in the bean will be checked. If they do not meet the requirements, the entire bean will stop refreshing and report an error.
  *
  * @author licheng
  */
