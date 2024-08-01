@@ -44,13 +44,13 @@ public class DefaultApolloClientExceptionApi extends
 
   private final AtomicInteger exceptionNum = new AtomicInteger(0);
   private int monitorExceptionQueueSize;
-  private BlockingQueue<ApolloConfigException> exceptions;
+  private final BlockingQueue<ApolloConfigException> exceptions;
 
   public DefaultApolloClientExceptionApi() {
     super(TAG_ERROR);
     monitorExceptionQueueSize = ApolloInjector.getInstance(ConfigUtil.class)
         .getMonitorExceptionQueueSize();
-    if(monitorExceptionQueueSize <= 0){
+    if (monitorExceptionQueueSize <= 0) {
       monitorExceptionQueueSize = 25;
     }
     exceptions = new ArrayBlockingQueue<>(
@@ -79,10 +79,6 @@ public class DefaultApolloClientExceptionApi extends
       exceptions.poll();
     }
     exceptions.add(exception);
-  }
-
-  @Override
-  public void export0() {
   }
 
   @Override

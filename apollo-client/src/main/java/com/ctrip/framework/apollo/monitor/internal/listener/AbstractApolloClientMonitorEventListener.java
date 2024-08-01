@@ -43,16 +43,6 @@ public abstract class AbstractApolloClientMonitorEventListener implements
     this.tag = tag;
   }
 
-  /**
-   * Specific collection logic
-   */
-  protected abstract void collect0(ApolloClientMonitorEvent event);
-
-  /**
-   * Convenient for indicators that can only be obtained from the status object
-   */
-  protected abstract void export0();
-
   @Override
   public String mBeanName() {
     return tag;
@@ -69,9 +59,6 @@ public abstract class AbstractApolloClientMonitorEventListener implements
     isUpdated.set(true);
   }
 
-  /**
-   * Whether the sample data has been updated
-   */
   @Override
   public boolean isMetricsSampleUpdated() {
     return isUpdated.getAndSet(false);
@@ -84,6 +71,17 @@ public abstract class AbstractApolloClientMonitorEventListener implements
     samples.addAll(gaugeSamples.values());
     return samples;
   }
+  
+  /**
+   * Specific collection logic
+   */
+  protected void collect0(ApolloClientMonitorEvent event){}
+
+  /**
+   * Convenient for indicators that can only be obtained from the status object
+   */
+  protected void export0(){}
+
 
 
   /**

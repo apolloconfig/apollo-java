@@ -47,4 +47,9 @@ public class NullClientThreadPoolMonitorApi implements ApolloClientThreadPoolMon
   public ApolloThreadPoolInfo getAbstractConfigFileThreadPoolInfo() {
     return null;
   }
+
+  @Override
+  public ApolloThreadPoolInfo getMetricsExporterThreadPoolInfo() {
+    return null;
+  }
 }

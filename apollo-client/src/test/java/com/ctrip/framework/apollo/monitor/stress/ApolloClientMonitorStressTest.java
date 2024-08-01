@@ -15,7 +15,9 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.stress;
+
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
+
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventFactory;
 import com.github.noconnor.junitperf.JUnitPerfRule;
@@ -30,21 +32,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ApolloClientMonitorStressTest.class)
 @ActiveProfiles("stress-test")
-public class ApolloClientMonitorStressTest { 
+public class ApolloClientMonitorStressTest {
+
   @Rule
   public JUnitPerfRule perfTestRule = new JUnitPerfRule();
-  
+
   @Test
   @JUnitPerfTest(threads = 25, durationMs = 10000, warmUpMs = 1000, maxExecutionsPerSecond = 1000)
-  public void testConfigMonitor(){
+  public void testConfigMonitor() {
     String exporterData = ConfigService.getConfigMonitor().getExporterData();
   }
-  
+
   @Test
   @JUnitPerfTest(threads = 50, durationMs = 10000, warmUpMs = 1000, maxExecutionsPerSecond = 1000)
-  public void testPublishEvent(){
+  public void testPublishEvent() {
     ApolloClientMonitorEventFactory.getInstance()
         .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
-        .putAttachment(NAMESPACE,"application").publish();
+        .putAttachment(NAMESPACE, "application").publish();
   }
 }

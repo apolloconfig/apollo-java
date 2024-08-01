@@ -28,12 +28,24 @@ public interface ApolloClientBootstrapArgsMonitorApi {
    */
   Map<String, String> getBootstrapArgs();
 
+  /**
+   * get startup params by key
+   */
   String getStartupParams(String key);
 
+  /**
+   *  config service url
+   */
   String getConfigServiceUrl();
 
+  /**
+   *  access key secret
+   */
   String getAccessKeySecret();
 
+  /**
+   * auto update injected spring properties
+   */
   Boolean getAutoUpdateInjectedSpringProperties();
 
   Boolean getBootstrapEnabled();

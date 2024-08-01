@@ -27,57 +27,57 @@ import org.mockito.MockitoAnnotations;
 
 public class ApolloClientMonitorMessageProducerTest {
 
-    private ApolloClientMonitorMessageProducer producer;
+  private ApolloClientMonitorMessageProducer producer;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        
-        producer = new ApolloClientMonitorMessageProducer();
-    }
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
 
-    @Test
-    public void testLogError_Throwable() {
-        Throwable cause = new Exception("Test exception");
+    producer = new ApolloClientMonitorMessageProducer();
+  }
 
-        producer.logError(cause);
-    }
+  @Test
+  public void testLogError_Throwable() {
+    Throwable cause = new Exception("Test exception");
 
-    @Test
-    public void testLogError_String_Throwable() {
-        String message = "Test error message";
-        Throwable cause = new Exception("Test exception");
+    producer.logError(cause);
+  }
 
-        producer.logError(message, cause);
-    }
+  @Test
+  public void testLogError_String_Throwable() {
+    String message = "Test error message";
+    Throwable cause = new Exception("Test exception");
 
-    @Test
-    public void testLogEvent_TaggedEvent() {
-        String type = ApolloClientMonitorMessageProducer.TAGS.get(0); // APOLLO_CLIENT_CONFIGCHANGES
-        String name = "Test event";
+    producer.logError(message, cause);
+  }
 
-        producer.logEvent(type, name);
-    }
+  @Test
+  public void testLogEvent_TaggedEvent() {
+    String type = ApolloClientMonitorMessageProducer.TAGS.get(0); // APOLLO_CLIENT_CONFIGCHANGES
+    String name = "Test event";
 
-    @Test
-    public void testLogEvent_ClientConfigEvent() {
-        String type = APOLLO_CLIENT_CONFIGS + "namespace";
-        String name = "Test config";
+    producer.logEvent(type, name);
+  }
 
-        producer.logEvent(type, name);
-    }
+  @Test
+  public void testLogEvent_ClientConfigEvent() {
+    String type = APOLLO_CLIENT_CONFIGS + "namespace";
+    String name = "Test config";
 
-    @Test
-    public void testLogMetricsForCount() {
-        String name = APOLLO_CLIENT_NAMESPACE_USAGE + ":testNamespace";
+    producer.logEvent(type, name);
+  }
 
-        producer.logMetricsForCount(name);
-    }
+  @Test
+  public void testLogMetricsForCount() {
+    String name = APOLLO_CLIENT_NAMESPACE_USAGE + ":testNamespace";
 
-    @Test
-    public void testNewTransaction() {
-        Transaction result = producer.newTransaction("type", "name");
+    producer.logMetricsForCount(name);
+  }
 
-        assertEquals(ApolloClientMessageProducerComposite.NULL_TRANSACTION, result);
-    }
+  @Test
+  public void testNewTransaction() {
+    Transaction result = producer.newTransaction("type", "name");
+
+    assertEquals(ApolloClientMessageProducerComposite.NULL_TRANSACTION, result);
+  }
 }

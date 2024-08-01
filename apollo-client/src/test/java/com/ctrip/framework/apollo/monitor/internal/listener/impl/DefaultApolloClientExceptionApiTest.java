@@ -29,73 +29,75 @@ import java.util.List;
 
 public class DefaultApolloClientExceptionApiTest {
 
-    private DefaultApolloClientExceptionApi exceptionApi;
+  private DefaultApolloClientExceptionApi exceptionApi;
 
-    @Before
-    public void setUp() {
-        exceptionApi = new DefaultApolloClientExceptionApi();
+  @Before
+  public void setUp() {
+    exceptionApi = new DefaultApolloClientExceptionApi();
+  }
+
+  @Test
+  public void testCollect0_AddsException() {
+    ApolloConfigException exception = new ApolloConfigException("Test Exception");
+    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+    when(event.getAttachmentValue(THROWABLE)).thenReturn(exception);
+
+    exceptionApi.collect0(event);
+
+    List<Exception> exceptions = exceptionApi.getApolloConfigExceptionList();
+    assertEquals(1, exceptions.size());
+    assertEquals(exception, exceptions.get(0));
+  }
+
+  @Test
+  public void testCollect0_IncrementsExceptionCount() {
+    ApolloConfigException exception = new ApolloConfigException("Test Exception");
+    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+    when(event.getAttachmentValue(THROWABLE)).thenReturn(exception);
+
+    exceptionApi.collect0(event);
+    exceptionApi.collect0(event);
+
+    assertEquals(2, exceptionApi.getApolloConfigExceptionList().size());
+  }
+
+  @Test
+  public void testGetApolloConfigExceptionDetails() {
+    ApolloConfigException exception1 = new ApolloConfigException("First Exception");
+    ApolloConfigException exception2 = new ApolloConfigException("Second Exception");
+
+    ApolloClientMonitorEvent event1 = mock(ApolloClientMonitorEvent.class);
+    ApolloClientMonitorEvent event2 = mock(ApolloClientMonitorEvent.class);
+
+    when(event1.getAttachmentValue(THROWABLE)).thenReturn(exception1);
+    when(event2.getAttachmentValue(THROWABLE)).thenReturn(exception2);
+
+    exceptionApi.collect0(event1);
+    exceptionApi.collect0(event2);
+
+    List<String> details = exceptionApi.getApolloConfigExceptionDetails();
+    assertEquals(2, details.size());
+    assertTrue(details.contains("First Exception"));
+    assertTrue(details.contains("Second Exception"));
+  }
+
+  @Test
+  public void testCollect0_HandlesMaxQueueSize() {
+    for (int i = 0; i < 25; i++) {
+      ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+      when(event.getAttachmentValue(THROWABLE)).thenReturn(
+          new ApolloConfigException("Exception " + i));
+      exceptionApi.collect0(event);
     }
 
-    @Test
-    public void testCollect0_AddsException() {
-        ApolloConfigException exception = new ApolloConfigException("Test Exception");
-        ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-        when(event.getAttachmentValue(THROWABLE)).thenReturn(exception);
+    assertEquals(25, exceptionApi.getApolloConfigExceptionList().size());
 
-        exceptionApi.collect0(event);
+    // Add one more to exceed the size.
+    ApolloClientMonitorEvent overflowEvent = mock(ApolloClientMonitorEvent.class);
+    when(overflowEvent.getAttachmentValue(THROWABLE)).thenReturn(
+        new ApolloConfigException("Overflow Exception"));
+    exceptionApi.collect0(overflowEvent);
 
-        List<Exception> exceptions = exceptionApi.getApolloConfigExceptionList();
-        assertEquals(1, exceptions.size());
-        assertEquals(exception, exceptions.get(0));
-    }
-
-    @Test
-    public void testCollect0_IncrementsExceptionCount() {
-        ApolloConfigException exception = new ApolloConfigException("Test Exception");
-        ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-        when(event.getAttachmentValue(THROWABLE)).thenReturn(exception);
-
-        exceptionApi.collect0(event);
-        exceptionApi.collect0(event);
-
-        assertEquals(2, exceptionApi.getApolloConfigExceptionList().size());
-    }
-
-    @Test
-    public void testGetApolloConfigExceptionDetails() {
-        ApolloConfigException exception1 = new ApolloConfigException("First Exception");
-        ApolloConfigException exception2 = new ApolloConfigException("Second Exception");
-        
-        ApolloClientMonitorEvent event1 = mock(ApolloClientMonitorEvent.class);
-        ApolloClientMonitorEvent event2 = mock(ApolloClientMonitorEvent.class);
-        
-        when(event1.getAttachmentValue(THROWABLE)).thenReturn(exception1);
-        when(event2.getAttachmentValue(THROWABLE)).thenReturn(exception2);
-        
-        exceptionApi.collect0(event1);
-        exceptionApi.collect0(event2);
-        
-        List<String> details = exceptionApi.getApolloConfigExceptionDetails();
-        assertEquals(2, details.size());
-        assertTrue(details.contains("First Exception"));
-        assertTrue(details.contains("Second Exception"));
-    }
-
-    @Test
-    public void testCollect0_HandlesMaxQueueSize() {
-        for (int i = 0; i < 25; i++) {
-            ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-            when(event.getAttachmentValue(THROWABLE)).thenReturn(new ApolloConfigException("Exception " + i));
-            exceptionApi.collect0(event);
-        }
-
-        assertEquals(25, exceptionApi.getApolloConfigExceptionList().size());
-        
-        // Add one more to exceed the size.
-        ApolloClientMonitorEvent overflowEvent = mock(ApolloClientMonitorEvent.class);
-        when(overflowEvent.getAttachmentValue(THROWABLE)).thenReturn(new ApolloConfigException("Overflow Exception"));
-        exceptionApi.collect0(overflowEvent);
-
-        assertEquals(25, exceptionApi.getApolloConfigExceptionList().size());
-    }
+    assertEquals(25, exceptionApi.getApolloConfigExceptionList().size());
+  }
 }

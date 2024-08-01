@@ -29,52 +29,52 @@ import java.util.Collections;
 
 public class ApolloClientMonitorEventPublisherTest {
 
-    private ApolloClientMonitorEventListenerManager mockCollectorManager;
-    private ConfigUtil mockConfigUtil;
-    private ApolloClientMonitorEventListener mockCollector;
-    private ApolloClientMonitorEvent mockEvent;
+  private ApolloClientMonitorEventListenerManager mockCollectorManager;
+  private ConfigUtil mockConfigUtil;
+  private ApolloClientMonitorEventListener mockCollector;
+  private ApolloClientMonitorEvent mockEvent;
 
-    @Before
-    public void setUp() {
-        mockCollectorManager = mock(ApolloClientMonitorEventListenerManager.class);
-        mockConfigUtil = mock(ConfigUtil.class);
-        mockCollector = mock(ApolloClientMonitorEventListener.class);
-        mockEvent = mock(ApolloClientMonitorEvent.class);
+  @Before
+  public void setUp() {
+    mockCollectorManager = mock(ApolloClientMonitorEventListenerManager.class);
+    mockConfigUtil = mock(ConfigUtil.class);
+    mockCollector = mock(ApolloClientMonitorEventListener.class);
+    mockEvent = mock(ApolloClientMonitorEvent.class);
 
-        // 使用 Mockito 来模拟静态方法
-        MockInjector.setInstance(ApolloClientMonitorEventListenerManager.class, mockCollectorManager);
-        MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
-        ApolloClientMonitorEventPublisher.reset();
-    }
+    // 使用 Mockito 来模拟静态方法
+    MockInjector.setInstance(ApolloClientMonitorEventListenerManager.class, mockCollectorManager);
+    MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
+    ApolloClientMonitorEventPublisher.reset();
+  }
 
-    @Test
-    public void testPublish_WhenClientMonitorEnabled_CollectorSupportsEvent() {
-        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(true);
-        when(mockCollectorManager.getCollectors()).thenReturn(Collections.singletonList(mockCollector));
-        when(mockCollector.isSupport(mockEvent)).thenReturn(true);
+  @Test
+  public void testPublish_WhenClientMonitorEnabled_CollectorSupportsEvent() {
+    when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(true);
+    when(mockCollectorManager.getCollectors()).thenReturn(Collections.singletonList(mockCollector));
+    when(mockCollector.isSupport(mockEvent)).thenReturn(true);
 
-        ApolloClientMonitorEventPublisher.publish(mockEvent);
+    ApolloClientMonitorEventPublisher.publish(mockEvent);
 
-        verify(mockCollector).collect(mockEvent);
-    }
+    verify(mockCollector).collect(mockEvent);
+  }
 
-    @Test
-    public void testPublish_WhenClientMonitorEnabled_CollectorDoesNotSupportEvent() {
-        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(true);
-        when(mockCollectorManager.getCollectors()).thenReturn(Collections.singletonList(mockCollector));
-        when(mockCollector.isSupport(mockEvent)).thenReturn(false);
+  @Test
+  public void testPublish_WhenClientMonitorEnabled_CollectorDoesNotSupportEvent() {
+    when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(true);
+    when(mockCollectorManager.getCollectors()).thenReturn(Collections.singletonList(mockCollector));
+    when(mockCollector.isSupport(mockEvent)).thenReturn(false);
 
-        ApolloClientMonitorEventPublisher.publish(mockEvent);
+    ApolloClientMonitorEventPublisher.publish(mockEvent);
 
-        verify(mockCollector, never()).collect(mockEvent);
-    }
+    verify(mockCollector, never()).collect(mockEvent);
+  }
 
-    @Test
-    public void testPublish_WhenClientMonitorDisabled() {
-        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(false);
+  @Test
+  public void testPublish_WhenClientMonitorDisabled() {
+    when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(false);
 
-        ApolloClientMonitorEventPublisher.publish(mockEvent);
+    ApolloClientMonitorEventPublisher.publish(mockEvent);
 
-        verify(mockCollectorManager, never()).getCollectors();
-    }
+    verify(mockCollectorManager, never()).getCollectors();
+  }
 }

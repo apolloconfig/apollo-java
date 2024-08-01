@@ -34,87 +34,89 @@ import java.util.List;
 
 public class AbstractApolloClientMetricsExporterTest {
 
-    private class TestMetricsExporter extends AbstractApolloClientMetricsExporter {
-        @Override
-        protected void doInit() {
-        }
+  private TestMetricsExporter exporter;
+  private ApolloClientMonitorEventListener mockListener;
 
-        public List<ApolloClientMonitorEventListener> getCollectors() {
-            return collectors;
-        }
+  @Before
+  public void setUp() {
+    exporter = new TestMetricsExporter();
+    mockListener = mock(ApolloClientMonitorEventListener.class);
+  }
 
-      @Override
-      public boolean isSupport(String form) {
-        return false;
-      }
+  @Test
+  public void testInit() {
+    List<ApolloClientMonitorEventListener> collectors = new ArrayList<>();
+    collectors.add(mockListener);
+    long collectPeriod = 10L;
 
-      @Override
-      public void registerOrUpdateCounterSample(String name, Map<String, String> tag,
-          double incrValue) {
+    exporter.init(collectors, collectPeriod);
 
-      }
+    assertEquals(collectors, exporter.getCollectors());
+  }
 
-      @Override
-      public void registerOrUpdateGaugeSample(String name, Map<String, String> tag, double value) {
+  @Test
+  public void testUpdateMetricsData() {
+    List<SampleModel> samples = new ArrayList<>();
+    GaugeModel gauge = mock(GaugeModel.class);
+    when(gauge.getType()).thenReturn(MeterEnums.GAUGE);
+    when(gauge.getName()).thenReturn("testGauge");
+    when(gauge.getValue()).thenReturn(10.0);
+    samples.add(gauge);
 
-      }
+    when(mockListener.isMetricsSampleUpdated()).thenReturn(true);
+    when(mockListener.export()).thenReturn(samples);
 
-      @Override
-      public String response() {
-        return "";
-      }
+    exporter.init(Collections.singletonList(mockListener), 10L);
+    exporter.updateMetricsData();
+
+    verify(mockListener).export();
+    verify(gauge).getValue();
+  }
+
+  @Test
+  public void testRegisterSampleGauge() {
+    GaugeModel gaugeModel = (GaugeModel) GaugeModel.create("testGauge", 5.0).putTag("key", "value");
+
+    exporter.registerSample(gaugeModel);
+  }
+
+  @Test
+  public void testRegisterSampleCounter() {
+    CounterModel counterModel = (CounterModel) CounterModel.create("testCounter", 5.0)
+        .putTag("key", "value");
+    exporter.registerSample(counterModel);
+  }
+
+  private class TestMetricsExporter extends AbstractApolloClientMetricsExporter {
+
+    @Override
+    protected void doInit() {
     }
 
-    private TestMetricsExporter exporter;
-    private ApolloClientMonitorEventListener mockListener;
-
-    @Before
-    public void setUp() {
-        exporter = new TestMetricsExporter();
-        mockListener = mock(ApolloClientMonitorEventListener.class);
+    public List<ApolloClientMonitorEventListener> getCollectors() {
+      return collectors;
     }
 
-    @Test
-    public void testInit() {
-        List<ApolloClientMonitorEventListener> collectors = new ArrayList<>();
-        collectors.add(mockListener);
-        long collectPeriod = 10L;
-
-        exporter.init(collectors, collectPeriod);
-
-        assertEquals(collectors, exporter.getCollectors());
+    @Override
+    public boolean isSupport(String form) {
+      return false;
     }
 
-    @Test
-    public void testUpdateMetricsData() {
-        List<SampleModel> samples = new ArrayList<>();
-        GaugeModel gauge = mock(GaugeModel.class);
-        when(gauge.getType()).thenReturn(MeterEnums.GAUGE);
-        when(gauge.getName()).thenReturn("testGauge");
-        when(gauge.getValue()).thenReturn(10.0);
-        samples.add(gauge);
+    @Override
+    public void registerOrUpdateCounterSample(String name, Map<String, String> tag,
+        double incrValue) {
 
-        when(mockListener.isMetricsSampleUpdated()).thenReturn(true);
-        when(mockListener.export()).thenReturn(samples);
-
-        exporter.init(Collections.singletonList(mockListener), 10L);
-        exporter.updateMetricsData();
-
-        verify(mockListener).export();
-        verify(gauge).getValue();
     }
 
-    @Test
-    public void testRegisterSampleGauge() {
-        GaugeModel gaugeModel = (GaugeModel) GaugeModel.create("testGauge", 5.0).putTag("key", "value");
+    @Override
+    public void registerOrUpdateGaugeSample(String name, Map<String, String> tag, double value) {
 
-        exporter.registerSample(gaugeModel);
     }
 
-    @Test
-    public void testRegisterSampleCounter() {
-        CounterModel counterModel = (CounterModel) CounterModel.create("testCounter", 5.0).putTag("key", "value");
-        exporter.registerSample(counterModel);
+    @Override
+    public String response() {
+      return "";
     }
-    
+  }
+
 }

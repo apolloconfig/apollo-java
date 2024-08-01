@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.monitor.internal.jmx;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -27,39 +28,39 @@ import javax.management.ObjectName;
 
 public class ApolloClientJmxMBeanRegisterTest {
 
-    private MBeanServer mockMBeanServer;
+  private MBeanServer mockMBeanServer;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMBeanServer = mock(MBeanServer.class);
-        ApolloClientJmxMBeanRegister.setMBeanServer(mockMBeanServer);
-    }
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    mockMBeanServer = mock(MBeanServer.class);
+    ApolloClientJmxMBeanRegister.setMBeanServer(mockMBeanServer);
+  }
 
-    @Test
-    public void testRegister_MBeanNotRegistered() throws Exception {
-        String name = "com.example:type=TestMBean";
-        Object mbean = new Object();
+  @Test
+  public void testRegister_MBeanNotRegistered() throws Exception {
+    String name = "com.example:type=TestMBean";
+    Object mbean = new Object();
 
-        when(mockMBeanServer.isRegistered(any(ObjectName.class))).thenReturn(false);
-        ObjectName objectName = ApolloClientJmxMBeanRegister.register(name, mbean);
+    when(mockMBeanServer.isRegistered(any(ObjectName.class))).thenReturn(false);
+    ObjectName objectName = ApolloClientJmxMBeanRegister.register(name, mbean);
 
-        assertNotNull(objectName);
-        verify(mockMBeanServer).registerMBean(mbean, objectName);
-    }
+    assertNotNull(objectName);
+    verify(mockMBeanServer).registerMBean(mbean, objectName);
+  }
 
-    @Test
-    public void testRegister_MBeanAlreadyRegistered() throws Exception {
-        String name = "com.example:type=TestMBean";
-        Object mbean = new Object();
+  @Test
+  public void testRegister_MBeanAlreadyRegistered() throws Exception {
+    String name = "com.example:type=TestMBean";
+    Object mbean = new Object();
 
-        ObjectName objectName = new ObjectName(name);
-        when(mockMBeanServer.isRegistered(objectName)).thenReturn(true);
+    ObjectName objectName = new ObjectName(name);
+    when(mockMBeanServer.isRegistered(objectName)).thenReturn(true);
 
-        ApolloClientJmxMBeanRegister.register(name, mbean);
+    ApolloClientJmxMBeanRegister.register(name, mbean);
 
-        verify(mockMBeanServer).unregisterMBean(objectName);
-        verify(mockMBeanServer).registerMBean(mbean, objectName);
-    }
+    verify(mockMBeanServer).unregisterMBean(objectName);
+    verify(mockMBeanServer).registerMBean(mbean, objectName);
+  }
 
 }

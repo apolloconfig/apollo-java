@@ -36,47 +36,23 @@ public class NullClientNamespaceMonitorApi implements ApolloClientNamespaceMonit
 
 
   @Override
-  public List<String> getNamespace404() {
+  public List<String> getNotFoundNamespaces() {
     return Collections.emptyList();
   }
 
   @Override
-  public List<String> getNamespaceTimeout() {
+  public List<String> getTimeoutNamespaces() {
     return Collections.emptyList();
   }
 
   @Override
-  public List<String> getNamespaceItemName(String namespace) {
-    return Collections.emptyList();
+  public Integer getNamespaceItemsNum(String namespace) {
+    return 0;
   }
 
   @Override
-  public List<String> getAllNamespaceReleaseKey() {
-    return Collections.emptyList();
+  public Integer getConfigFileNum() {
+    return 0;
   }
 
-  @Override
-  public List<String> getAllNamespaceUsageCount() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<String> getAllNamespacesLatestUpdateTime() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<String> getAllUsedNamespaceName() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<String> getAllNamespaceFirstLoadSpend() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public List<String> getAllNamespaceItemName() {
-    return Collections.emptyList();
-  }
 }

@@ -25,7 +25,7 @@ import com.ctrip.framework.apollo.monitor.internal.DefaultConfigMonitor;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientMonitorEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.listener.DefaultApolloClientMonitorEventListenerManager;
 import com.ctrip.framework.apollo.monitor.internal.tracer.ApolloClientMessageProducerComposite;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import java.util.Collections;

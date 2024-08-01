@@ -22,6 +22,7 @@ import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
 import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
 import com.ctrip.framework.apollo.monitor.internal.DefaultConfigMonitor;
+import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.jmx.ApolloClientJmxMBeanRegister;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
@@ -29,7 +30,7 @@ import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloCl
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientExceptionApi;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientNamespaceApi;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientThreadPoolApi;
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientMonitorEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.listener.DefaultApolloClientMonitorEventListenerManager;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.monitor.internal.tracer.ApolloClientMonitorMessageProducer;
@@ -91,7 +92,8 @@ public class ConfigMonitorInitializer {
         new DefaultApolloClientExceptionApi(),
         new DefaultApolloClientNamespaceApi(configManager.m_configs, configManager.m_configFiles),
         new DefaultApolloClientThreadPoolApi(RemoteConfigRepository.m_executorService,
-            AbstractConfig.m_executorService, AbstractConfigFile.m_executorService),
+            AbstractConfig.m_executorService, AbstractConfigFile.m_executorService,
+            AbstractApolloClientMetricsExporter.m_executorService),
         new DefaultApolloClientBootstrapArgsApi(CONFIG_UTIL)
     );
 

@@ -30,23 +30,25 @@ public interface ApolloClientNamespaceMonitorApi {
    */
   Map<String, NamespaceMetrics> getNamespaceMetrics();
 
-  List<String> getNamespaceItemName(String namespace);
+  /**
+   *  get Namespace Config.ItemsNum
+   */
+  Integer getNamespaceItemsNum(String namespace);
 
-  List<String> getNamespace404();
+  /**
+   * get ConfigFile num
+   */
+  Integer getConfigFileNum();
 
-  List<String> getNamespaceTimeout();
+  /**
+   * get not found namespaces
+   */
+  List<String> getNotFoundNamespaces();
 
-  List<String> getAllNamespaceReleaseKey();
-
-  List<String> getAllNamespaceUsageCount();
-
-  List<String> getAllNamespacesLatestUpdateTime();
-
-  List<String> getAllUsedNamespaceName();
-
-  List<String> getAllNamespaceFirstLoadSpend();
-
-  List<String> getAllNamespaceItemName();
+  /**
+   * get timeout namespaces
+   */
+  List<String> getTimeoutNamespaces();
 
 
 }

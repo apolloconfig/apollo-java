@@ -38,7 +38,7 @@ public class ApolloClientMonitorConstant {
   public static final String TIMESTAMP = "timestamp";
   public static final String THROWABLE = "throwable";
   public static final String NAMESPACE_RELEASE_KEY = "releaseKey";
-  public static final String APOLLO_CLIENT = "Apollo_Client_";
+  public static final String APOLLO_CLIENT = "apollo_client_";
   public static final String ENV = "env";
   public static final String VERSION = "version";
   public static final String META_FRESH = "metaFreshTime";
@@ -80,9 +80,14 @@ public class ApolloClientMonitorConstant {
   public static final String METRICS_NAMESPACE_USAGE = "namespace_usage";
   public static final String METRICS_NAMESPACE_NOT_FOUND = "namespace_not_found";
   public static final String METRICS_NAMESPACE_TIMEOUT = "namespace_timeout";
-  public static final String[] METRICS_THREAD_POOL_PARAMS = new String[]{"ThreadPoolName",
-      "activeTaskCount", "queueSize",
-      "completedTaskCount",
-      "poolSize", "totalTaskCount", "corePoolSize", "maximumPoolSize", "largestPoolSize",
-      "queueCapacity", "queueRemainingCapacity", "currentLoad"};
+  public static final String METRICS_THREAD_POOL = "thread_pool_";
+  public static final String[] METRICS_THREAD_POOL_PARAMS = new String[]{
+      METRICS_THREAD_POOL + "name",
+      METRICS_THREAD_POOL + "active_task_count", METRICS_THREAD_POOL + "queue_size",
+      METRICS_THREAD_POOL + "completed_task_count",
+      METRICS_THREAD_POOL + "pool_size", METRICS_THREAD_POOL + "total_task_count",
+      METRICS_THREAD_POOL + "core_pool_size", METRICS_THREAD_POOL + "maximum_pool_size",
+      METRICS_THREAD_POOL + "largest_pool_size",
+      METRICS_THREAD_POOL + "queue_capacity", METRICS_THREAD_POOL + "queue_remaining_capacity",
+      METRICS_THREAD_POOL + "current_load"};
 }

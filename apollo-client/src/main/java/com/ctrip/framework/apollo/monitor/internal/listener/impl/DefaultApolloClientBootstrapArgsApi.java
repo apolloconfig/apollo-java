@@ -98,11 +98,6 @@ public class DefaultApolloClientBootstrapArgsApi extends
   }
 
   @Override
-  public void export0() {
-    // do nothing
-  }
-
-  @Override
   public String getStartupParams(String key) {
     return Optional.ofNullable(bootstrapArgs.get(key)).orElse("").toString();
   }

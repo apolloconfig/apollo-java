@@ -31,104 +31,104 @@ import java.util.List;
 
 public class ApolloClientMessageProducerCompositeTest {
 
-    private ApolloClientMessageProducerComposite composite;
+  private ApolloClientMessageProducerComposite composite;
 
-    @Mock
-    private MessageProducer producer1;
+  @Mock
+  private MessageProducer producer1;
 
-    @Mock
-    private MessageProducer producer2;
+  @Mock
+  private MessageProducer producer2;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        List<MessageProducer> producers = Arrays.asList(producer1, producer2);
-        composite = new ApolloClientMessageProducerComposite(producers);
-    }
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    List<MessageProducer> producers = Arrays.asList(producer1, producer2);
+    composite = new ApolloClientMessageProducerComposite(producers);
+  }
 
-    @Test
-    public void testLogError_Throwable() {
-        Throwable cause = new Exception("Test exception");
+  @Test
+  public void testLogError_Throwable() {
+    Throwable cause = new Exception("Test exception");
 
-        composite.logError(cause);
+    composite.logError(cause);
 
-        verify(producer1).logError(cause);
-        verify(producer2).logError(cause);
-    }
+    verify(producer1).logError(cause);
+    verify(producer2).logError(cause);
+  }
 
-    @Test
-    public void testLogError_String_Throwable() {
-        String message = "Test error message";
-        Throwable cause = new Exception("Test exception");
+  @Test
+  public void testLogError_String_Throwable() {
+    String message = "Test error message";
+    Throwable cause = new Exception("Test exception");
 
-        composite.logError(message, cause);
+    composite.logError(message, cause);
 
-        verify(producer1).logError(message, cause);
-        verify(producer2).logError(message, cause);
-    }
+    verify(producer1).logError(message, cause);
+    verify(producer2).logError(message, cause);
+  }
 
-    @Test
-    public void testLogEvent_Type_Name() {
-        String type = "EVENT_TYPE";
-        String name = "EVENT_NAME";
+  @Test
+  public void testLogEvent_Type_Name() {
+    String type = "EVENT_TYPE";
+    String name = "EVENT_NAME";
 
-        composite.logEvent(type, name);
+    composite.logEvent(type, name);
 
-        verify(producer1).logEvent(type, name);
-        verify(producer2).logEvent(type, name);
-    }
+    verify(producer1).logEvent(type, name);
+    verify(producer2).logEvent(type, name);
+  }
 
-    @Test
-    public void testLogEvent_Type_Name_Status_NameValuePairs() {
-        String type = "EVENT_TYPE";
-        String name = "EVENT_NAME";
-        String status = "SUCCESS";
-        String nameValuePairs = "key=value";
+  @Test
+  public void testLogEvent_Type_Name_Status_NameValuePairs() {
+    String type = "EVENT_TYPE";
+    String name = "EVENT_NAME";
+    String status = "SUCCESS";
+    String nameValuePairs = "key=value";
 
-        composite.logEvent(type, name, status, nameValuePairs);
+    composite.logEvent(type, name, status, nameValuePairs);
 
-        verify(producer1).logEvent(type, name, status, nameValuePairs);
-        verify(producer2).logEvent(type, name, status, nameValuePairs);
-    }
+    verify(producer1).logEvent(type, name, status, nameValuePairs);
+    verify(producer2).logEvent(type, name, status, nameValuePairs);
+  }
 
-    @Test
-    public void testLogMetricsForCount() {
-        String name = "METRIC_NAME";
+  @Test
+  public void testLogMetricsForCount() {
+    String name = "METRIC_NAME";
 
-        composite.logMetricsForCount(name);
+    composite.logMetricsForCount(name);
 
-        verify(producer1).logMetricsForCount(name);
-        verify(producer2).logMetricsForCount(name);
-    }
+    verify(producer1).logMetricsForCount(name);
+    verify(producer2).logMetricsForCount(name);
+  }
 
-    @Test
-    public void testNewTransaction() {
-        String type = "TRANSACTION_TYPE";
-        String name = "TRANSACTION_NAME";
+  @Test
+  public void testNewTransaction() {
+    String type = "TRANSACTION_TYPE";
+    String name = "TRANSACTION_NAME";
 
-        Transaction transaction1 = mock(Transaction.class);
-        when(producer1.newTransaction(type, name)).thenReturn(null);
-        when(producer2.newTransaction(type, name)).thenReturn(transaction1);
+    Transaction transaction1 = mock(Transaction.class);
+    when(producer1.newTransaction(type, name)).thenReturn(null);
+    when(producer2.newTransaction(type, name)).thenReturn(transaction1);
 
-        Transaction result = composite.newTransaction(type, name);
+    Transaction result = composite.newTransaction(type, name);
 
-        assertEquals(transaction1, result);
-        verify(producer1).newTransaction(type, name);
-        verify(producer2).newTransaction(type, name);
-    }
+    assertEquals(transaction1, result);
+    verify(producer1).newTransaction(type, name);
+    verify(producer2).newTransaction(type, name);
+  }
 
-    @Test
-    public void testNewTransaction_NoValidTransaction() {
-        String type = "TRANSACTION_TYPE";
-        String name = "TRANSACTION_NAME";
+  @Test
+  public void testNewTransaction_NoValidTransaction() {
+    String type = "TRANSACTION_TYPE";
+    String name = "TRANSACTION_NAME";
 
-        when(producer1.newTransaction(type, name)).thenReturn(null);
-        when(producer2.newTransaction(type, name)).thenReturn(null);
+    when(producer1.newTransaction(type, name)).thenReturn(null);
+    when(producer2.newTransaction(type, name)).thenReturn(null);
 
-        Transaction result = composite.newTransaction(type, name);
+    Transaction result = composite.newTransaction(type, name);
 
-        assertEquals(ApolloClientMessageProducerComposite.NULL_TRANSACTION, result);
-        verify(producer1).newTransaction(type, name);
-        verify(producer2).newTransaction(type, name);
-    }
+    assertEquals(ApolloClientMessageProducerComposite.NULL_TRANSACTION, result);
+    verify(producer1).newTransaction(type, name);
+    verify(producer2).newTransaction(type, name);
+  }
 }

@@ -29,9 +29,23 @@ public interface ApolloClientThreadPoolMonitorApi {
    */
   Map<String, ApolloThreadPoolInfo> getThreadPoolInfo();
 
+  /**
+   * RemoteConfigRepository.m_executorService
+   */
   ApolloThreadPoolInfo getRemoteConfigRepositoryThreadPoolInfo();
 
+  /**
+   * AbstractConfig.m_executorService
+   */
   ApolloThreadPoolInfo getAbstractConfigThreadPoolInfo();
 
+  /**
+   * AbstractConfigFile.m_executorService
+   */
   ApolloThreadPoolInfo getAbstractConfigFileThreadPoolInfo();
+
+  /**
+   * AbstractApolloClientMetricsExporter.m_executorService
+   */
+  ApolloThreadPoolInfo getMetricsExporterThreadPoolInfo();
 }

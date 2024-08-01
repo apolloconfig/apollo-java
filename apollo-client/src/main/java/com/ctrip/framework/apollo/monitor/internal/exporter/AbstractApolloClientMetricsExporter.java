@@ -35,7 +35,7 @@ public abstract class AbstractApolloClientMetricsExporter implements ApolloClien
 
   private static final Logger log = DeferredLoggerFactory.getLogger(
       AbstractApolloClientMetricsExporter.class);
-  private static final ScheduledExecutorService m_executorService;
+  public static final ScheduledExecutorService m_executorService;
   private static final long INITIAL_DELAY = 5L;
   private static final int THREAD_POOL_SIZE = 1;
 

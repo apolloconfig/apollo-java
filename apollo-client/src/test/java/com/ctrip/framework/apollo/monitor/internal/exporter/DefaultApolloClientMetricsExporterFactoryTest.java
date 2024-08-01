@@ -33,52 +33,52 @@ import java.util.List;
 
 public class DefaultApolloClientMetricsExporterFactoryTest {
 
-    private DefaultApolloClientMetricsExporterFactory factory;
+  private DefaultApolloClientMetricsExporterFactory factory;
 
-    @Mock
-    private ConfigUtil configUtil;
+  @Mock
+  private ConfigUtil configUtil;
 
-    @Mock
-    private ApolloClientMonitorEventListener metricsCollector;
+  @Mock
+  private ApolloClientMonitorEventListener metricsCollector;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        MockInjector.setInstance(ConfigUtil.class, configUtil);
-        factory = new DefaultApolloClientMetricsExporterFactory();
-    }
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    MockInjector.setInstance(ConfigUtil.class, configUtil);
+    factory = new DefaultApolloClientMetricsExporterFactory();
+  }
 
-    @Test
-    public void testGetMetricsReporter_NoExternalSystemType() {
-        when(configUtil.getMonitorExternalType()).thenReturn(null);
+  @Test
+  public void testGetMetricsReporter_NoExternalSystemType() {
+    when(configUtil.getMonitorExternalType()).thenReturn(null);
 
-        ApolloClientMetricsExporter result = factory.getMetricsReporter(Collections.emptyList());
+    ApolloClientMetricsExporter result = factory.getMetricsReporter(Collections.emptyList());
 
-        assertNull(result);
-        verify(configUtil).getMonitorExternalType();
-    }
+    assertNull(result);
+    verify(configUtil).getMonitorExternalType();
+  }
 
-    @Test
-    public void testGetMetricsReporter_ExporterFound() {
-        when(configUtil.getMonitorExternalType()).thenReturn("mocktheus");
-        when(configUtil.getClientMonitorJmxEnabled()).thenReturn(true);
-        when(configUtil.getMonitorExternalExportPeriod()).thenReturn(1000L);
-        when(metricsCollector.mBeanName()).thenReturn("testMBean");
-        List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(metricsCollector);
-        
-        ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);
+  @Test
+  public void testGetMetricsReporter_ExporterFound() {
+    when(configUtil.getMonitorExternalType()).thenReturn("mocktheus");
+    when(configUtil.getClientMonitorJmxEnabled()).thenReturn(true);
+    when(configUtil.getMonitorExternalExportPeriod()).thenReturn(1000L);
+    when(metricsCollector.mBeanName()).thenReturn("testMBean");
+    List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(metricsCollector);
 
-        assertNotNull(result);
-        assertTrue(result instanceof MockApolloClientMetricsExporter);
-    }
+    ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);
 
-    @Test
-    public void testGetMetricsReporter_ExporterNotFound() {
-        when(configUtil.getMonitorExternalType()).thenReturn("unknownType");
+    assertNotNull(result);
+    assertTrue(result instanceof MockApolloClientMetricsExporter);
+  }
 
-        ApolloClientMetricsExporter result = factory.getMetricsReporter(Collections.emptyList());
+  @Test
+  public void testGetMetricsReporter_ExporterNotFound() {
+    when(configUtil.getMonitorExternalType()).thenReturn("unknownType");
 
-        assertNull(result);
-        verify(configUtil).getMonitorExternalType();
-    }
+    ApolloClientMetricsExporter result = factory.getMetricsReporter(Collections.emptyList());
+
+    assertNull(result);
+    verify(configUtil).getMonitorExternalType();
+  }
 }

@@ -15,6 +15,7 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
+
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_NOT_FOUND;
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_TIMEOUT;
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
@@ -34,58 +35,66 @@ import org.mockito.internal.util.collections.Sets;
 
 public class DefaultApolloClientNamespaceApiTest {
 
-    private DefaultApolloClientNamespaceApi api;
-    private Map<String, Config> configs;
-    private Map<String, ConfigFile> configFiles;
+  private DefaultApolloClientNamespaceApi api;
+  private Map<String, Config> configs;
+  private Map<String, ConfigFile> configFiles;
 
-    @Before
-    public void setUp() {
-        configs = new HashMap<>();
-        configFiles = new HashMap<>();
-        api = new DefaultApolloClientNamespaceApi(configs, configFiles);
-    }
+  @Before
+  public void setUp() {
+    configs = new HashMap<>();
+    configFiles = new HashMap<>();
+    api = new DefaultApolloClientNamespaceApi(configs, configFiles);
+  }
 
-    @Test
-    public void testCollectNamespaceNotFound() {
-        ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-        when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
-        when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_NOT_FOUND);
+  @Test
+  public void testCollectNamespaceNotFound() {
+    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+    when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
+    when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_NOT_FOUND);
 
-        api.collect0(event);
+    api.collect0(event);
 
-        assertEquals(1, api.getNamespace404().size());
-        assertTrue(api.getNamespace404().contains("testNamespace"));
-    }
+    assertEquals(1, api.getNotFoundNamespaces().size());
+    assertTrue(api.getNotFoundNamespaces().contains("testNamespace"));
+  }
 
-    @Test
-    public void testCollectNamespaceTimeout() {
-        ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-        when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
-        when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_TIMEOUT);
+  @Test
+  public void testCollectNamespaceTimeout() {
+    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+    when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
+    when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_TIMEOUT);
 
-        api.collect0(event);
+    api.collect0(event);
 
-        assertEquals(1, api.getNamespaceTimeout().size());
-        assertTrue(api.getNamespaceTimeout().contains("testNamespace"));
-    }
+    assertEquals(1, api.getTimeoutNamespaces().size());
+    assertTrue(api.getTimeoutNamespaces().contains("testNamespace"));
+  }
 
-    @Test
-    public void testCollectNamespaceUsage() {
-        ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-        when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
-        when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_USAGE);
+  @Test
+  public void testCollectNamespaceUsage() {
+    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+    when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
+    when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_USAGE);
 
-        api.collect0(event);
+    api.collect0(event);
 
-        assertEquals(1, api.getNamespaceMetrics().get("testNamespace").getUsageCount());
-    }
+    assertEquals(1, api.getNamespaceMetrics().get("testNamespace").getUsageCount());
+  }
 
-    @Test
-    public void testGetNamespaceItemName() {
-        Config mockConfig = mock(Config.class);
-        when(mockConfig.getPropertyNames()).thenReturn(Sets.newSet("key1", "key2"));
-        configs.put("testNamespace", mockConfig);
+  @Test
+  public void testGetNamespaceItemsNum() {
+    Config mockConfig = mock(Config.class);
+    when(mockConfig.getPropertyNames()).thenReturn(Sets.newSet("key1", "key2"));
+    configs.put("testNamespace", mockConfig);
+    Integer testNamespace = api.getNamespaceItemsNum("testNamespace");
+    assertEquals(2, testNamespace.intValue());
+  }
 
-        assertEquals(2, api.getNamespaceItemName("testNamespace").size());
-    }
+  @Test
+  public void testGetConfigFileNum() {
+    ConfigFile mockConfigFile = mock(ConfigFile.class);
+    configFiles.put("testNamespace", mockConfigFile);
+    Integer testNamespace = api.getConfigFileNum();
+    assertEquals(1, testNamespace.intValue());
+  }
 }

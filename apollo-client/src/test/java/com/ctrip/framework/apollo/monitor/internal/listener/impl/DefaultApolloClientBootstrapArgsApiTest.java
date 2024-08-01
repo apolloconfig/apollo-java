@@ -15,6 +15,7 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
+
 import static com.ctrip.framework.apollo.core.ApolloClientSystemConsts.*;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -29,61 +30,61 @@ import java.util.Map;
 
 public class DefaultApolloClientBootstrapArgsApiTest {
 
-    private ConfigUtil configUtil;
-    private DefaultApolloClientBootstrapArgsApi api;
+  private ConfigUtil configUtil;
+  private DefaultApolloClientBootstrapArgsApi api;
 
-    @Before
-    public void setUp() {
-        configUtil = mock(ConfigUtil.class);
-        when(configUtil.getAccessKeySecret()).thenReturn("secret");
-        when(configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()).thenReturn(true);
-        when(configUtil.isOverrideSystemProperties()).thenReturn(false);
-        when(configUtil.getDefaultLocalCacheDir()).thenReturn("/cache");
-        when(configUtil.getCluster()).thenReturn("default");
-        when(configUtil.getAppId()).thenReturn("myApp");
-        when(configUtil.getApolloEnv()).thenReturn(Env.DEV);
-        when(configUtil.getMetaServerDomainName()).thenReturn("http://meta.server");
-        
-        api = new DefaultApolloClientBootstrapArgsApi(configUtil);
-    }
+  @Before
+  public void setUp() {
+    configUtil = mock(ConfigUtil.class);
+    when(configUtil.getAccessKeySecret()).thenReturn("secret");
+    when(configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()).thenReturn(true);
+    when(configUtil.isOverrideSystemProperties()).thenReturn(false);
+    when(configUtil.getDefaultLocalCacheDir()).thenReturn("/cache");
+    when(configUtil.getCluster()).thenReturn("default");
+    when(configUtil.getAppId()).thenReturn("myApp");
+    when(configUtil.getApolloEnv()).thenReturn(Env.DEV);
+    when(configUtil.getMetaServerDomainName()).thenReturn("http://meta.server");
 
-    @Test
-    public void testGetAccessKeySecret() {
-        assertEquals("secret", api.getAccessKeySecret());
-    }
+    api = new DefaultApolloClientBootstrapArgsApi(configUtil);
+  }
 
-    @Test
-    public void testGetAutoUpdateInjectedSpringProperties() {
-        assertTrue(api.getAutoUpdateInjectedSpringProperties());
-    }
+  @Test
+  public void testGetAccessKeySecret() {
+    assertEquals("secret", api.getAccessKeySecret());
+  }
 
-    @Test
-    public void testGetCacheDir() {
-        assertEquals("/cache", api.getCacheDir());
-    }
+  @Test
+  public void testGetAutoUpdateInjectedSpringProperties() {
+    assertTrue(api.getAutoUpdateInjectedSpringProperties());
+  }
 
-    @Test
-    public void testCollect0() {
-        ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-        when(event.getName()).thenReturn(APOLLO_ACCESS_KEY_SECRET);
-        when(event.getAttachmentValue(APOLLO_ACCESS_KEY_SECRET)).thenReturn("newSecret");
+  @Test
+  public void testGetCacheDir() {
+    assertEquals("/cache", api.getCacheDir());
+  }
 
-        api.collect0(event);
-        
-        assertEquals("newSecret", api.getAccessKeySecret());
-    }
+  @Test
+  public void testCollect0() {
+    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+    when(event.getName()).thenReturn(APOLLO_ACCESS_KEY_SECRET);
+    when(event.getAttachmentValue(APOLLO_ACCESS_KEY_SECRET)).thenReturn("newSecret");
 
-    @Test
-    public void testUnhandledEvent() {
-        ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-        when(event.getName()).thenReturn("unknownEvent");
-        api.collect0(event);
-    }
+    api.collect0(event);
 
-    @Test
-    public void testGetBootstrapArgs() {
-        Map<String, String> bootstrapArgs = api.getBootstrapArgs();
-        assertNotNull(bootstrapArgs);
-        assertTrue(bootstrapArgs.containsKey(APOLLO_ACCESS_KEY_SECRET));
-    }
+    assertEquals("newSecret", api.getAccessKeySecret());
+  }
+
+  @Test
+  public void testUnhandledEvent() {
+    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
+    when(event.getName()).thenReturn("unknownEvent");
+    api.collect0(event);
+  }
+
+  @Test
+  public void testGetBootstrapArgs() {
+    Map<String, String> bootstrapArgs = api.getBootstrapArgs();
+    assertNotNull(bootstrapArgs);
+    assertTrue(bootstrapArgs.containsKey(APOLLO_ACCESS_KEY_SECRET));
+  }
 }

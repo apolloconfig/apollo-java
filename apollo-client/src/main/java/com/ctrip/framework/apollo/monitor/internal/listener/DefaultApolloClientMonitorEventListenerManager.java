@@ -14,10 +14,8 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.listener.impl;
+package com.ctrip.framework.apollo.monitor.internal.listener;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
 import java.util.ArrayList;
 import java.util.List;
 

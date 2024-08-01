@@ -15,6 +15,7 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
+
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
@@ -29,59 +30,65 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class DefaultApolloClientThreadPoolApiTest {
 
-    private DefaultApolloClientThreadPoolApi threadPoolApi;
-    private ThreadPoolExecutor remoteConfigExecutor;
-    private ThreadPoolExecutor abstractConfigExecutor;
-    private ThreadPoolExecutor abstractConfigFileExecutor;
+  private DefaultApolloClientThreadPoolApi threadPoolApi;
+  private ThreadPoolExecutor remoteConfigExecutor;
+  private ThreadPoolExecutor abstractConfigExecutor;
+  private ThreadPoolExecutor abstractConfigFileExecutor;
+  private ThreadPoolExecutor metricsExporterExecutor;
 
-    @Before
-    public void setUp() {
-        remoteConfigExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
-        abstractConfigExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
-        abstractConfigFileExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+  @Before
+  public void setUp() {
+    remoteConfigExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+    abstractConfigExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+    abstractConfigFileExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+    metricsExporterExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+    threadPoolApi = new DefaultApolloClientThreadPoolApi(
+        remoteConfigExecutor,
+        abstractConfigExecutor,
+        abstractConfigFileExecutor,
+        metricsExporterExecutor
+    );
+  }
 
-        threadPoolApi = new DefaultApolloClientThreadPoolApi(
-                remoteConfigExecutor,
-                abstractConfigExecutor,
-                abstractConfigFileExecutor
-        );
-    }
+  @SneakyThrows
+  @Test
+  public void testExportThreadPoolMetrics() {
+    remoteConfigExecutor.execute(() -> {
+    });
+    remoteConfigExecutor.execute(() -> {
+    });
+    // 等待任务执行完成
+    Thread.sleep(200);
+    threadPoolApi.export0();
 
-    @SneakyThrows
-    @Test
-    public void testExportThreadPoolMetrics() {
-        remoteConfigExecutor.execute(() -> {});
-        remoteConfigExecutor.execute(() -> {});
-        // 等待任务执行完成
-        Thread.sleep(200); 
-        threadPoolApi.export0();
+    ApolloThreadPoolInfo info = threadPoolApi.getRemoteConfigRepositoryThreadPoolInfo();
+    assertEquals(0, info.getQueueSize());
+    assertEquals(2, info.getCompletedTaskCount());
+    assertEquals(2, info.getPoolSize());
+  }
 
-        ApolloThreadPoolInfo info = threadPoolApi.getRemoteConfigRepositoryThreadPoolInfo();
-        assertEquals(0, info.getQueueSize());
-        assertEquals(2, info.getCompletedTaskCount());
-        assertEquals(2, info.getPoolSize());
-    }
+  @Test
+  public void testGetThreadPoolInfo() {
+    assertNotNull(threadPoolApi.getThreadPoolInfo());
+    assertEquals(4, threadPoolApi.getThreadPoolInfo().size());
+  }
 
-    @Test
-    public void testGetThreadPoolInfo() {
-        assertNotNull(threadPoolApi.getThreadPoolInfo());
-        assertEquals(3, threadPoolApi.getThreadPoolInfo().size());
-    }
+  @Test
+  public void testMetricsSampleUpdated() {
+    assertTrue(threadPoolApi.isMetricsSampleUpdated());
+  }
 
-    @Test
-    public void testMetricsSampleUpdated() {
-        assertTrue(threadPoolApi.isMetricsSampleUpdated());
-    }
+  @Test
+  public void testGetAbstractConfigThreadPoolInfo() {
+    ApolloThreadPoolInfo info = threadPoolApi.getAbstractConfigThreadPoolInfo();
+    assertNotNull(info);
+  }
 
-    @Test
-    public void testGetAbstractConfigThreadPoolInfo() {
-        ApolloThreadPoolInfo info = threadPoolApi.getAbstractConfigThreadPoolInfo();
-        assertNotNull(info);
-    }
-
-    @Test
-    public void testGetAbstractConfigFileThreadPoolInfo() {
-        ApolloThreadPoolInfo info = threadPoolApi.getAbstractConfigFileThreadPoolInfo();
-        assertNotNull(info);
-    }
+  @Test
+  public void testGetAbstractConfigFileThreadPoolInfo() {
+    ApolloThreadPoolInfo info = threadPoolApi.getAbstractConfigFileThreadPoolInfo();
+    assertNotNull(info);
+  }
+  
+  
 }

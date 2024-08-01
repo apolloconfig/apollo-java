@@ -18,11 +18,11 @@ package com.ctrip.framework.apollo.monitor.internal.exporter;
 
 import java.util.Map;
 
-public class MockApolloClientMetricsExporter extends AbstractApolloClientMetricsExporter{
+public class MockApolloClientMetricsExporter extends AbstractApolloClientMetricsExporter {
 
   @Override
   protected void doInit() {
-    
+
   }
 
   @Override

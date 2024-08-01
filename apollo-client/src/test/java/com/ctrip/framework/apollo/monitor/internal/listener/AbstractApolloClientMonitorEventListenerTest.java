@@ -32,80 +32,81 @@ import java.util.Map;
 
 public class AbstractApolloClientMonitorEventListenerTest {
 
-    private class TestMonitorEventListener extends AbstractApolloClientMonitorEventListener {
-        public TestMonitorEventListener(String tag) {
-            super(tag);
-        }
+  private TestMonitorEventListener listener;
+  private ApolloClientMonitorEvent event;
 
-        @Override
-        protected void collect0(ApolloClientMonitorEvent event) {
-            // 简单的收集逻辑
-        }
+  @Before
+  public void setUp() {
+    listener = new TestMonitorEventListener("testTag");
+    event = mock(ApolloClientMonitorEvent.class);
+    when(event.getTag()).thenReturn("testTag");
+  }
 
-        @Override
-        protected void export0() {
-            // 模拟导出逻辑
-        }
+  @Test
+  public void testCollect() {
+    listener.collect(event);
+    assertTrue(listener.isMetricsSampleUpdated());
+  }
+
+  @Test
+  public void testIsSupport() {
+    assertTrue(listener.isSupport(event));
+    when(event.getTag()).thenReturn("otherTag");
+    assertFalse(listener.isSupport(event));
+  }
+
+  @Test
+  public void testExport() {
+    listener.collect(event);
+    List<SampleModel> samples = listener.export();
+    assertNotNull(samples);
+    assertTrue(samples.isEmpty()); // 应为空，因为尚未添加样本
+  }
+
+  @Test
+  public void testCreateOrUpdateGaugeSample() {
+    String mapKey = "gauge1";
+    String metricsName = "testGauge";
+    Map<String, String> tags = new HashMap<>();
+    tags.put("key", "value");
+
+    listener.createOrUpdateGaugeSample(mapKey, metricsName, tags, 42.0);
+
+    List<SampleModel> samples = listener.export();
+    assertEquals(1, samples.size());
+    assertTrue(samples.get(0) instanceof GaugeModel);
+    assertEquals(42.0, ((GaugeModel) samples.get(0)).getValue(), 0.01);
+  }
+
+  @Test
+  public void testCreateOrUpdateCounterSample() {
+    String mapKey = "counter1";
+    String metricsName = "testCounter";
+    Map<String, String> tags = new HashMap<>();
+    tags.put("key", "value");
+
+    listener.createOrUpdateCounterSample(mapKey, metricsName, tags, 5.0);
+
+    List<SampleModel> samples = listener.export();
+    assertEquals(1, samples.size());
+    assertTrue(samples.get(0) instanceof CounterModel);
+    assertEquals(5.0, ((CounterModel) samples.get(0)).getValue(), 0.01);
+  }
+
+  private class TestMonitorEventListener extends AbstractApolloClientMonitorEventListener {
+
+    public TestMonitorEventListener(String tag) {
+      super(tag);
     }
 
-    private TestMonitorEventListener listener;
-    private ApolloClientMonitorEvent event;
-
-    @Before
-    public void setUp() {
-        listener = new TestMonitorEventListener("testTag");
-        event = mock(ApolloClientMonitorEvent.class);
-        when(event.getTag()).thenReturn("testTag");
+    @Override
+    protected void collect0(ApolloClientMonitorEvent event) {
+      // 简单的收集逻辑
     }
 
-    @Test
-    public void testCollect() {
-        listener.collect(event);
-        assertTrue(listener.isMetricsSampleUpdated());
+    @Override
+    protected void export0() {
+      // 模拟导出逻辑
     }
-
-    @Test
-    public void testIsSupport() {
-        assertTrue(listener.isSupport(event));
-        when(event.getTag()).thenReturn("otherTag");
-        assertFalse(listener.isSupport(event));
-    }
-
-    @Test
-    public void testExport() {
-        listener.collect(event);
-        List<SampleModel> samples = listener.export();
-        assertNotNull(samples);
-        assertTrue(samples.isEmpty()); // 应为空，因为尚未添加样本
-    }
-
-    @Test
-    public void testCreateOrUpdateGaugeSample() {
-        String mapKey = "gauge1";
-        String metricsName = "testGauge";
-        Map<String, String> tags = new HashMap<>();
-        tags.put("key", "value");
-
-        listener.createOrUpdateGaugeSample(mapKey, metricsName, tags, 42.0);
-
-        List<SampleModel> samples = listener.export();
-        assertEquals(1, samples.size());
-        assertTrue(samples.get(0) instanceof GaugeModel);
-        assertEquals(42.0, ((GaugeModel) samples.get(0)).getValue(), 0.01);
-    }
-
-    @Test
-    public void testCreateOrUpdateCounterSample() {
-        String mapKey = "counter1";
-        String metricsName = "testCounter";
-        Map<String, String> tags = new HashMap<>();
-        tags.put("key", "value");
-
-        listener.createOrUpdateCounterSample(mapKey, metricsName, tags, 5.0);
-
-        List<SampleModel> samples = listener.export();
-        assertEquals(1, samples.size());
-        assertTrue(samples.get(0) instanceof CounterModel);
-        assertEquals(5.0, ((CounterModel) samples.get(0)).getValue(), 0.01);
-    }
+  }
 }
