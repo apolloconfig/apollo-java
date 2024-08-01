@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CONFIG_EXCEPTION;
+
 import com.ctrip.framework.apollo.util.ExceptionUtil;
 import java.util.Properties;
 
@@ -65,7 +67,7 @@ public class YamlConfigFile extends PlainTextConfigFile implements PropertiesCom
       transformToProperties();
       return true;
     } catch (Throwable ex) {
-      Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+      Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
       logger.warn("yaml to properties failed, reason: {}", ExceptionUtil.getDetailMessage(ex));
     }
     return false;

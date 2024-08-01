@@ -16,12 +16,34 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CONFIG_EXCEPTION;
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CONFIG_SERVICES;
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_META_SERVICE;
+
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ServiceNameConsts;
+import com.ctrip.framework.apollo.core.dto.ServiceDTO;
+import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.core.utils.DeprecatedPropertyNotifyUtil;
+import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
+import com.ctrip.framework.apollo.tracer.Tracer;
+import com.ctrip.framework.apollo.tracer.spi.Transaction;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.ctrip.framework.apollo.util.ExceptionUtil;
+import com.ctrip.framework.apollo.util.http.HttpClient;
+import com.ctrip.framework.apollo.util.http.HttpRequest;
+import com.ctrip.framework.apollo.util.http.HttpResponse;
 import com.ctrip.framework.foundation.Foundation;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.google.common.util.concurrent.RateLimiter;
+import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -29,27 +51,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.slf4j.Logger;
-
-import com.ctrip.framework.apollo.build.ApolloInjector;
-import com.ctrip.framework.apollo.core.dto.ServiceDTO;
-import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
-import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
-import com.ctrip.framework.apollo.tracer.Tracer;
-import com.ctrip.framework.apollo.tracer.spi.Transaction;
-import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.ctrip.framework.apollo.util.ExceptionUtil;
-import com.ctrip.framework.apollo.util.http.HttpRequest;
-import com.ctrip.framework.apollo.util.http.HttpResponse;
-import com.ctrip.framework.apollo.util.http.HttpClient;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.google.gson.reflect.TypeToken;
 
 public class ConfigServiceLocator {
   private static final Logger logger = DeferredLoggerFactory.getLogger(ConfigServiceLocator.class);
@@ -218,7 +220,7 @@ public class ConfigServiceLocator {
           @Override
           public void run() {
             logger.debug("refresh config services");
-            Tracer.logEvent("Apollo.MetaService", "periodicRefresh");
+            Tracer.logEvent(APOLLO_META_SERVICE, "periodicRefresh");
             tryUpdateConfigServices();
           }
         }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
@@ -258,7 +260,7 @@ public class ConfigServiceLocator {
         setConfigServices(services);
         return;
       } catch (Throwable ex) {
-        Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+        Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
         transaction.setStatus(ex);
         exception = ex;
       } finally {
@@ -302,6 +304,6 @@ public class ConfigServiceLocator {
   }
 
   private void logConfigService(String serviceUrl) {
-    Tracer.logEvent("Apollo.Config.Services", serviceUrl);
+    Tracer.logEvent(APOLLO_CONFIG_SERVICES, serviceUrl);
   }
 }

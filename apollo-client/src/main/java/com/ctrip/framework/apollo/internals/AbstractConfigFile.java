@@ -16,6 +16,9 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CLIENT_CONFIGCHANGES;
+
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
@@ -43,7 +46,7 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractConfigFile implements ConfigFile, RepositoryChangeListener {
   private static final Logger logger = DeferredLoggerFactory.getLogger(AbstractConfigFile.class);
-  private static ExecutorService m_executorService;
+  protected static ExecutorService m_executorService;
   protected final ConfigRepository m_configRepository;
   protected final String m_namespace;
   protected final AtomicReference<Properties> m_configProperties;
@@ -112,7 +115,7 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
 
     this.fireConfigChange(new ConfigFileChangeEvent(m_namespace, oldValue, newValue, changeType));
 
-    Tracer.logEvent("Apollo.Client.ConfigChanges", m_namespace);
+    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
   }
 
   @Override

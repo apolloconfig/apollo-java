@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CLIENT_CONFIGCHANGES;
+
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import java.util.Collections;
 import java.util.List;
@@ -113,7 +115,7 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
 
     this.fireConfigChange(m_namespace, changeMap);
 
-    Tracer.logEvent("Apollo.Client.ConfigChanges", m_namespace);
+    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
   }
 
   private void updateConfig(Properties newConfigProperties, ConfigSourceType sourceType) {

@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CONFIG_EXCEPTION;
+
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import java.io.File;
@@ -154,7 +156,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
       m_sourceType = ConfigSourceType.LOCAL;
       transaction.setStatus(Transaction.SUCCESS);
     } catch (Throwable ex) {
-      Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+      Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
       transaction.setStatus(ex);
       exception = ex;
       //ignore

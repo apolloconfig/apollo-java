@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CLIENT_CONFIGCHANGES;
+
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.google.common.collect.Maps;
@@ -236,7 +238,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
     this.fireConfigChange(m_namespace, actualChanges);
 
-    Tracer.logEvent("Apollo.Client.ConfigChanges", m_namespace);
+    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
   }
 
   private void updateConfig(Properties newConfigProperties, ConfigSourceType sourceType) {

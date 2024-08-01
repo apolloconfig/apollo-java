@@ -64,6 +64,35 @@
       "defaultValue": ""
     },
     {
+      "name": "apollo.client.monitor.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "apollo.client.monitor.jmx.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor jmx enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "apollo.client.monitor.external.type",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor external monitoring system type.",
+      "defaultValue": ""
+    },
+
+    {
+      "name": "apollo.client.monitor.external.export-period",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor external metrics export period.",
+      "defaultValue": ""
+    },
+    {
       "name": "apollo.meta",
       "type": "java.net.URI",
       "sourceType": "com.ctrip.framework.apollo.core.ConfigConsts",
