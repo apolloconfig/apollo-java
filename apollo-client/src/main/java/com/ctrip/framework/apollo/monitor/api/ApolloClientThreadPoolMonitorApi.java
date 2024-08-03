@@ -16,14 +16,18 @@
  */
 package com.ctrip.framework.apollo.monitor.api;
 
-import javax.management.MXBean;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientThreadPoolApi.ApolloThreadPoolInfo;
+import java.util.Map;
 
 /**
  * @author Rawven
  */
-@MXBean
-public interface ApolloThreadPoolMonitorApi {
+public interface ApolloClientThreadPoolMonitorApi {
 
+  /**
+   * get thread pool info key "RemoteConfigRepository" ,"AbstractConfig","AbstractConfigFile";
+   */
+  Map<String, ApolloThreadPoolInfo> getThreadPoolInfo();
 
   int getRemoteConfigRepositoryThreadPoolActiveCount();
 
@@ -85,5 +89,4 @@ public interface ApolloThreadPoolMonitorApi {
   int getAbstractConfigFileThreadPoolRemainingCapacity();
 
   double getAbstractConfigFileThreadPoolCurrentLoad();
-
 }

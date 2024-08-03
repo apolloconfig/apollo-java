@@ -16,14 +16,19 @@
  */
 package com.ctrip.framework.apollo.monitor.api;
 
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientNamespaceApi.NamespaceMetrics;
 import java.util.List;
-import javax.management.MXBean;
+import java.util.Map;
 
 /**
  * @author Rawven
  */
-@MXBean
-public interface ApolloNamespaceMonitorApi {
+public interface ApolloClientNamespaceMonitorApi {
+
+  /**
+   * get namespace metrics map
+   */
+  Map<String, NamespaceMetrics> getNamespaceMetrics();
 
   String getNamespaceReleaseKey(String namespace);
 
@@ -50,4 +55,6 @@ public interface ApolloNamespaceMonitorApi {
   List<String> getAllNamespaceFirstLoadSpend();
 
   List<String> getAllNamespaceItemName();
+
+
 }

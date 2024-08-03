@@ -16,13 +16,17 @@
  */
 package com.ctrip.framework.apollo.monitor.api;
 
-import javax.management.MXBean;
+import java.util.Map;
 
 /**
  * @author Rawven
  */
-@MXBean
-public interface ApolloRunningParamsMonitorApi {
+public interface ApolloClientBootstrapArgsMonitorApi {
+
+  /**
+   * get bootstrap args map
+   */
+  Map<String, String> getBootstrapArgs();
 
   String getStartupParams(String key);
 
@@ -54,7 +58,11 @@ public interface ApolloRunningParamsMonitorApi {
 
   long getClientMonitorExternalExportPeriod();
 
-  String getMeta();
+  int getClientMonitorExceptionSaveSize();
+
+  int getClientMonitorMetricsEventPoolSize();
+
+  String getApolloMeta();
 
   String getMetaLatestFreshTime();
 

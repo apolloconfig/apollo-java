@@ -16,33 +16,55 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.model;
 
+import static com.ctrip.framework.apollo.monitor.internal.MonitorConstant.APOLLO_CLIENT;
+
 import com.ctrip.framework.apollo.monitor.internal.util.MeterType;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Rawven
  */
-public class MetricsModel {
+public class SampleModel {
 
-  protected final Map<String, String> tags = new HashMap<>();
-  protected String name;
-  protected MeterType type;
+  private Map<String, String> tags;
+  private String name;
+  private MeterType type;
 
   public String getName() {
-    return "Apollo_Client_" + name;
+    return name;
   }
 
   public void setName(String name) {
-    this.name = name;
+    this.name = APOLLO_CLIENT + name;
+  }
+
+  public SampleModel putTag(String key, String value) {
+    if (tags == null) {
+      tags = new HashMap<>(1);
+    }
+    tags.put(key, value);
+    return this;
   }
 
   public MeterType getType() {
     return type;
   }
 
+  public void setType(MeterType type) {
+    this.type = type;
+  }
+
   public Map<String, String> getTags() {
-    return tags;
+    if (tags != null) {
+      return Collections.unmodifiableMap(tags);
+    }
+    return null;
+  }
+
+  public void setTags(Map<String, String> tags) {
+    this.tags = tags;
   }
 }
 

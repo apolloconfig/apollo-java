@@ -14,13 +14,25 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal;
+package com.ctrip.framework.apollo.monitor.internal.collector.impl;
 
-import com.ctrip.framework.apollo.monitor.api.ApolloNamespaceMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
+import com.ctrip.framework.apollo.monitor.jmx.mbean.ApolloClientJmxNamespaceMBean;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientNamespaceApi.NamespaceMetrics;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-public class NullNamespaceMonitorApi implements ApolloNamespaceMonitorApi {
+/**
+ * @author Rawven
+ */
+public class NullClientNamespaceMonitorApi implements ApolloClientNamespaceMonitorApi,
+    ApolloClientJmxNamespaceMBean {
+
+  @Override
+  public Map<String, NamespaceMetrics> getNamespaceMetrics() {
+    return Collections.emptyMap();
+  }
 
   @Override
   public String getNamespaceReleaseKey(String namespace) {

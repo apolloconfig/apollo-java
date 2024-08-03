@@ -16,10 +16,10 @@
  */
 package com.ctrip.framework.apollo.plugin.prometheus;
 
-import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
-import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.MetricsExporter;
+import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
+import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
@@ -39,9 +39,9 @@ public class PrometheusMetricExporter extends AbstractMetricsExporter implements
 
   private static final Logger logger = LoggerFactory.getLogger(
       PrometheusMetricExporter.class);
+  private static final String PROMETHEUS = "prometheus";
   private final CollectorRegistry registry;
   private final Map<String, Collector.Describable> map = new HashMap<>();
-  private final String PROMETHEUS = "prometheus";
 
   public PrometheusMetricExporter() {
     this.registry = new CollectorRegistry();
@@ -56,6 +56,7 @@ public class PrometheusMetricExporter extends AbstractMetricsExporter implements
   public boolean isSupport(String form) {
     return PROMETHEUS.equals(form);
   }
+
 
   @Override
   public void registerCounterSample(CounterModel sample) {
@@ -75,7 +76,7 @@ public class PrometheusMetricExporter extends AbstractMetricsExporter implements
   }
 
   @Override
-  public void registerGaugeSample(GaugeModel<?> sample) {
+  public void registerGaugeSample(GaugeModel sample) {
     String[][] tags = getTags(sample);
     Gauge gauge;
     if (!map.containsKey(sample.getName())) {
@@ -88,19 +89,19 @@ public class PrometheusMetricExporter extends AbstractMetricsExporter implements
     } else {
       gauge = (Gauge) map.get(sample.getName());
     }
-    gauge.labels(tags[1]).set(sample.getApplyValue());
+    gauge.labels(tags[1]).set(sample.getValue());
   }
 
 
   @Override
   public String response() {
-    StringWriter writer = new StringWriter();
-    try {
+    try (StringWriter writer = new StringWriter()) {
       TextFormat.writeFormat(TextFormat.CONTENT_TYPE_OPENMETRICS_100, writer,
           registry.metricFamilySamples());
+      return writer.toString();
     } catch (IOException e) {
       logger.error("Write metrics to Prometheus format failed", e);
+      return "";
     }
-    return writer.toString();
   }
 }

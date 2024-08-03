@@ -23,11 +23,11 @@ import com.ctrip.framework.apollo.tracer.spi.MessageProducerManager;
 /**
  * @author Rawven
  */
-public class ClientMessageProducerManager implements MessageProducerManager {
+public class ApolloClientMessageProducerManager implements MessageProducerManager {
 
   private static MessageProducer producer;
 
-  public ClientMessageProducerManager() {
+  public ApolloClientMessageProducerManager() {
     producer = ConfigMonitorInitializer.initializeMessageProducerComposite();
   }
 

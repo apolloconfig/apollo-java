@@ -14,11 +14,19 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal;
+package com.ctrip.framework.apollo.monitor.internal.collector.impl;
 
-import com.ctrip.framework.apollo.monitor.api.ApolloThreadPoolMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi;
+import com.ctrip.framework.apollo.monitor.jmx.mbean.ApolloClientJmxThreadPoolMBean;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientThreadPoolApi.ApolloThreadPoolInfo;
+import java.util.Collections;
+import java.util.Map;
 
-public class NullThreadPoolMonitorApi implements ApolloThreadPoolMonitorApi {
+/**
+ * @author Rawven
+ */
+public class NullClientThreadPoolMonitorApi implements ApolloClientThreadPoolMonitorApi,
+    ApolloClientJmxThreadPoolMBean {
 
   @Override
   public int getRemoteConfigRepositoryThreadPoolActiveCount() {
@@ -168,5 +176,10 @@ public class NullThreadPoolMonitorApi implements ApolloThreadPoolMonitorApi {
   @Override
   public double getAbstractConfigFileThreadPoolCurrentLoad() {
     return 0;
+  }
+
+  @Override
+  public Map<String, ApolloThreadPoolInfo> getThreadPoolInfo() {
+    return Collections.emptyMap();
   }
 }

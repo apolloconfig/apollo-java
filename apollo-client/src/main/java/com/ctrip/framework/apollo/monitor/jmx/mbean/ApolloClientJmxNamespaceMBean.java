@@ -14,19 +14,15 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.util;
+package com.ctrip.framework.apollo.monitor.jmx.mbean;
+
+import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
+import javax.management.MXBean;
 
 /**
  * @author Rawven
  */
-public enum MeterType {
-  /**
-   * counter
-   */
-  COUNTER,
+@MXBean
+public interface ApolloClientJmxNamespaceMBean extends ApolloClientNamespaceMonitorApi {
 
-  /**
-   * gauge
-   */
-  GAUGE
 }

@@ -168,6 +168,14 @@ public class ApolloClientSystemConsts {
   public static final String APOLLO_CLIENT_MONITOR_ENABLED = "apollo.client.monitor.enabled";
 
   /**
+   * apollo client monitor metrics event pool size
+   */
+  public static final String APOLLO_CLIENT_MONITOR_METRICS_EVENT_POOL_SIZE = "apollo.client.monitor.metrics-event-pool-size";
+  /**
+   * apollo client monitor exception save size
+   */
+  public static final String APOLLO_CLIENT_MONITOR_EXCEPTION_SAVE_SIZE = "apollo.client.monitor.exception-save-size";
+  /**
    * apollo client monitor jmx enabled
    */
   public static final String APOLLO_CLIENT_MONITOR_JMX_ENABLED = "apollo.client.monitor.jmx.enabled";

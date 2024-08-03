@@ -1,1 +1,1 @@
-com.ctrip.framework.apollo.monitor.internal.tracer.ClientMessageProducerManager
+com.ctrip.framework.apollo.monitor.internal.tracer.ApolloClientMessageProducerManager

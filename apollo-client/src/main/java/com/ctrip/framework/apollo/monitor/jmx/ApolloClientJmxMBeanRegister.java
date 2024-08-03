@@ -14,19 +14,26 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.util;
+package com.ctrip.framework.apollo.monitor.jmx;
 
+import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
+import com.ctrip.framework.apollo.internals.AbstractConfigFile;
 import java.lang.management.ManagementFactory;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import org.slf4j.Logger;
 
 /**
  * @author Rawven
  */
-public final class JMXUtil {
+public final class ApolloClientJmxMBeanRegister {
+  private static final Logger logger = DeferredLoggerFactory.getLogger(ApolloClientJmxMBeanRegister.class);
+  private static MBeanServer mbeanServer;
 
-  public static MBeanServer mbeanServer;
+  public static void setMBeanServer(MBeanServer mbeanServer) {
+    ApolloClientJmxMBeanRegister.mbeanServer = mbeanServer;
+  }
 
   public static ObjectName register(String name, Object mbean) {
     try {
@@ -43,7 +50,8 @@ public final class JMXUtil {
 
       return objectName;
     } catch (JMException e) {
-      throw new IllegalArgumentException(name, e);
+      logger.error("Register JMX MBean failed.", e);
+      return null;
     }
   }
 
@@ -52,7 +60,7 @@ public final class JMXUtil {
       MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
       mbeanServer.unregisterMBean(new ObjectName(name));
     } catch (JMException e) {
-      throw new IllegalArgumentException(name, e);
+      logger.error("Unregister JMX MBean failed.", e);
     }
   }
 }

@@ -14,11 +14,18 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal;
+package com.ctrip.framework.apollo.monitor.internal.collector.impl;
 
-import com.ctrip.framework.apollo.monitor.api.ApolloRunningParamsMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
+import com.ctrip.framework.apollo.monitor.jmx.mbean.ApolloClientJmxBootstrapArgsMBean;
+import java.util.Collections;
+import java.util.Map;
 
-public class NullRunningParamsMonitorApi implements ApolloRunningParamsMonitorApi {
+/**
+ * @author Rawven
+ */
+public class NullClientBootstrapArgsMonitorApi implements ApolloClientBootstrapArgsMonitorApi,
+    ApolloClientJmxBootstrapArgsMBean {
 
   @Override
   public String getStartupParams(String key) {
@@ -96,7 +103,17 @@ public class NullRunningParamsMonitorApi implements ApolloRunningParamsMonitorAp
   }
 
   @Override
-  public String getMeta() {
+  public int getClientMonitorExceptionSaveSize() {
+    return 0;
+  }
+
+  @Override
+  public int getClientMonitorMetricsEventPoolSize() {
+    return 0;
+  }
+
+  @Override
+  public String getApolloMeta() {
     return "";
   }
 
@@ -128,5 +145,10 @@ public class NullRunningParamsMonitorApi implements ApolloRunningParamsMonitorAp
   @Override
   public String getAppId() {
     return "";
+  }
+
+  @Override
+  public Map<String, String> getBootstrapArgs() {
+    return Collections.emptyMap();
   }
 }

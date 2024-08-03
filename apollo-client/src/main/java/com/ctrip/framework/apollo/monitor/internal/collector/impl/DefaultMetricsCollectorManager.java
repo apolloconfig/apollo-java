@@ -14,32 +14,31 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.model;
+package com.ctrip.framework.apollo.monitor.internal.collector.impl;
 
-import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollector;
 import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollectorManager;
-import com.ctrip.framework.apollo.util.ConfigUtil;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Rawven
  */
-public abstract class MetricsEventPusher {
+public class DefaultMetricsCollectorManager implements MetricsCollectorManager {
 
-  private static final MetricsCollectorManager COLLECTOR_MANAGER = ApolloInjector.getInstance(
-      MetricsCollectorManager.class);
-  private static final ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+  private List<MetricsCollector> collectors;
 
-  public static void push(MetricsEvent event) {
-    if (m_configUtil.isClientMonitorEnabled()) {
-      for (MetricsCollector collector : COLLECTOR_MANAGER.getCollectors()) {
-        if (collector.isSupport(event)) {
-          collector.collect(event);
-          return;
-        }
-      }
-    }
+  public DefaultMetricsCollectorManager() {
+    collectors = Collections.emptyList();
   }
+
+  @Override
+  public List<MetricsCollector> getCollectors() {
+    return collectors;
+  }
+
+  public void setCollectors(List<MetricsCollector> collectors) {
+    this.collectors = collectors;
+  }
+
 }
-
-

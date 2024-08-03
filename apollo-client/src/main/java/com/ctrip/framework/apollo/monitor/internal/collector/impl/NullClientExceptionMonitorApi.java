@@ -14,39 +14,26 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.collector;
+package com.ctrip.framework.apollo.monitor.internal.collector.impl;
 
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
-import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientExceptionMonitorApi;
+import com.ctrip.framework.apollo.monitor.jmx.mbean.ApolloClientJmxExceptionMBean;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Rawven
  */
-public interface MetricsCollector {
+public class NullClientExceptionMonitorApi implements ApolloClientExceptionMonitorApi,
+    ApolloClientJmxExceptionMBean {
 
+  @Override
+  public List<Exception> getApolloConfigExceptionList() {
+    return Collections.emptyList();
+  }
 
-  String name();
-
-  /**
-   * is support the event
-   */
-  boolean isSupport(ApolloConfigMetricsEvent event);
-
-  /**
-   * collect metrics from event
-   */
-  void collect(ApolloConfigMetricsEvent event);
-
-  /**
-   * is samples updated
-   */
-  boolean isSamplesUpdated();
-
-  /**
-   * export to a format recognized by the monitoring system
-   */
-  List<SampleModel> export();
-
-
+  @Override
+  public List<String> getApolloConfigExceptionDetails() {
+    return Collections.emptyList();
+  }
 }

@@ -14,25 +14,15 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.api;
+package com.ctrip.framework.apollo.monitor.jmx.mbean;
 
-import java.util.List;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
 import javax.management.MXBean;
 
 /**
  * @author Rawven
  */
 @MXBean
-public interface ApolloExceptionMonitorApi {
+public interface ApolloClientJmxBootstrapArgsMBean extends ApolloClientBootstrapArgsMonitorApi {
 
-
-  /**
-   * get the number of exceptions
-   */
-  Integer getExceptionNum();
-
-  /**
-   * get exception details
-   */
-  List<String> getExceptionDetails();
 }

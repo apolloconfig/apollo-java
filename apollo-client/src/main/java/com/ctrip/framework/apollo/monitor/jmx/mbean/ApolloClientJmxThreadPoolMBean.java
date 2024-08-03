@@ -14,19 +14,16 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.util;
+package com.ctrip.framework.apollo.monitor.jmx.mbean;
+
+import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi;
+import javax.management.MXBean;
 
 /**
  * @author Rawven
  */
-public enum MeterType {
-  /**
-   * counter
-   */
-  COUNTER,
+@MXBean
+public interface ApolloClientJmxThreadPoolMBean extends ApolloClientThreadPoolMonitorApi {
 
-  /**
-   * gauge
-   */
-  GAUGE
+
 }

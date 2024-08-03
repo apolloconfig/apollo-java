@@ -22,15 +22,15 @@ import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
 import com.ctrip.framework.apollo.monitor.internal.DefaultConfigMonitor;
 import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollector;
 import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollectorManager;
-import com.ctrip.framework.apollo.monitor.internal.collector.internal.DefaultApolloExceptionCollector;
-import com.ctrip.framework.apollo.monitor.internal.collector.internal.DefaultApolloNamespaceCollector;
-import com.ctrip.framework.apollo.monitor.internal.collector.internal.DefaultApolloRunningParamsCollector;
-import com.ctrip.framework.apollo.monitor.internal.collector.internal.DefaultApolloThreadPoolCollector;
-import com.ctrip.framework.apollo.monitor.internal.collector.internal.DefaultMetricsCollectorManager;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientBootstrapArgsApi;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientExceptionApi;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientNamespaceApi;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultApolloClientThreadPoolApi;
+import com.ctrip.framework.apollo.monitor.internal.collector.impl.DefaultMetricsCollectorManager;
 import com.ctrip.framework.apollo.monitor.internal.exporter.MetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.MetricsExporterFactory;
+import com.ctrip.framework.apollo.monitor.internal.tracer.ApolloClientMonitorMessageProducer;
 import com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite;
-import com.ctrip.framework.apollo.monitor.internal.tracer.MonitorMessageProducer;
 import com.ctrip.framework.apollo.tracer.internals.NullMessageProducer;
 import com.ctrip.framework.apollo.tracer.internals.cat.CatMessageProducer;
 import com.ctrip.framework.apollo.tracer.internals.cat.CatNames;
@@ -73,14 +73,13 @@ public class ConfigMonitorInitializer {
       DefaultMetricsCollectorManager manager) {
     DefaultConfigManager configManager = (DefaultConfigManager) ApolloInjector.getInstance(
         ConfigManager.class);
-    DefaultApolloExceptionCollector exceptionCollector = new DefaultApolloExceptionCollector();
-    DefaultApolloThreadPoolCollector threadPoolCollector = new DefaultApolloThreadPoolCollector(
+    DefaultApolloClientExceptionApi exceptionCollector = new DefaultApolloClientExceptionApi();
+    DefaultApolloClientThreadPoolApi threadPoolCollector = new DefaultApolloClientThreadPoolApi(
         RemoteConfigRepository.m_executorService, AbstractConfig.m_executorService,
         AbstractConfigFile.m_executorService);
-    DefaultApolloNamespaceCollector namespaceCollector = new DefaultApolloNamespaceCollector(
-        configManager.m_configs, configManager.m_configLocks, configManager.m_configFiles,
-        configManager.m_configFileLocks);
-    DefaultApolloRunningParamsCollector startupCollector = new DefaultApolloRunningParamsCollector(
+    DefaultApolloClientNamespaceApi namespaceCollector = new DefaultApolloClientNamespaceApi(
+        configManager.m_configs, configManager.m_configFiles);
+    DefaultApolloClientBootstrapArgsApi startupCollector = new DefaultApolloClientBootstrapArgsApi(
         m_configUtil);
 
     List<MetricsCollector> collectors = Lists.newArrayList(exceptionCollector, namespaceCollector,
@@ -99,13 +98,13 @@ public class ConfigMonitorInitializer {
       MetricsExporter metricsExporter) {
     DefaultConfigMonitor defaultConfigMonitor = (DefaultConfigMonitor) ApolloInjector.getInstance(
         ConfigMonitor.class);
-    DefaultApolloExceptionCollector exceptionCollector = (DefaultApolloExceptionCollector) collectors.get(
+    DefaultApolloClientExceptionApi exceptionCollector = (DefaultApolloClientExceptionApi) collectors.get(
         0);
-    DefaultApolloNamespaceCollector namespaceCollector = (DefaultApolloNamespaceCollector) collectors.get(
+    DefaultApolloClientNamespaceApi namespaceCollector = (DefaultApolloClientNamespaceApi) collectors.get(
         1);
-    DefaultApolloThreadPoolCollector threadPoolCollector = (DefaultApolloThreadPoolCollector) collectors.get(
+    DefaultApolloClientThreadPoolApi threadPoolCollector = (DefaultApolloClientThreadPoolApi) collectors.get(
         2);
-    DefaultApolloRunningParamsCollector startupCollector = (DefaultApolloRunningParamsCollector) collectors.get(
+    DefaultApolloClientBootstrapArgsApi startupCollector = (DefaultApolloClientBootstrapArgsApi) collectors.get(
         3);
     defaultConfigMonitor.init(namespaceCollector, threadPoolCollector, exceptionCollector,
         startupCollector, metricsExporter);
@@ -118,7 +117,7 @@ public class ConfigMonitorInitializer {
 
     // The producer that comes with the client
     if (m_configUtil.isClientMonitorEnabled()) {
-      producers.add(new MonitorMessageProducer());
+      producers.add(new ApolloClientMonitorMessageProducer());
     }
 
     if (ClassLoaderUtil.isClassPresent(CatNames.CAT_CLASS)) {

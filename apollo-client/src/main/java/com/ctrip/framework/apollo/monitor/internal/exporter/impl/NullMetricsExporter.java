@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.exporter;
+package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 
-import com.ctrip.framework.apollo.core.spi.Ordered;
 import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollector;
+import com.ctrip.framework.apollo.monitor.internal.exporter.MetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import java.util.List;
@@ -25,37 +25,27 @@ import java.util.List;
 /**
  * @author Rawven
  */
-public interface MetricsExporter extends Ordered {
-
-  /**
-   * init method
-   */
-  void init(List<MetricsCollector> collectors, long collectPeriod);
-
-  /**
-   * is support
-   *
-   * @param form form
-   */
-  boolean isSupport(String form);
-
-  /**
-   * used to register Counter type metrics
-   */
-  void registerCounterSample(CounterModel sample);
-
-  /**
-   * used to register Gauge type metrics
-   */
-  void registerGaugeSample(GaugeModel sample);
-
-  /**
-   * result of the collect metrics
-   */
-  String response();
+public class NullMetricsExporter implements MetricsExporter {
 
   @Override
-  default int getOrder() {
-    return 0;
+  public void init(List<MetricsCollector> collectors, long collectPeriod) {
+  }
+
+  @Override
+  public boolean isSupport(String form) {
+    return false;
+  }
+
+  @Override
+  public void registerCounterSample(CounterModel sample) {
+  }
+
+  @Override
+  public void registerGaugeSample(GaugeModel sample) {
+  }
+
+  @Override
+  public String response() {
+    return "No Reporter Use";
   }
 }

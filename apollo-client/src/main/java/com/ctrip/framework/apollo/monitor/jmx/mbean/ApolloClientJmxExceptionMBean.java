@@ -14,19 +14,21 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.util;
+package com.ctrip.framework.apollo.monitor.jmx.mbean;
+
+import java.util.List;
+import javax.management.MXBean;
 
 /**
  * @author Rawven
  */
-public enum MeterType {
-  /**
-   * counter
-   */
-  COUNTER,
+@MXBean
+public interface ApolloClientJmxExceptionMBean {
+  //由于不适配 List<Exception> getApolloConfigExceptionList()
+  //单独声明接口
 
   /**
-   * gauge
+   * get exception details
    */
-  GAUGE
+  List<String> getApolloConfigExceptionDetails();
 }

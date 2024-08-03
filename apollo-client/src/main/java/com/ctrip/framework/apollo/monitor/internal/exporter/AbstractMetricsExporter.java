@@ -21,7 +21,7 @@ import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollector;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
-import com.ctrip.framework.apollo.monitor.internal.model.MetricsModel;
+import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -30,9 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 
 /**
- * General framework for access monitoring systems
- * <p>
- * 作者：Rawven
+ * @author Rawven
  */
 public abstract class AbstractMetricsExporter implements MetricsExporter {
 
@@ -81,11 +79,11 @@ public abstract class AbstractMetricsExporter implements MetricsExporter {
     });
   }
 
-  protected void registerSample(MetricsModel sample) {
+  protected void registerSample(SampleModel sample) {
     try {
       switch (sample.getType()) {
         case GAUGE:
-          registerGaugeSample((GaugeModel<?>) sample);
+          registerGaugeSample((GaugeModel) sample);
           break;
         case COUNTER:
           registerCounterSample((CounterModel) sample);
@@ -99,7 +97,7 @@ public abstract class AbstractMetricsExporter implements MetricsExporter {
     }
   }
 
-  protected String[][] getTags(MetricsModel sample) {
+  protected String[][] getTags(SampleModel sample) {
     Map<String, String> tags = sample.getTags();
     if (tags == null || tags.isEmpty()) {
       return new String[][]{new String[0], new String[0]};

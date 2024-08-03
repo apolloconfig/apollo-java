@@ -14,29 +14,18 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.collector.internal;
+package com.ctrip.framework.apollo.monitor.api;
 
-import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollector;
-import com.ctrip.framework.apollo.monitor.internal.collector.MetricsCollectorManager;
 import java.util.List;
 
 /**
  * @author Rawven
  */
-public class DefaultMetricsCollectorManager implements MetricsCollectorManager {
+public interface ApolloClientExceptionMonitorApi {
 
-  private List<MetricsCollector> collectors;
-
-  public DefaultMetricsCollectorManager() {
-  }
-
-  @Override
-  public List<MetricsCollector> getCollectors() {
-    return collectors;
-  }
-
-  public void setCollectors(List<MetricsCollector> collectors) {
-    this.collectors = collectors;
-  }
+  /**
+   * get ApolloConfigException details
+   */
+  List<Exception> getApolloConfigExceptionList();
 
 }

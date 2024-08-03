@@ -14,21 +14,17 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal;
+package com.ctrip.framework.apollo.monitor.internal.event;
 
-import com.ctrip.framework.apollo.monitor.api.ApolloExceptionMonitorApi;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
-public class NullExceptionMonitorApi implements ApolloExceptionMonitorApi {
+/**
+ * @author Rawven
+ * @date 2024/08/08
+ */
+public class ApolloConfigMetricsEventFactory {
 
-  @Override
-  public Integer getExceptionNum() {
-    return 0;
-  }
-
-  @Override
-  public List<String> getExceptionDetails() {
-    return Collections.emptyList();
+  public ApolloConfigMetricsEvent createEvent(String name) {
+    return new ApolloConfigMetricsEvent(name, null, new HashMap<>(2));
   }
 }

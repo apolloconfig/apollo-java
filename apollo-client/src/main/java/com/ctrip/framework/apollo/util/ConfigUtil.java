@@ -77,6 +77,8 @@ public class ConfigUtil {
   private boolean isClientMonitorJmxEnabled = false;
   private String monitorExternalType = null;
   private long monitorExternalExportPeriod = 10;
+  private int monitorExceptionSaveSize = 25;
+  private int monitorMetricsEventPoolSize = 100;
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -92,10 +94,12 @@ public class ConfigUtil {
     initPropertyNamesCacheEnabled();
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
-    initMonitorExternalType();
-    initMonitorExternalCollectPeriod();
     initClientMonitorEnabled();
     initClientMonitorJmxEnabled();
+    initClientMonitorExternalType();
+    initClientMonitorExternalCollectPeriod();
+    initClientMonitorExceptionSaveSize();
+    initClientMonitorMetricsEventPoolSize();
   }
 
 
@@ -507,7 +511,7 @@ public class ConfigUtil {
         overrideSystemProperties);
   }
 
-  private void initMonitorExternalType() {
+  private void initClientMonitorExternalType() {
     monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
     if (Strings.isNullOrEmpty(monitorExternalType)) {
       monitorExternalType = Foundation.app()
@@ -519,20 +523,11 @@ public class ConfigUtil {
     return monitorExternalType;
   }
 
-  private void initMonitorExternalCollectPeriod() {
-    String collectPeriod = System.getProperty(
+  private void initClientMonitorExternalCollectPeriod() {
+       Integer value = getCustomizedIntegerValue(
         ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD);
-    if (Strings.isNullOrEmpty(collectPeriod)) {
-      collectPeriod = Foundation.app()
-          .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, null);
-    }
-    if (!Strings.isNullOrEmpty(collectPeriod)) {
-      try {
-        monitorExternalExportPeriod = Long.parseLong(collectPeriod);
-      } catch (Throwable ex) {
-        logger.error("Config for {} is invalid: {}",
-            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, collectPeriod);
-      }
+    if (null != value){
+      monitorExternalExportPeriod = value;
     }
   }
 
@@ -564,6 +559,27 @@ public class ConfigUtil {
   }
   public boolean isClientMonitorJmxEnabled() {
     return isClientMonitorJmxEnabled;
+  }
+  private void initClientMonitorExceptionSaveSize() {
+      Integer value = getCustomizedIntegerValue(
+        ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_SAVE_SIZE);
+    if (null != value){
+      monitorExceptionSaveSize = value;
+    }
+  }
+  public int getMonitorExceptionSaveSize() {
+    return monitorExceptionSaveSize;
+  }
+  
+  private void initClientMonitorMetricsEventPoolSize() {
+    Integer value = getCustomizedIntegerValue(
+        ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_METRICS_EVENT_POOL_SIZE);
+    if (null != value){
+      monitorMetricsEventPoolSize = value;
+    }
+  }
+  public int getMonitorMetricsEventPoolSize() {
+    return monitorMetricsEventPoolSize;
   }
 
 

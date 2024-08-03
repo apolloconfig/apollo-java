@@ -16,13 +16,12 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.collector;
 
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
-import com.ctrip.framework.apollo.monitor.internal.model.MetricsEvent;
-import com.ctrip.framework.apollo.monitor.internal.model.MetricsModel;
+import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,26 +36,24 @@ public abstract class AbstractMetricsCollector implements MetricsCollector {
   protected final Map<String, CounterModel> counterSamples = Maps.newHashMap();
   protected final Map<String, GaugeModel> gaugeSamples = Maps.newHashMap();
   private final AtomicBoolean isUpdated = new AtomicBoolean();
-  private final List<String> tags;
-  private final String name;
+  private final String tag;
 
-  public AbstractMetricsCollector(String name, String... tags) {
-    this.name = name;
-    this.tags = Arrays.asList(tags);
+  public AbstractMetricsCollector(String tag) {
+    this.tag = tag;
   }
 
   @Override
   public String name() {
-    return name;
+    return tag;
   }
 
   @Override
-  public boolean isSupport(MetricsEvent event) {
-    return tags.contains(event.getTag());
+  public boolean isSupport(ApolloConfigMetricsEvent event) {
+    return tag.equals(event.getTag());
   }
 
   @Override
-  public void collect(MetricsEvent event) {
+  public void collect(ApolloConfigMetricsEvent event) {
     collect0(event);
     isUpdated.set(true);
   }
@@ -67,14 +64,14 @@ public abstract class AbstractMetricsCollector implements MetricsCollector {
   }
 
   @Override
-  public List<MetricsModel> export() {
+  public List<SampleModel> export() {
     export0();
-    List<MetricsModel> samples = new ArrayList<>(counterSamples.values());
+    List<SampleModel> samples = new ArrayList<>(counterSamples.values());
     samples.addAll(gaugeSamples.values());
     return samples;
   }
 
-  protected abstract void collect0(MetricsEvent event);
+  protected abstract void collect0(ApolloConfigMetricsEvent event);
 
   protected abstract void export0();
 }

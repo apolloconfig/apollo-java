@@ -14,30 +14,46 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.model;
+package com.ctrip.framework.apollo.monitor.internal.event;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * metrics event model
- *
  * @author Rawven
  */
-public class MetricsEvent {
+public class ApolloConfigMetricsEvent {
 
-  private final String name;
-  private final String tag;
-  private final Map<String, Object> attachments;
+  private String name;
+  private String tag;
+  private Map<String, Object> attachments;
 
-  private MetricsEvent(Builder builder) {
-    this.name = builder.name;
-    this.attachments = builder.attachment;
-    this.tag = builder.tag;
+  public ApolloConfigMetricsEvent(String name, String tag, Map<String, Object> attachments) {
+    this.name = name;
+    this.tag = tag;
+    this.attachments = attachments != null ? new HashMap<>(attachments) : new HashMap<>();
   }
 
-  public static Builder builder() {
-    return new Builder();
+
+  public void reset(String name) {
+    this.name = name;
+    this.tag = null;
+    this.attachments.clear();
+  }
+
+  public ApolloConfigMetricsEvent withTag(String tag) {
+    this.tag = tag;
+    return this;
+  }
+
+  public ApolloConfigMetricsEvent putAttachment(String key, Object value) {
+    this.attachments.put(key, value);
+    return this;
+  }
+
+  public void push() {
+    ApolloConfigMetricsEventPusher.push(this);
+    ApolloConfigMetricsEventPool.getInstance().returnEvent(this);
   }
 
   public String getName() {
@@ -70,33 +86,4 @@ public class MetricsEvent {
         '}';
   }
 
-  public static class Builder {
-
-    private final Map<String, Object> attachment = new HashMap<>(3);
-    private String name;
-    private String tag;
-
-    public Builder withName(String name) {
-      this.name = name;
-      return this;
-    }
-
-    public Builder putAttachment(String k, Object v) {
-      this.attachment.put(k, v);
-      return this;
-    }
-
-    public Builder withTag(String tag) {
-      this.tag = tag;
-      return this;
-    }
-
-    public void push() {
-      MetricsEventPusher.push(this.build());
-    }
-
-    public MetricsEvent build() {
-      return new MetricsEvent(this);
-    }
-  }
 }

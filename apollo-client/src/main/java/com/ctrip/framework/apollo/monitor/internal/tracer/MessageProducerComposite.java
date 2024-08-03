@@ -20,7 +20,6 @@ import com.ctrip.framework.apollo.tracer.internals.NullTransaction;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * message producer composite
@@ -29,17 +28,7 @@ import java.util.Objects;
  */
 public class MessageProducerComposite implements MessageProducer {
 
-  public static final String ERROR_METRICS = "errorMetrics";
-  public static final String THROWABLE = ERROR_METRICS + ".throwable";
-  public static final String APOLLO_CLIENT_CONFIGCHANGES = "Apollo.Client.ConfigChanges";
-  public static final String APOLLO_CONFIG_EXCEPTION = "ApolloConfigException";
-  public static final String APOLLO_META_SERVICE = "Apollo.MetaService";
-  public static final String APOLLO_CONFIG_SERVICES = "Apollo.Config.Services";
-  public static final String APOLLO_CLIENT_VERSION = "Apollo.Client.Version";
-  public static final String APOLLO_CONFIGSERVICE = "Apollo.ConfigService";
-  public static final String APOLLO_CLIENT_CONFIGS = "Apollo.Client.Configs.";
-  public static final String APOLLO_CLIENT_CONFIGMETA = "Apollo.Client.ConfigMeta";
-  public static final String HELP_STR = "periodicRefresh: ";
+
   private static final NullTransaction NULL_TRANSACTION = new NullTransaction();
   private List<MessageProducer> producers;
 
@@ -50,35 +39,56 @@ public class MessageProducerComposite implements MessageProducer {
 
   @Override
   public void logError(Throwable cause) {
-    producers.forEach(producer -> producer.logError(cause));
+    for (MessageProducer producer : producers) {
+      producer.logError(cause);
+    }
   }
 
   @Override
   public void logError(String message, Throwable cause) {
-    producers.forEach(producer -> producer.logError(message, cause));
+    for (MessageProducer producer : producers) {
+      producer.logError(message, cause);
+    }
   }
 
   @Override
   public void logEvent(String type, String name) {
-    producers.forEach(producer -> producer.logEvent(type, name));
+    for (MessageProducer producer : producers) {
+      producer.logEvent(type, name);
+    }
   }
 
   @Override
   public void logEvent(String type, String name, String status,
       String nameValuePairs) {
-    producers.forEach(producer -> producer.logEvent(type, name, status, nameValuePairs));
+    for (MessageProducer producer : producers) {
+      producer.logEvent(type, name, status, nameValuePairs);
+    }
+  }
+
+  @Override
+  public void logMetricsForCount(String name) {
+    for (MessageProducer producer : producers) {
+      producer.logMetricsForCount(name);
+    }
+  }
+
+  @Override
+  public void logMetricsForCount(String name, int count) {
+    for (MessageProducer producer : producers) {
+      producer.logMetricsForCount(name, count);
+    }
   }
 
   @Override
   public Transaction newTransaction(String type, String name) {
-    return producers.stream()
-        .map(producer -> producer.newTransaction(type, name))
-        .filter(Objects::nonNull)
-        .findFirst()
-        .orElse(NULL_TRANSACTION);
+    for (MessageProducer producer : producers) {
+      Transaction transaction = producer.newTransaction(type, name);
+      if (transaction != null) {
+        return transaction;
+      }
+    }
+    return NULL_TRANSACTION;
   }
 
-  public List<MessageProducer> getProducers() {
-    return producers;
-  }
 }

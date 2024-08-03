@@ -14,22 +14,21 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.collector.internal;
+package com.ctrip.framework.apollo.monitor.internal.collector.impl;
 
 
-import static com.ctrip.framework.apollo.monitor.internal.MonitorConstant.NAMESPACE;
-import static com.ctrip.framework.apollo.monitor.internal.model.GaugeModel.INT_CONVERTER;
-import static com.ctrip.framework.apollo.monitor.internal.model.GaugeModel.LONG_CONVERTER;
+import static com.ctrip.framework.apollo.monitor.internal.MonitorConstant.*;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
-import com.ctrip.framework.apollo.monitor.api.ApolloNamespaceMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
+import com.ctrip.framework.apollo.monitor.jmx.mbean.ApolloClientJmxNamespaceMBean;
 import com.ctrip.framework.apollo.monitor.internal.MonitorConstant;
 import com.ctrip.framework.apollo.monitor.internal.collector.AbstractMetricsCollector;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
-import com.ctrip.framework.apollo.monitor.internal.model.MetricsEvent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.Instant;
@@ -39,62 +38,66 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToDoubleFunction;
 import org.slf4j.Logger;
 
 /**
  * @author Rawven
  */
-public class DefaultApolloNamespaceCollector extends AbstractMetricsCollector implements
-    ApolloNamespaceMonitorApi {
+public class DefaultApolloClientNamespaceApi extends AbstractMetricsCollector implements
+    ApolloClientNamespaceMonitorApi, ApolloClientJmxNamespaceMBean {
 
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(
       "yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
-  public static final String NAMESPACE_MONITOR = "namespace_monitor";
-  public static final String NAMESPACE_LATEST_UPDATE_TIME = "namespace_latest_update_time";
-  public static final String NAMESPACE_FIRST_LOAD_SPEND = "namespace_first_load_spend_time";
-  public static final String NAMESPACE_USAGE_COUNT = "namespace_usage_count";
-  public static final String NAMESPACE_RELEASE_KEY = "namespace_release_key";
-  public static final String NAMESPACE_ITEM_NUM = "namespace_item_num";
-  public static final String CONFIG_FILE_NUM = "config_file_num";
-  public static final String NAMESPACE_NOT_FOUND = "namespace_not_found";
-  public static final String NAMESPACE_TIMEOUT = "namespace_timeout";
   private static final Logger logger = DeferredLoggerFactory.getLogger(
-      DefaultApolloNamespaceCollector.class);
+      DefaultApolloClientNamespaceApi.class);
+
   private final Map<String, Config> m_configs;
-  private final Map<String, Object> m_configLocks;
   private final Map<String, ConfigFile> m_configFiles;
-  private final Map<String, Object> m_configFileLocks;
   private final Map<String, NamespaceMetrics> namespaces = Maps.newConcurrentMap();
+
   private final List<String> namespace404 = Lists.newCopyOnWriteArrayList();
   private final List<String> namespaceTimeout = Lists.newCopyOnWriteArrayList();
 
-  public DefaultApolloNamespaceCollector(Map<String, Config> m_configs,
-      Map<String, Object> m_configLocks,
-      Map<String, ConfigFile> m_configFiles,
-      Map<String, Object> m_configFileLocks) {
-    super(NAMESPACE_MONITOR, NAMESPACE_MONITOR);
+  public DefaultApolloClientNamespaceApi(Map<String, Config> m_configs,
+      Map<String, ConfigFile> m_configFiles
+  ) {
+    super(TAG_NAMESPACE);
     this.m_configs = m_configs;
-    this.m_configLocks = m_configLocks;
     this.m_configFiles = m_configFiles;
-    this.m_configFileLocks = m_configFileLocks;
   }
 
-
   @Override
-  public void collect0(MetricsEvent event) {
+  public void collect0(ApolloConfigMetricsEvent event) {
     String namespace = event.getAttachmentValue(NAMESPACE);
-    NamespaceMetrics namespaceMetrics = namespaces.computeIfAbsent(namespace,
-        k -> new NamespaceMetrics());
-    switch (event.getName()) {
-      case NAMESPACE_USAGE_COUNT:
+    String eventName = event.getName();
+
+    switch (eventName) {
+      case APOLLO_CLIENT_NAMESPACE_NOT_FOUND:
+        namespace404.add(namespace);
+        break;
+      case APOLLO_CLIENT_NAMESPACE_TIMEOUT:
+        namespaceTimeout.add(namespace);
+        break;
+      default:
+        NamespaceMetrics namespaceMetrics = namespaces.computeIfAbsent(namespace,
+            k -> new NamespaceMetrics());
+        handleNamespaceMetricsEvent(event, namespaceMetrics);
+        break;
+    }
+  }
+
+  private void handleNamespaceMetricsEvent(ApolloConfigMetricsEvent event,
+      NamespaceMetrics namespaceMetrics) {
+    String eventName = event.getName();
+    switch (eventName) {
+      case APOLLO_CLIENT_NAMESPACE_USAGE:
         namespaceMetrics.incrementUsageCount();
         break;
-      case NAMESPACE_LATEST_UPDATE_TIME:
+      case METRICS_NAMESPACE_LATEST_UPDATE_TIME:
         long updateTime = event.getAttachmentValue(MonitorConstant.TIMESTAMP);
         namespaceMetrics.setLatestUpdateTime(updateTime);
         break;
-      case NAMESPACE_FIRST_LOAD_SPEND:
+      case APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND:
         long firstLoadSpendTime = event.getAttachmentValue(MonitorConstant.TIMESTAMP);
         namespaceMetrics.setFirstLoadSpend(firstLoadSpendTime);
         break;
@@ -102,14 +105,8 @@ public class DefaultApolloNamespaceCollector extends AbstractMetricsCollector im
         String releaseKey = event.getAttachmentValue(NAMESPACE_RELEASE_KEY);
         namespaceMetrics.setReleaseKey(releaseKey);
         break;
-      case NAMESPACE_TIMEOUT:
-        namespaceTimeout.add(namespace);
-        break;
-      case NAMESPACE_NOT_FOUND:
-        namespace404.add(namespace);
-        break;
       default:
-        logger.warn("Unknown event: {}", event);
+        logger.warn("Unhandled event name: {}", eventName);
         break;
     }
   }
@@ -117,46 +114,48 @@ public class DefaultApolloNamespaceCollector extends AbstractMetricsCollector im
   @Override
   public void export0() {
     namespaces.forEach((namespace, metrics) -> {
-      updateCounterSample(NAMESPACE_USAGE_COUNT, namespace, metrics.getUsageCount());
-      updateGaugeSample(NAMESPACE_FIRST_LOAD_SPEND, namespace, metrics.getFirstLoadSpend(),
-          LONG_CONVERTER);
-      updateGaugeSample(NAMESPACE_LATEST_UPDATE_TIME, namespace, metrics.getLatestUpdateTime(),
-          LONG_CONVERTER);
-      updateGaugeSample(NAMESPACE_ITEM_NUM, namespace,
-          m_configs.get(namespace).getPropertyNames().size(), INT_CONVERTER);
-      updateGaugeSample(CONFIG_FILE_NUM, namespace, m_configFiles.size(), INT_CONVERTER);
+      updateCounterSample(METRICS_NAMESPACE_USAGE, namespace, metrics.getUsageCount());
+      updateGaugeSample(METRICS_NAMESPACE_FIRST_LOAD_SPEND, namespace,
+          metrics.getFirstLoadSpend());
+      updateGaugeSample(METRICS_NAMESPACE_LATEST_UPDATE_TIME, namespace,
+          metrics.getLatestUpdateTime());
+      updateGaugeSample(METRICS_NAMESPACE_ITEM_NUM, namespace,
+          m_configs.get(namespace).getPropertyNames().size());
+      updateGaugeSample(METRICS_CONFIG_FILE_NUM, namespace, m_configFiles.size());
     });
-    updateGaugeSample(NAMESPACE_NOT_FOUND, "", namespace404.size(), INT_CONVERTER);
-    updateGaugeSample(NAMESPACE_TIMEOUT, "", namespaceTimeout.size(), INT_CONVERTER);
+    updateGaugeSample(METRICS_NAMESPACE_NOT_FOUND, "", namespace404.size());
+    updateGaugeSample(METRICS_NAMESPACE_TIMEOUT, "", namespaceTimeout.size());
   }
 
   private void updateCounterSample(String key, String namespace, double value) {
     String mapKey = namespace + key;
     if (!counterSamples.containsKey(mapKey)) {
-      CounterModel.CounterBuilder builder = CounterModel.builder().name(key).value(0);
+      CounterModel builder = CounterModel.create(key, 0);
       if (!namespace.isEmpty()) {
         builder.putTag(NAMESPACE, namespace);
       }
-      counterSamples.put(mapKey, builder.build());
+      counterSamples.put(mapKey, builder);
     }
     counterSamples.get(mapKey).updateValue(value);
   }
 
-  @SuppressWarnings("unchecked")
-  private void updateGaugeSample(String key, String namespace, Object value,
-      ToDoubleFunction<Object> applyFunction) {
+
+  private void updateGaugeSample(String key, String namespace, double value) {
     String mapKey = namespace + key;
     if (!gaugeSamples.containsKey(mapKey)) {
-      GaugeModel.GaugeBuilder<Object> builder = GaugeModel.builder().name(key).value(0)
-          .apply(applyFunction);
+      GaugeModel builder = GaugeModel.create(key, 0);
       if (!namespace.isEmpty()) {
         builder.putTag(NAMESPACE, namespace);
       }
-      gaugeSamples.put(mapKey, builder.build());
+      gaugeSamples.put(mapKey, builder);
     }
     gaugeSamples.get(mapKey).updateValue(value);
   }
 
+  @Override
+  public Map<String, NamespaceMetrics> getNamespaceMetrics() {
+    return namespaces;
+  }
 
   @Override
   public String getNamespaceReleaseKey(String namespace) {
