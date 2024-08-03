@@ -36,11 +36,10 @@
             <artifactId>apollo-client</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient_common</artifactId>
-            <scope>provided</scope>
-        </dependency>
+      <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_common</artifactId>
+      </dependency>
     </dependencies>
 
 </project>

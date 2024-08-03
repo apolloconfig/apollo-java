@@ -16,12 +16,17 @@
  */
 package com.ctrip.framework.apollo.monitor.internal;
 
-import com.ctrip.framework.apollo.monitor.api.ApolloExceptionMonitorApi;
-import com.ctrip.framework.apollo.monitor.api.ApolloNamespaceMonitorApi;
-import com.ctrip.framework.apollo.monitor.api.ApolloRunningParamsMonitorApi;
-import com.ctrip.framework.apollo.monitor.api.ApolloThreadPoolMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientExceptionMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi;
 import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
-import com.ctrip.framework.apollo.monitor.internal.exporter.MetricsExporter;
+import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientBootstrapArgsMonitorApi;
+import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientExceptionMonitorApi;
+import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientNamespaceMonitorApi;
+import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientThreadPoolMonitorApi;
+import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
+import com.ctrip.framework.apollo.monitor.internal.exporter.impl.NullApolloClientMetricsExporter;
 
 /**
  * exposes all collected data through ConfigService
@@ -30,49 +35,46 @@ import com.ctrip.framework.apollo.monitor.internal.exporter.MetricsExporter;
  */
 public class DefaultConfigMonitor implements ConfigMonitor {
 
-  private MetricsExporter reporter;
-  private ApolloThreadPoolMonitorApi threadPoolMonitorApi = new NullThreadPoolMonitorApi();
-  private ApolloExceptionMonitorApi exceptionMonitorApi = new NullExceptionMonitorApi();
-  private ApolloNamespaceMonitorApi apolloNamespaceMonitorApi = new NullNamespaceMonitorApi();
-  private ApolloRunningParamsMonitorApi apolloRunningParamsMonitorApi = new NullRunningParamsMonitorApi();
+  private ApolloClientMetricsExporter reporter = new NullApolloClientMetricsExporter();
+  private ApolloClientThreadPoolMonitorApi threadPoolMonitorApi = new NullClientThreadPoolMonitorApi();
+  private ApolloClientExceptionMonitorApi exceptionMonitorApi = new NullClientExceptionMonitorApi();
+  private ApolloClientNamespaceMonitorApi apolloClientNamespaceMonitorApi = new NullClientNamespaceMonitorApi();
+  private ApolloClientBootstrapArgsMonitorApi apolloClientBootstrapArgsMonitorApi = new NullClientBootstrapArgsMonitorApi();
 
   @Override
-  public ApolloThreadPoolMonitorApi getThreadPoolMonitorApi() {
+  public ApolloClientThreadPoolMonitorApi getThreadPoolMonitorApi() {
     return threadPoolMonitorApi;
   }
 
   @Override
-  public ApolloExceptionMonitorApi getExceptionMonitorApi() {
+  public ApolloClientExceptionMonitorApi getExceptionMonitorApi() {
     return exceptionMonitorApi;
   }
 
   @Override
-  public ApolloNamespaceMonitorApi getNamespaceMonitorApi() {
-    return apolloNamespaceMonitorApi;
+  public ApolloClientNamespaceMonitorApi getNamespaceMonitorApi() {
+    return apolloClientNamespaceMonitorApi;
   }
 
   @Override
-  public ApolloRunningParamsMonitorApi getRunningParamsMonitorApi() {
-    return apolloRunningParamsMonitorApi;
+  public ApolloClientBootstrapArgsMonitorApi getRunningParamsMonitorApi() {
+    return apolloClientBootstrapArgsMonitorApi;
   }
 
   @Override
-  public String getDataWithCurrentMonitoringSystemFormat() {
-    if (reporter == null) {
-      return "No MonitoringSystem Use";
-    }
+  public String getExporterData() {
     return reporter.response();
   }
 
-  public void init(ApolloNamespaceMonitorApi apolloNamespaceMonitorApi,
-      ApolloThreadPoolMonitorApi threadPoolMonitorApi,
-      ApolloExceptionMonitorApi exceptionMonitorApi,
-      ApolloRunningParamsMonitorApi apolloRunningParamsMonitorApi,
-      MetricsExporter reporter) {
-    this.apolloNamespaceMonitorApi = apolloNamespaceMonitorApi;
+  public void init(ApolloClientNamespaceMonitorApi apolloClientNamespaceMonitorApi,
+      ApolloClientThreadPoolMonitorApi threadPoolMonitorApi,
+      ApolloClientExceptionMonitorApi exceptionMonitorApi,
+      ApolloClientBootstrapArgsMonitorApi apolloClientBootstrapArgsMonitorApi,
+      ApolloClientMetricsExporter reporter) {
+    this.apolloClientNamespaceMonitorApi = apolloClientNamespaceMonitorApi;
     this.threadPoolMonitorApi = threadPoolMonitorApi;
     this.exceptionMonitorApi = exceptionMonitorApi;
-    this.apolloRunningParamsMonitorApi = apolloRunningParamsMonitorApi;
+    this.apolloClientBootstrapArgsMonitorApi = apolloClientBootstrapArgsMonitorApi;
     this.reporter = reporter;
   }
 }

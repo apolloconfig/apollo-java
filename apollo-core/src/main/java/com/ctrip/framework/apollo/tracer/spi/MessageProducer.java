@@ -54,6 +54,16 @@ public interface MessageProducer extends Ordered {
    */
   void logEvent(String type, String name, String status, String nameValuePairs);
 
+
+  /**
+   * log metrics for count
+   *
+   * @param name        metrics name
+   */
+  default void logMetricsForCount(String name) {
+      //do nothing
+  }
+
   /**
    * Create a new transaction with given type and name.
    *

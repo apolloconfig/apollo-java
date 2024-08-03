@@ -21,13 +21,13 @@ package com.ctrip.framework.apollo.monitor.api;
  */
 public interface ConfigMonitor {
 
-  ApolloThreadPoolMonitorApi getThreadPoolMonitorApi();
+  ApolloClientThreadPoolMonitorApi getThreadPoolMonitorApi();
 
-  ApolloExceptionMonitorApi getExceptionMonitorApi();
+  ApolloClientExceptionMonitorApi getExceptionMonitorApi();
 
-  ApolloNamespaceMonitorApi getNamespaceMonitorApi();
+  ApolloClientNamespaceMonitorApi getNamespaceMonitorApi();
 
-  ApolloRunningParamsMonitorApi getRunningParamsMonitorApi();
+  ApolloClientBootstrapArgsMonitorApi getRunningParamsMonitorApi();
 
-  String getDataWithCurrentMonitoringSystemFormat();
+  String getExporterData();
 }

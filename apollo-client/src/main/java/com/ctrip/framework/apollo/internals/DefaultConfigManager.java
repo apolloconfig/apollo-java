@@ -16,17 +16,16 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static com.ctrip.framework.apollo.monitor.internal.collector.internal.DefaultApolloNamespaceCollector.NAMESPACE_MONITOR;
-import static com.ctrip.framework.apollo.monitor.internal.collector.internal.DefaultApolloNamespaceCollector.NAMESPACE_USAGE_COUNT;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
-import com.ctrip.framework.apollo.monitor.internal.MonitorConstant;
-import com.ctrip.framework.apollo.monitor.internal.model.MetricsEvent;
+import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
+import com.ctrip.framework.apollo.tracer.Tracer;
 import com.google.common.collect.Maps;
 import java.util.Map;
 
@@ -62,10 +61,9 @@ public class DefaultConfigManager implements ConfigManager {
         }
       }
     }
-
-    MetricsEvent.builder().withName(NAMESPACE_USAGE_COUNT)
-        .putAttachment(MonitorConstant.NAMESPACE, namespace)
-        .withTag(NAMESPACE_MONITOR).push();
+    if(!ConfigSourceType.NONE.equals(config.getSourceType())) {
+      Tracer.logMetricsForCount(APOLLO_CLIENT_NAMESPACE_USAGE+":"+namespace);
+    }
 
     return config;
   }

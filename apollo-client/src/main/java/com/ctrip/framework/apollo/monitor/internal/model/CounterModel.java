@@ -16,85 +16,38 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.model;
 
-import com.ctrip.framework.apollo.monitor.internal.util.MeterType;
-import java.util.HashMap;
-import java.util.Map;
+import com.ctrip.framework.apollo.monitor.internal.enums.MeterEnums;
 
 /**
  * @author Rawven
  */
-public class CounterModel extends MetricsModel {
+public class CounterModel extends SampleModel {
 
-  private double nowValue;
-  private double increaseValue;
-
-  public CounterModel(String name, double num) {
+  private CounterModel(String name, double num) {
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException("Name cannot be null or empty");
     }
     if (Double.isNaN(num) || Double.isInfinite(num)) {
       throw new IllegalArgumentException("Number must be a valid double");
     }
-    this.name = name;
-    this.nowValue = num;
-    this.increaseValue = num;
-    this.type = MeterType.COUNTER;
+    setName(name);
+    setType(MeterEnums.COUNTER);
+    this.value.set(num);
   }
 
-  public static CounterBuilder builder() {
-    return new CounterBuilder();
+  public static CounterModel create(String name, double value) {
+    return new CounterModel(name, value);
   }
 
-  public void updateValue(double value) {
+  public void increase(double value) {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       throw new IllegalArgumentException("Value must be a valid double");
     }
-    increaseValue = value - nowValue;
-    nowValue = value;
+    this.value.addAndGet(value);
   }
 
-  public Double getIncreaseValue() {
-    return increaseValue;
+  public double getIncreaseValueAndResetZero() {
+    return value.getAndSet(0.0);
   }
 
-  public void setValue(Double value) {
-    if (value == null || Double.isNaN(value) || Double.isInfinite(value)) {
-      throw new IllegalArgumentException("Value must be a valid double");
-    }
-    this.nowValue = value;
-  }
-
-  public static class CounterBuilder {
-
-    private final Map<String, String> tags = new HashMap<>();
-    private String name;
-    private double value;
-
-    public CounterBuilder name(String name) {
-      if (name == null || name.isEmpty()) {
-        throw new IllegalArgumentException("Name cannot be null or empty");
-      }
-      this.name = name;
-      return this;
-    }
-
-    public CounterBuilder value(double value) {
-      if (Double.isNaN(value) || Double.isInfinite(value)) {
-        throw new IllegalArgumentException("Value must be a valid double");
-      }
-      this.value = value;
-      return this;
-    }
-
-    public CounterBuilder putTag(String key, String value) {
-      this.tags.put(key, value);
-      return this;
-    }
-
-    public CounterModel build() {
-      CounterModel sample = new CounterModel(name, value);
-      sample.tags.putAll(tags);
-      return sample;
-    }
-  }
 }

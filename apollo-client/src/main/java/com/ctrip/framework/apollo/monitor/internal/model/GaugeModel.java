@@ -16,83 +16,25 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.model;
 
-import com.ctrip.framework.apollo.monitor.internal.util.MeterType;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.ToDoubleFunction;
+import com.ctrip.framework.apollo.monitor.internal.enums.MeterEnums;
+import com.google.common.util.concurrent.AtomicDouble;
 
-public class GaugeModel<T> extends MetricsModel {
+/**
+ * @author Rawven
+ */
+public class GaugeModel extends SampleModel {
 
-  public static final ToDoubleFunction<Object> INT_CONVERTER = v -> (int) v;
-  public static final ToDoubleFunction<Object> LONG_CONVERTER = v -> (long) v;
-  public static final ToDoubleFunction<Object> DOUBLE_CONVERTER = v -> (double) v;
-
-  private T value;
-  private ToDoubleFunction<T> apply;
-
-  public GaugeModel(String name, T value, ToDoubleFunction<T> apply) {
-    this.name = name;
-    this.value = value;
-    this.apply = apply;
-    this.type = MeterType.GAUGE;
-  }
-
-  public static <T> GaugeBuilder<T> builder() {
-    return new GaugeBuilder<>();
-  }
-
-  public T getValue() {
-    return value;
-  }
-
-  public void updateValue(T value) {
-    this.value = value;
-  }
-
-  public ToDoubleFunction<T> getApply() {
-    return this.apply;
-  }
-
-  public void setApply(ToDoubleFunction<T> apply) {
-    this.apply = apply;
-  }
-
-  public double getApplyValue() {
-    return getApply().applyAsDouble(getValue());
-  }
-
-  public static class GaugeBuilder<T> {
-
-    private final Map<String, String> tags = new HashMap<>(1);
-    private String name;
-    private T value;
-    private ToDoubleFunction<T> apply;
-
-    public GaugeBuilder<T> name(String name) {
-      this.name = name;
-      return this;
+  private GaugeModel(String name, double value) {
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("Name cannot be null or empty");
     }
-
-    public GaugeBuilder<T> value(T value) {
-      this.value = value;
-      return this;
-    }
-
-    public GaugeBuilder<T> apply(ToDoubleFunction<T> apply) {
-      this.apply = apply;
-      return this;
-    }
-
-    public GaugeBuilder<T> putTag(String key, String value) {
-      this.tags.put(key, value);
-      return this;
-    }
-
-    public GaugeModel<T> build() {
-      GaugeModel<T> sample = new GaugeModel<>(name, value, apply);
-      sample.tags.putAll(tags);
-      return sample;
-    }
+    setName(name);
+    setType(MeterEnums.GAUGE);
+    this.value.set(value);
   }
+
+  public static GaugeModel create(String name, double value) {
+    return new GaugeModel(name, value);
+  }
+
 }
-

@@ -166,7 +166,11 @@ public class ApolloClientSystemConsts {
    * apollo client monitor enabled
    */
   public static final String APOLLO_CLIENT_MONITOR_ENABLED = "apollo.client.monitor.enabled";
-
+  
+  /**
+   * apollo client monitor exception save size
+   */
+  public static final String APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE = "apollo.client.monitor.exception-queue-size";
   /**
    * apollo client monitor jmx enabled
    */

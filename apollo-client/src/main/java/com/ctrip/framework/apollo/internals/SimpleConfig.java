@@ -16,8 +16,7 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static com.ctrip.framework.apollo.monitor.internal.tracer.MessageProducerComposite.APOLLO_CLIENT_CONFIGCHANGES;
-
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import java.util.Collections;
 import java.util.List;

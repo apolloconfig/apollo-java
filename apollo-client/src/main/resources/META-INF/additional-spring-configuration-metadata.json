@@ -93,6 +93,21 @@
       "defaultValue": ""
     },
     {
+      "name": "apollo.client.monitor.exception-save-size",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor exception-save-size.",
+      "defaultValue": ""
+    },
+    {
+      "name": "apollo.client.monitor.metrics-event-pool-size",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor MetricsEvent object pool size.",
+      "defaultValue": ""
+    },
+    
+    {
       "name": "apollo.meta",
       "type": "java.net.URI",
       "sourceType": "com.ctrip.framework.apollo.core.ConfigConsts",
