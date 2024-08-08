@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class AbstractConfig implements Config {
   private static final Logger logger = LoggerFactory.getLogger(AbstractConfig.class);
 
-  private static final ExecutorService m_executorService;
+  protected static final ExecutorService m_executorService;
 
   private final List<ConfigChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
   private final Map<ConfigChangeListener, Set<String>> m_interestedKeys = Maps.newConcurrentMap();

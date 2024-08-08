@@ -42,6 +42,16 @@ public class NullMessageProducer implements MessageProducer {
   }
 
   @Override
+  public void logMetricsForCount(String name) {
+    
+  }
+
+  @Override
+  public void logMetricsForCount(String name, int count) {
+
+  }
+
+  @Override
   public Transaction newTransaction(String type, String name) {
     return NULL_TRANSACTION;
   }

@@ -24,5 +24,6 @@ public interface ConfigConsts {
   String APOLLO_META_KEY = "apollo.meta";
   String CONFIG_FILE_CONTENT_KEY = "content";
   String NO_APPID_PLACEHOLDER = "ApolloNoAppIdPlaceHolder";
+  String APOLLO_AUTO_UPDATE_INJECTED_SPRING_PROPERTIES = "ApolloAutoUpdateInjectedSpringProperties";
   long NOTIFICATION_ID_PLACEHOLDER = -1;
 }

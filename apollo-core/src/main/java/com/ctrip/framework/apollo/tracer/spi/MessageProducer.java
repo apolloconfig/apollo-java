@@ -16,10 +16,12 @@
  */
 package com.ctrip.framework.apollo.tracer.spi;
 
+import com.ctrip.framework.apollo.core.spi.Ordered;
+
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
-public interface MessageProducer {
+public interface MessageProducer extends Ordered {
   /**
    * Log an error.
    *
@@ -52,6 +54,22 @@ public interface MessageProducer {
    */
   void logEvent(String type, String name, String status, String nameValuePairs);
 
+
+  /**
+   * log metrics for count
+   *
+   * @param name        metrics name
+   */
+  void logMetricsForCount(String name);
+
+  /**
+   * log metrics for count
+   *
+   * @param name        metrics name
+   * @param count       count
+   */
+  void logMetricsForCount(String name, int count);
+
   /**
    * Create a new transaction with given type and name.
    *
@@ -59,4 +77,10 @@ public interface MessageProducer {
    * @param name transaction name
    */
   Transaction newTransaction(String type, String name);
+
+
+  @Override
+  default int getOrder() {
+    return 0;
+  }
 }

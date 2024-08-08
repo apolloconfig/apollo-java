@@ -16,35 +16,38 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import java.util.Map;
+import static com.ctrip.framework.apollo.monitor.internal.MonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
+import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
+import com.ctrip.framework.apollo.tracer.Tracer;
 import com.google.common.collect.Maps;
+import java.util.Map;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultConfigManager implements ConfigManager {
-  private ConfigFactoryManager m_factoryManager;
 
-  private Map<String, Config> m_configs = Maps.newConcurrentMap();
-  private Map<String, Object> m_configLocks = Maps.newConcurrentMap();
-  private Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
-  private Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
+  protected Map<String, Config> m_configs = Maps.newConcurrentMap();
+  protected Map<String, Object> m_configLocks = Maps.newConcurrentMap();
+  protected Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
+  protected Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
+  private ConfigFactoryManager m_factoryManager;
 
   public DefaultConfigManager() {
     m_factoryManager = ApolloInjector.getInstance(ConfigFactoryManager.class);
+
   }
 
   @Override
   public Config getConfig(String namespace) {
     Config config = m_configs.get(namespace);
-
     if (config == null) {
       Object lock = m_configLocks.computeIfAbsent(namespace, key -> new Object());
       synchronized (lock) {
@@ -58,12 +61,16 @@ public class DefaultConfigManager implements ConfigManager {
         }
       }
     }
+    if(!ConfigSourceType.NONE.equals(config.getSourceType())) {
+      Tracer.logMetricsForCount(APOLLO_CLIENT_NAMESPACE_USAGE+":"+namespace);
+    }
 
     return config;
   }
 
   @Override
-  public ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+  public ConfigFile getConfigFile(String namespace,
+      ConfigFileFormat configFileFormat) {
     String namespaceFileName = String.format("%s.%s", namespace, configFileFormat.getValue());
     ConfigFile configFile = m_configFiles.get(namespaceFileName);
 
