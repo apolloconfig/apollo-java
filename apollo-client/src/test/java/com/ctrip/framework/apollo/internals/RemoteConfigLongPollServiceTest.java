@@ -28,11 +28,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.dto.ApolloNotificationMessages;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
 import com.ctrip.framework.apollo.core.signature.Signature;
+import com.ctrip.framework.apollo.spring.config.PropertySourcesProcessor;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.http.HttpRequest;
 import com.ctrip.framework.apollo.util.http.HttpResponse;
@@ -41,6 +43,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.net.HttpHeaders;
 import com.google.common.util.concurrent.SettableFuture;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +92,10 @@ public class RemoteConfigLongPollServiceTest {
     MockInjector.setInstance(ConfigServiceLocator.class, configServiceLocator);
 
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
+
+    Field field = PropertySourcesProcessor.class.getDeclaredField("configUtil");
+    field.setAccessible(true);
+    field.set(null, ApolloInjector.getInstance(ConfigUtil.class));
 
     remoteConfigLongPollService = new RemoteConfigLongPollService();
 

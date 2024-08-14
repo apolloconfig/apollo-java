@@ -197,7 +197,7 @@ public abstract class AbstractSpringIntegrationTest {
 
     Field field = PropertySourcesProcessor.class.getDeclaredField("configUtil");
     field.setAccessible(true);
-    field.set(null, ApolloInjector.getInstance(ConfigUtil.class));
+    field.set(null, configUtil);
 
   }
 

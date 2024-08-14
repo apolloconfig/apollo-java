@@ -39,6 +39,7 @@ import com.ctrip.framework.apollo.core.signature.Signature;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigStatusCodeException;
+import com.ctrip.framework.apollo.spring.config.PropertySourcesProcessor;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.OrderedProperties;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
@@ -52,6 +53,7 @@ import com.google.common.net.HttpHeaders;
 import com.google.common.net.UrlEscapers;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.Gson;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +103,10 @@ public class RemoteConfigRepositoryTest {
     configUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, configUtil);
 
+    Field field = PropertySourcesProcessor.class.getDeclaredField("configUtil");
+    field.setAccessible(true);
+    field.set(null, configUtil);
+
     someServerUrl = "http://someServer";
 
     ServiceDTO serviceDTO = mock(ServiceDTO.class);
@@ -126,6 +132,7 @@ public class RemoteConfigRepositoryTest {
 
     someAppId = "someAppId";
     someCluster = "someCluster";
+
   }
 
   @After
