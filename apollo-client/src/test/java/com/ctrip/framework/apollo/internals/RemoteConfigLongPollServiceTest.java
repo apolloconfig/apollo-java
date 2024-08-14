@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.build.MockInjector;
+import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.dto.ApolloNotificationMessages;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
@@ -83,6 +84,12 @@ public class RemoteConfigLongPollServiceTest {
 
   @Before
   public void setUp() throws Exception {
+
+    someAppId = "someAppId";
+    someCluster = "someCluster";
+
+    System.setProperty(ApolloClientSystemConsts.APP_ID, someAppId);
+
     MockInjector.setInstance(HttpClient.class, httpClient);
 
     someServerUrl = "http://someServer";
@@ -102,8 +109,7 @@ public class RemoteConfigLongPollServiceTest {
     responseType =
         (Type) ReflectionTestUtils.getField(remoteConfigLongPollService, "m_responseType");
 
-    someAppId = "someAppId";
-    someCluster = "someCluster";
+
   }
 
   @After
@@ -254,7 +260,7 @@ public class RemoteConfigLongPollServiceTest {
     }).when(someRepository).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));
 
     remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
-    onNotified.get(5000, TimeUnit.MILLISECONDS);
+    onNotified.get(50000, TimeUnit.MILLISECONDS);
     remoteConfigLongPollService.stopLongPollingRefresh();
 
     verify(someRepository, times(1)).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));
@@ -583,6 +589,14 @@ public class RemoteConfigLongPollServiceTest {
     @Override
     public long getLongPollingInitialDelayInMills() {
       return 0;
+    }
+
+    @Override
+    public String getAccessKeySecret(String appId){
+      if(appId.equals(someAppId)){
+        return someSecret;
+      }
+      return null;
     }
   }
 

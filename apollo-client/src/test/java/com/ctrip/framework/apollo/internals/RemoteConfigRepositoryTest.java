@@ -423,6 +423,14 @@ public class RemoteConfigRepositoryTest {
     public long getLongPollingInitialDelayInMills() {
       return 0;
     }
+
+    @Override
+    public String getAccessKeySecret(String appId){
+      if(appId.equals(someAppId)){
+        return someSecret;
+      }
+      return null;
+    }
   }
 
   public static class MockHttpClient implements HttpClient {

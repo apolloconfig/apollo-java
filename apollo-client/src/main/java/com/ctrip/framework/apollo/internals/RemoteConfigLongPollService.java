@@ -86,7 +86,7 @@ public class RemoteConfigLongPollService {
   public RemoteConfigLongPollService() {
     m_longPollFailSchedulePolicyInSecond = new ExponentialSchedulePolicy(1, 120); //in second
     m_longPollingStopped = new AtomicBoolean(false);
-    m_longPollingService = new ThreadPoolExecutor(1, 10,
+    m_longPollingService = new ThreadPoolExecutor(10, 10,
         0L, TimeUnit.MILLISECONDS,
         new LinkedBlockingQueue<Runnable>(),
         ApolloThreadFactory.create("RemoteConfigLongPollService", true));
