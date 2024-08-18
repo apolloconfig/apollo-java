@@ -25,8 +25,8 @@ import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxBootstrapArgsMBean;
-import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMetricsEventListener;
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
+import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Maps;
 import java.util.Map;
@@ -37,7 +37,7 @@ import org.slf4j.Logger;
  * @author Rawven
  */
 public class DefaultApolloClientBootstrapArgsApi extends
-    AbstractApolloClientMetricsEventListener implements
+    AbstractApolloClientMonitorEventListener implements
     ApolloClientBootstrapArgsMonitorApi, ApolloClientJmxBootstrapArgsMBean {
 
   private static final Logger logger = DeferredLoggerFactory.getLogger(
@@ -83,7 +83,7 @@ public class DefaultApolloClientBootstrapArgsApi extends
   }
 
   @Override
-  public void collect0(ApolloConfigMetricsEvent event) {
+  public void collect0(ApolloClientMonitorEvent event) {
     String argName = event.getName();
     if (bootstrapArgs.containsKey(argName)) {
       bootstrapArgs.put(argName, event.getAttachmentValue(argName));

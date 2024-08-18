@@ -16,10 +16,8 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
-import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
-import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +27,7 @@ import java.util.Map;
 public class NullApolloClientMetricsExporter implements ApolloClientMetricsExporter {
 
   @Override
-  public void init(List<ApolloClientMetricsEventListener> collectors, long collectPeriod) {
+  public void init(List<ApolloClientMonitorEventListener> collectors, long collectPeriod) {
   }
 
   @Override

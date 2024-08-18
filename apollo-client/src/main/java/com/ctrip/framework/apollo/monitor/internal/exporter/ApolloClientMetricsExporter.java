@@ -17,10 +17,7 @@
 package com.ctrip.framework.apollo.monitor.internal.exporter;
 
 import com.ctrip.framework.apollo.core.spi.Ordered;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
-import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
-import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
-import java.util.Date;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +29,7 @@ public interface ApolloClientMetricsExporter extends Ordered {
   /**
    * init method
    */
-  void init(List<ApolloClientMetricsEventListener> collectors, long collectPeriod);
+  void init(List<ApolloClientMonitorEventListener> collectors, long collectPeriod);
 
   /**
    * Used to access custom monitoring systems

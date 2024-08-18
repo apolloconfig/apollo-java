@@ -18,7 +18,7 @@ package com.ctrip.framework.apollo.monitor.internal.exporter;
 
 import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
@@ -44,10 +44,10 @@ public abstract class AbstractApolloClientMetricsExporter implements ApolloClien
         ApolloThreadFactory.create("MetricsReporter", true));
   }
 
-  protected List<ApolloClientMetricsEventListener> collectors;
+  protected List<ApolloClientMonitorEventListener> collectors;
 
   @Override
-  public void init(List<ApolloClientMetricsEventListener> collectors, long collectPeriod) {
+  public void init(List<ApolloClientMonitorEventListener> collectors, long collectPeriod) {
     log.info("Initializing metrics exporter with {} collectors and collect period of {} seconds.",
         collectors.size(), collectPeriod);
     doInit();

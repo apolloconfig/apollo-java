@@ -19,7 +19,7 @@ package com.ctrip.framework.apollo.monitor.internal.listener;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientMetricsEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientMonitorEventListenerManager;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,30 +27,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultApolloClientMetricsEventListenerManagerTest {
+public class DefaultApolloClientMonitorEventListenerManagerTest {
 
-    private DefaultApolloClientMetricsEventListenerManager manager;
+    private DefaultApolloClientMonitorEventListenerManager manager;
 
     @Before
     public void setUp() {
-        manager = new DefaultApolloClientMetricsEventListenerManager();
+        manager = new DefaultApolloClientMonitorEventListenerManager();
     }
 
     @Test
     public void testInitialCollectors() {
-        List<ApolloClientMetricsEventListener> collectors = manager.getCollectors();
+        List<ApolloClientMonitorEventListener> collectors = manager.getCollectors();
         assertNotNull(collectors);
         assertTrue(collectors.isEmpty()); // 初始状态应该为空列表
     }
 
     @Test
     public void testSetCollectors() {
-        ApolloClientMetricsEventListener mockListener = mock(ApolloClientMetricsEventListener.class);
-        List<ApolloClientMetricsEventListener> newCollectors = new ArrayList<>();
+        ApolloClientMonitorEventListener mockListener = mock(ApolloClientMonitorEventListener.class);
+        List<ApolloClientMonitorEventListener> newCollectors = new ArrayList<>();
         newCollectors.add(mockListener);
 
         manager.setCollectors(newCollectors);
-        List<ApolloClientMetricsEventListener> collectors = manager.getCollectors();
+        List<ApolloClientMonitorEventListener> collectors = manager.getCollectors();
 
         assertNotNull(collectors);
         assertEquals(1, collectors.size());
@@ -60,7 +60,7 @@ public class DefaultApolloClientMetricsEventListenerManagerTest {
     @Test
     public void testSetEmptyCollectors() {
         manager.setCollectors(Collections.emptyList());
-        List<ApolloClientMetricsEventListener> collectors = manager.getCollectors();
+        List<ApolloClientMonitorEventListener> collectors = manager.getCollectors();
 
         assertNotNull(collectors);
         assertTrue(collectors.isEmpty()); // 设置为空列表后应该为空

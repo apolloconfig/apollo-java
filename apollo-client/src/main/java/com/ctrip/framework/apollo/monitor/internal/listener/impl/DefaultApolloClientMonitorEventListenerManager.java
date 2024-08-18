@@ -16,30 +16,30 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListenerManager;
-import java.util.Collections;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Rawven
  */
-public class DefaultApolloClientMetricsEventListenerManager implements
-    ApolloClientMetricsEventListenerManager {
+public class DefaultApolloClientMonitorEventListenerManager implements
+    ApolloClientMonitorEventListenerManager {
 
-  private List<ApolloClientMetricsEventListener> collectors;
+  private List<ApolloClientMonitorEventListener> collectors = new ArrayList<>();
 
-  public DefaultApolloClientMetricsEventListenerManager() {
-    collectors = Collections.emptyList();
+  public DefaultApolloClientMonitorEventListenerManager() {
   }
 
   @Override
-  public List<ApolloClientMetricsEventListener> getCollectors() {
+  public List<ApolloClientMonitorEventListener> getCollectors() {
     return collectors;
   }
 
-  public void setCollectors(List<ApolloClientMetricsEventListener> collectors) {
-    this.collectors = collectors;
+  public void setCollectors(List<ApolloClientMonitorEventListener> collectors) {
+    this.collectors.clear();
+    this.collectors.addAll(collectors);
   }
 
 }

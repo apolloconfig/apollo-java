@@ -25,10 +25,8 @@ import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxNamespaceMBean;
 import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant;
-import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMetricsEventListener;
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
-import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
-import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
+import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.Instant;
@@ -36,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
@@ -44,7 +41,7 @@ import org.slf4j.Logger;
  * @author Rawven
  */
 public class DefaultApolloClientNamespaceApi extends
-    AbstractApolloClientMetricsEventListener implements
+    AbstractApolloClientMonitorEventListener implements
     ApolloClientNamespaceMonitorApi, ApolloClientJmxNamespaceMBean {
 
   private static final Logger logger = DeferredLoggerFactory.getLogger(
@@ -64,7 +61,7 @@ public class DefaultApolloClientNamespaceApi extends
   }
 
   @Override
-  public void collect0(ApolloConfigMetricsEvent event) {
+  public void collect0(ApolloClientMonitorEvent event) {
     String namespace = event.getAttachmentValue(NAMESPACE);
     String eventName = event.getName();
 
@@ -83,7 +80,7 @@ public class DefaultApolloClientNamespaceApi extends
     }
   }
 
-  private void handleNamespaceMetricsEvent(ApolloConfigMetricsEvent event,
+  private void handleNamespaceMetricsEvent(ApolloClientMonitorEvent event,
       NamespaceMetrics namespaceMetrics, String namespace) {
     String eventName = event.getName();
     switch (eventName) {

@@ -20,8 +20,8 @@ import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
 import com.ctrip.framework.apollo.monitor.internal.DefaultConfigMonitor;
 import com.ctrip.framework.apollo.monitor.internal.exporter.impl.DefaultApolloClientMetricsExporterFactory;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListenerManager;
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientMetricsEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientMonitorEventListenerManager;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.spi.ApolloInjectorCustomizer;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
@@ -113,8 +113,8 @@ public class DefaultInjector implements Injector {
       bind(YamlParser.class).in(Singleton.class);
       bind(PropertiesFactory.class).to(DefaultPropertiesFactory.class).in(Singleton.class);
       bind(ConfigMonitor.class).to(DefaultConfigMonitor.class).in(Singleton.class);
-      bind(ApolloClientMetricsEventListenerManager.class).to(
-          DefaultApolloClientMetricsEventListenerManager.class).in(Singleton.class);
+      bind(ApolloClientMonitorEventListenerManager.class).to(
+          DefaultApolloClientMonitorEventListenerManager.class).in(Singleton.class);
       bind(ApolloClientMetricsExporterFactory.class).to(DefaultApolloClientMetricsExporterFactory.class).in(Singleton.class);
     }
   }

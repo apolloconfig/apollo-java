@@ -16,21 +16,40 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener;
 
-import com.ctrip.framework.apollo.core.spi.Ordered;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
+import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
 import java.util.List;
 
 /**
  * @author Rawven
  */
-public interface ApolloClientMetricsEventListenerManager extends Ordered {
+public interface ApolloClientMonitorEventListener {
+
 
   /**
-   * get collectors
+   * mbean name
    */
-  List<ApolloClientMetricsEventListener> getCollectors();
+  String mBeanName();
 
-  @Override
-  default int getOrder() {
-    return 0;
-  }
+  /**
+   * is support the event
+   */
+  boolean isSupport(ApolloClientMonitorEvent event);
+
+  /**
+   * collect metrics from event
+   */
+  void collect(ApolloClientMonitorEvent event);
+
+  /**
+   * is samples updated
+   */
+  boolean isMetricsSampleUpdated();
+
+  /**
+   * export to a format recognized by the monitoring system
+   */
+  List<SampleModel> export();
+
+
 }

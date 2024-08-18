@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import com.ctrip.framework.apollo.monitor.internal.enums.MeterEnums;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
@@ -39,7 +39,7 @@ public class AbstractApolloClientMetricsExporterTest {
         protected void doInit() {
         }
 
-        public List<ApolloClientMetricsEventListener> getCollectors() {
+        public List<ApolloClientMonitorEventListener> getCollectors() {
             return collectors;
         }
 
@@ -66,17 +66,17 @@ public class AbstractApolloClientMetricsExporterTest {
     }
 
     private TestMetricsExporter exporter;
-    private ApolloClientMetricsEventListener mockListener;
+    private ApolloClientMonitorEventListener mockListener;
 
     @Before
     public void setUp() {
         exporter = new TestMetricsExporter();
-        mockListener = mock(ApolloClientMetricsEventListener.class);
+        mockListener = mock(ApolloClientMonitorEventListener.class);
     }
 
     @Test
     public void testInit() {
-        List<ApolloClientMetricsEventListener> collectors = new ArrayList<>();
+        List<ApolloClientMonitorEventListener> collectors = new ArrayList<>();
         collectors.add(mockListener);
         long collectPeriod = 10L;
 

@@ -22,25 +22,25 @@ import java.util.HashMap;
  * @author Rawven
  * @date 2024/08/08
  */
-public class ApolloConfigMetricsEventFactory {
+public class ApolloClientMonitorEventFactory {
 
-  public static volatile ApolloConfigMetricsEventFactory INSTANCE;
+  public static volatile ApolloClientMonitorEventFactory INSTANCE;
 
-  private ApolloConfigMetricsEventFactory() {
+  private ApolloClientMonitorEventFactory() {
   }
 
-  public static ApolloConfigMetricsEventFactory getInstance() {
+  public static ApolloClientMonitorEventFactory getInstance() {
     if (INSTANCE == null) {
-      synchronized (ApolloConfigMetricsEventFactory.class) {
+      synchronized (ApolloClientMonitorEventFactory.class) {
         if (INSTANCE == null) {
-          INSTANCE = new ApolloConfigMetricsEventFactory();
+          INSTANCE = new ApolloClientMonitorEventFactory();
         }
       }
     }
     return INSTANCE;
   }
 
-  public ApolloConfigMetricsEvent createEvent(String name) {
-    return new ApolloConfigMetricsEvent(name, null, new HashMap<>(2));
+  public ApolloClientMonitorEvent createEvent(String name) {
+    return new ApolloClientMonitorEvent(name, null, new HashMap<>(2));
   }
 }
