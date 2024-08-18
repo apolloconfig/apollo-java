@@ -21,7 +21,7 @@ import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorCon
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.monitor.internal.jmx.ApolloClientJmxMBeanRegister;
@@ -43,8 +43,7 @@ public class DefaultApolloClientMetricsExporterFactory implements
 
   @Override
   public ApolloClientMetricsExporter getMetricsReporter(
-      List<ApolloClientMetricsEventListener> collectors) {
-    initializeJmxMonitoring(collectors);
+      List<ApolloClientMonitorEventListener> collectors) {
 
     String externalSystemType = configUtil.getMonitorExternalType();
     if (externalSystemType == null) {
@@ -54,17 +53,8 @@ public class DefaultApolloClientMetricsExporterFactory implements
     return findAndInitializeExporter(collectors, externalSystemType);
   }
 
-  public void initializeJmxMonitoring(List<ApolloClientMetricsEventListener> collectors) {
-    if (configUtil.getClientMonitorJmxEnabled()) {
-      collectors.forEach(metricsCollector ->
-          ApolloClientJmxMBeanRegister.register(
-              MBEAN_NAME + metricsCollector.mBeanName(), metricsCollector)
-      );
-    }
-  }
-
   private ApolloClientMetricsExporter findAndInitializeExporter(
-      List<ApolloClientMetricsEventListener> collectors, String externalSystemType) {
+      List<ApolloClientMonitorEventListener> collectors, String externalSystemType) {
     List<ApolloClientMetricsExporter> exporters = ServiceBootstrap.loadAllOrdered(
         ApolloClientMetricsExporter.class);
     ApolloClientMetricsExporter reporter = exporters.stream()
@@ -85,5 +75,5 @@ public class DefaultApolloClientMetricsExporterFactory implements
     }
     return reporter;
   }
-    
+
 }

@@ -16,7 +16,7 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import java.util.List;
 
 /**
@@ -24,5 +24,5 @@ import java.util.List;
  */
 public interface ApolloClientMetricsExporterFactory {
 
-  ApolloClientMetricsExporter getMetricsReporter(List<ApolloClientMetricsEventListener> collectors);
+  ApolloClientMetricsExporter getMetricsReporter(List<ApolloClientMonitorEventListener> collectors);
 }

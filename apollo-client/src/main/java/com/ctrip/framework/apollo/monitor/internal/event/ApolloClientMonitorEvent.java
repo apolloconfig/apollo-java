@@ -22,19 +22,19 @@ import java.util.Map;
 /**
  * @author Rawven
  */
-public class ApolloConfigMetricsEvent {
+public class ApolloClientMonitorEvent {
 
   private final String name;
-  private String tag;
   private final Map<String, Object> attachments;
+  private String tag;
 
-  public ApolloConfigMetricsEvent(String name, String tag, Map<String, Object> attachments) {
+  public ApolloClientMonitorEvent(String name, String tag, Map<String, Object> attachments) {
     this.name = name;
     this.tag = tag;
     this.attachments = attachments != null ? new HashMap<>(attachments) : new HashMap<>();
   }
 
-  public ApolloConfigMetricsEvent withTag(String tag) {
+  public ApolloClientMonitorEvent withTag(String tag) {
     this.tag = tag;
     return this;
   }
@@ -42,11 +42,12 @@ public class ApolloConfigMetricsEvent {
   public String getTag() {
     return tag;
   }
+
   public String getName() {
     return name;
   }
-  
-  public ApolloConfigMetricsEvent putAttachment(String key, Object value) {
+
+  public ApolloClientMonitorEvent putAttachment(String key, Object value) {
     this.attachments.put(key, value);
     return this;
   }
@@ -67,7 +68,7 @@ public class ApolloConfigMetricsEvent {
 
 
   public void publish() {
-    ApolloConfigMetricsEventPublisher.publish(this);
+    ApolloClientMonitorEventPublisher.publish(this);
   }
 
 }

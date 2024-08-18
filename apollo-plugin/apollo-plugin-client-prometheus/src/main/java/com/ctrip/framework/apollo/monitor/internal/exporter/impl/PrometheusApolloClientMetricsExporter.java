@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.plugin.prometheus;
+package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
@@ -36,20 +36,17 @@ import org.slf4j.Logger;
  */
 public class PrometheusApolloClientMetricsExporter extends
     AbstractApolloClientMetricsExporter implements ApolloClientMetricsExporter {
-  private  final Logger logger = DeferredLoggerFactory.getLogger(
-      DefaultApolloClientNamespaceApi.class);
-  private static final String PROMETHEUS = "prometheus";
-  private final CollectorRegistry registry;
-  private final Map<String, Collector.Describable> map = new HashMap<>();
-  
 
-  public PrometheusApolloClientMetricsExporter() {
-    this.registry = new CollectorRegistry();
-  }
+  private static final String PROMETHEUS = "prometheus";
+  private final Logger logger = DeferredLoggerFactory.getLogger(
+      DefaultApolloClientNamespaceApi.class);
+  private CollectorRegistry registry;
+  private  Map<String, Collector.Describable> map;
 
   @Override
   public void doInit() {
-
+    registry = new CollectorRegistry();
+    map = new HashMap<>();
   }
 
   @Override
@@ -59,31 +56,48 @@ public class PrometheusApolloClientMetricsExporter extends
 
 
   @Override
-  public void registerOrUpdateCounterSample(String name, Map<String,String> tags, double incrValue) {
-    Counter counter = (Counter) map.computeIfAbsent(name, k -> Counter.build()
+  public void registerOrUpdateCounterSample(String name, Map<String, String> tags,
+      double incrValue) {
+    Counter counter = (Counter) map.get(name);
+    if (counter == null) {
+      counter = createCounter(name, tags);
+      map.put(name, counter);
+    }
+    counter.labels(tags.values().toArray(new String[0])).inc(incrValue);
+  }
+
+  private Counter createCounter(String name, Map<String, String> tags) {
+    return Counter.build()
         .name(name)
         .help("apollo")
         .labelNames(tags.keySet().toArray(new String[0]))
-        .register(registry));
-    counter.labels(tags.values().toArray(new String[0])).inc(incrValue);
-}
-
+        .register(registry);
+  }
 
   @Override
-  public void registerOrUpdateGaugeSample(String name, Map<String,String> tags, double value) {
-    Gauge gauge = (Gauge) map.computeIfAbsent(name, k -> Gauge.build()
+  public void registerOrUpdateGaugeSample(String name, Map<String, String> tags, double value) {
+    Gauge gauge = (Gauge) map.get(name);
+    if (gauge == null) {
+      gauge = createGauge(name, tags);
+      map.put(name, gauge);
+    }
+    gauge.labels(tags.values().toArray(new String[0])).set(value);
+  }
+
+  private Gauge createGauge(String name, Map<String, String> tags) {
+    return Gauge.build()
         .name(name)
         .help("apollo")
         .labelNames(tags.keySet().toArray(new String[0]))
-        .register(registry));
-    gauge.labels(tags.values().toArray(new String[0])).set(value);
+        .register(registry);
   }
 
 
   @Override
   public String response() {
-    try (StringWriter writer = new StringWriter()){
-      TextFormat.writeFormat(TextFormat.CONTENT_TYPE_OPENMETRICS_100, writer, registry.metricFamilySamples());
+    try (StringWriter writer = new StringWriter()) {
+      TextFormat.writeFormat(TextFormat.CONTENT_TYPE_OPENMETRICS_100, writer,
+          registry.metricFamilySamples());
       return writer.toString();
     } catch (IOException e) {
       logger.error("Write metrics to Prometheus format failed", e);

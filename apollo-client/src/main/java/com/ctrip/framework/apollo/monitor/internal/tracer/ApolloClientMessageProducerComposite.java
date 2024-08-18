@@ -29,44 +29,56 @@ import java.util.Objects;
  */
 public class ApolloClientMessageProducerComposite implements MessageProducer {
 
-    public static final NullTransaction NULL_TRANSACTION = new NullTransaction();
-    private final List<MessageProducer> producers;
+  public static final NullTransaction NULL_TRANSACTION = new NullTransaction();
+  private final List<MessageProducer> producers;
 
-    public ApolloClientMessageProducerComposite(List<MessageProducer> producers) {
-        this.producers = producers;
-    }
+  public ApolloClientMessageProducerComposite(List<MessageProducer> producers) {
+    this.producers = producers;
+  }
 
-    @Override
-    public void logError(Throwable cause) {
-        producers.forEach(producer -> producer.logError(cause));
+  @Override
+  public void logError(Throwable cause) {
+    for (MessageProducer producer : producers) {
+      producer.logError(cause);
     }
+  }
 
-    @Override
-    public void logError(String message, Throwable cause) {
-        producers.forEach(producer -> producer.logError(message, cause));
+  @Override
+  public void logError(String message, Throwable cause) {
+    for (MessageProducer producer : producers) {
+      producer.logError(message, cause);
     }
+  }
 
-    @Override
-    public void logEvent(String type, String name) {
-        producers.forEach(producer -> producer.logEvent(type, name));
+  @Override
+  public void logEvent(String type, String name) {
+    for (MessageProducer producer : producers) {
+      producer.logEvent(type, name);
     }
+  }
 
-    @Override
-    public void logEvent(String type, String name, String status, String nameValuePairs) {
-        producers.forEach(producer -> producer.logEvent(type, name, status, nameValuePairs));
+  @Override
+  public void logEvent(String type, String name, String status, String nameValuePairs) {
+    for (MessageProducer producer : producers) {
+      producer.logEvent(type, name, status, nameValuePairs);
     }
+  }
 
-    @Override
-    public void logMetricsForCount(String name) {
-        producers.forEach(producer -> producer.logMetricsForCount(name));
+  @Override
+  public void logMetricsForCount(String name) {
+    for (MessageProducer producer : producers) {
+      producer.logMetricsForCount(name);
     }
+  }
 
-    @Override
-    public Transaction newTransaction(String type, String name) {
-        return producers.stream()
-            .map(producer -> producer.newTransaction(type, name))
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(NULL_TRANSACTION);
+  @Override
+  public Transaction newTransaction(String type, String name) {
+    for (MessageProducer producer : producers) {
+      Transaction transaction = producer.newTransaction(type, name);
+      if (transaction != null) {
+        return transaction;
+      }
     }
+    return NULL_TRANSACTION;
+  }
 }

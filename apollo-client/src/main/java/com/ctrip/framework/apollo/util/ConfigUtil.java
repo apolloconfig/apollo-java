@@ -77,7 +77,7 @@ public class ConfigUtil {
   private boolean clientMonitorJmxEnabled = false;
   private String monitorExternalType = null;
   private long monitorExternalExportPeriod = 10;
-  private int monitorExceptionSaveSize = 25;
+  private int monitorExceptionQueueSize = 25;
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -97,7 +97,7 @@ public class ConfigUtil {
     initClientMonitorJmxEnabled();
     initClientMonitorExternalType();
     initClientMonitorExternalCollectPeriod();
-    initClientMonitorExceptionSaveSize();
+    initClientMonitorExceptionQueueSize();
   }
 
 
@@ -558,15 +558,15 @@ public class ConfigUtil {
   public boolean getClientMonitorJmxEnabled() {
     return clientMonitorJmxEnabled;
   }
-  private void initClientMonitorExceptionSaveSize() {
+  private void initClientMonitorExceptionQueueSize() {
       Integer value = getCustomizedIntegerValue(
         ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE);
     if (null != value){
-      monitorExceptionSaveSize = value;
+      monitorExceptionQueueSize = value;
     }
   }
   public int getMonitorExceptionQueueSize() {
-    return monitorExceptionSaveSize;
+    return monitorExceptionQueueSize;
   }
 
   private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {

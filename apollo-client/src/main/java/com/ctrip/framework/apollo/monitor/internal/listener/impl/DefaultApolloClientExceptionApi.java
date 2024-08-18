@@ -24,9 +24,8 @@ import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientExceptionMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxExceptionMBean;
-import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMetricsEventListener;
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
-import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
+import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +39,7 @@ import java.util.stream.Collectors;
  * @author Rawven
  */
 public class DefaultApolloClientExceptionApi extends
-    AbstractApolloClientMetricsEventListener implements
+    AbstractApolloClientMonitorEventListener implements
     ApolloClientExceptionMonitorApi, ApolloClientJmxExceptionMBean {
 
   private static final int MAX_EXCEPTIONS_SIZE = ApolloInjector.getInstance(ConfigUtil.class)
@@ -59,7 +58,7 @@ public class DefaultApolloClientExceptionApi extends
   }
 
   @Override
-  public void collect0(ApolloConfigMetricsEvent event) {
+  public void collect0(ApolloClientMonitorEvent event) {
     ApolloConfigException exception = event.getAttachmentValue(THROWABLE);
     if (exception != null) {
       addExceptionToQueue(exception);
@@ -78,12 +77,13 @@ public class DefaultApolloClientExceptionApi extends
   }
 
   @Override
-  public void export0() {}
+  public void export0() {
+  }
 
   @Override
   public List<String> getApolloConfigExceptionDetails() {
-        return exceptions.stream()
-                         .map(ApolloConfigException::getMessage)
-                         .collect(Collectors.toList());
+    return exceptions.stream()
+        .map(ApolloConfigException::getMessage)
+        .collect(Collectors.toList());
   }
 }

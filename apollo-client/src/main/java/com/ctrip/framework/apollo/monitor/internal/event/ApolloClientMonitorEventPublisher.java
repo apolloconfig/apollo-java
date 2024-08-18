@@ -17,28 +17,35 @@
 package com.ctrip.framework.apollo.monitor.internal.event;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 
 /**
  * @author Rawven
  */
-public class ApolloConfigMetricsEventPublisher {
+public class ApolloClientMonitorEventPublisher {
 
-  private static final ApolloClientMetricsEventListenerManager COLLECTOR_MANAGER = ApolloInjector.getInstance(
-      ApolloClientMetricsEventListenerManager.class);
-  private static final ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+  private static ApolloClientMonitorEventListenerManager COLLECTOR_MANAGER = ApolloInjector.getInstance(
+      ApolloClientMonitorEventListenerManager.class);
+  private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
-  public static void publish(ApolloConfigMetricsEvent event) {
+  public static void publish(ApolloClientMonitorEvent event) {
     if (m_configUtil.getClientMonitorEnabled()) {
-      for (ApolloClientMetricsEventListener collector : COLLECTOR_MANAGER.getCollectors()) {
+      for (ApolloClientMonitorEventListener collector : COLLECTOR_MANAGER.getCollectors()) {
         if (collector.isSupport(event)) {
           collector.collect(event);
           return;
         }
       }
     }
+  }
+
+  protected static void reset() {
+    COLLECTOR_MANAGER = ApolloInjector.getInstance(
+        ApolloClientMonitorEventListenerManager.class);
+    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+
   }
 }
 

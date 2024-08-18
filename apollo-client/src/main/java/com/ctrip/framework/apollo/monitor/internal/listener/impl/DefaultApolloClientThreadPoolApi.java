@@ -23,9 +23,8 @@ import com.ctrip.framework.apollo.internals.AbstractConfigFile;
 import com.ctrip.framework.apollo.internals.RemoteConfigRepository;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxThreadPoolMBean;
-import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMetricsEventListener;
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
-import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
+import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +37,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @author Rawven
  */
 public class DefaultApolloClientThreadPoolApi extends
-    AbstractApolloClientMetricsEventListener implements
+    AbstractApolloClientMonitorEventListener implements
     ApolloClientThreadPoolMonitorApi, ApolloClientJmxThreadPoolMBean {
 
   public static final String REMOTE_CONFIG_REPOSITORY = RemoteConfigRepository.class.getSimpleName();
@@ -60,7 +59,7 @@ public class DefaultApolloClientThreadPoolApi extends
   }
 
   @Override
-  public void collect0(ApolloConfigMetricsEvent event) {
+  public void collect0(ApolloClientMonitorEvent event) {
     // do nothing
   }
 

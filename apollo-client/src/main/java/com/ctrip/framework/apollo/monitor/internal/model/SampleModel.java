@@ -63,7 +63,7 @@ public class SampleModel {
   public Map<String, String> getTags() {
     return Collections.unmodifiableMap(tags);
   }
-  
+
   public double getValue() {
     return value.get();
   }

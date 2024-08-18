@@ -1,1 +1,1 @@
-com.ctrip.framework.apollo.plugin.prometheus.PrometheusApolloClientMetricsExporter
+com.ctrip.framework.apollo.monitor.internal.exporter.impl.PrometheusApolloClientMetricsExporter

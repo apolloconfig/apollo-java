@@ -19,7 +19,7 @@ package com.ctrip.framework.apollo.monitor.internal.listener;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
@@ -30,15 +30,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AbstractApolloClientMetricsEventListenerTest {
+public class AbstractApolloClientMonitorEventListenerTest {
 
-    private class TestMetricsEventListener extends AbstractApolloClientMetricsEventListener {
-        public TestMetricsEventListener(String tag) {
+    private class TestMonitorEventListener extends AbstractApolloClientMonitorEventListener {
+        public TestMonitorEventListener(String tag) {
             super(tag);
         }
 
         @Override
-        protected void collect0(ApolloConfigMetricsEvent event) {
+        protected void collect0(ApolloClientMonitorEvent event) {
             // 简单的收集逻辑
         }
 
@@ -48,13 +48,13 @@ public class AbstractApolloClientMetricsEventListenerTest {
         }
     }
 
-    private TestMetricsEventListener listener;
-    private ApolloConfigMetricsEvent event;
+    private TestMonitorEventListener listener;
+    private ApolloClientMonitorEvent event;
 
     @Before
     public void setUp() {
-        listener = new TestMetricsEventListener("testTag");
-        event = mock(ApolloConfigMetricsEvent.class);
+        listener = new TestMonitorEventListener("testTag");
+        event = mock(ApolloClientMonitorEvent.class);
         when(event.getTag()).thenReturn("testTag");
     }
 

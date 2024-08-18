@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.exporter.impl.DefaultApolloClientMetricsExporterFactory;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMetricsEventListener;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
     private ConfigUtil configUtil;
 
     @Mock
-    private ApolloClientMetricsEventListener metricsCollector;
+    private ApolloClientMonitorEventListener metricsCollector;
 
     @Before
     public void setUp() {
@@ -64,7 +64,7 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
         when(configUtil.getClientMonitorJmxEnabled()).thenReturn(true);
         when(configUtil.getMonitorExternalExportPeriod()).thenReturn(1000L);
         when(metricsCollector.mBeanName()).thenReturn("testMBean");
-        List<ApolloClientMetricsEventListener> collectors = Collections.singletonList(metricsCollector);
+        List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(metricsCollector);
         
         ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);
 
@@ -80,14 +80,5 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
 
         assertNull(result);
         verify(configUtil).getMonitorExternalType();
-    }
-
-    @Test
-    public void testInitializeJmxMonitoring() {
-        when(configUtil.getClientMonitorJmxEnabled()).thenReturn(true);
-        List<ApolloClientMetricsEventListener> collectors = Collections.singletonList(metricsCollector);
-
-        factory.initializeJmxMonitoring(collectors);
-        verify(metricsCollector).mBeanName();
     }
 }

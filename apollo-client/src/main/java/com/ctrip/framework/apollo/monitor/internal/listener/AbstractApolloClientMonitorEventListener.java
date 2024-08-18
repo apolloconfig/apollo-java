@@ -16,7 +16,7 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener;
 
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloConfigMetricsEvent;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
@@ -31,22 +31,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Rawven
  */
-public abstract class AbstractApolloClientMetricsEventListener implements
-    ApolloClientMetricsEventListener {
+public abstract class AbstractApolloClientMonitorEventListener implements
+    ApolloClientMonitorEventListener {
 
   private final Map<String, CounterModel> counterSamples = Maps.newConcurrentMap();
   private final Map<String, GaugeModel> gaugeSamples = Maps.newConcurrentMap();
   private final AtomicBoolean isUpdated = new AtomicBoolean();
   private final String tag;
 
-  public AbstractApolloClientMetricsEventListener(String tag) {
+  public AbstractApolloClientMonitorEventListener(String tag) {
     this.tag = tag;
   }
 
   /**
    * Specific collection logic
    */
-  protected abstract void collect0(ApolloConfigMetricsEvent event);
+  protected abstract void collect0(ApolloClientMonitorEvent event);
 
   /**
    * Convenient for indicators that can only be obtained from the status object
@@ -59,12 +59,12 @@ public abstract class AbstractApolloClientMetricsEventListener implements
   }
 
   @Override
-  public boolean isSupport(ApolloConfigMetricsEvent event) {
+  public boolean isSupport(ApolloClientMonitorEvent event) {
     return tag.equals(event.getTag());
   }
 
   @Override
-  public void collect(ApolloConfigMetricsEvent event) {
+  public void collect(ApolloClientMonitorEvent event) {
     collect0(event);
     isUpdated.set(true);
   }
