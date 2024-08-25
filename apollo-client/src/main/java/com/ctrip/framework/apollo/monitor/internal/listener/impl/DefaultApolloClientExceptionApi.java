@@ -42,14 +42,19 @@ public class DefaultApolloClientExceptionApi extends
     AbstractApolloClientMonitorEventListener implements
     ApolloClientExceptionMonitorApi, ApolloClientJmxExceptionMBean {
 
-  private static final int MAX_EXCEPTIONS_SIZE = ApolloInjector.getInstance(ConfigUtil.class)
-      .getMonitorExceptionQueueSize();
-  private final BlockingQueue<ApolloConfigException> exceptions = new ArrayBlockingQueue<>(
-      MAX_EXCEPTIONS_SIZE);
   private final AtomicInteger exceptionNum = new AtomicInteger(0);
+  private int monitorExceptionQueueSize;
+  private BlockingQueue<ApolloConfigException> exceptions;
 
   public DefaultApolloClientExceptionApi() {
     super(TAG_ERROR);
+    monitorExceptionQueueSize = ApolloInjector.getInstance(ConfigUtil.class)
+        .getMonitorExceptionQueueSize();
+    if(monitorExceptionQueueSize <= 0){
+      monitorExceptionQueueSize = 25;
+    }
+    exceptions = new ArrayBlockingQueue<>(
+        monitorExceptionQueueSize);
   }
 
   @Override
@@ -70,7 +75,7 @@ public class DefaultApolloClientExceptionApi extends
   }
 
   private void addExceptionToQueue(ApolloConfigException exception) {
-    if (exceptions.size() >= MAX_EXCEPTIONS_SIZE) {
+    if (exceptions.size() >= monitorExceptionQueueSize) {
       exceptions.poll();
     }
     exceptions.add(exception);

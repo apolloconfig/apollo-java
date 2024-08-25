@@ -40,8 +40,8 @@ public class PrometheusApolloClientMetricsExporter extends
   private static final String PROMETHEUS = "prometheus";
   private final Logger logger = DeferredLoggerFactory.getLogger(
       DefaultApolloClientNamespaceApi.class);
-  private CollectorRegistry registry;
-  private  Map<String, Collector.Describable> map;
+  protected CollectorRegistry registry;
+  protected  Map<String, Collector.Describable> map;
 
   @Override
   public void doInit() {
@@ -69,7 +69,7 @@ public class PrometheusApolloClientMetricsExporter extends
   private Counter createCounter(String name, Map<String, String> tags) {
     return Counter.build()
         .name(name)
-        .help("apollo")
+        .help("apollo counter metrics")
         .labelNames(tags.keySet().toArray(new String[0]))
         .register(registry);
   }
@@ -87,7 +87,7 @@ public class PrometheusApolloClientMetricsExporter extends
   private Gauge createGauge(String name, Map<String, String> tags) {
     return Gauge.build()
         .name(name)
-        .help("apollo")
+        .help("apollo gauge metrics")
         .labelNames(tags.keySet().toArray(new String[0]))
         .register(registry);
   }

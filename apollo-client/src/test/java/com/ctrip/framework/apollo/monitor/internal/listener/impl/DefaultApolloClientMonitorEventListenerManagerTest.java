@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.monitor.internal.listener;
+package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientMonitorEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import org.junit.Before;
 import org.junit.Test;
 

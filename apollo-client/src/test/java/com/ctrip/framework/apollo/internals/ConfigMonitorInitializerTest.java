@@ -46,11 +46,14 @@ public class ConfigMonitorInitializerTest {
     @Before
     public void setUp() {
         mockConfigUtil = mock(ConfigUtil.class);
+        when(mockConfigUtil.getMonitorExceptionQueueSize()).thenReturn(100);
+        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(false);
         mockLogger = mock(Logger.class);
         mockManager = mock(DefaultApolloClientMonitorEventListenerManager.class);
         mockMetricsExporter = mock(ApolloClientMetricsExporter.class);
         mockConfigManager = mock(DefaultConfigManager.class);
         mockConfigMonitor = mock(DefaultConfigMonitor.class);
+        
 
         // Mock static methods
         MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
@@ -60,8 +63,6 @@ public class ConfigMonitorInitializerTest {
         
         // Reset static state before each test
         ConfigMonitorInitializer.reset();
-        when(mockConfigUtil.getMonitorExceptionQueueSize()).thenReturn(100);
-        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(false);
     }
 
     @Test
