@@ -73,6 +73,4 @@ public class DefaultConfigFactoryManager implements ConfigFactoryManager {
     // factory should not be null
     return factory;
   }
-
-
 }

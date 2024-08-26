@@ -195,9 +195,9 @@ public abstract class AbstractSpringIntegrationTest {
     configUtil.setAutoUpdateInjectedSpringProperties(true);
     MockInjector.setInstance(ConfigUtil.class, configUtil);
 
-    Field field = PropertySourcesProcessor.class.getDeclaredField("configUtil");
+/*    Field field = PropertySourcesProcessor.class.getDeclaredField("configUtil");
     field.setAccessible(true);
-    field.set(null, configUtil);
+    field.set(null, configUtil);*/
 
   }
 

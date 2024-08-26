@@ -158,6 +158,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     processor.postProcessBeanFactory(beanFactory);
 
     assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME));
-    assertNotEquals(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, propertySources.iterator().next().getName());
+    assertEquals(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, propertySources.iterator().next().getName());
   }
 }

@@ -64,7 +64,7 @@ public class RemoteConfigLongPollService {
   private static final long INIT_NOTIFICATION_ID = ConfigConsts.NOTIFICATION_ID_PLACEHOLDER;
   //90 seconds, should be longer than server side's long polling timeout, which is now 60 seconds
   private static final int LONG_POLLING_READ_TIMEOUT = 90 * 1000;
-  private final ExecutorService m_longPollingService;
+  private final ThreadPoolExecutor m_longPollingService;
   private final AtomicBoolean m_longPollingStopped;
   private SchedulePolicy m_longPollFailSchedulePolicyInSecond;
   private RateLimiter m_longPollRateLimiter;
@@ -86,7 +86,7 @@ public class RemoteConfigLongPollService {
   public RemoteConfigLongPollService() {
     m_longPollFailSchedulePolicyInSecond = new ExponentialSchedulePolicy(1, 120); //in second
     m_longPollingStopped = new AtomicBoolean(false);
-    m_longPollingService = new ThreadPoolExecutor(10, 10,
+    m_longPollingService = new ThreadPoolExecutor(1, 15,
         0L, TimeUnit.MILLISECONDS,
         new LinkedBlockingQueue<Runnable>(),
         ApolloThreadFactory.create("RemoteConfigLongPollService", true));
@@ -123,6 +123,10 @@ public class RemoteConfigLongPollService {
       final String dataCenter = m_configUtil.getDataCenter();
       final String secret = m_configUtil.getAccessKeySecret(appId);
       final long longPollingInitialDelayInMills = m_configUtil.getLongPollingInitialDelayInMills();
+
+      // increase core pool size
+      m_longPollingService.setCorePoolSize(m_longPollingService.getCorePoolSize() + 1);
+
       m_longPollingService.submit(new Runnable() {
         @Override
         public void run() {

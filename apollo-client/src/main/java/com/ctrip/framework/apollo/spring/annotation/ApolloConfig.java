@@ -50,7 +50,9 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 @Documented
 public @interface ApolloConfig {
   /**
-   * Apollo appId for the config, if not specified then default to application
+   * Apollo appId for the config, if not specified then default to the global appid
+   *
+   * @since 2.4.0
    */
   String appId() default "";
   /**

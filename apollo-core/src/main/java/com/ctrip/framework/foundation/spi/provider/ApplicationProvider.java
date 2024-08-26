@@ -49,6 +49,10 @@ public interface ApplicationProvider extends Provider {
 
   /**
    * @return the application's access key secret by appId
+   *
+   * @since 2.4.0
    */
-  String getAccessKeySecret(String appId);
+  default String getAccessKeySecret(String appId){
+    return null;
+  }
 }

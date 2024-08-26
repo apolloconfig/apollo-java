@@ -57,6 +57,9 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
 
+  private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+
+
   /**
    * Constructor.
    *
@@ -64,14 +67,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @param configRepository the config repository for this config instance
    */
   public DefaultConfig(String namespace, ConfigRepository configRepository) {
-    ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-    m_appId = configUtil.getAppId();
-    m_namespace = namespace;
-    m_resourceProperties = loadFromResource(m_appId, m_namespace);
-    m_configRepository = configRepository;
-    m_configProperties = new AtomicReference<>();
-    m_warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
-    initialize();
+    this(m_configUtil.getAppId(), namespace , configRepository);
   }
 
   /**

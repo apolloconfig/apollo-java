@@ -470,12 +470,12 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     MockConfigUtil configUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, configUtil);
 
-    try {
+/*    try {
       Field field = PropertySourcesProcessor.class.getDeclaredField("configUtil");
       field.setAccessible(true);
       field.set(null, configUtil);
     } catch (Exception e) {
-    }
+    }*/
 
     getSimpleBean(TestApolloConfigChangeListenerResolveExpressionSimpleConfiguration.class);
 

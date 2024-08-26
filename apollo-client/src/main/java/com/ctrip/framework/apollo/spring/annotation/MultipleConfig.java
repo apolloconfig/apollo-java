@@ -19,8 +19,10 @@ package com.ctrip.framework.apollo.spring.annotation;
 import java.lang.annotation.*;
 
 /**
- * @author Terry.Lam This annotation is used as a supplement to @EnableApolloConfig to fill in
- * multiple appid
+ * @author Terry.Lam
+ * This annotation is used as a supplement to @EnableApolloConfig to fill in multiple appid
+ *
+ * @since 2.4.0
  */
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -34,10 +36,15 @@ public @interface MultipleConfig {
    */
   String appId();
 
-
+  /**
+   * Add the namespace you need to load
+   * @return
+   */
   String[] namespaces();
 
   /**
+   * Configure the key corresponding to the appId. If the key is not required, you do not need to configure this item
+   * The secret could also be specified as a placeholder
    * eg. ${apollo.multiple.shop.secret}
    * @return
    */

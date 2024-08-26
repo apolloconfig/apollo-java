@@ -33,8 +33,6 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
 public class ConfigService {
   private static final ConfigService s_instance = new ConfigService();
 
-  private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-
   private volatile ConfigManager m_configManager;
   private volatile ConfigRegistry m_configRegistry;
 
@@ -101,6 +99,9 @@ public class ConfigService {
    */
   static void setConfig(String namespace, final Config config) {
     s_instance.getRegistry().register(namespace, new ConfigFactory() {
+
+      private ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+
       @Override
       public Config create(String namespace) {
         return config;
@@ -108,7 +109,7 @@ public class ConfigService {
 
       @Override
       public Config create(String appId, String namespace) {
-        if(!StringUtils.equals(appId,m_configUtil.getAppId())){
+        if(!StringUtils.equals(appId, m_configUtil.getAppId())){
           throw new IllegalArgumentException("appId not match");
         }
         return config;

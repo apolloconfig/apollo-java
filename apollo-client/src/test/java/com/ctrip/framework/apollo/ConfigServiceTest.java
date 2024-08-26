@@ -45,11 +45,11 @@ public class ConfigServiceTest {
   @Before
   public void setUp() throws Exception {
     someAppId = "someAppId";
-
-    Field field = ConfigService.class.getDeclaredField("m_configUtil");
+    MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
+/*    Field field = ConfigService.class.getDeclaredField("m_configUtil");
     field.setAccessible(true);
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
-    field.set(null, ApolloInjector.getInstance(ConfigUtil.class));
+    field.set(null, ApolloInjector.getInstance(ConfigUtil.class));*/
 
   }
 

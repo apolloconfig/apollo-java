@@ -45,7 +45,17 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
   private volatile Properties m_configProperties;
   private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
 
-  private ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+  private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+
+  /**
+   * Constructor.
+   *
+   * @param namespace        the namespace for this config instance
+   * @param configRepository the config repository for this config instance
+   */
+  public SimpleConfig(String namespace, ConfigRepository configRepository) {
+    this(m_configUtil.getAppId(), namespace, configRepository);
+  }
 
   /**
    * Constructor.
@@ -99,8 +109,8 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
   }
 
   @Override
-  public void onRepositoryChange(String namespace, Properties newProperties) {
-    this.onRepositoryChange(m_configUtil.getAppId(), namespace, newProperties);
+  public synchronized void onRepositoryChange(String namespace, Properties newProperties) {
+    this.onRepositoryChange(m_appId, namespace, newProperties);
   }
 
   @Override
@@ -123,7 +133,7 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
     updateConfig(newConfigProperties, m_configRepository.getSourceType());
     clearConfigCache();
 
-    this.fireConfigChange(m_appId, m_namespace, changeMap);
+    this.fireConfigChange(appId, m_namespace, changeMap);
 
     Tracer.logEvent("Apollo.Client.ConfigChanges", m_namespace);
   }

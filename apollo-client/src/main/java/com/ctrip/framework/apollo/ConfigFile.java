@@ -38,6 +38,8 @@ public interface ConfigFile {
   /**
    * Get the appId of this config file instance
    * @return the appId
+   *
+   * @since 2.4.0
    */
   default String getAppId(){
     return null;
