@@ -34,7 +34,7 @@ public class NullClientBootstrapArgsMonitorApiTest {
 
   @Test
   public void testGetStartupParams() {
-    assertEquals("", bootstrapArgsMonitorApi.getStartupParams("testKey"));
+    assertEquals(null, bootstrapArgsMonitorApi.getStartupArg("testKey"));
   }
 
   @Test
@@ -53,8 +53,8 @@ public class NullClientBootstrapArgsMonitorApiTest {
   }
 
   @Test
-  public void testGetBootstrapEnabled() {
-    assertNull(bootstrapArgsMonitorApi.getBootstrapEnabled());
+  public void testIsBootstrapEnabled() {
+    assertFalse(bootstrapArgsMonitorApi.isBootstrapEnabled());
   }
 
   @Test
@@ -63,13 +63,13 @@ public class NullClientBootstrapArgsMonitorApiTest {
   }
 
   @Test
-  public void testGetBootstrapEagerLoadEnabled() {
-    assertNull(bootstrapArgsMonitorApi.getBootstrapEagerLoadEnabled());
+  public void testIsBootstrapEagerLoadEnabled() {
+    assertFalse(bootstrapArgsMonitorApi.isBootstrapEagerLoadEnabled());
   }
 
   @Test
-  public void testGetOverrideSystemProperties() {
-    assertNull(bootstrapArgsMonitorApi.getOverrideSystemProperties());
+  public void testIsOverrideSystemProperties() {
+    assertFalse(bootstrapArgsMonitorApi.isOverrideSystemProperties());
   }
 
   @Test
@@ -88,13 +88,13 @@ public class NullClientBootstrapArgsMonitorApiTest {
   }
 
   @Test
-  public void testGetClientMonitorEnabled() {
-    assertNull(bootstrapArgsMonitorApi.getClientMonitorEnabled());
+  public void testIsClientMonitorEnabled() {
+    assertFalse(bootstrapArgsMonitorApi.isClientMonitorEnabled());
   }
 
   @Test
-  public void testGetClientMonitorJmxEnabled() {
-    assertNull(bootstrapArgsMonitorApi.getClientMonitorJmxEnabled());
+  public void testIsClientMonitorJmxEnabled() {
+    assertFalse(bootstrapArgsMonitorApi.isClientMonitorJmxEnabled());
   }
 
   @Test
@@ -123,13 +123,13 @@ public class NullClientBootstrapArgsMonitorApiTest {
   }
 
   @Test
-  public void testGetPropertyNamesCacheEnable() {
-    assertNull(bootstrapArgsMonitorApi.getPropertyNamesCacheEnable());
+  public void testIsPropertyNamesCacheEnable() {
+    assertFalse(bootstrapArgsMonitorApi.isPropertyNamesCacheEnable());
   }
 
   @Test
-  public void testGetPropertyOrderEnable() {
-    assertNull(bootstrapArgsMonitorApi.getPropertyOrderEnable());
+  public void testIsPropertyOrderEnable() {
+    assertFalse(bootstrapArgsMonitorApi.isPropertyOrderEnable());
   }
 
   @Test
@@ -149,7 +149,7 @@ public class NullClientBootstrapArgsMonitorApiTest {
 
   @Test
   public void testGetBootstrapArgs() {
-    Map<String, String> bootstrapArgs = bootstrapArgsMonitorApi.getBootstrapArgs();
+    Map<String, Object> bootstrapArgs = bootstrapArgsMonitorApi.getBootstrapArgs();
 
     assertNotNull(bootstrapArgs);
     assertTrue(bootstrapArgs.isEmpty());

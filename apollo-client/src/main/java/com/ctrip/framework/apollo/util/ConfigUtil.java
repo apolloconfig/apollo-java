@@ -543,7 +543,7 @@ public class ConfigUtil {
     clientMonitorEnabled = Boolean.parseBoolean(enabled);
   }
 
-  public boolean getClientMonitorEnabled() {
+  public boolean isClientMonitorEnabled() {
     return clientMonitorEnabled;
   }
 
@@ -555,7 +555,7 @@ public class ConfigUtil {
     }
     clientMonitorJmxEnabled = Boolean.parseBoolean(enabled);
   }
-  public boolean getClientMonitorJmxEnabled() {
+  public boolean isClientMonitorJmxEnabled() {
     return clientMonitorJmxEnabled;
   }
   private void initClientMonitorExceptionQueueSize() {
@@ -566,6 +566,9 @@ public class ConfigUtil {
     }
   }
   public int getMonitorExceptionQueueSize() {
+    if(monitorExceptionQueueSize <= 0){
+      monitorExceptionQueueSize = 25;
+    }
     return monitorExceptionQueueSize;
   }
 

@@ -20,6 +20,7 @@ import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientNamespaceApi;
+import com.google.common.collect.Maps;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
@@ -41,12 +42,12 @@ public class PrometheusApolloClientMetricsExporter extends
   private final Logger logger = DeferredLoggerFactory.getLogger(
       DefaultApolloClientNamespaceApi.class);
   protected CollectorRegistry registry;
-  protected  Map<String, Collector.Describable> map;
+  protected Map<String, Collector.Describable> map;
 
   @Override
   public void doInit() {
     registry = new CollectorRegistry();
-    map = new HashMap<>();
+    map = Maps.newConcurrentMap();
   }
 
   @Override
@@ -58,11 +59,8 @@ public class PrometheusApolloClientMetricsExporter extends
   @Override
   public void registerOrUpdateCounterSample(String name, Map<String, String> tags,
       double incrValue) {
-    Counter counter = (Counter) map.get(name);
-    if (counter == null) {
-      counter = createCounter(name, tags);
-      map.put(name, counter);
-    }
+    Counter counter = (Counter) map.computeIfAbsent(name,
+        key -> createCounter(key, tags));
     counter.labels(tags.values().toArray(new String[0])).inc(incrValue);
   }
 
@@ -76,11 +74,7 @@ public class PrometheusApolloClientMetricsExporter extends
 
   @Override
   public void registerOrUpdateGaugeSample(String name, Map<String, String> tags, double value) {
-    Gauge gauge = (Gauge) map.get(name);
-    if (gauge == null) {
-      gauge = createGauge(name, tags);
-      map.put(name, gauge);
-    }
+    Gauge gauge = (Gauge) map.computeIfAbsent(name, key -> createGauge(key, tags));
     gauge.labels(tags.values().toArray(new String[0])).set(value);
   }
 

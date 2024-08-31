@@ -115,7 +115,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     if (m_configCache.get() == null) {
       long start = System.currentTimeMillis();
       this.sync();
-      Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND+m_namespace,
+      Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND+":"+m_namespace,
           String.valueOf(System.currentTimeMillis() - start));
     }
     return transformApolloConfigToProperties(m_configCache.get());

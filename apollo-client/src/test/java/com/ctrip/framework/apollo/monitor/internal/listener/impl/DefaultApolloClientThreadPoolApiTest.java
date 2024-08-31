@@ -16,15 +16,13 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
-import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientThreadPoolApi.ApolloThreadPoolInfo;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi.ApolloThreadPoolInfo;
 import lombok.SneakyThrows;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -89,6 +87,6 @@ public class DefaultApolloClientThreadPoolApiTest {
     ApolloThreadPoolInfo info = threadPoolApi.getAbstractConfigFileThreadPoolInfo();
     assertNotNull(info);
   }
-  
-  
+
+
 }

@@ -16,15 +16,12 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.MBEAN_NAME;
-
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
-import com.ctrip.framework.apollo.monitor.internal.jmx.ApolloClientJmxMBeanRegister;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.foundation.internals.ServiceBootstrap;

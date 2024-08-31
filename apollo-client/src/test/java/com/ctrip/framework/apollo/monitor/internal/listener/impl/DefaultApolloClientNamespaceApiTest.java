@@ -26,6 +26,8 @@ import static org.junit.Assert.*;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
+import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,19 +84,19 @@ public class DefaultApolloClientNamespaceApiTest {
   }
 
   @Test
-  public void testGetNamespaceItemsNum() {
+  public void testGetNamespacePropertySize() {
     Config mockConfig = mock(Config.class);
     when(mockConfig.getPropertyNames()).thenReturn(Sets.newSet("key1", "key2"));
     configs.put("testNamespace", mockConfig);
-    Integer testNamespace = api.getNamespaceItemsNum("testNamespace");
+    Integer testNamespace = api.getNamespacePropertySize("testNamespace");
     assertEquals(2, testNamespace.intValue());
   }
 
   @Test
-  public void testGetConfigFileNum() {
+  public void testGetConfigFileNamespaces() {
     ConfigFile mockConfigFile = mock(ConfigFile.class);
     configFiles.put("testNamespace", mockConfigFile);
-    Integer testNamespace = api.getConfigFileNum();
-    assertEquals(1, testNamespace.intValue());
+    List<String> configFileNum = api.getConfigFileNamespaces();
+    assertEquals(1, configFileNum.size());
   }
 }

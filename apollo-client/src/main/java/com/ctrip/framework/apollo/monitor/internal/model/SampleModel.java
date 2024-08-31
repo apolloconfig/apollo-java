@@ -16,9 +16,7 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.model;
 
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT;
-
-import com.ctrip.framework.apollo.monitor.internal.enums.MeterEnums;
+import com.ctrip.framework.apollo.monitor.internal.enums.MetricTypeEnums;
 import com.google.common.util.concurrent.AtomicDouble;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,14 +30,14 @@ public class SampleModel {
   protected final AtomicDouble value = new AtomicDouble();
   private final Map<String, String> tags = new HashMap<>(1);
   private String name;
-  private MeterEnums type;
+  private MetricTypeEnums type;
 
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
-    this.name = APOLLO_CLIENT + name;
+    this.name = name;
   }
 
   public SampleModel putTag(String key, String value) {
@@ -52,11 +50,11 @@ public class SampleModel {
     return this;
   }
 
-  public MeterEnums getType() {
+  public MetricTypeEnums getType() {
     return type;
   }
 
-  public void setType(MeterEnums type) {
+  public void setType(MetricTypeEnums type) {
     this.type = type;
   }
 

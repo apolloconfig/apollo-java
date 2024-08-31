@@ -20,18 +20,19 @@ import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorCon
 
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventFactory;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventPublisher;
 import com.github.noconnor.junitperf.JUnitPerfRule;
 import com.github.noconnor.junitperf.JUnitPerfTest;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@Ignore("Stress test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ApolloClientMonitorStressTest.class)
-@ActiveProfiles("stress-test")
 public class ApolloClientMonitorStressTest {
 
   @Rule
@@ -40,14 +41,16 @@ public class ApolloClientMonitorStressTest {
   @Test
   @JUnitPerfTest(threads = 25, durationMs = 10000, warmUpMs = 1000, maxExecutionsPerSecond = 1000)
   public void testConfigMonitor() {
-    String exporterData = ConfigService.getConfigMonitor().getExporterData();
+    System.out.println("abcdeft");
+    ConfigService.getConfigMonitor().getExporterData();
   }
 
   @Test
   @JUnitPerfTest(threads = 50, durationMs = 10000, warmUpMs = 1000, maxExecutionsPerSecond = 1000)
   public void testPublishEvent() {
-    ApolloClientMonitorEventFactory.getInstance()
-        .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
-        .putAttachment(NAMESPACE, "application").publish();
+    ApolloClientMonitorEventPublisher.publish(
+        ApolloClientMonitorEventFactory.getInstance()
+            .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
+            .putAttachment(NAMESPACE, "application"));
   }
 }

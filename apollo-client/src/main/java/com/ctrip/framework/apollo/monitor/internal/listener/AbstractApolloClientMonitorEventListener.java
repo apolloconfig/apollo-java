@@ -22,13 +22,13 @@ import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 抽象的 Metrics 收集器 用于收集数据和导出指标样本
- *
  * @author Rawven
  */
 public abstract class AbstractApolloClientMonitorEventListener implements
@@ -44,12 +44,12 @@ public abstract class AbstractApolloClientMonitorEventListener implements
   }
 
   @Override
-  public String mBeanName() {
+  public String getName() {
     return tag;
   }
 
   @Override
-  public boolean isSupport(ApolloClientMonitorEvent event) {
+  public boolean isSupported(ApolloClientMonitorEvent event) {
     return tag.equals(event.getTag());
   }
 
@@ -71,42 +71,67 @@ public abstract class AbstractApolloClientMonitorEventListener implements
     samples.addAll(gaugeSamples.values());
     return samples;
   }
-  
+
   /**
    * Specific collection logic
    */
-  protected void collect0(ApolloClientMonitorEvent event){}
+  protected void collect0(ApolloClientMonitorEvent event) {
+  }
 
   /**
    * Convenient for indicators that can only be obtained from the status object
    */
-  protected void export0(){}
-
-
-
-  /**
-   * tool method for updating indicator model
-   */
-  public void createOrUpdateGaugeSample(String mapKey, String metricsName, Map<String, String> tags,
-      double value) {
-    if (!gaugeSamples.containsKey(mapKey)) {
-      GaugeModel builder = (GaugeModel) GaugeModel.create(metricsName, 0).putTags(tags);
-      gaugeSamples.put(mapKey, builder);
-    }
-    gaugeSamples.get(mapKey).setValue(value);
+  protected void export0() {
   }
 
+
   /**
    * tool method for updating indicator model
    */
-  public void createOrUpdateCounterSample(String mapKey, String metricsName,
-      Map<String, String> tags,
+  public void createOrUpdateGaugeSample(String metricsName, String[] tagKeys, String[] tagValues,
+      double value) {
+    createOrUpdateSample(metricsName, tagKeys, tagValues, value, false);
+  }
+
+  public void createOrUpdateGaugeSample(String metricsName, double value) {
+    createOrUpdateSample(metricsName, null, null, value, false);
+  }
+
+  public void createOrUpdateCounterSample(String metricsName, String[] tagKeys, String[] tagValues,
       double increaseValue) {
-    if (!counterSamples.containsKey(mapKey)) {
-      CounterModel builder = (CounterModel) CounterModel.create(metricsName, 0).putTags(tags);
-      counterSamples.put(mapKey, builder);
+    createOrUpdateSample(metricsName, tagKeys, tagValues, increaseValue, true);
+  }
+
+  public void createOrUpdateCounterSample(String metricsName, double increaseValue) {
+    createOrUpdateSample(metricsName, null, null, increaseValue, true);
+  }
+
+  private void createOrUpdateSample(String metricsName, String[] tagKeys, String[] tagValues,
+      double value, boolean isCounter) {
+    String mapKey = metricsName + (tagValues != null ? Arrays.toString(tagValues) : "");
+
+    if (isCounter) {
+      CounterModel counter = counterSamples.computeIfAbsent(mapKey,
+          key -> (CounterModel) CounterModel.create(metricsName, 0)
+              .putTags(getTags(tagKeys, tagValues)));
+      counter.increase(value);
+    } else {
+      GaugeModel gauge = gaugeSamples.computeIfAbsent(mapKey,
+          key -> (GaugeModel) GaugeModel.create(metricsName, 0)
+              .putTags(getTags(tagKeys, tagValues)));
+      gauge.setValue(value);
     }
-    counterSamples.get(mapKey).increase(increaseValue);
+  }
+
+  private Map<String, String> getTags(String[] tagKeys, String[] tagValues) {
+    if (tagKeys != null && tagValues != null && tagKeys.length == tagValues.length) {
+      Map<String, String> tags = Maps.newHashMap();
+      for (int i = 0; i < tagKeys.length; i++) {
+        tags.put(tagKeys[i], tagValues[i]);
+      }
+      return tags;
+    }
+    return Collections.emptyMap();
   }
 
 }

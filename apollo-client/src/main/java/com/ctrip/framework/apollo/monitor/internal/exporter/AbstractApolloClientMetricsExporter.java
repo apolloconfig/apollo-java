@@ -33,15 +33,15 @@ import org.slf4j.Logger;
  */
 public abstract class AbstractApolloClientMetricsExporter implements ApolloClientMetricsExporter {
 
+  public static final ScheduledExecutorService m_executorService;
   private static final Logger log = DeferredLoggerFactory.getLogger(
       AbstractApolloClientMetricsExporter.class);
-  public static final ScheduledExecutorService m_executorService;
   private static final long INITIAL_DELAY = 5L;
   private static final int THREAD_POOL_SIZE = 1;
 
   static {
     m_executorService = Executors.newScheduledThreadPool(THREAD_POOL_SIZE,
-        ApolloThreadFactory.create("MetricsReporter", true));
+        ApolloThreadFactory.create(ApolloClientMetricsExporter.class.getName(), true));
   }
 
   protected List<ApolloClientMonitorEventListener> collectors;
@@ -75,7 +75,7 @@ public abstract class AbstractApolloClientMetricsExporter implements ApolloClien
     log.debug("Start to update metrics data job");
     collectors.forEach(collector -> {
       if (collector.isMetricsSampleUpdated()) {
-        log.debug("Collector {} has updated samples.", collector.mBeanName());
+        log.debug("Collector {} has updated samples.", collector.getName());
         collector.export().forEach(this::registerSample);
       }
     });

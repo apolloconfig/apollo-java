@@ -18,7 +18,8 @@ package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import static org.junit.Assert.*;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientNamespaceApi.NamespaceMetrics;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi.NamespaceMetrics;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,15 +45,15 @@ public class NullClientNamespaceMonitorApiTest {
 
   @Test
   public void testGetNamespaceItemNames() {
-    Integer testNamespace = namespaceMonitorApi.getNamespaceItemsNum("testNamespace");
+    Integer testNamespace = namespaceMonitorApi.getNamespacePropertySize("testNamespace");
     assertEquals(0, testNamespace.intValue());
 
   }
-  
+
   @Test
-  public void testGetConfigFileNum() {
-    Integer configFileNum = namespaceMonitorApi.getConfigFileNum();
-    assertEquals(0, configFileNum.intValue());
+  public void testGetConfigFileNamespaces() {
+    List<String> configFileNamespaces = namespaceMonitorApi.getConfigFileNamespaces();
+    assertEquals(0, configFileNamespaces.size());
   }
 
   @Test

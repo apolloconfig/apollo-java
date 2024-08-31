@@ -17,9 +17,8 @@
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientThreadPoolApi.ApolloThreadPoolInfo;
+import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi.ApolloThreadPoolInfo;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,21 +44,8 @@ public class NullClientThreadPoolMonitorApiTest {
   @Test
   public void testGetRemoteConfigRepositoryThreadPoolInfo() {
     ApolloThreadPoolInfo info = monitorApi.getRemoteConfigRepositoryThreadPoolInfo();
-
-    assertNull(info);
+    assertNotNull(info);
+    assertEquals(0, info.getPoolSize());
   }
-
-  @Test
-  public void testGetAbstractConfigThreadPoolInfo() {
-    ApolloThreadPoolInfo info = monitorApi.getAbstractConfigThreadPoolInfo();
-
-    assertNull(info);
-  }
-
-  @Test
-  public void testGetAbstractConfigFileThreadPoolInfo() {
-    ApolloThreadPoolInfo info = monitorApi.getAbstractConfigFileThreadPoolInfo();
-
-    assertNull(info);
-  }
+  
 }

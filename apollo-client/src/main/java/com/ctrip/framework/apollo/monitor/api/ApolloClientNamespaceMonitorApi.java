@@ -16,7 +16,7 @@
  */
 package com.ctrip.framework.apollo.monitor.api;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientNamespaceApi.NamespaceMetrics;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -31,14 +31,14 @@ public interface ApolloClientNamespaceMonitorApi {
   Map<String, NamespaceMetrics> getNamespaceMetrics();
 
   /**
-   *  get Namespace Config.ItemsNum
+   * get Namespace Config.ItemsNum
    */
-  Integer getNamespaceItemsNum(String namespace);
+  Integer getNamespacePropertySize(String namespace);
 
   /**
-   * get ConfigFile num
+   * get ConfigFile namespaces
    */
-  Integer getConfigFileNum();
+  List<String> getConfigFileNamespaces();
 
   /**
    * get not found namespaces
@@ -49,6 +49,47 @@ public interface ApolloClientNamespaceMonitorApi {
    * get timeout namespaces
    */
   List<String> getTimeoutNamespaces();
+
+
+  class NamespaceMetrics {
+
+    private int usageCount;
+    private long firstLoadTimeSpendInMs;
+    private LocalDateTime latestUpdateTime = LocalDateTime.now();
+    private String releaseKey = "";
+
+    public String getReleaseKey() {
+      return releaseKey;
+    }
+
+    public void setReleaseKey(String releaseKey) {
+      this.releaseKey = releaseKey;
+    }
+
+    public int getUsageCount() {
+      return usageCount;
+    }
+
+    public void incrementUsageCount() {
+      usageCount++;
+    }
+
+    public long getFirstLoadTimeSpendInMs() {
+      return firstLoadTimeSpendInMs;
+    }
+
+    public void setFirstLoadTimeSpendInMs(long firstLoadTimeSpendInMs) {
+      this.firstLoadTimeSpendInMs = firstLoadTimeSpendInMs;
+    }
+
+    public LocalDateTime getLatestUpdateTime() {
+      return latestUpdateTime;
+    }
+
+    public void setLatestUpdateTime(LocalDateTime latestUpdateTime) {
+      this.latestUpdateTime = latestUpdateTime;
+    }
+  }
 
 
 }

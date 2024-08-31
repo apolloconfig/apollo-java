@@ -29,12 +29,12 @@ public interface ApolloClientMonitorEventListener {
   /**
    * mbean name
    */
-  String mBeanName();
+  String getName();
 
   /**
    * is support the event
    */
-  boolean isSupport(ApolloClientMonitorEvent event);
+  boolean isSupported(ApolloClientMonitorEvent event);
 
   /**
    * collect metrics from event

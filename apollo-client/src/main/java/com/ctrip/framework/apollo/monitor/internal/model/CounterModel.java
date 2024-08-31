@@ -16,7 +16,7 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.model;
 
-import com.ctrip.framework.apollo.monitor.internal.enums.MeterEnums;
+import com.ctrip.framework.apollo.monitor.internal.enums.MetricTypeEnums;
 
 /**
  * @author Rawven
@@ -31,7 +31,7 @@ public class CounterModel extends SampleModel {
       throw new IllegalArgumentException("Number must be a valid double");
     }
     setName(name);
-    setType(MeterEnums.COUNTER);
+    setType(MetricTypeEnums.COUNTER);
     this.value.set(num);
   }
 
