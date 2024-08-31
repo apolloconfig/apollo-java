@@ -16,15 +16,21 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 
+import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
+import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
 
 /**
  * @author Rawven
  */
 public class NullApolloClientMetricsExporter implements ApolloClientMetricsExporter {
+
+  private static final Logger log = DeferredLoggerFactory.getLogger(
+      AbstractApolloClientMetricsExporter.class);
 
   @Override
   public void init(List<ApolloClientMonitorEventListener> collectors, long collectPeriod) {
@@ -48,6 +54,7 @@ public class NullApolloClientMetricsExporter implements ApolloClientMetricsExpor
 
   @Override
   public String response() {
-    return "No Reporter Use";
+    log.warn("No metrics exporter found, response empty string");
+    return "";
   }
 }

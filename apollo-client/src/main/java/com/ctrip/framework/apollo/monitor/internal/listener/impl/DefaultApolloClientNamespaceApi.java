@@ -29,6 +29,7 @@ import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClient
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,14 +78,6 @@ public class DefaultApolloClientNamespaceApi extends
     }
   }
 
-  private void handleNamespaceNotFound(String namespace) {
-    namespace404.add(namespace);
-  }
-
-  private void handleNamespaceTimeout(String namespace) {
-    namespaceTimeout.add(namespace);
-  }
-
   private void handleNormalNamespace(String namespace, ApolloClientMonitorEvent event) {
     namespace404.remove(namespace);
     namespaceTimeout.remove(namespace);
@@ -115,23 +108,30 @@ public class DefaultApolloClientNamespaceApi extends
     }
   }
 
+  private void handleNamespaceNotFound(String namespace) {
+    namespace404.add(namespace);
+  }
+
+  private void handleNamespaceTimeout(String namespace) {
+    namespaceTimeout.add(namespace);
+  }
+
+
   private void handleUsageEvent(NamespaceMetrics namespaceMetrics, String namespace) {
     namespaceMetrics.incrementUsageCount();
-    String mapKey = namespace + ApolloClientMonitorConstant.METRICS_NAMESPACE_USAGE;
-    createOrUpdateCounterSample(mapKey, ApolloClientMonitorConstant.METRICS_NAMESPACE_USAGE,
-        Collections.singletonMap(NAMESPACE, namespace), 1);
+    createOrUpdateCounterSample(ApolloClientMonitorConstant.METRICS_NAMESPACE_USAGE,
+        new String[]{NAMESPACE}, new String[]{namespace}, 1);
   }
 
   private void handleUpdateTimeEvent(ApolloClientMonitorEvent event,
       NamespaceMetrics namespaceMetrics) {
-    long updateTime = event.getAttachmentValue(ApolloClientMonitorConstant.TIMESTAMP);
-    namespaceMetrics.setLatestUpdateTime(updateTime);
+    namespaceMetrics.setLatestUpdateTime(LocalDateTime.now());
   }
 
   private void handleFirstLoadSpendEvent(ApolloClientMonitorEvent event,
       NamespaceMetrics namespaceMetrics) {
     long firstLoadSpendTime = event.getAttachmentValue(ApolloClientMonitorConstant.TIMESTAMP);
-    namespaceMetrics.setFirstLoadSpend(firstLoadSpendTime);
+    namespaceMetrics.setFirstLoadTimeSpendInMs(firstLoadSpendTime);
   }
 
   private void handleReleaseKeyEvent(ApolloClientMonitorEvent event,
@@ -144,32 +144,26 @@ public class DefaultApolloClientNamespaceApi extends
   public void export0() {
     namespaces.forEach((namespace, metrics) -> {
       // update NamespaceMetrics
-      createOrUpdateGaugeSample(namespace + METRICS_NAMESPACE_FIRST_LOAD_SPEND,
+      createOrUpdateGaugeSample(
           METRICS_NAMESPACE_FIRST_LOAD_SPEND,
-          Collections.singletonMap(NAMESPACE, namespace),
-          metrics.getFirstLoadSpend());
+          new String[]{NAMESPACE}, new String[]{namespace},
+          metrics.getFirstLoadTimeSpendInMs());
 
-      createOrUpdateGaugeSample(namespace + METRICS_NAMESPACE_ITEM_NUM,
+      createOrUpdateGaugeSample(
           METRICS_NAMESPACE_ITEM_NUM,
-          Collections.singletonMap(NAMESPACE, namespace),
+          new String[]{NAMESPACE}, new String[]{namespace},
           m_configs.get(namespace).getPropertyNames().size());
     });
 
     //  update ConfigFile num
     createOrUpdateGaugeSample(METRICS_CONFIG_FILE_NUM,
-        METRICS_CONFIG_FILE_NUM,
-        Collections.emptyMap(),
         m_configFiles.size());
 
     //  update NamespaceStatus metrics
     createOrUpdateGaugeSample(METRICS_NAMESPACE_NOT_FOUND,
-        METRICS_NAMESPACE_NOT_FOUND,
-        Collections.emptyMap(),
         namespace404.size());
 
     createOrUpdateGaugeSample(METRICS_NAMESPACE_TIMEOUT,
-        METRICS_NAMESPACE_TIMEOUT,
-        Collections.emptyMap(),
         namespaceTimeout.size());
   }
 
@@ -189,53 +183,28 @@ public class DefaultApolloClientNamespaceApi extends
   }
 
   @Override
-  public Integer getNamespaceItemsNum(String namespace) {
+  public Map<String, NamespaceMetricsString> getNamespaceMetricsString() {
+    Map<String, NamespaceMetricsString> namespaceMetricsStringMap = Maps.newHashMap();
+    namespaces.forEach((namespace, metrics) -> {
+      NamespaceMetricsString namespaceMetricsString = new NamespaceMetricsString();
+      namespaceMetricsString.setFirstLoadTimeSpendInMs(metrics.getFirstLoadTimeSpendInMs());
+      namespaceMetricsString.setLatestUpdateTime(metrics.getLatestUpdateTime().toString());
+      namespaceMetricsString.setUsageCount(metrics.getUsageCount());
+      namespaceMetricsString.setReleaseKey(metrics.getReleaseKey());
+      namespaceMetricsStringMap.put(namespace, namespaceMetricsString);
+    });
+    return namespaceMetricsStringMap;
+  }
+
+  @Override
+  public Integer getNamespacePropertySize(String namespace) {
     Config config = m_configs.get(namespace);
     return (config != null) ? config.getPropertyNames().size() : 0;
   }
 
   @Override
-  public Integer getConfigFileNum() {
-    return m_configFiles.size();
+  public List<String> getConfigFileNamespaces() {
+    return new ArrayList<>(m_configFiles.keySet());
   }
 
-  public static class NamespaceMetrics {
-
-    private int usageCount;
-    private long firstLoadSpend;
-    private long latestUpdateTime = System.currentTimeMillis();
-    private String releaseKey = "";
-
-    public String getReleaseKey() {
-      return releaseKey;
-    }
-
-    public void setReleaseKey(String releaseKey) {
-      this.releaseKey = releaseKey;
-    }
-
-    public int getUsageCount() {
-      return usageCount;
-    }
-
-    public void incrementUsageCount() {
-      usageCount++;
-    }
-
-    public long getFirstLoadSpend() {
-      return firstLoadSpend;
-    }
-
-    public void setFirstLoadSpend(long firstLoadSpend) {
-      this.firstLoadSpend = firstLoadSpend;
-    }
-
-    public long getLatestUpdateTime() {
-      return latestUpdateTime;
-    }
-
-    public void setLatestUpdateTime(long latestUpdateTime) {
-      this.latestUpdateTime = latestUpdateTime;
-    }
-  }
 }

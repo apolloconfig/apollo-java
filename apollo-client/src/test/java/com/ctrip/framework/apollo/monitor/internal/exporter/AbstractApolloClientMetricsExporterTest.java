@@ -19,7 +19,7 @@ package com.ctrip.framework.apollo.monitor.internal.exporter;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.ctrip.framework.apollo.monitor.internal.enums.MeterEnums;
+import com.ctrip.framework.apollo.monitor.internal.enums.MetricTypeEnums;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
@@ -58,7 +58,7 @@ public class AbstractApolloClientMetricsExporterTest {
   public void testUpdateMetricsData() {
     List<SampleModel> samples = new ArrayList<>();
     GaugeModel gauge = mock(GaugeModel.class);
-    when(gauge.getType()).thenReturn(MeterEnums.GAUGE);
+    when(gauge.getType()).thenReturn(MetricTypeEnums.GAUGE);
     when(gauge.getName()).thenReturn("testGauge");
     when(gauge.getValue()).thenReturn(10.0);
     samples.add(gauge);

@@ -18,7 +18,6 @@ package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxNamespaceMBean;
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientNamespaceApi.NamespaceMetrics;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,13 +45,18 @@ public class NullClientNamespaceMonitorApi implements ApolloClientNamespaceMonit
   }
 
   @Override
-  public Integer getNamespaceItemsNum(String namespace) {
+  public Map<String, NamespaceMetricsString> getNamespaceMetricsString() {
+    return Collections.emptyMap();
+  }
+
+  @Override
+  public Integer getNamespacePropertySize(String namespace) {
     return 0;
   }
 
   @Override
-  public Integer getConfigFileNum() {
-    return 0;
+  public List<String> getConfigFileNamespaces() {
+    return Collections.emptyList();
   }
 
 }

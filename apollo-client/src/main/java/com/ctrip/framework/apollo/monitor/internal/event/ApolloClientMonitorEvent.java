@@ -16,6 +16,7 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.event;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class ApolloClientMonitorEvent {
   public ApolloClientMonitorEvent(String name, String tag, Map<String, Object> attachments) {
     this.name = name;
     this.tag = tag;
-    this.attachments = attachments != null ? new HashMap<>(attachments) : new HashMap<>();
+    this.attachments = attachments != null ? new HashMap<>(attachments) : Collections.emptyMap();
   }
 
   public ApolloClientMonitorEvent withTag(String tag) {
@@ -65,10 +66,4 @@ public class ApolloClientMonitorEvent {
       throw new IllegalArgumentException("Value for key " + key + " is not of expected type", e);
     }
   }
-
-
-  public void publish() {
-    ApolloClientMonitorEventPublisher.publish(this);
-  }
-
 }

@@ -18,7 +18,6 @@ package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxThreadPoolMBean;
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientThreadPoolApi.ApolloThreadPoolInfo;
 import java.util.Collections;
 import java.util.Map;
 
@@ -28,6 +27,8 @@ import java.util.Map;
 public class NullClientThreadPoolMonitorApi implements ApolloClientThreadPoolMonitorApi,
     ApolloClientJmxThreadPoolMBean {
 
+  private final ApolloThreadPoolInfo NULL_THREAD_POOL_INFO = new ApolloThreadPoolInfo();
+
   @Override
   public Map<String, ApolloThreadPoolInfo> getThreadPoolInfo() {
     return Collections.emptyMap();
@@ -35,21 +36,21 @@ public class NullClientThreadPoolMonitorApi implements ApolloClientThreadPoolMon
 
   @Override
   public ApolloThreadPoolInfo getRemoteConfigRepositoryThreadPoolInfo() {
-    return null;
+    return NULL_THREAD_POOL_INFO;
   }
 
   @Override
   public ApolloThreadPoolInfo getAbstractConfigThreadPoolInfo() {
-    return null;
+    return NULL_THREAD_POOL_INFO;
   }
 
   @Override
   public ApolloThreadPoolInfo getAbstractConfigFileThreadPoolInfo() {
-    return null;
+    return NULL_THREAD_POOL_INFO;
   }
 
   @Override
   public ApolloThreadPoolInfo getMetricsExporterThreadPoolInfo() {
-    return null;
+    return NULL_THREAD_POOL_INFO;
   }
 }

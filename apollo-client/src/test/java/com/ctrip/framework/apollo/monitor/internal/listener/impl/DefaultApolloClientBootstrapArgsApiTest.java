@@ -83,7 +83,7 @@ public class DefaultApolloClientBootstrapArgsApiTest {
 
   @Test
   public void testGetBootstrapArgs() {
-    Map<String, String> bootstrapArgs = api.getBootstrapArgs();
+    Map<String, Object> bootstrapArgs = api.getBootstrapArgs();
     assertNotNull(bootstrapArgs);
     assertTrue(bootstrapArgs.containsKey(APOLLO_ACCESS_KEY_SECRET));
   }

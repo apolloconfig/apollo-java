@@ -15,10 +15,11 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal;
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientExceptionMonitorApi;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
@@ -31,60 +32,48 @@ import org.mockito.MockitoAnnotations;
 
 public class DefaultConfigMonitorTest {
 
-  private DefaultConfigMonitor configMonitor;
-
-  @Mock
-  private ApolloClientMetricsExporter reporter;
-
-  @Mock
-  private ApolloClientThreadPoolMonitorApi threadPoolMonitorApi;
-
   @Mock
   private ApolloClientExceptionMonitorApi exceptionMonitorApi;
-
   @Mock
   private ApolloClientNamespaceMonitorApi namespaceMonitorApi;
-
   @Mock
   private ApolloClientBootstrapArgsMonitorApi bootstrapArgsMonitorApi;
+  @Mock
+  private ApolloClientThreadPoolMonitorApi threadPoolMonitorApi;
+  @Mock
+  private ApolloClientMetricsExporter metricsExporter;
+  @Mock
+  private ApolloClientMonitorContext monitorContext;
+
+  private DefaultConfigMonitor configMonitor;
 
   @Before
-  public void setUp() {
+  public void setUp(){
     MockitoAnnotations.initMocks(this);
+    when(monitorContext.getExceptionApi()).thenReturn(exceptionMonitorApi);
+    when(monitorContext.getNamespaceApi()).thenReturn(namespaceMonitorApi);
+    when(monitorContext.getBootstrapArgsApi()).thenReturn(bootstrapArgsMonitorApi);
+    when(monitorContext.getThreadPoolApi()).thenReturn(threadPoolMonitorApi);
+    when(monitorContext.getMetricsExporter()).thenReturn(metricsExporter);
+    MockInjector.setInstance(ApolloClientMonitorContext.class, monitorContext);
+    
     configMonitor = new DefaultConfigMonitor();
+
   }
 
   @Test
-  public void testInit() {
-    configMonitor.init(namespaceMonitorApi, threadPoolMonitorApi, exceptionMonitorApi,
-        bootstrapArgsMonitorApi, reporter);
-
-    assertEquals(namespaceMonitorApi, configMonitor.getNamespaceMonitorApi());
-    assertEquals(threadPoolMonitorApi, configMonitor.getThreadPoolMonitorApi());
-    assertEquals(exceptionMonitorApi, configMonitor.getExceptionMonitorApi());
-    assertEquals(bootstrapArgsMonitorApi, configMonitor.getRunningParamsMonitorApi());
+  public void testApis(){
+    assertSame(exceptionMonitorApi, configMonitor.getExceptionMonitorApi());
+    assertSame(namespaceMonitorApi, configMonitor.getNamespaceMonitorApi());
+    assertSame(bootstrapArgsMonitorApi, configMonitor.getRunningParamsMonitorApi());
+    assertSame(threadPoolMonitorApi, configMonitor.getThreadPoolMonitorApi());
   }
 
   @Test
-  public void testGetExporterData() {
-    when(reporter.response()).thenReturn("exporter data");
+  public void testExporterData(){
+    String data = "data";
+    when(metricsExporter.response()).thenReturn(data);
 
-    configMonitor.init(namespaceMonitorApi, threadPoolMonitorApi, exceptionMonitorApi,
-        bootstrapArgsMonitorApi, reporter);
-
-    String result = configMonitor.getExporterData();
-
-    assertEquals("exporter data", result);
-    verify(reporter).response();
-  }
-
-  @Test
-  public void testDefaultInstances() {
-    assertNotNull(configMonitor.getThreadPoolMonitorApi());
-    assertNotNull(configMonitor.getExceptionMonitorApi());
-    assertNotNull(configMonitor.getNamespaceMonitorApi());
-    assertNotNull(configMonitor.getRunningParamsMonitorApi());
-    assertEquals("No Reporter Use",
-        configMonitor.getExporterData()); // Assuming NullApolloClientMetricsExporter returns "null"
+    assertEquals(data, configMonitor.getExporterData());
   }
 }

@@ -61,9 +61,9 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
   @Test
   public void testGetMetricsReporter_ExporterFound() {
     when(configUtil.getMonitorExternalType()).thenReturn("mocktheus");
-    when(configUtil.getClientMonitorJmxEnabled()).thenReturn(true);
+    when(configUtil.isClientMonitorJmxEnabled()).thenReturn(true);
     when(configUtil.getMonitorExternalExportPeriod()).thenReturn(1000L);
-    when(metricsCollector.mBeanName()).thenReturn("testMBean");
+    when(metricsCollector.getName()).thenReturn("testMBean");
     List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(metricsCollector);
 
     ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);

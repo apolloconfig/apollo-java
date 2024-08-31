@@ -19,7 +19,7 @@ package com.ctrip.framework.apollo.monitor.internal.enums;
 /**
  * @author Rawven
  */
-public enum MeterEnums {
+public enum MetricTypeEnums {
   /**
    * counter
    */

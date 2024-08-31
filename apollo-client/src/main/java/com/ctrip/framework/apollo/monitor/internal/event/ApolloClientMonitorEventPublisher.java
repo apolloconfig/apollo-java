@@ -18,7 +18,7 @@ package com.ctrip.framework.apollo.monitor.internal.event;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
+import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorContext;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 
 /**
@@ -26,14 +26,14 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
  */
 public class ApolloClientMonitorEventPublisher {
 
-  private static ApolloClientMonitorEventListenerManager COLLECTOR_MANAGER = ApolloInjector.getInstance(
-      ApolloClientMonitorEventListenerManager.class);
+  private static ApolloClientMonitorContext COLLECTOR_MANAGER = ApolloInjector.getInstance(
+      ApolloClientMonitorContext.class);
   private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   public static void publish(ApolloClientMonitorEvent event) {
-    if (m_configUtil.getClientMonitorEnabled()) {
+    if (m_configUtil.isClientMonitorEnabled()) {
       for (ApolloClientMonitorEventListener collector : COLLECTOR_MANAGER.getCollectors()) {
-        if (collector.isSupport(event)) {
+        if (collector.isSupported(event)) {
           collector.collect(event);
           return;
         }
@@ -43,7 +43,7 @@ public class ApolloClientMonitorEventPublisher {
 
   protected static void reset() {
     COLLECTOR_MANAGER = ApolloInjector.getInstance(
-        ApolloClientMonitorEventListenerManager.class);
+        ApolloClientMonitorContext.class);
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   }

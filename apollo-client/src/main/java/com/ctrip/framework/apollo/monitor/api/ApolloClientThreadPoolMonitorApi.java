@@ -16,8 +16,8 @@
  */
 package com.ctrip.framework.apollo.monitor.api;
 
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientThreadPoolApi.ApolloThreadPoolInfo;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Rawven
@@ -48,4 +48,55 @@ public interface ApolloClientThreadPoolMonitorApi {
    * AbstractApolloClientMetricsExporter.m_executorService
    */
   ApolloThreadPoolInfo getMetricsExporterThreadPoolInfo();
+
+
+  class ApolloThreadPoolInfo {
+
+    private ThreadPoolExecutor executor;
+
+    public ApolloThreadPoolInfo(ThreadPoolExecutor executor) {
+      this.executor = executor;
+    }
+
+    public ApolloThreadPoolInfo() {
+    }
+
+
+    public int getActiveTaskCount() {
+      return executor != null ? executor.getActiveCount() : 0;
+    }
+
+    public int getQueueSize() {
+      return executor != null ? executor.getQueue().size() : 0;
+    }
+
+    public int getCorePoolSize() {
+      return executor != null ? executor.getCorePoolSize() : 0;
+    }
+
+    public int getMaximumPoolSize() {
+      return executor != null ? executor.getMaximumPoolSize() : 0;
+    }
+
+    public int getPoolSize() {
+      return executor != null ? executor.getPoolSize() : 0;
+    }
+
+    public long getTotalTaskCount() {
+      return executor != null ? executor.getTaskCount() : 0;
+    }
+
+    public long getCompletedTaskCount() {
+      return executor != null ? executor.getCompletedTaskCount() : 0;
+    }
+
+    public int getLargestPoolSize() {
+      return executor != null ? executor.getLargestPoolSize() : 0;
+    }
+
+    public int getQueueRemainingCapacity() {
+      return executor != null ? executor.getQueue().remainingCapacity() : 0;
+    }
+
+  }
 }

@@ -16,8 +16,7 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.model;
 
-import com.ctrip.framework.apollo.monitor.internal.enums.MeterEnums;
-import com.google.common.util.concurrent.AtomicDouble;
+import com.ctrip.framework.apollo.monitor.internal.enums.MetricTypeEnums;
 
 /**
  * @author Rawven
@@ -29,7 +28,7 @@ public class GaugeModel extends SampleModel {
       throw new IllegalArgumentException("Name cannot be null or empty");
     }
     setName(name);
-    setType(MeterEnums.GAUGE);
+    setType(MetricTypeEnums.GAUGE);
     this.value.set(value);
   }
 

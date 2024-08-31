@@ -33,6 +33,11 @@ public class NullClientExceptionMonitorApi implements ApolloClientExceptionMonit
   }
 
   @Override
+  public Integer getExceptionCountFromStartup() {
+    return 0;
+  }
+
+  @Override
   public List<String> getApolloConfigExceptionDetails() {
     return Collections.emptyList();
   }

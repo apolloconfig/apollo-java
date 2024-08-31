@@ -24,8 +24,11 @@ import java.util.List;
 public interface ApolloClientExceptionMonitorApi {
 
   /**
-   * get ApolloConfigException details
+   * Get exception information the number is limited and can be configured through
+   * apollo.client.monitor.exception-queue-size
    */
   List<Exception> getApolloConfigExceptionList();
+
+  Integer getExceptionCountFromStartup();
 
 }

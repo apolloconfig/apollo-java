@@ -25,11 +25,7 @@ import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxThreadPoolMBean;
 import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.google.common.collect.Maps;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -68,26 +64,34 @@ public class DefaultApolloClientThreadPoolApi extends
     executorMap.forEach((key, value) -> exportThreadPoolMetrics(value, key));
   }
 
-  private void exportThreadPoolMetrics(ApolloThreadPoolInfo info, String name) {
-    List<Double> metrics = Arrays.asList(
-        (double) info.getActiveTaskCount(),
-        (double) info.getQueueSize(),
-        (double) info.getCompletedTaskCount(),
-        (double) info.getPoolSize(),
-        (double) info.getTotalTaskCount(),
-        (double) info.getCorePoolSize(),
-        (double) info.getMaximumPoolSize(),
-        (double) info.getLargestPoolSize(),
-        (double) info.getQueueCapacity(),
-        (double) info.getQueueRemainingCapacity(),
-        info.getCurrentLoad()
-    );
+  private void exportThreadPoolMetrics(ApolloThreadPoolInfo info, String threadPoolName) {
 
-    for (int i = 0; i < metrics.size(); i++) {
-      String key = name + METRICS_THREAD_POOL_PARAMS[i + 1];
-      createOrUpdateGaugeSample(key, METRICS_THREAD_POOL_PARAMS[i + 1],
-          Collections.singletonMap(METRICS_THREAD_POOL_PARAMS[0], name), metrics.get(i));
-    }
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_ACTIVE_TASK_COUNT,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        info.getActiveTaskCount());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_QUEUE_SIZE,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        info.getQueueSize());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_COMPLETED_TASK_COUNT,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        (double) info.getCompletedTaskCount());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_POOL_SIZE, new String[]{METRICS_THREAD_POOL_NAME},
+        new String[]{threadPoolName}, info.getPoolSize());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_TOTAL_TASK_COUNT,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        (double) info.getTotalTaskCount());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_CORE_POOL_SIZE,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        info.getCorePoolSize());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_MAXIMUM_POOL_SIZE,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        info.getMaximumPoolSize());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_LARGEST_POOL_SIZE,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        info.getLargestPoolSize());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_QUEUE_REMAINING_CAPACITY,
+        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        info.getQueueRemainingCapacity());
   }
 
 
@@ -120,58 +124,5 @@ public class DefaultApolloClientThreadPoolApi extends
   @Override
   public ApolloThreadPoolInfo getMetricsExporterThreadPoolInfo() {
     return executorMap.get(METRICS_EXPORTER);
-  }
-
-  public static class ApolloThreadPoolInfo {
-
-    private final ThreadPoolExecutor executor;
-
-    public ApolloThreadPoolInfo(ThreadPoolExecutor executor) {
-      this.executor = executor;
-    }
-
-    public int getActiveTaskCount() {
-      return executor.getActiveCount();
-    }
-
-    public int getQueueSize() {
-      return executor.getQueue().size();
-    }
-
-    public int getCorePoolSize() {
-      return executor.getCorePoolSize();
-    }
-
-    public int getMaximumPoolSize() {
-      return executor.getMaximumPoolSize();
-    }
-
-    public int getPoolSize() {
-      return executor.getPoolSize();
-    }
-
-    public long getTotalTaskCount() {
-      return executor.getTaskCount();
-    }
-
-    public long getCompletedTaskCount() {
-      return executor.getCompletedTaskCount();
-    }
-
-    public int getLargestPoolSize() {
-      return executor.getLargestPoolSize();
-    }
-
-    public int getQueueCapacity() {
-      return executor.getQueue().remainingCapacity() + executor.getQueue().size();
-    }
-
-    public int getQueueRemainingCapacity() {
-      return executor.getQueue().remainingCapacity();
-    }
-
-    public double getCurrentLoad() {
-      return (double) executor.getPoolSize() / executor.getMaximumPoolSize();
-    }
   }
 }

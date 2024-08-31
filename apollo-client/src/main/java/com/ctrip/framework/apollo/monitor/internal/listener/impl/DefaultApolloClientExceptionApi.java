@@ -27,11 +27,11 @@ import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxExce
 import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.google.common.collect.EvictingQueue;
+import com.google.common.collect.Queues;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -42,48 +42,41 @@ public class DefaultApolloClientExceptionApi extends
     AbstractApolloClientMonitorEventListener implements
     ApolloClientExceptionMonitorApi, ApolloClientJmxExceptionMBean {
 
-  private final AtomicInteger exceptionNum = new AtomicInteger(0);
-  private int monitorExceptionQueueSize;
-  private final BlockingQueue<ApolloConfigException> exceptions;
+  private final AtomicInteger exceptionCountFromStartup = new AtomicInteger(0);
+  private final Queue<ApolloConfigException> exceptionsQueue;
 
   public DefaultApolloClientExceptionApi() {
     super(TAG_ERROR);
-    monitorExceptionQueueSize = ApolloInjector.getInstance(ConfigUtil.class)
+    int monitorExceptionQueueSize = ApolloInjector.getInstance(ConfigUtil.class)
         .getMonitorExceptionQueueSize();
-    if (monitorExceptionQueueSize <= 0) {
-      monitorExceptionQueueSize = 25;
-    }
-    exceptions = new ArrayBlockingQueue<>(
+    EvictingQueue<ApolloConfigException> evictingQueue = EvictingQueue.create(
         monitorExceptionQueueSize);
+    exceptionsQueue = Queues.synchronizedQueue(evictingQueue);
   }
 
   @Override
   public List<Exception> getApolloConfigExceptionList() {
-    return new ArrayList<>(exceptions);
+    return new ArrayList<>(exceptionsQueue);
+  }
+
+  @Override
+  public Integer getExceptionCountFromStartup() {
+    return exceptionCountFromStartup.get();
   }
 
   @Override
   public void collect0(ApolloClientMonitorEvent event) {
     ApolloConfigException exception = event.getAttachmentValue(THROWABLE);
     if (exception != null) {
-      addExceptionToQueue(exception);
-      exceptionNum.incrementAndGet();
-      createOrUpdateCounterSample(METRICS_EXCEPTION_NUM, METRICS_EXCEPTION_NUM,
-          Collections.emptyMap(),
-          1);
+      exceptionsQueue.add(exception);
+      exceptionCountFromStartup.incrementAndGet();
+      createOrUpdateCounterSample(METRICS_EXCEPTION_NUM, 1);
     }
-  }
-
-  private void addExceptionToQueue(ApolloConfigException exception) {
-    if (exceptions.size() >= monitorExceptionQueueSize) {
-      exceptions.poll();
-    }
-    exceptions.add(exception);
   }
 
   @Override
   public List<String> getApolloConfigExceptionDetails() {
-    return exceptions.stream()
+    return exceptionsQueue.stream()
         .map(ApolloConfigException::getMessage)
         .collect(Collectors.toList());
   }

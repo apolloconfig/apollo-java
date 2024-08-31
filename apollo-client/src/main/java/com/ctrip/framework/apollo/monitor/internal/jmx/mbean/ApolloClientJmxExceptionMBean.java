@@ -24,11 +24,13 @@ import javax.management.MXBean;
  */
 @MXBean
 public interface ApolloClientJmxExceptionMBean {
-  // Because JMX does not support Exception type return values
+  // Because JMX does not support all type return values
   // declare the interface separately.
 
   /**
    * get exception details
    */
   List<String> getApolloConfigExceptionDetails();
+
+  Integer getExceptionCountFromStartup();
 }

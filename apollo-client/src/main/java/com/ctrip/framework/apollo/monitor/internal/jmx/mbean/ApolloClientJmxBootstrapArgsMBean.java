@@ -16,13 +16,20 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.jmx.mbean;
 
-import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
+import java.util.Map;
 import javax.management.MXBean;
 
 /**
  * @author Rawven
  */
 @MXBean
-public interface ApolloClientJmxBootstrapArgsMBean extends ApolloClientBootstrapArgsMonitorApi {
+public interface ApolloClientJmxBootstrapArgsMBean {
+  // Because JMX does not support all type return values
+  // declare the interface separately.
+
+  /**
+   * get bootstrap args map
+   */
+  Map<String, String> getBootstrapArgsString();
 
 }

@@ -20,7 +20,6 @@ import com.ctrip.framework.apollo.tracer.internals.NullTransaction;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * message producer composite

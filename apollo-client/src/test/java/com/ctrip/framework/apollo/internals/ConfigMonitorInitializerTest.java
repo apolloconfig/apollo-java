@@ -16,102 +16,71 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-
 import com.ctrip.framework.apollo.build.MockInjector;
-import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
-import com.ctrip.framework.apollo.monitor.internal.DefaultConfigMonitor;
-import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
-import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListenerManager;
-import com.ctrip.framework.apollo.monitor.internal.listener.DefaultApolloClientMonitorEventListenerManager;
-import com.ctrip.framework.apollo.monitor.internal.tracer.ApolloClientMessageProducerComposite;
+import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorContext;
+import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import java.util.Collections;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ConfigMonitorInitializerTest {
 
-    private ConfigUtil mockConfigUtil;
-    private Logger mockLogger;
-    private DefaultApolloClientMonitorEventListenerManager mockManager;
-    private ApolloClientMetricsExporter mockMetricsExporter;
-    private DefaultConfigManager mockConfigManager;
-    private DefaultConfigMonitor mockConfigMonitor;
+	@Mock
+	private ConfigUtil mockConfigUtil;
+	@Mock
+	private ApolloClientMonitorContext mockMonitorContext;
+	@Mock
+	private ApolloClientMetricsExporterFactory mockExporterFactory;
 
-    @Before
-    public void setUp() {
-        mockConfigUtil = mock(ConfigUtil.class);
-        when(mockConfigUtil.getMonitorExceptionQueueSize()).thenReturn(100);
-        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(false);
-        mockLogger = mock(Logger.class);
-        mockManager = mock(DefaultApolloClientMonitorEventListenerManager.class);
-        mockMetricsExporter = mock(ApolloClientMetricsExporter.class);
-        mockConfigManager = mock(DefaultConfigManager.class);
-        mockConfigMonitor = mock(DefaultConfigMonitor.class);
-        
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
+		MockInjector.setInstance(ApolloClientMonitorContext.class, mockMonitorContext);
+		MockInjector.setInstance(ApolloClientMetricsExporterFactory.class, mockExporterFactory);
+		resetConfigMonitorInitializer();
+	}
 
-        // Mock static methods
-        MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
-        MockInjector.setInstance(ApolloClientMonitorEventListenerManager.class, mockManager);
-        MockInjector.setInstance(ConfigManager.class, mockConfigManager);
-        MockInjector.setInstance(ConfigMonitor.class, mockConfigMonitor);
-        
-        // Reset static state before each test
-        ConfigMonitorInitializer.reset();
-    }
+	@Test
+	public void testInitializeWhenMonitorEnabledAndNotInitialized() {
+		when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
+		ConfigMonitorInitializer.initialize();
+		assertTrue(ConfigMonitorInitializer.hasInitialized);
+		//ConfigMonitorInitializer.53line + DefaultApolloClientBootstrapArgsApi.64line
+		verify(mockConfigUtil, times(2)).isClientMonitorEnabled();
+	}
 
-    @Test
-    public void testInitialize_WhenEnabledAndNotInitialized() {
-        when(mockManager.getCollectors()).thenReturn(Collections.emptyList());
-        doReturn(true).when(mockConfigUtil).getClientMonitorEnabled();
-        ConfigMonitorInitializer.initialize();
+	@Test
+	public void testInitializeWhenMonitorDisabled() {
+		when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(false);
+		ConfigMonitorInitializer.initialize();
+		assertFalse(ConfigMonitorInitializer.hasInitialized);
+	}
 
-        verify(mockManager).setCollectors(anyList());
-        verify(mockConfigMonitor).init(any(), any(), any(), any(), any());
-        assertTrue(ConfigMonitorInitializer.hasInitialized); // Check hasInitialized flag
-    }
+	@Test
+	public void testInitializeWhenAlreadyInitialized() {
+		when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
+		ConfigMonitorInitializer.hasInitialized = true;
+		ConfigMonitorInitializer.initialize();
+		verify(mockConfigUtil, times(1)).isClientMonitorEnabled();
+	}
 
-    @Test
-    public void testInitialize_WhenAlreadyInitialized() {
-        ConfigMonitorInitializer.hasInitialized = true;
+	@Test
+	public void testReset() {
+		ConfigMonitorInitializer.reset();
+		assertFalse(ConfigMonitorInitializer.hasInitialized);
+	}
 
-        ConfigMonitorInitializer.initialize();
+	private void resetConfigMonitorInitializer() {
+		ConfigMonitorInitializer.reset();
+	}
 
-        verify(mockConfigMonitor, never()).init(any(), any(), any(), any(), any());
-    }
-
-    @Test
-    public void testInitialize_WhenClientMonitorDisabled() {
-        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(false);
-
-        ConfigMonitorInitializer.initialize();
-
-        verify(mockManager, never()).setCollectors(anyList());
-        verify(mockConfigMonitor, never()).init(any(), any(), any(), any(), any());
-    }
-
-    @Test
-    public void testInitializeMessageProducerComposite() {
-        when(mockConfigUtil.getClientMonitorEnabled()).thenReturn(true);
-
-        ApolloClientMessageProducerComposite composite = ConfigMonitorInitializer.initializeMessageProducerComposite();
-
-        assertNotNull(composite);
-        // Additional assertions can be added based on expected behavior
-    }
-        @Test
-    public void testInitializeJmxMonitoring() {
-        when(mockConfigUtil.getClientMonitorJmxEnabled()).thenReturn(true);
-        ApolloClientMonitorEventListener metricsCollector = mock(ApolloClientMonitorEventListener.class);
-        List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(metricsCollector);
-
-        ConfigMonitorInitializer.initializeJmxMonitoring(collectors);
-        verify(metricsCollector).mBeanName();
-    }
-    
 }
