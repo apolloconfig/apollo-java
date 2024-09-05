@@ -42,7 +42,7 @@ public class DefaultConfigManager implements ConfigManager {
 
   private Map<String, Object> m_configLocks = Maps.newConcurrentMap();
 
-  private Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
+  private Table<String,String, ConfigFile> m_configFiles = HashBasedTable.create();
 
   private Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
 
@@ -84,19 +84,20 @@ public class DefaultConfigManager implements ConfigManager {
 
   @Override
   public ConfigFile getConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
-    String namespaceFileName = String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue());
-    ConfigFile configFile = m_configFiles.get(namespaceFileName);
+    String namespaceFileName = String.format("%s.%s", namespace, configFileFormat.getValue());
+    String lockNamespaceFileName = String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue());
+    ConfigFile configFile = m_configFiles.get(appId, namespaceFileName);
 
     if (configFile == null) {
-      Object lock = m_configFileLocks.computeIfAbsent(namespaceFileName, key -> new Object());
+      Object lock = m_configFileLocks.computeIfAbsent(lockNamespaceFileName, key -> new Object());
       synchronized (lock) {
-        configFile = m_configFiles.get(namespaceFileName);
+        configFile = m_configFiles.get(appId, namespaceFileName);
 
         if (configFile == null) {
-          ConfigFactory factory = m_factoryManager.getFactory(namespaceFileName);
+          ConfigFactory factory = m_factoryManager.getFactory(appId, namespaceFileName);
 
-          configFile = factory.createConfigFile(namespaceFileName, configFileFormat);
-          m_configFiles.put(namespaceFileName, configFile);
+          configFile = factory.createConfigFile(appId, namespaceFileName, configFileFormat);
+          m_configFiles.put(appId, namespaceFileName, configFile);
         }
       }
     }

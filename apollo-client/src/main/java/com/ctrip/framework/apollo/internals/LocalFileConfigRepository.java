@@ -85,7 +85,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
 
   private File findLocalCacheDir() {
     try {
-      String defaultCacheDir = m_configUtil.getDefaultLocalCacheDir();
+      String defaultCacheDir = m_configUtil.getDefaultLocalCacheDir(m_appId);
       Path path = Paths.get(defaultCacheDir);
       if (!Files.exists(path)) {
         Files.createDirectories(path);
@@ -198,7 +198,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
       return;
     }
     this.m_fileProperties = newProperties;
-    persistLocalCacheFile(m_baseDir,m_appId, m_namespace);
+    persistLocalCacheFile(m_baseDir, m_appId, m_namespace);
   }
 
   private Properties loadFromLocalCacheFile(File baseDir, String appId, String namespace) throws IOException {
@@ -236,7 +236,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     return properties;
   }
 
-  void persistLocalCacheFile(File baseDir, String appId,String namespace) {
+  void persistLocalCacheFile(File baseDir, String appId, String namespace) {
     if (baseDir == null) {
       return;
     }

@@ -101,7 +101,7 @@ public class ConfigServiceTest {
     String someNamespace = "mock";
     ConfigFileFormat someConfigFileFormat = ConfigFileFormat.Properties;
     String someNamespaceFileName =
-        String.format("%s+%s.%s", someAppId, someNamespace, someConfigFileFormat.getValue());
+        String.format("%s.%s", someNamespace, someConfigFileFormat.getValue());
     MockInjector.setInstance(ConfigFactory.class, someNamespaceFileName, new MockConfigFactory());
     ConfigFile configFile = ConfigService.getConfigFile(someNamespace, someConfigFileFormat);
 

@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.internals;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Maps;
@@ -57,9 +58,6 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
 
-  private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-
-
   /**
    * Constructor.
    *
@@ -67,7 +65,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @param configRepository the config repository for this config instance
    */
   public DefaultConfig(String namespace, ConfigRepository configRepository) {
-    this(m_configUtil.getAppId(), namespace , configRepository);
+    this(null, namespace , configRepository);
   }
 
   /**
@@ -78,6 +76,9 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @param configRepository the config repository for this config instance
    */
   public DefaultConfig(String appId, String namespace, ConfigRepository configRepository) {
+    if (appId == null) {
+      appId = ApolloInjector.getInstance(ConfigUtil.class).getAppId();
+    }
     m_appId = appId;
     m_namespace = namespace;
     m_resourceProperties = loadFromResource(m_appId, m_namespace);
@@ -326,6 +327,12 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
     InputStream in = ClassLoaderUtil.getLoader().getResourceAsStream(name);
     Properties properties = null;
 
+    if (StringUtils.equals(ApolloInjector.getInstance(ConfigUtil.class).getAppId(), appId)
+        && in == null) {
+      name = String.format("META-INF/config/%s.properties", namespace);
+      in = ClassLoaderUtil.getLoader().getResourceAsStream(name);
+    }
+
     if (in != null) {
       properties = propertiesFactory.getPropertiesInstance();
 
@@ -333,7 +340,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
         properties.load(in);
       } catch (IOException ex) {
         Tracer.logError(ex);
-        logger.error("Load resource config for namespace {}_{} failed", appId, namespace, ex);
+        logger.error("Load resource config for appId {} namespace {} failed", appId, namespace, ex);
       } finally {
         try {
           in.close();

@@ -24,7 +24,6 @@ import java.lang.annotation.*;
  *
  * @since 2.4.0
  */
-
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented

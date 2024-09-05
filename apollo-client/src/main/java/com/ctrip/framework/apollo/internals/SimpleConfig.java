@@ -54,7 +54,7 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
    * @param configRepository the config repository for this config instance
    */
   public SimpleConfig(String namespace, ConfigRepository configRepository) {
-    this(m_configUtil.getAppId(), namespace, configRepository);
+    this(null, namespace, configRepository);
   }
 
   /**
@@ -65,6 +65,9 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
    * @param configRepository the config repository for this config instance
    */
   public SimpleConfig(String appId, String namespace, ConfigRepository configRepository) {
+    if (appId == null) {
+      appId = ApolloInjector.getInstance(ConfigUtil.class).getAppId();
+    }
     m_appId = appId;
     m_namespace = namespace;
     m_configRepository = configRepository;

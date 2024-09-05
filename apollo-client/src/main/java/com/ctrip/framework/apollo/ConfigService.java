@@ -100,7 +100,7 @@ public class ConfigService {
   static void setConfig(String namespace, final Config config) {
     s_instance.getRegistry().register(namespace, new ConfigFactory() {
 
-      private ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+      private final ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
       @Override
       public Config create(String namespace) {

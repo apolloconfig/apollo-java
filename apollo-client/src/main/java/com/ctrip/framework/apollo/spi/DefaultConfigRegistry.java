@@ -16,8 +16,6 @@
  */
 package com.ctrip.framework.apollo.spi;
 
-import java.util.Map;
-
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.HashBasedTable;
@@ -25,8 +23,6 @@ import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -36,7 +32,8 @@ public class DefaultConfigRegistry implements ConfigRegistry {
 
   private ConfigUtil m_configUtil;
 
-  private Table<String,String,ConfigFactory> m_instances = Tables.synchronizedTable(HashBasedTable.create());
+  private Table<String, String, ConfigFactory> m_instances = Tables.synchronizedTable(
+      HashBasedTable.create());
 
   public DefaultConfigRegistry() {
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);

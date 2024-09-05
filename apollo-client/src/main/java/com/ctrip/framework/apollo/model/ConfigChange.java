@@ -49,7 +49,6 @@ public class ConfigChange {
     this.newValue = newValue;
     this.changeType = changeType;
   }
-
   public String getPropertyName() {
     return propertyName;
   }

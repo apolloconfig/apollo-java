@@ -40,7 +40,6 @@ public class ConfigChangeEvent {
     this.m_changes = changes;
   }
 
-
   /**
    * Get the keys changed.
    * @return the list of the keys

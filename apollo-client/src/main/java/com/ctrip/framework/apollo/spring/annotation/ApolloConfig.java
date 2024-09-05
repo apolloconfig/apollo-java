@@ -55,6 +55,7 @@ public @interface ApolloConfig {
    * @since 2.4.0
    */
   String appId() default "";
+  
   /**
    * Apollo namespace for the config, if not specified then default to application
    */

@@ -277,6 +277,11 @@ public abstract class BaseIntegrationTest {
     public boolean isPropertiesOrderEnabled() {
       return propertiesOrderEnabled;
     }
+
+    @Override
+    public String getDefaultLocalCacheDir(String appId) {
+      return ClassLoaderUtil.getClassPath() + "/" + appId;
+    }
   }
 
   /**

@@ -53,7 +53,7 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
     final String[] namespaces = attributes.getStringArray("value");
     final int order = attributes.getNumber("order");
 
-    Map<String,String[]> configMap = new HashMap<>();
+    Map<String, String[]> configMap = new HashMap<>();
 
     configMap.put(configUtil.getAppId(), this.resolveNamespaces(namespaces));
 

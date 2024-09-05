@@ -135,6 +135,9 @@ public class DefaultConfigFactoryManagerTest {
 
     @Override
     public ConfigFactory getFactory(String appId, String namespace) {
+      if (namespace.equals(NAMESPACE_REGISTERED)) {
+        return REGISTERED_CONFIGFACTORY;
+      }
       return null;
     }
   }

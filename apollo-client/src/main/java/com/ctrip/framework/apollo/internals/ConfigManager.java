@@ -31,7 +31,6 @@ public interface ConfigManager {
    */
   Config getConfig(String namespace);
 
-
   /**
    * Get the config instance for the namespace and appId specified.
    * @param appId the appId

@@ -56,7 +56,7 @@ import org.springframework.core.env.*;
  */
 public class PropertySourcesProcessor implements BeanFactoryPostProcessor, EnvironmentAware,
     ApplicationEventPublisherAware, PriorityOrdered {
-  private static final Multimap<Integer, Multimap<String,String>> APP_NAMESPACE_NAMES = LinkedHashMultimap.create();
+  private static final Multimap<Integer, Multimap<String, String>> APP_NAMESPACE_NAMES = LinkedHashMultimap.create();
   private static final Set<BeanFactory> AUTO_UPDATE_INITIALIZED_BEAN_FACTORIES = Sets.newConcurrentHashSet();
 
   private final ConfigPropertySourceFactory configPropertySourceFactory = SpringInjector
@@ -66,13 +66,12 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
   private ApplicationEventPublisher applicationEventPublisher;
 
   public static boolean addNamespaces(Collection<String> namespaces, int order) {
-    ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-    return addNamespaces(configUtil.getAppId(), namespaces, order);
+    return addNamespaces(ApolloInjector.getInstance(ConfigUtil.class).getAppId(), namespaces, order);
   }
 
   public static boolean addNamespaces(String appId, Collection<String> namespaces, int order) {
-    Multimap<String,String> appNamespaceNames = LinkedHashMultimap.create();
-    appNamespaceNames.putAll(appId,namespaces);
+    Multimap<String, String> appNamespaceNames = LinkedHashMultimap.create();
+    appNamespaceNames.putAll(appId, namespaces);
     return APP_NAMESPACE_NAMES.put(order, appNamespaceNames);
   }
 
