@@ -19,6 +19,8 @@ package com.ctrip.framework.apollo.spring.config;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import com.ctrip.framework.apollo.BaseIntegrationTest;
+import com.ctrip.framework.apollo.BaseIntegrationTest.MockConfigUtil;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.build.ApolloInjector;
@@ -48,9 +50,13 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   private MutablePropertySources propertySources;
   private ApplicationEventPublisher applicationEventPublisher;
 
+  private final static String someAppId = "someAppId";
+
   @Override
   @Before
   public void setUp() throws Exception {
+    System.setProperty(ApolloClientSystemConsts.APP_ID, someAppId);
+    //MockInjector.setInstance(ConfigUtil.class, new BaseIntegrationTest.MockConfigUtil());
     super.setUp();
     propertySources = mock(MutablePropertySources.class);
     environment = mock(ConfigurableEnvironment.class);
@@ -60,6 +66,7 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     processor = new PropertySourcesProcessor();
     processor.setEnvironment(environment);
     processor.setApplicationEventPublisher(applicationEventPublisher);
+
   }
 
   @Override
@@ -71,12 +78,13 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
 
   @Test
   public void testInitializePropertySources() {
+    String someAppId = "someAppId";
     String namespaceName = "someNamespace";
     String anotherNamespaceName = "anotherNamespace";
     Config config = mock(Config.class);
     Config anotherConfig = mock(Config.class);
-    mockConfig(namespaceName, config);
-    mockConfig(anotherNamespaceName, anotherConfig);
+    mockConfig(someAppId, namespaceName, config);
+    mockConfig(someAppId, anotherNamespaceName, anotherConfig);
     PropertySourcesProcessor.addNamespaces(Lists.newArrayList(namespaceName, anotherNamespaceName),
         0);
 
@@ -94,17 +102,18 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     ConfigPropertySource anotherPropertySource = (ConfigPropertySource) Lists.newArrayList(
         compositePropertySource.getPropertySources()).get(1);
 
-    assertEquals(namespaceName, propertySource.getName());
+    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + namespaceName, propertySource.getName());
     assertSame(config, propertySource.getSource());
-    assertEquals(anotherNamespaceName, anotherPropertySource.getName());
+    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + anotherNamespaceName, anotherPropertySource.getName());
     assertSame(anotherConfig, anotherPropertySource.getSource());
   }
 
   @Test
   public void testApplicationEvent() {
+    String someAppId = "someAppId";
     String namespaceName = "someNamespace";
     Config config = mock(Config.class);
-    mockConfig(namespaceName, config);
+    mockConfig(someAppId, namespaceName, config);
     PropertySourcesProcessor.addNamespaces(Lists.newArrayList(namespaceName), 0);
     ConfigChangeEvent someConfigChangeEvent = mock(ConfigChangeEvent.class);
 
@@ -149,6 +158,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     processor.postProcessBeanFactory(beanFactory);
 
     assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME));
-    assertEquals(propertySources.iterator().next().getName(), StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
+    assertEquals(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, propertySources.iterator().next().getName());
   }
 }

@@ -27,7 +27,7 @@ import com.ctrip.framework.apollo.spi.DefaultConfigFactory;
 public class PureApolloConfigFactory extends DefaultConfigFactory implements ConfigFactory {
 
   @Override
-  protected Config createRepositoryConfig(String namespace, ConfigRepository configRepository) {
-    return new PureApolloConfig(namespace, configRepository);
+  protected Config createRepositoryConfig(String appId, String namespace, ConfigRepository configRepository) {
+    return new PureApolloConfig(appId, namespace, configRepository);
   }
 }

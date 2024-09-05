@@ -33,9 +33,26 @@ public interface ConfigFactory {
   Config create(String namespace);
 
   /**
+   * Create the config instance for the appId and namespace.
+   *
+   * @param appId the appId
+   * @param namespace the namespace
+   * @return the newly created config instance
+   */
+  Config create(String appId, String namespace);
+
+  /**
    * Create the config file instance for the namespace
    * @param namespace the namespace
    * @return the newly created config file instance
    */
   ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat);
+
+  /**
+   * Create the config file instance for the appId and namespace.
+   * @param appId the appId
+   * @param namespace the namespace
+   * @return the newly created config file instance
+   */
+  ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat);
 }

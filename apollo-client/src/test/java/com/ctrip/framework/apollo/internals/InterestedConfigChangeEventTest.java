@@ -42,6 +42,8 @@ import static org.mockito.Mockito.*;
  */
 public class InterestedConfigChangeEventTest {
 
+  private static String someAppId = "someAppId";
+
   @Test
   public void TestInterestedChangedKeys()
       throws ExecutionException, InterruptedException, TimeoutException {
@@ -69,10 +71,10 @@ public class InterestedConfigChangeEventTest {
 
 
     Map<String, ConfigChange> changes = new HashMap<>();
-    changes.put(key, new ConfigChange(namespace, key, "123", "456", PropertyChangeType.MODIFIED));
+    changes.put(key, new ConfigChange(someAppId, namespace, key, "123", "456", PropertyChangeType.MODIFIED));
     changes.put(anotherKey,
-        new ConfigChange(namespace, anotherKey, null, "someValue", PropertyChangeType.ADDED));
-    config.fireConfigChange(namespace, changes);
+        new ConfigChange(someAppId, namespace, anotherKey, null, "someValue", PropertyChangeType.ADDED));
+    config.fireConfigChange(someAppId, namespace, changes);
 
     onChangeFuture.get(500, TimeUnit.MILLISECONDS);
 

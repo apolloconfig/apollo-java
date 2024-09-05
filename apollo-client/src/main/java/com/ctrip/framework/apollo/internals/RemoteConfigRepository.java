@@ -72,6 +72,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   private final ConfigUtil m_configUtil;
   private final RemoteConfigLongPollService remoteConfigLongPollService;
   private volatile AtomicReference<ApolloConfig> m_configCache;
+  private final String m_appId;
   private final String m_namespace;
   private final static ScheduledExecutorService m_executorService;
   private final AtomicReference<ServiceDTO> m_longPollServiceDto;
@@ -89,9 +90,11 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   /**
    * Constructor.
    *
+   * @param appId the appId
    * @param namespace the namespace
    */
-  public RemoteConfigRepository(String namespace) {
+  public RemoteConfigRepository(String appId, String namespace) {
+    m_appId = appId;
     m_namespace = namespace;
     m_configCache = new AtomicReference<>();
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
@@ -154,7 +157,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
       if (previous != current) {
         logger.debug("Remote Config refreshed!");
         m_configCache.set(current);
-        this.fireRepositoryChange(m_namespace, this.getConfig());
+        this.fireRepositoryChange(m_appId, m_namespace, this.getConfig());
       }
 
       if (current != null) {
@@ -185,10 +188,10 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
       } catch (InterruptedException e) {
       }
     }
-    String appId = m_configUtil.getAppId();
+    String appId = this.m_appId;
     String cluster = m_configUtil.getCluster();
     String dataCenter = m_configUtil.getDataCenter();
-    String secret = m_configUtil.getAccessKeySecret();
+    String secret = m_configUtil.getAccessKeySecret(appId);
     Tracer.logEvent("Apollo.Client.ConfigMeta", STRING_JOINER.join(appId, cluster, m_namespace));
     int maxRetries = m_configNeedForceRefresh.get() ? 2 : 1;
     long onErrorSleepTime = 0; // 0 means no sleep
@@ -330,7 +333,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   }
 
   private void scheduleLongPollingRefresh() {
-    remoteConfigLongPollService.submit(m_namespace, this);
+    remoteConfigLongPollService.submit(m_appId, m_namespace, this);
   }
 
   public void onLongPollNotified(ServiceDTO longPollNotifiedServiceDto, ApolloNotificationMessages remoteMessages) {

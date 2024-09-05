@@ -308,6 +308,17 @@ public class ConfigUtil {
     return String.format(cacheRoot, getAppId());
   }
 
+  public String getDefaultLocalCacheDir(String appId) {
+    String cacheRoot = getCustomizedCacheRoot();
+
+    if (!Strings.isNullOrEmpty(cacheRoot)) {
+      return cacheRoot + File.separator + appId;
+    }
+
+    cacheRoot = isOSWindows() ? "C:\\opt\\data\\%s" : "/opt/data/%s";
+    return String.format(cacheRoot, appId);
+  }
+
   private String getCustomizedCacheRoot() {
     // 1. Get from System Property
     String cacheRoot = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR);
@@ -508,5 +519,9 @@ public class ConfigUtil {
       }
     }
     return defaultVal;
+  }
+
+  public String getAccessKeySecret(String appId){
+    return Foundation.app().getAccessKeySecret(appId);
   }
 }

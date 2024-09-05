@@ -39,6 +39,7 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class JsonConfigFileTest {
+  private String someAppId;
   private String someNamespace;
   @Mock
   private ConfigRepository configRepository;
@@ -47,6 +48,7 @@ public class JsonConfigFileTest {
 
   @Before
   public void setUp() throws Exception {
+    someAppId = "someAppId";
     someNamespace = "someName";
   }
 
@@ -62,7 +64,7 @@ public class JsonConfigFileTest {
     when(configRepository.getConfig()).thenReturn(someProperties);
     when(configRepository.getSourceType()).thenReturn(someSourceType);
 
-    JsonConfigFile configFile = new JsonConfigFile(someNamespace, configRepository);
+    JsonConfigFile configFile = new JsonConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(ConfigFileFormat.JSON, configFile.getConfigFileFormat());
     assertEquals(someNamespace, configFile.getNamespace());
@@ -75,7 +77,7 @@ public class JsonConfigFileTest {
   public void testWhenHasNoContent() throws Exception {
     when(configRepository.getConfig()).thenReturn(null);
 
-    JsonConfigFile configFile = new JsonConfigFile(someNamespace, configRepository);
+    JsonConfigFile configFile = new JsonConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -85,7 +87,7 @@ public class JsonConfigFileTest {
   public void testWhenConfigRepositoryHasError() throws Exception {
     when(configRepository.getConfig()).thenThrow(new RuntimeException("someError"));
 
-    JsonConfigFile configFile = new JsonConfigFile(someNamespace, configRepository);
+    JsonConfigFile configFile = new JsonConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -105,7 +107,7 @@ public class JsonConfigFileTest {
     when(configRepository.getConfig()).thenReturn(someProperties);
     when(configRepository.getSourceType()).thenReturn(someSourceType);
 
-    JsonConfigFile configFile = new JsonConfigFile(someNamespace, configRepository);
+    JsonConfigFile configFile = new JsonConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(someValue, configFile.getContent());
     assertEquals(someSourceType, configFile.getSourceType());
@@ -116,7 +118,7 @@ public class JsonConfigFileTest {
     ConfigSourceType anotherSourceType = ConfigSourceType.REMOTE;
     when(configRepository.getSourceType()).thenReturn(anotherSourceType);
 
-    configFile.onRepositoryChange(someNamespace, anotherProperties);
+    configFile.onRepositoryChange(someAppId, someNamespace, anotherProperties);
 
     assertEquals(anotherValue, configFile.getContent());
     assertEquals(anotherSourceType, configFile.getSourceType());
@@ -134,13 +136,13 @@ public class JsonConfigFileTest {
     when(configRepository.getConfig()).thenThrow(new RuntimeException("someError"));
     when(configRepository.getSourceType()).thenReturn(someSourceType);
 
-    JsonConfigFile configFile = new JsonConfigFile(someNamespace, configRepository);
+    JsonConfigFile configFile = new JsonConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
     assertEquals(ConfigSourceType.NONE, configFile.getSourceType());
 
-    configFile.onRepositoryChange(someNamespace, someProperties);
+    configFile.onRepositoryChange(someAppId, someNamespace, someProperties);
 
     assertTrue(configFile.hasContent());
     assertEquals(someValue, configFile.getContent());

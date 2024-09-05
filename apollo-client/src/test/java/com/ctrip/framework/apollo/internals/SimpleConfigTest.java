@@ -49,6 +49,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class SimpleConfigTest {
 
+  private String someAppId;
   private String someNamespace;
   @Mock
   private ConfigRepository configRepository;
@@ -58,6 +59,7 @@ public class SimpleConfigTest {
 
   @Before
   public void setUp() throws Exception {
+    someAppId = "someAppId";
     someNamespace = "someName";
 
     when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
@@ -86,7 +88,7 @@ public class SimpleConfigTest {
     when(configRepository.getConfig()).thenReturn(someProperties);
     when(configRepository.getSourceType()).thenReturn(someSourceType);
 
-    SimpleConfig config = new SimpleConfig(someNamespace, configRepository);
+    SimpleConfig config = new SimpleConfig(someAppId, someNamespace, configRepository);
 
     assertEquals(someValue, config.getProperty(someKey, null));
     assertEquals(someSourceType, config.getSourceType());
@@ -99,7 +101,7 @@ public class SimpleConfigTest {
 
     when(configRepository.getConfig()).thenThrow(mock(RuntimeException.class));
 
-    Config config = new SimpleConfig(someNamespace, configRepository);
+    Config config = new SimpleConfig(someAppId, someNamespace, configRepository);
 
     assertEquals(anyValue, config.getProperty(someKey, anyValue));
     assertEquals(ConfigSourceType.NONE, config.getSourceType());
@@ -133,7 +135,7 @@ public class SimpleConfigTest {
       }
     };
 
-    SimpleConfig config = new SimpleConfig(someNamespace, configRepository);
+    SimpleConfig config = new SimpleConfig(someAppId, someNamespace, configRepository);
 
     assertEquals(someSourceType, config.getSourceType());
 
@@ -142,10 +144,11 @@ public class SimpleConfigTest {
     ConfigSourceType anotherSourceType = ConfigSourceType.REMOTE;
     when(configRepository.getSourceType()).thenReturn(anotherSourceType);
 
-    config.onRepositoryChange(someNamespace, anotherProperties);
+    config.onRepositoryChange(someAppId, someNamespace, anotherProperties);
 
     ConfigChangeEvent changeEvent = configChangeFuture.get(500, TimeUnit.MILLISECONDS);
 
+    assertEquals(someAppId, changeEvent.getAppId());
     assertEquals(someNamespace, changeEvent.getNamespace());
     assertEquals(3, changeEvent.changedKeys().size());
 

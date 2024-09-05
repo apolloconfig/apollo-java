@@ -99,7 +99,17 @@ public class DefaultConfigFactoryManagerTest {
       }
 
       @Override
+      public Config create(String appId, String namespace) {
+        return null;
+      }
+
+      @Override
       public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+        return null;
+      }
+
+      @Override
+      public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
         return null;
       }
 
@@ -111,7 +121,20 @@ public class DefaultConfigFactoryManagerTest {
     }
 
     @Override
+    public void register(String appId, String namespace, ConfigFactory factory) {
+
+    }
+
+    @Override
     public ConfigFactory getFactory(String namespace) {
+      if (namespace.equals(NAMESPACE_REGISTERED)) {
+        return REGISTERED_CONFIGFACTORY;
+      }
+      return null;
+    }
+
+    @Override
+    public ConfigFactory getFactory(String appId, String namespace) {
       if (namespace.equals(NAMESPACE_REGISTERED)) {
         return REGISTERED_CONFIGFACTORY;
       }
@@ -126,7 +149,17 @@ public class DefaultConfigFactoryManagerTest {
     }
 
     @Override
+    public Config create(String appId, String namespace) {
+      return null;
+    }
+
+    @Override
     public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+      return null;
+    }
+
+    @Override
+    public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
       return null;
     }
   }
@@ -138,7 +171,17 @@ public class DefaultConfigFactoryManagerTest {
     }
 
     @Override
+    public Config create(String appId, String namespace) {
+      return null;
+    }
+
+    @Override
     public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+      return null;
+    }
+
+    @Override
+    public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
       return null;
     }
   }
