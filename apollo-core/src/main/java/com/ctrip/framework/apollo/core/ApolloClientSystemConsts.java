@@ -74,6 +74,16 @@ public class ApolloClientSystemConsts {
   public static final String DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES = "APOLLO_CACHEDIR";
 
   /**
+   * kubernetes configmap cache namespace
+   */
+  public static final String APOLLO_CONFIGMAP_NAMESPACE = "apollo.configmap-namespace";
+
+  /**
+   * kubernetes configmap cache namespace environment variables
+   */
+  public static final String APOLLO_CONFIGMAP_NAMESPACE_ENVIRONMENT_VARIABLES = "APOLLO_CONFIGMAP_NAMESPACE";
+
+  /**
    * apollo client access key
    */
   public static final String APOLLO_ACCESS_KEY_SECRET = "apollo.access-key.secret";
@@ -156,6 +166,16 @@ public class ApolloClientSystemConsts {
    * enable property names cache environment variables
    */
   public static final String APOLLO_CACHE_FILE_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_FILE_ENABLE";
+
+  /**
+   * enable property names cache
+   */
+  public static final String APOLLO_KUBERNETES_CACHE_ENABLE = "apollo.cache.kubernetes.enable";
+
+  /**
+   * enable property names cache environment variables
+   */
+  public static final String APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_KUBERNETES_CACHE_ENABLE";
 
   /**
    * enable apollo overrideSystemProperties

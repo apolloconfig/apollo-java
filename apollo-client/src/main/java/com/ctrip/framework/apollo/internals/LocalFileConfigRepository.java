@@ -58,6 +58,13 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
   private volatile ConfigSourceType m_sourceType = ConfigSourceType.LOCAL;
 
   /**
+   * configmapnamespace 用户配的，不配用默认default
+   * configmapname appid
+   * configmap-key cluster+namespace
+   * configmap-value 配置文件信息的json串
+   */
+
+  /**
    * Constructor.
    *
    * @param namespace the namespace

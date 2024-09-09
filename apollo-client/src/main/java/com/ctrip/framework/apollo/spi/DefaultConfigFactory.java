@@ -22,17 +22,7 @@ import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.PropertiesCompatibleConfigFile;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
-import com.ctrip.framework.apollo.internals.ConfigRepository;
-import com.ctrip.framework.apollo.internals.DefaultConfig;
-import com.ctrip.framework.apollo.internals.JsonConfigFile;
-import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
-import com.ctrip.framework.apollo.internals.PropertiesCompatibleFileConfigRepository;
-import com.ctrip.framework.apollo.internals.PropertiesConfigFile;
-import com.ctrip.framework.apollo.internals.RemoteConfigRepository;
-import com.ctrip.framework.apollo.internals.TxtConfigFile;
-import com.ctrip.framework.apollo.internals.XmlConfigFile;
-import com.ctrip.framework.apollo.internals.YamlConfigFile;
-import com.ctrip.framework.apollo.internals.YmlConfigFile;
+import com.ctrip.framework.apollo.internals.*;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +67,7 @@ public class DefaultConfigFactory implements ConfigFactory {
       configRepository = createPropertiesCompatibleFileConfigRepository(namespace, format);
     } else {
       configRepository = createConfigRepository(namespace);
+      //ServiceBootstrap.loadPrimary(ConfigRepository.class);
     }
 
     logger.debug("Created a configuration repository of type [{}] for namespace [{}]",
@@ -111,7 +102,10 @@ public class DefaultConfigFactory implements ConfigFactory {
   }
 
   ConfigRepository createConfigRepository(String namespace) {
-    if (m_configUtil.isPropertyFileCacheEnabled()) {
+    // TODO 本地和configMap允许同时开启
+    if (m_configUtil.isPropertyKubernetesCacheEnabled()) {
+      return createConfigMapConfigRepository(namespace);
+    }else if (m_configUtil.isPropertyFileCacheEnabled()) {
       return createLocalConfigRepository(namespace);
     }
     return createRemoteConfigRepository(namespace);
@@ -131,6 +125,21 @@ public class DefaultConfigFactory implements ConfigFactory {
       return new LocalFileConfigRepository(namespace);
     }
     return new LocalFileConfigRepository(namespace, createRemoteConfigRepository(namespace));
+  }
+
+  /**
+   * Creates a Kubernetes config map repository for a given namespace
+   * @param namespace the namespace of the repository
+   * @return the newly created repository for the given namespace
+   */
+  private ConfigRepository createConfigMapConfigRepository(String namespace) {
+    if (m_configUtil.isInKubernetesMode()) {
+      logger.warn(
+              "==== Apollo is in local mode! Won't pull configs from remote server for namespace {} ! ====",
+              namespace);
+      return new K8sConfigMapConfigRepository(namespace);
+    }
+    return new K8sConfigMapConfigRepository(namespace, createLocalConfigRepository(namespace));
   }
 
   RemoteConfigRepository createRemoteConfigRepository(String namespace) {

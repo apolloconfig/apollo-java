@@ -65,12 +65,15 @@ public class ConfigUtil {
   private long configCacheExpireTime = 1;//1 minute
   private TimeUnit configCacheExpireTimeUnit = TimeUnit.MINUTES;//1 minute
   private long longPollingInitialDelayInMills = 2000;//2 seconds
+  private String kubernetesCacheConfigMapNamespace;
+  private final String DEFAULT_KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE = "default";
   private boolean autoUpdateInjectedSpringProperties = true;
   private final RateLimiter warnLogRateLimiter;
   private boolean propertiesOrdered = false;
   private boolean propertyNamesCacheEnabled = false;
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
+  private boolean PropertyKubernetesCacheEnabled = false;
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -86,6 +89,7 @@ public class ConfigUtil {
     initPropertyNamesCacheEnabled();
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
+    initPropertyKubernetesCacheEnabled();
   }
 
   /**
@@ -366,9 +370,46 @@ public class ConfigUtil {
     return cacheRoot;
   }
 
+  public String getConfigMapNamespace() {
+    String configMapNamespace = getCustomizedConfigMapNamespace();
+
+    if (!Strings.isNullOrEmpty(configMapNamespace)) {
+      return configMapNamespace;
+    }
+
+    return DEFAULT_KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE;
+  }
+
+  private String getCustomizedConfigMapNamespace() {
+    // 1. Get from System Property
+    String configMapNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE);
+    if (!Strings.isNullOrEmpty(configMapNamespace)) {
+      // 2. Get from OS environment variable
+      configMapNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE_ENVIRONMENT_VARIABLES);
+    }
+    if (Strings.isNullOrEmpty(configMapNamespace)) {
+      // 3. Get from server.properties
+      configMapNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE, null);
+    }
+    if (Strings.isNullOrEmpty(configMapNamespace)) {
+      // 4. Get from app.properties
+      configMapNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE, null);
+    }
+    return configMapNamespace;
+  }
+
   public boolean isInLocalMode() {
     try {
       return Env.LOCAL == getApolloEnv();
+    } catch (Throwable ex) {
+      //ignore
+    }
+    return false;
+  }
+
+  public boolean isInKubernetesMode() {
+    try {
+      return Env.KUBERNETES == getApolloEnv();
     } catch (Throwable ex) {
       //ignore
     }
@@ -469,6 +510,10 @@ public class ConfigUtil {
     return propertyFileCacheEnabled;
   }
 
+  public boolean isPropertyKubernetesCacheEnabled() {
+    return PropertyKubernetesCacheEnabled;
+  }
+
   public boolean isOverrideSystemProperties() {
     return overrideSystemProperties;
   }
@@ -489,6 +534,12 @@ public class ConfigUtil {
     overrideSystemProperties = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
             ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
             overrideSystemProperties);
+  }
+
+  private void initPropertyKubernetesCacheEnabled() {
+    PropertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
+            ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES,
+            PropertyKubernetesCacheEnabled);
   }
 
   private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
