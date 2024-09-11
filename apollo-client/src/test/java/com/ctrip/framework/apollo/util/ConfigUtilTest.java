@@ -244,6 +244,24 @@ public class ConfigUtilTest {
   }
 
   @Test
+  public void testConfigMapNamespaceWithSystemProperty() {
+    String someConfigMapNamespace = "someConfigMapNamespace";
+
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE, someConfigMapNamespace);
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(someConfigMapNamespace, configUtil.getConfigMapNamespace());
+  }
+
+  @Test
+  public void testConfigMapNamespaceWithDefault() {
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT, configUtil.getConfigMapNamespace());
+  }
+
+  @Test
   public void testCustomizePropertiesOrdered() {
     boolean propertiesOrdered = true;
     System.setProperty(PropertiesFactory.APOLLO_PROPERTY_ORDER_ENABLE,

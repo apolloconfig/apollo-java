@@ -65,8 +65,6 @@ public class ConfigUtil {
   private long configCacheExpireTime = 1;//1 minute
   private TimeUnit configCacheExpireTimeUnit = TimeUnit.MINUTES;//1 minute
   private long longPollingInitialDelayInMills = 2000;//2 seconds
-  private String kubernetesCacheConfigMapNamespace;
-  private final String DEFAULT_KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE = "default";
   private boolean autoUpdateInjectedSpringProperties = true;
   private final RateLimiter warnLogRateLimiter;
   private boolean propertiesOrdered = false;
@@ -377,13 +375,13 @@ public class ConfigUtil {
       return configMapNamespace;
     }
 
-    return DEFAULT_KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE;
+    return ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT;
   }
 
   private String getCustomizedConfigMapNamespace() {
     // 1. Get from System Property
     String configMapNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE);
-    if (!Strings.isNullOrEmpty(configMapNamespace)) {
+    if (Strings.isNullOrEmpty(configMapNamespace)) {
       // 2. Get from OS environment variable
       configMapNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE_ENVIRONMENT_VARIABLES);
     }
