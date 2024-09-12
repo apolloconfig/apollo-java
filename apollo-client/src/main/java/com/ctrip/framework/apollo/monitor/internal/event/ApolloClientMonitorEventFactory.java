@@ -24,7 +24,7 @@ import java.util.HashMap;
  */
 public class ApolloClientMonitorEventFactory {
 
-  public static volatile ApolloClientMonitorEventFactory INSTANCE;
+  private static volatile ApolloClientMonitorEventFactory INSTANCE;
 
   private ApolloClientMonitorEventFactory() {
   }

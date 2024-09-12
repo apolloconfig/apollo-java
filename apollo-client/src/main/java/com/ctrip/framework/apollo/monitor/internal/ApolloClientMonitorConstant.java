@@ -16,19 +16,10 @@
  */
 package com.ctrip.framework.apollo.monitor.internal;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-
 /**
  * @author Rawven
  */
 public class ApolloClientMonitorConstant {
-
-  /**
-   * util
-   */
-  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(
-      "yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
 
   /**
    * common
@@ -61,7 +52,7 @@ public class ApolloClientMonitorConstant {
   public static final String APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND = "Apollo.Client.NamespaceFirstLoadSpendTime";
 
   /**
-   * collector tag
+   * listener tag
    */
   public static final String TAG_ERROR = "ErrorMonitor";
   public static final String TAG_NAMESPACE = "NamespaceMonitor";
@@ -73,7 +64,6 @@ public class ApolloClientMonitorConstant {
    */
   public static final String METRICS_NAMESPACE_LATEST_UPDATE_TIME = "apollo_client_namespace_latest_update_time";
   public static final String METRICS_NAMESPACE_ITEM_NUM = "apollo_client_namespace_item_num";
-  public static final String METRICS_CONFIG_FILE_NUM = "apollo_client_config_file_num";
   public static final String METRICS_EXCEPTION_NUM = "apollo_client_exception_num";
   public static final String METRICS_NAMESPACE_FIRST_LOAD_SPEND = "apollo_client_namespace_first_load_time_spend_in_ms";
   public static final String METRICS_NAMESPACE_USAGE = "apollo_client_namespace_usage";

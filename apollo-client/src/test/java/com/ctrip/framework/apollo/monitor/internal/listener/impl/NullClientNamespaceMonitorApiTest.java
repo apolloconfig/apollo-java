@@ -51,12 +51,6 @@ public class NullClientNamespaceMonitorApiTest {
   }
 
   @Test
-  public void testGetConfigFileNamespaces() {
-    List<String> configFileNamespaces = namespaceMonitorApi.getConfigFileNamespaces();
-    assertEquals(0, configFileNamespaces.size());
-  }
-
-  @Test
   public void testGetNotFoundNamespaces() {
     List<String> notFoundNamespaces = namespaceMonitorApi.getNotFoundNamespaces();
 

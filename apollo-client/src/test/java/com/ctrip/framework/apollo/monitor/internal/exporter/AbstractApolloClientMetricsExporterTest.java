@@ -94,7 +94,7 @@ public class AbstractApolloClientMetricsExporterTest {
     }
 
     public List<ApolloClientMonitorEventListener> getCollectors() {
-      return collectors;
+      return listeners;
     }
 
     @Override

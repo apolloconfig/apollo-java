@@ -27,7 +27,7 @@ import javax.management.MXBean;
 public interface ApolloClientJmxNamespaceMBean {
   // Because JMX does not support all type return values
   // declare the interface separately.
-  
+
   /**
    * NamespaceMetrics: 1.usageCount 2.firstLoadSpend 3.latestUpdateTime 4.releaseKey
    */
@@ -37,11 +37,6 @@ public interface ApolloClientJmxNamespaceMBean {
    * get Namespace Config.ItemsNum
    */
   Integer getNamespacePropertySize(String namespace);
-
-  /**
-   * get ConfigFile namespaces
-   */
-  List<String> getConfigFileNamespaces();
 
   /**
    * get not found namespaces

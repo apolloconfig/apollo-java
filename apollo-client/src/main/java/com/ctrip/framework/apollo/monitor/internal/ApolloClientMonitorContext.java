@@ -28,6 +28,7 @@ import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientExcep
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientNamespaceMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientThreadPoolMonitorApi;
 import com.google.common.collect.Lists;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,6 +41,20 @@ public class ApolloClientMonitorContext {
   private ApolloClientBootstrapArgsMonitorApi apolloClientBootstrapArgsMonitorApi = new NullClientBootstrapArgsMonitorApi();
   private ApolloClientThreadPoolMonitorApi apolloClientThreadPoolMonitorApi = new NullClientThreadPoolMonitorApi();
   private ApolloClientMetricsExporter apolloClientMetricsExporter = new NullApolloClientMetricsExporter();
+  private List<ApolloClientMonitorEventListener> listener = Lists.newArrayList();
+
+  public void addApolloClientMonitorEventListener(ApolloClientMonitorEventListener listener) {
+    this.listener.add(listener);
+  }
+
+  public List<ApolloClientMonitorEventListener> getApolloClientMonitorEventListeners() {
+    return Collections.unmodifiableList(listener);
+  }
+
+  public void setApolloClientMonitorEventListeners(
+      List<ApolloClientMonitorEventListener> listeners) {
+    listener = listeners;
+  }
 
   public void setApolloClientExceptionMonitorApi(
       ApolloClientExceptionMonitorApi apolloClientExceptionMonitorApi) {
@@ -64,14 +79,6 @@ public class ApolloClientMonitorContext {
   public void setApolloClientMetricsExporter(
       ApolloClientMetricsExporter apolloClientMetricsExporter) {
     this.apolloClientMetricsExporter = apolloClientMetricsExporter;
-  }
-
-  public List<ApolloClientMonitorEventListener> getCollectors() {
-    return Lists.newArrayList(
-        (ApolloClientMonitorEventListener) apolloClientBootstrapArgsMonitorApi,
-        (ApolloClientMonitorEventListener) apolloClientThreadPoolMonitorApi,
-        (ApolloClientMonitorEventListener) apolloClientExceptionMonitorApi,
-        (ApolloClientMonitorEventListener) apolloClientNamespaceMonitorApi);
   }
 
   public ApolloClientExceptionMonitorApi getExceptionApi() {

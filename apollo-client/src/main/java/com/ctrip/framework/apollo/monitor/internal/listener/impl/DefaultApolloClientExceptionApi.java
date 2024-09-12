@@ -45,10 +45,9 @@ public class DefaultApolloClientExceptionApi extends
   private final AtomicInteger exceptionCountFromStartup = new AtomicInteger(0);
   private final Queue<ApolloConfigException> exceptionsQueue;
 
-  public DefaultApolloClientExceptionApi() {
+  public DefaultApolloClientExceptionApi(ConfigUtil configUtil) {
     super(TAG_ERROR);
-    int monitorExceptionQueueSize = ApolloInjector.getInstance(ConfigUtil.class)
-        .getMonitorExceptionQueueSize();
+    int monitorExceptionQueueSize = configUtil.getMonitorExceptionQueueSize();
     EvictingQueue<ApolloConfigException> evictingQueue = EvictingQueue.create(
         monitorExceptionQueueSize);
     exceptionsQueue = Queues.synchronizedQueue(evictingQueue);

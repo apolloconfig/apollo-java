@@ -25,7 +25,8 @@ import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEven
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventPublisher;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
-import java.time.Instant;
+
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -50,12 +51,12 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
 
   @Override
   public void logError(Throwable cause) {
-    publishErrorEvent(TAG_ERROR, cause);
+    publishErrorEvent(cause);
   }
 
   @Override
   public void logError(String message, Throwable cause) {
-    publishErrorEvent(TAG_ERROR, cause);
+    publishErrorEvent(cause);
   }
 
   @Override
@@ -104,10 +105,10 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
   }
 
 
-  private void publishErrorEvent(String tag, Throwable cause) {
+  private void publishErrorEvent(Throwable cause) {
     ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance().createEvent(tag)
-            .withTag(tag)
+        ApolloClientMonitorEventFactory.getInstance().createEvent(TAG_ERROR)
+            .withTag(TAG_ERROR)
             .putAttachment(THROWABLE, cause));
   }
 
@@ -123,7 +124,7 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
     ApolloClientMonitorEventPublisher.publish(
         ApolloClientMonitorEventFactory.getInstance().createEvent(META_FRESH)
             .withTag(TAG_BOOTSTRAP)
-            .putAttachment(META_FRESH, DATE_FORMATTER.format(Instant.now())));
+            .putAttachment(META_FRESH, LocalDate.now().toString()));
   }
 
   private void publishConfigServiceEvent(String name) {

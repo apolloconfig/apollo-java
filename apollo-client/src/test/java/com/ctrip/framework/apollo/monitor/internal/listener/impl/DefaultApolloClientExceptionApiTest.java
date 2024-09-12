@@ -20,8 +20,10 @@ import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorCon
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
+import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +35,11 @@ public class DefaultApolloClientExceptionApiTest {
 
   @Before
   public void setUp() {
-    exceptionApi = new DefaultApolloClientExceptionApi();
+    int someQueueSize = 10;
+    ConfigUtil configUtil = mock(ConfigUtil.class);
+    when(configUtil.getMonitorExceptionQueueSize()).thenReturn(someQueueSize);
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, String.valueOf(someQueueSize));
+    exceptionApi = new DefaultApolloClientExceptionApi(configUtil);
   }
 
   @Test
@@ -83,14 +89,14 @@ public class DefaultApolloClientExceptionApiTest {
 
   @Test
   public void testCollect0_HandlesMaxQueueSize() {
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 10; i++) {
       ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
       when(event.getAttachmentValue(THROWABLE)).thenReturn(
           new ApolloConfigException("Exception " + i));
       exceptionApi.collect0(event);
     }
 
-    assertEquals(25, exceptionApi.getApolloConfigExceptionList().size());
+    assertEquals(10, exceptionApi.getApolloConfigExceptionList().size());
 
     // Add one more to exceed the size.
     ApolloClientMonitorEvent overflowEvent = mock(ApolloClientMonitorEvent.class);
@@ -98,6 +104,6 @@ public class DefaultApolloClientExceptionApiTest {
         new ApolloConfigException("Overflow Exception"));
     exceptionApi.collect0(overflowEvent);
 
-    assertEquals(25, exceptionApi.getApolloConfigExceptionList().size());
+    assertEquals(10, exceptionApi.getApolloConfigExceptionList().size());
   }
 }

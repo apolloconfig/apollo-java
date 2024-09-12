@@ -39,7 +39,7 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
   private ConfigUtil configUtil;
 
   @Mock
-  private ApolloClientMonitorEventListener metricsCollector;
+  private ApolloClientMonitorEventListener monitorEventListener;
 
   @Before
   public void setUp() {
@@ -63,8 +63,8 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
     when(configUtil.getMonitorExternalType()).thenReturn("mocktheus");
     when(configUtil.isClientMonitorJmxEnabled()).thenReturn(true);
     when(configUtil.getMonitorExternalExportPeriod()).thenReturn(1000L);
-    when(metricsCollector.getName()).thenReturn("testMBean");
-    List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(metricsCollector);
+    when(monitorEventListener.getName()).thenReturn("testMBean");
+    List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(monitorEventListener);
 
     ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);
 

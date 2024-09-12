@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
@@ -40,27 +41,25 @@ public class DefaultApolloClientMetricsExporterFactory implements
 
   @Override
   public ApolloClientMetricsExporter getMetricsReporter(
-      List<ApolloClientMonitorEventListener> collectors) {
-
+      List<ApolloClientMonitorEventListener> listeners) {
     String externalSystemType = configUtil.getMonitorExternalType();
-    if (externalSystemType == null) {
-      return null;
-    }
-
-    return findAndInitializeExporter(collectors, externalSystemType);
+    return findAndInitializeExporter(listeners, externalSystemType);
   }
 
   private ApolloClientMetricsExporter findAndInitializeExporter(
-      List<ApolloClientMonitorEventListener> collectors, String externalSystemType) {
+      List<ApolloClientMonitorEventListener> listeners, String externalSystemType) {
     List<ApolloClientMetricsExporter> exporters = ServiceBootstrap.loadAllOrdered(
         ApolloClientMetricsExporter.class);
+    if (StringUtils.isEmpty(externalSystemType)) {
+      return null;
+    }
     ApolloClientMetricsExporter reporter = exporters.stream()
         .filter(metricsExporter -> metricsExporter.isSupport(externalSystemType))
         .findFirst()
         .orElse(null);
 
     if (reporter != null) {
-      reporter.init(collectors, configUtil.getMonitorExternalExportPeriod());
+      reporter.init(listeners, configUtil.getMonitorExternalExportPeriod());
     } else {
       String errorMessage =
           "No matching exporter found with monitor-external-type " + externalSystemType;

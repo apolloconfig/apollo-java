@@ -44,14 +44,14 @@ public abstract class AbstractApolloClientMetricsExporter implements ApolloClien
         ApolloThreadFactory.create(ApolloClientMetricsExporter.class.getName(), true));
   }
 
-  protected List<ApolloClientMonitorEventListener> collectors;
+  protected List<ApolloClientMonitorEventListener> listeners;
 
   @Override
-  public void init(List<ApolloClientMonitorEventListener> collectors, long collectPeriod) {
-    log.info("Initializing metrics exporter with {} collectors and collect period of {} seconds.",
-        collectors.size(), collectPeriod);
+  public void init(List<ApolloClientMonitorEventListener> listeners, long collectPeriod) {
+    log.info("Initializing metrics exporter with {} listeners and collect period of {} seconds.",
+        listeners.size(), collectPeriod);
     doInit();
-    this.collectors = collectors;
+    this.listeners = listeners;
     initScheduleMetricsCollectSync(collectPeriod);
     log.info("Metrics collection scheduled with a period of {} seconds.", collectPeriod);
   }
@@ -73,10 +73,10 @@ public abstract class AbstractApolloClientMetricsExporter implements ApolloClien
 
   protected void updateMetricsData() {
     log.debug("Start to update metrics data job");
-    collectors.forEach(collector -> {
-      if (collector.isMetricsSampleUpdated()) {
-        log.debug("Collector {} has updated samples.", collector.getName());
-        collector.export().forEach(this::registerSample);
+    listeners.forEach(listener -> {
+      if (listener.isMetricsSampleUpdated()) {
+        log.debug("Listener {} has updated samples.", listener.getName());
+        listener.export().forEach(this::registerSample);
       }
     });
   }

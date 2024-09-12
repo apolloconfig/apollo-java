@@ -26,15 +26,15 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
  */
 public class ApolloClientMonitorEventPublisher {
 
-  private static ApolloClientMonitorContext COLLECTOR_MANAGER = ApolloInjector.getInstance(
+  private static ApolloClientMonitorContext MONITOR_CONTEXT = ApolloInjector.getInstance(
       ApolloClientMonitorContext.class);
   private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   public static void publish(ApolloClientMonitorEvent event) {
     if (m_configUtil.isClientMonitorEnabled()) {
-      for (ApolloClientMonitorEventListener collector : COLLECTOR_MANAGER.getCollectors()) {
-        if (collector.isSupported(event)) {
-          collector.collect(event);
+      for (ApolloClientMonitorEventListener listener : MONITOR_CONTEXT.getApolloClientMonitorEventListeners()) {
+        if (listener.isSupported(event)) {
+          listener.collect(event);
           return;
         }
       }
@@ -42,7 +42,7 @@ public class ApolloClientMonitorEventPublisher {
   }
 
   protected static void reset() {
-    COLLECTOR_MANAGER = ApolloInjector.getInstance(
+    MONITOR_CONTEXT = ApolloInjector.getInstance(
         ApolloClientMonitorContext.class);
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 

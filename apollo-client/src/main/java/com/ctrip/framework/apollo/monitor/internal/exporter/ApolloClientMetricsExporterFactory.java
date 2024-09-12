@@ -24,5 +24,8 @@ import java.util.List;
  */
 public interface ApolloClientMetricsExporterFactory {
 
-  ApolloClientMetricsExporter getMetricsReporter(List<ApolloClientMonitorEventListener> collectors);
+  /**
+   * get metrics reporter
+   */
+  ApolloClientMetricsExporter getMetricsReporter(List<ApolloClientMonitorEventListener> listeners);
 }

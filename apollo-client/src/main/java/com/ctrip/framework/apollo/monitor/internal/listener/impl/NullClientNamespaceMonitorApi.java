@@ -54,9 +54,4 @@ public class NullClientNamespaceMonitorApi implements ApolloClientNamespaceMonit
     return 0;
   }
 
-  @Override
-  public List<String> getConfigFileNamespaces() {
-    return Collections.emptyList();
-  }
-
 }

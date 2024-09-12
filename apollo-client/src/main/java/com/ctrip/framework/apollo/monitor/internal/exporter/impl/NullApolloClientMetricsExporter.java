@@ -30,10 +30,10 @@ import org.slf4j.Logger;
 public class NullApolloClientMetricsExporter implements ApolloClientMetricsExporter {
 
   private static final Logger log = DeferredLoggerFactory.getLogger(
-      AbstractApolloClientMetricsExporter.class);
+      NullApolloClientMetricsExporter.class);
 
   @Override
-  public void init(List<ApolloClientMonitorEventListener> collectors, long collectPeriod) {
+  public void init(List<ApolloClientMonitorEventListener> listeners, long collectPeriod) {
   }
 
   @Override

@@ -31,14 +31,14 @@ public class ApolloClientMonitorEventPublisherTest {
 
   private ApolloClientMonitorContext mockCollectorManager;
   private ConfigUtil mockConfigUtil;
-  private ApolloClientMonitorEventListener mockCollector;
+  private ApolloClientMonitorEventListener mockListener;
   private ApolloClientMonitorEvent mockEvent;
 
   @Before
   public void setUp() {
     mockCollectorManager = mock(ApolloClientMonitorContext.class);
     mockConfigUtil = mock(ConfigUtil.class);
-    mockCollector = mock(ApolloClientMonitorEventListener.class);
+    mockListener = mock(ApolloClientMonitorEventListener.class);
     mockEvent = mock(ApolloClientMonitorEvent.class);
 
     // 使用 Mockito 来模拟静态方法
@@ -50,23 +50,24 @@ public class ApolloClientMonitorEventPublisherTest {
   @Test
   public void testPublish_WhenClientMonitorEnabled_CollectorSupportsEvent() {
     when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
-    when(mockCollectorManager.getCollectors()).thenReturn(Collections.singletonList(mockCollector));
-    when(mockCollector.isSupported(mockEvent)).thenReturn(true);
+    when(mockCollectorManager.getApolloClientMonitorEventListeners()).thenReturn(Collections.singletonList(
+        mockListener));
+    when(mockListener.isSupported(mockEvent)).thenReturn(true);
 
     ApolloClientMonitorEventPublisher.publish(mockEvent);
 
-    verify(mockCollector).collect(mockEvent);
+    verify(mockListener).collect(mockEvent);
   }
 
   @Test
   public void testPublish_WhenClientMonitorEnabled_CollectorDoesNotSupportEvent() {
     when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
-    when(mockCollectorManager.getCollectors()).thenReturn(Collections.singletonList(mockCollector));
-    when(mockCollector.isSupported(mockEvent)).thenReturn(false);
+    when(mockCollectorManager.getApolloClientMonitorEventListeners()).thenReturn(Collections.singletonList(mockListener));
+    when(mockListener.isSupported(mockEvent)).thenReturn(false);
 
     ApolloClientMonitorEventPublisher.publish(mockEvent);
 
-    verify(mockCollector, never()).collect(mockEvent);
+    verify(mockListener, never()).collect(mockEvent);
   }
 
   @Test
@@ -75,6 +76,6 @@ public class ApolloClientMonitorEventPublisherTest {
 
     ApolloClientMonitorEventPublisher.publish(mockEvent);
 
-    verify(mockCollectorManager, never()).getCollectors();
+    verify(mockCollectorManager, never()).getApolloClientMonitorEventListeners();
   }
 }

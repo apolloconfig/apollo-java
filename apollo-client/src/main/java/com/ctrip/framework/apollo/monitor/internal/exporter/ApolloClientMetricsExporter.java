@@ -29,7 +29,7 @@ public interface ApolloClientMetricsExporter extends Ordered {
   /**
    * init method
    */
-  void init(List<ApolloClientMonitorEventListener> collectors, long collectPeriod);
+  void init(List<ApolloClientMonitorEventListener> listeners, long collectPeriod);
 
   /**
    * Used to access custom monitoring systems

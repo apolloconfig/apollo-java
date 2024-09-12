@@ -22,6 +22,7 @@ import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorCon
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
+import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxNamespaceMBean;
 import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant;
@@ -46,18 +47,15 @@ public class DefaultApolloClientNamespaceApi extends
 
   private static final Logger logger = DeferredLoggerFactory.getLogger(
       DefaultApolloClientNamespaceApi.class);
-  private final Map<String, Config> m_configs;
-  private final Map<String, ConfigFile> m_configFiles;
+  private final ConfigManager configManager;
   private final Map<String, NamespaceMetrics> namespaces = Maps.newConcurrentMap();
   private final Set<String> namespace404 = Sets.newCopyOnWriteArraySet();
   private final Set<String> namespaceTimeout = Sets.newCopyOnWriteArraySet();
 
-  public DefaultApolloClientNamespaceApi(Map<String, Config> m_configs,
-      Map<String, ConfigFile> m_configFiles
+  public DefaultApolloClientNamespaceApi(ConfigManager configManager
   ) {
     super(TAG_NAMESPACE);
-    this.m_configs = m_configs;
-    this.m_configFiles = m_configFiles;
+    this.configManager = configManager;
   }
 
   @Override
@@ -152,12 +150,8 @@ public class DefaultApolloClientNamespaceApi extends
       createOrUpdateGaugeSample(
           METRICS_NAMESPACE_ITEM_NUM,
           new String[]{NAMESPACE}, new String[]{namespace},
-          m_configs.get(namespace).getPropertyNames().size());
+          configManager.getConfig(namespace).getPropertyNames().size());
     });
-
-    //  update ConfigFile num
-    createOrUpdateGaugeSample(METRICS_CONFIG_FILE_NUM,
-        m_configFiles.size());
 
     //  update NamespaceStatus metrics
     createOrUpdateGaugeSample(METRICS_NAMESPACE_NOT_FOUND,
@@ -198,13 +192,8 @@ public class DefaultApolloClientNamespaceApi extends
 
   @Override
   public Integer getNamespacePropertySize(String namespace) {
-    Config config = m_configs.get(namespace);
+    Config config = configManager.getConfig(namespace);
     return (config != null) ? config.getPropertyNames().size() : 0;
-  }
-
-  @Override
-  public List<String> getConfigFileNamespaces() {
-    return new ArrayList<>(m_configFiles.keySet());
   }
 
 }

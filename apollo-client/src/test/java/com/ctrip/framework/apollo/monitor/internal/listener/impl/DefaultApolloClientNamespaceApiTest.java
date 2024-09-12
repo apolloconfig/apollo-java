@@ -16,87 +16,95 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_NOT_FOUND;
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_TIMEOUT;
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.NAMESPACE;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-
 import com.ctrip.framework.apollo.Config;
-import com.ctrip.framework.apollo.ConfigFile;
+import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
-import java.util.List;
-import java.util.Set;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.mockito.internal.util.collections.Sets;
+import java.util.Collections;
+
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class DefaultApolloClientNamespaceApiTest {
 
-  private DefaultApolloClientNamespaceApi api;
-  private Map<String, Config> configs;
-  private Map<String, ConfigFile> configFiles;
+  @Mock
+  private ConfigManager configManager;
+
+  @Mock
+  private Config config;
+
+  @InjectMocks
+  private DefaultApolloClientNamespaceApi namespaceApi;
 
   @Before
   public void setUp() {
-    configs = new HashMap<>();
-    configFiles = new HashMap<>();
-    api = new DefaultApolloClientNamespaceApi(configs, configFiles);
+    MockitoAnnotations.initMocks(this);
+    when(configManager.getConfig(anyString())).thenReturn(config);
   }
 
   @Test
   public void testCollectNamespaceNotFound() {
-    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-    when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
-    when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_NOT_FOUND);
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
+        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND)
+        .putAttachment(NAMESPACE, "testNamespace");
 
-    api.collect0(event);
+    namespaceApi.collect0(event);
 
-    assertEquals(1, api.getNotFoundNamespaces().size());
-    assertTrue(api.getNotFoundNamespaces().contains("testNamespace"));
+    assertTrue(namespaceApi.getNotFoundNamespaces().contains("testNamespace"));
   }
 
   @Test
   public void testCollectNamespaceTimeout() {
-    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-    when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
-    when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_TIMEOUT);
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
+        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT)
+        .putAttachment(NAMESPACE, "testNamespace");
 
-    api.collect0(event);
+    namespaceApi.collect0(event);
 
-    assertEquals(1, api.getTimeoutNamespaces().size());
-    assertTrue(api.getTimeoutNamespaces().contains("testNamespace"));
+    assertTrue(namespaceApi.getTimeoutNamespaces().contains("testNamespace"));
   }
 
   @Test
-  public void testCollectNamespaceUsage() {
-    ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-    when(event.getAttachmentValue(NAMESPACE)).thenReturn("testNamespace");
-    when(event.getName()).thenReturn(APOLLO_CLIENT_NAMESPACE_USAGE);
+  public void testCollectNormalNamespace() {
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
+        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
+        .putAttachment(NAMESPACE, "testNamespace");
 
-    api.collect0(event);
+    namespaceApi.collect0(event);
 
-    assertEquals(1, api.getNamespaceMetrics().get("testNamespace").getUsageCount());
+    // Verify that the usage count has been incremented
+    assertEquals(1, namespaceApi.getNamespaceMetrics().get("testNamespace").getUsageCount());
   }
 
   @Test
   public void testGetNamespacePropertySize() {
-    Config mockConfig = mock(Config.class);
-    when(mockConfig.getPropertyNames()).thenReturn(Sets.newSet("key1", "key2"));
-    configs.put("testNamespace", mockConfig);
-    Integer testNamespace = api.getNamespacePropertySize("testNamespace");
-    assertEquals(2, testNamespace.intValue());
+    when(config.getPropertyNames()).thenReturn(Collections.singleton("property1"));
+
+    Integer propertySize = namespaceApi.getNamespacePropertySize("testNamespace");
+
+    assertEquals(Integer.valueOf(1), propertySize);
   }
 
   @Test
-  public void testGetConfigFileNamespaces() {
-    ConfigFile mockConfigFile = mock(ConfigFile.class);
-    configFiles.put("testNamespace", mockConfigFile);
-    List<String> configFileNum = api.getConfigFileNamespaces();
-    assertEquals(1, configFileNum.size());
+  public void testExportMetrics() {
+    // Set up some initial state
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
+        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
+        .putAttachment(NAMESPACE, "testNamespace");
+    namespaceApi.collect0(event);
+
+    // Call the export method
+    namespaceApi.export0();
+
+    // Verify interactions with the configManager
+    verify(configManager).getConfig("testNamespace");
   }
 }

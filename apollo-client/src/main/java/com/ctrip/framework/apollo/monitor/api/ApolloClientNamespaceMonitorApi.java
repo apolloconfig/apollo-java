@@ -19,6 +19,7 @@ package com.ctrip.framework.apollo.monitor.api;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Rawven
@@ -36,11 +37,6 @@ public interface ApolloClientNamespaceMonitorApi {
   Integer getNamespacePropertySize(String namespace);
 
   /**
-   * get ConfigFile namespaces
-   */
-  List<String> getConfigFileNamespaces();
-
-  /**
    * get not found namespaces
    */
   List<String> getNotFoundNamespaces();
@@ -53,7 +49,7 @@ public interface ApolloClientNamespaceMonitorApi {
 
   class NamespaceMetrics {
 
-    private int usageCount;
+    private AtomicInteger usageCount = new AtomicInteger(0);
     private long firstLoadTimeSpendInMs;
     private LocalDateTime latestUpdateTime = LocalDateTime.now();
     private String releaseKey = "";
@@ -67,11 +63,11 @@ public interface ApolloClientNamespaceMonitorApi {
     }
 
     public int getUsageCount() {
-      return usageCount;
+      return usageCount.get();
     }
 
     public void incrementUsageCount() {
-      usageCount++;
+      usageCount.incrementAndGet();
     }
 
     public long getFirstLoadTimeSpendInMs() {
