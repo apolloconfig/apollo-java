@@ -43,14 +43,25 @@ public class KubernetesManager {
             coreV1Api = new CoreV1Api(client);
 
         } catch (Exception e) {
-            throw new RuntimeException("k8s client init failed");
+            String errorMessage = "Failed to initialize Kubernetes client: " + e.getMessage();
+            log.error(errorMessage, e);
+            throw new RuntimeException(errorMessage, e);
         }
     }
 
+    /**
+     * Creates a Kubernetes ConfigMap.
+     *
+     * @param configMapNamespace the namespace of the ConfigMap
+     * @param name the name of the ConfigMap
+     * @param data the data to be stored in the ConfigMap
+     * @return the name of the created ConfigMap
+     * @throws RuntimeException if an error occurs while creating the ConfigMap
+     */
     public String createConfigMap(String configMapNamespace, String name, Map<String, String> data) {
         if (configMapNamespace == null || configMapNamespace == "" || name == null || name == "") {
             log.error("create config map failed due to null parameter");
-            return null;
+            throw new RuntimeException("ConfigMap namespace and name cannot be null or empty");
         }
         V1ConfigMap configMap = new V1ConfigMap().metadata(new V1ObjectMeta().name(name).namespace(configMapNamespace)).data(data);
         try {
@@ -58,34 +69,51 @@ public class KubernetesManager {
             return name;
         } catch (Exception e) {
             log.error("create config map failed", e);
-            return null;
+            throw new RuntimeException("Failed to create ConfigMap: " + e.getMessage(), e);
         }
     }
 
+    /**
+     * get value from config map
+     * @param configMapNamespace
+     * @param name config map name (appId)
+     * @return configMap data(all key-value pairs in config map)
+     */
     public String loadFromConfigMap(String configMapNamespace, String name) {
         if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() || name == null || name.isEmpty()) {
             log.error("参数不能为空");
-            return null;
+            throw new RuntimeException(String
+                    .format("参数不能为空, configMapNamespace: %s, name: %s", configMapNamespace, name));
         }
         try {
             V1ConfigMap configMap = coreV1Api.readNamespacedConfigMap(name, configMapNamespace, null);
             if (configMap == null) {
                 log.error("ConfigMap不存在");
-                return null;
+                throw new RuntimeException(String
+                        .format("ConfigMap不存在, configMapNamespace: %s, name: %s", configMapNamespace, name));
             }
             Map<String, String> data = configMap.getData();
             if (data != null && data.containsKey(name)) {
                 return data.get(name);
             } else {
                 log.error("在ConfigMap中未找到指定的键: " + name);
-                return null;
+                throw new RuntimeException(String
+                        .format("在ConfigMap中未找到指定的键: %s, configMapNamespace: %s, name: %s", name, configMapNamespace, name));
             }
         } catch (Exception e) {
             log.error("get config map failed", e);
-            return null;
+            throw new RuntimeException(String
+                    .format("get config map failed, configMapNamespace: %s, name: %s", configMapNamespace, name));
         }
     }
 
+    /**
+     * get value from config map
+     * @param configMapNamespace configMapNamespace
+     * @param name config map name (appId)
+     * @param key config map key (cluster+namespace)
+     * @return value(json string)
+     */
     public String getValueFromConfigMap(String configMapNamespace, String name, String key) {
         if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() || key == null || key.isEmpty()) {
             log.error("参数不能为空");
@@ -108,6 +136,13 @@ public class KubernetesManager {
         }
     }
 
+    /**
+     * update config map
+     * @param configMapNamespace
+     * @param name config map name (appId)
+     * @param data new data
+     * @return config map name
+     */
     public String updateConfigMap(String configMapNamespace, String name, Map<String, String> data) {
         if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() || data == null || data.isEmpty()) {
             log.error("参数不能为空");
@@ -123,6 +158,12 @@ public class KubernetesManager {
         }
     }
 
+    /**
+     * check config map exist
+     * @param configMapNamespace config map namespace
+     * @param configMapName config map name
+     * @return true if config map exist, false otherwise
+     */
     public boolean checkConfigMapExist(String configMapNamespace, String configMapName) {
         if (configMapNamespace == null || configMapNamespace.isEmpty() || configMapName == null || configMapName.isEmpty()) {
             log.error("参数不能为空");

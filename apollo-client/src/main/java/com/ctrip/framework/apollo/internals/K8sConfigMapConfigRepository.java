@@ -64,9 +64,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
      * configmap-value 配置文件信息的json串
      */
 
-    // TODO Properties和appConfig格式的兼容
-    // TODO 初次时configMap的创建
-    // TODO configUtil和k8sManager单测已完成
+    // TODO Properties和appConfig格式的兼容(go客户端存的格式是封装过的ApolloConfig，不是单纯的配置信息json）
 
     /**
      * Constructor
@@ -208,6 +206,10 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         try {
             // 从ConfigMap获取整个配置信息的JSON字符串
             String jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configUtil.getAppId(), configMapKey);
+            if (jsonConfig == null) {
+                // TODO 待修改，重试访问保底configmap
+                jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configMapName, Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join("default", namespace));
+            }
 
             // 确保获取到的配置信息不为空
             if (jsonConfig != null) {
