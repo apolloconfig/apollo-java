@@ -69,7 +69,7 @@ public class KubernetesManagerTest {
     }
 
     /**
-     * 测试 createConfigMap 传入空的命名空间
+     * 测试 createConfigMap 传入空的命名空间，抛出异常
      */
     @Test
     public void testCreateConfigMapEmptyNamespace() throws Exception {
@@ -80,15 +80,16 @@ public class KubernetesManagerTest {
         data.put("key", "value");
 
         // act
-        String result = kubernetesManager.createConfigMap(namespace, name, data);
+        assertThrows("create config map failed due to null parameter", IllegalArgumentException.class, () -> {
+            kubernetesManager.createConfigMap(namespace, name, data);
+        });
 
         // assert
         verify(coreV1Api, never()).createNamespacedConfigMap(anyString(), any(V1ConfigMap.class), isNull(), isNull(), isNull(),isNull());
-        assert result == null;
     }
 
     /**
-     * 测试 createConfigMap 传入空的配置名
+     * 测试 createConfigMap 传入空的配置名，抛出异常
      */
     @Test
     public void testCreateConfigMapEmptyName() throws Exception {
@@ -99,15 +100,16 @@ public class KubernetesManagerTest {
         data.put("key", "value");
 
         // act
-        String result = kubernetesManager.createConfigMap(namespace, name, data);
+        assertThrows("create config map failed due to null parameter", IllegalArgumentException.class, () -> {
+            kubernetesManager.createConfigMap(namespace, name, data);
+        });
 
         // assert
         verify(coreV1Api, never()).createNamespacedConfigMap(anyString(), any(V1ConfigMap.class), isNull(), isNull(), isNull(),isNull());
-        assert result == null;
     }
 
     /**
-     * 测试 createConfigMap 传入 null 作为数据
+     * 测试 createConfigMap 传入 null 作为数据，正常执行
      */
     @Test
     public void testCreateConfigMapNullData() throws Exception {
@@ -153,11 +155,10 @@ public class KubernetesManagerTest {
         String name = "TestName";
         when(coreV1Api.readNamespacedConfigMap(name, namespace, null)).thenThrow(new ApiException("Kubernetes Manager Exception"));
 
-        // act
-        String result = kubernetesManager.loadFromConfigMap(namespace, name);
+        assertThrows(String.format("get config map failed, configMapNamespace: %s, name: %s", namespace, name), RuntimeException.class, () -> {
+            kubernetesManager.loadFromConfigMap(namespace, name);
+        });
 
-        // assert
-        assertNull(result);
     }
 
     /**
@@ -171,10 +172,10 @@ public class KubernetesManagerTest {
         when(coreV1Api.readNamespacedConfigMap(name, namespace, null)).thenReturn(null);
 
         // act
-        String result = kubernetesManager.loadFromConfigMap(namespace, name);
+        assertThrows(String.format("get config map failed, configMapNamespace: %s, name: %s", namespace, name), RuntimeException.class, () -> {
+            kubernetesManager.loadFromConfigMap(namespace, name);
+        });
 
-        // assert
-        assertNull(result);
     }
 
     /**
