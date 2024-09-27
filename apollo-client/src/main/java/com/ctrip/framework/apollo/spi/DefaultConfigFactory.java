@@ -67,7 +67,6 @@ public class DefaultConfigFactory implements ConfigFactory {
       configRepository = createPropertiesCompatibleFileConfigRepository(namespace, format);
     } else {
       configRepository = createConfigRepository(namespace);
-      //ServiceBootstrap.loadPrimary(ConfigRepository.class);
     }
 
     logger.debug("Created a configuration repository of type [{}] for namespace [{}]",
@@ -133,12 +132,6 @@ public class DefaultConfigFactory implements ConfigFactory {
    * @return the newly created repository for the given namespace
    */
   private ConfigRepository createConfigMapConfigRepository(String namespace) {
-    if (m_configUtil.isInKubernetesMode()) {
-      logger.warn(
-              "==== Apollo is in local mode! Won't pull configs from remote server for namespace {} ! ====",
-              namespace);
-      return new K8sConfigMapConfigRepository(namespace);
-    }
     return new K8sConfigMapConfigRepository(namespace, createLocalConfigRepository(namespace));
   }
 
