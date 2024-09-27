@@ -63,7 +63,9 @@ public class KubernetesManager {
             log.error("create config map failed due to null or empty parameter: configMapNamespace={}, name={}", configMapNamespace, name);
             throw new IllegalArgumentException("ConfigMap namespace and name cannot be null or empty");
         }
-        V1ConfigMap configMap = new V1ConfigMap().metadata(new V1ObjectMeta().name(name).namespace(configMapNamespace)).data(data);
+        V1ConfigMap configMap = new V1ConfigMap()
+                .metadata(new V1ObjectMeta().name(name).namespace(configMapNamespace))
+                .data(data);
         try {
             coreV1Api.createNamespacedConfigMap(configMapNamespace, configMap, null, null, null, null);
             return name;
@@ -167,10 +169,9 @@ public class KubernetesManager {
         }
         try {
             coreV1Api.readNamespacedConfigMap(configMapName, configMapNamespace, null);
-            return true;
         } catch (Exception e) {
-            log.error("check config map failed", e);
             return false;
         }
+        return true;
     }
 }

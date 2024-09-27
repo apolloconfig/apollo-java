@@ -27,6 +27,7 @@ import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.ExceptionUtil;
+import com.ctrip.framework.foundation.internals.provider.DefaultServerProvider;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
@@ -53,6 +54,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     private final ConfigUtil configUtil;
     private final KubernetesManager kubernetesManager;
     private volatile Properties configMapProperties;
+    private volatile DefaultServerProvider serverProvider;
     // 上游数据源
     private volatile ConfigRepository upstream;
     private volatile ConfigSourceType sourceType = ConfigSourceType.CONFIGMAP;
@@ -63,8 +65,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
      * configmap-key cluster+namespace
      * configmap-value 配置文件信息的json串
      */
-
-    // TODO Properties和appConfig格式的兼容(go客户端存的格式是封装过的ApolloConfig，不是单纯的配置信息json）
 
     /**
      * Constructor
@@ -78,7 +78,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     public K8sConfigMapConfigRepository(String namespace, ConfigRepository upstream) {
         this.namespace = namespace;
         configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-        // 单例模式，客户端只会初始化一个
         kubernetesManager = ApolloInjector.getInstance(KubernetesManager.class);
         // 读取，默认为default
         configMapNamespace = configUtil.getConfigMapNamespace();
@@ -88,18 +87,27 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         this.setUpstreamRepository(upstream);
     }
 
-    void setConfigMapKey(String cluster, String namespace){
+    void setConfigMapKey(String cluster, String namespace) {
         // TODO 兜底key怎么设计不会冲突(cluster初始化时已经设置了层级)
-        // cluster 就是填写>idc>default,所以不需要额外层级设置了
-        if (StringUtils.isBlank(cluster)){
+        // cluster 就是用户定义>idc>default,所以已经不需要额外层级设置了
+        if (StringUtils.isBlank(cluster)) {
             configMapKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join("default", namespace);
             return;
         }
         configMapKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(cluster, namespace);
     }
 
-    void setConfigMapName(String appId, boolean syncImmediately){
+    public String getConfigMapKey() {
+        return configMapKey;
+    }
+
+    public String getConfigMapName() {
+        return configMapName;
+    }
+
+    void setConfigMapName(String appId, boolean syncImmediately) {
         configMapName = appId;
+        // 初始化configmap
         this.checkConfigMapName(configMapName);
         if (syncImmediately) {
             this.sync();
@@ -108,14 +116,13 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
 
     private void checkConfigMapName(String configMapName) {
         if (StringUtils.isBlank(configMapName)) {
-            throw new ApolloConfigException("ConfigMap name cannot be null");
+            throw new IllegalArgumentException("ConfigMap name cannot be null");
         }
         // 判断configMap是否存在，若存在直接返回，若不存在尝试创建
-        if(kubernetesManager.checkConfigMapExist(configMapNamespace, configMapName)){
+        if (kubernetesManager.checkConfigMapExist(configMapNamespace, configMapName)) {
             return;
         }
         // TODO 初步理解这里只生成就可以，后续update事件再写入新值
-
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "createK8sConfigMap");
         transaction.addData("configMapName", configMapName);
         try {
@@ -130,6 +137,12 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
     }
 
+    /**
+     * TODO 测试点：
+     * 1. 从上游成功恢复（开启文件存储）
+     * 2. 从上游成功恢复（没开启文件存储，从remote）
+     * 3. 从k8s成功恢复
+     */
     @Override
     public Properties getConfig() {
         if (configMapProperties == null) {
@@ -142,6 +155,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
 
     /**
      * Update the memory when the configuration center changes
+     *
      * @param upstreamConfigRepository the upstream repo
      */
     @Override
@@ -198,7 +212,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     }
 
     // 职责明确: manager层进行序列化和解析，把key传进去
-    // repo这里只负责更新内存, Properties和appConfig格式的兼容
     public Properties loadFromK8sConfigMap() throws IOException {
         Preconditions.checkNotNull(configMapName, "ConfigMap name cannot be null");
 
@@ -207,8 +220,8 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             // 从ConfigMap获取整个配置信息的JSON字符串
             String jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configUtil.getAppId(), configMapKey);
             if (jsonConfig == null) {
-                // TODO 待修改，重试访问保底configmap
-                jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configMapName, Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join("default", namespace));
+                // TODO 待修改，先重试访问idc再default保底
+                jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configMapName, Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(configUtil, namespace));
             }
 
             // 确保获取到的配置信息不为空
@@ -223,7 +236,8 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             // 使用Gson将JSON字符串转换为Map对象
             if (jsonConfig != null && !jsonConfig.isEmpty()) {
                 Gson gson = new Gson();
-                Type type = new TypeToken<Map<String, String>>() {}.getType();
+                Type type = new TypeToken<Map<String, String>>() {
+                }.getType();
                 Map<String, String> configMap = gson.fromJson(jsonConfig, type);
                 // 将Map中的键值对填充到Properties对象中
                 for (Map.Entry<String, String> entry : configMap.entrySet()) {
@@ -243,22 +257,31 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             return false;
         }
         try {
-            // TODO 从上游数据恢复的逻辑
             // 拉新数据，并将新数据更新到configMap
             updateConfigMapProperties(upstream.getConfig(), upstream.getSourceType());
             return true;
         } catch (Throwable ex) {
             Tracer.logError(ex);
-            logger
-                    .warn("Sync config from upstream repository {} failed, reason: {}", upstream.getClass(),
-                            ExceptionUtil.getDetailMessage(ex));
+            logger.warn("Sync config from upstream repository {} failed, reason: {}", upstream.getClass(),
+                    ExceptionUtil.getDetailMessage(ex));
         }
         return false;
     }
 
+    //  从上游数据恢复，并更新configmap
+    private synchronized void updateConfigMapProperties(Properties newProperties, ConfigSourceType sourceType) {
+        this.sourceType = sourceType;
+        if (newProperties.equals(configMapProperties)) {
+            return;
+        }
+        this.configMapProperties = newProperties;
+        persistConfigMap(configMapProperties);
+    }
+
     /**
      * Update the memory
-     * @param namespace the namespace of this repository change
+     *
+     * @param namespace     the namespace of this repository change
      * @param newProperties the properties after change
      */
     @Override
@@ -270,15 +293,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         newFileProperties.putAll(newProperties);
         updateConfigMapProperties(newFileProperties, upstream.getSourceType());
         this.fireRepositoryChange(namespace, newProperties);
-    }
-
-    private synchronized void updateConfigMapProperties(Properties newProperties, ConfigSourceType sourceType) {
-        this.sourceType = sourceType;
-        if (newProperties.equals(configMapProperties)) {
-            return;
-        }
-        this.configMapProperties = newProperties;
-        persistConfigMap(configMapProperties);
     }
 
     public void persistConfigMap(Properties properties) {
@@ -308,7 +322,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         } finally {
             transaction.complete();
         }
-        transaction.complete();
     }
 
 }
