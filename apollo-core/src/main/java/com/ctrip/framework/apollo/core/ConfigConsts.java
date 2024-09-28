@@ -24,5 +24,6 @@ public interface ConfigConsts {
   String APOLLO_META_KEY = "apollo.meta";
   String CONFIG_FILE_CONTENT_KEY = "content";
   String NO_APPID_PLACEHOLDER = "ApolloNoAppIdPlaceHolder";
+  String KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT = "default";
   long NOTIFICATION_ID_PLACEHOLDER = -1;
 }

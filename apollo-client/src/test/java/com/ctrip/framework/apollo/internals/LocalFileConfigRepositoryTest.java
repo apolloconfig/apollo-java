@@ -64,6 +64,7 @@ public class LocalFileConfigRepositoryTest {
     someBaseDir.mkdir();
 
     someNamespace = "someName";
+
     someProperties = new Properties();
     defaultKey = "defaultKey";
     defaultValue = "defaultValue";
