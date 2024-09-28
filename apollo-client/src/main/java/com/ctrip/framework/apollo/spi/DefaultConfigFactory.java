@@ -102,6 +102,7 @@ public class DefaultConfigFactory implements ConfigFactory {
 
   ConfigRepository createConfigRepository(String namespace) {
     // TODO 本地和configMap允许同时开启
+    // 已完成，创建configmapRepo时会同时创建一个fileRepo作为上游，相当于同时开启了，路径若未设置用默认
     if (m_configUtil.isPropertyKubernetesCacheEnabled()) {
       return createConfigMapConfigRepository(namespace);
     }else if (m_configUtil.isPropertyFileCacheEnabled()) {

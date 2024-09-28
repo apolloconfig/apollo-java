@@ -122,7 +122,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         if (kubernetesManager.checkConfigMapExist(configMapNamespace, configMapName)) {
             return;
         }
-        // TODO 初步理解这里只生成就可以，后续update事件再写入新值
+        // TODO 初步理解这里只创建就可以，后续update事件再写入新值
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "createK8sConfigMap");
         transaction.addData("configMapName", configMapName);
         try {
@@ -142,6 +142,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
      * 1. 从上游成功恢复（开启文件存储）
      * 2. 从上游成功恢复（没开启文件存储，从remote）
      * 3. 从k8s成功恢复
+     *  怎么mock k8s客户端coreapi有点卡住
      */
     @Override
     public Properties getConfig() {
