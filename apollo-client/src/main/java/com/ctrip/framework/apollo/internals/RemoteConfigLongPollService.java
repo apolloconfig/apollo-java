@@ -55,7 +55,11 @@ import com.google.gson.Gson;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,11 +117,9 @@ public class RemoteConfigLongPollService {
     boolean result = false;
     if(repositoryMultimap == null){
       repositoryMultimap = Multimaps.synchronizedSetMultimap(HashMultimap.<String, RemoteConfigRepository>create());
-      result = repositoryMultimap.put(namespace, remoteConfigRepository);
       m_longPollNamespaces.put(appId, repositoryMultimap);
-    }else{
-      result = repositoryMultimap.put(namespace, remoteConfigRepository);
     }
+    result = repositoryMultimap.put(namespace, remoteConfigRepository);
     m_notifications.put(appId, namespace, INIT_NOTIFICATION_ID);
     if (m_longPollStarted.get(appId) == null) {
       startLongPolling(appId);
