@@ -45,6 +45,8 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
   private volatile Properties m_configProperties;
   private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
 
+  private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+
   /**
    * Constructor.
    *

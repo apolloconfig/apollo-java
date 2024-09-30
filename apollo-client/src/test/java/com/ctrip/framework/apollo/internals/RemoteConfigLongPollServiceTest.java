@@ -100,6 +100,10 @@ public class RemoteConfigLongPollServiceTest {
 
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
 
+/*    Field field = PropertySourcesProcessor.class.getDeclaredField("configUtil");
+    field.setAccessible(true);
+    field.set(null, ApolloInjector.getInstance(ConfigUtil.class));*/
+
     remoteConfigLongPollService = new RemoteConfigLongPollService();
 
     responseType =

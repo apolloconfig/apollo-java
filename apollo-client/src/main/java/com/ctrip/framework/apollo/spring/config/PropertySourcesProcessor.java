@@ -119,6 +119,7 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
               appId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + namespace, config));
         }
       }
+
     }
 
     // clean up
