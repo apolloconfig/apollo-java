@@ -43,6 +43,7 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
 public class DefaultConfigManagerTest {
   private DefaultConfigManager defaultConfigManager;
   private static String someConfigContent;
+  private static String someAppId;
 
   @Before
   public void setUp() throws Exception {
@@ -50,6 +51,7 @@ public class DefaultConfigManagerTest {
     MockInjector.setInstance(ConfigUtil.class, new ConfigUtil());
     defaultConfigManager = new DefaultConfigManager();
     someConfigContent = "someContent";
+    someAppId = "someAppId";
   }
 
   @After
@@ -111,10 +113,10 @@ public class DefaultConfigManagerTest {
   public static class MockConfigFactoryManager implements ConfigFactoryManager {
 
     @Override
-    public ConfigFactory getFactory(String namespace) {
+    public ConfigFactory getFactory(String appId, String namespace) {
       return new ConfigFactory() {
         @Override
-        public Config create(final String namespace) {
+        public Config create(final String appId, final String namespace) {
           return new AbstractConfig() {
             @Override
             public String getProperty(String key, String defaultValue) {
@@ -134,9 +136,14 @@ public class DefaultConfigManagerTest {
         }
 
         @Override
-        public ConfigFile createConfigFile(String namespace, final ConfigFileFormat configFileFormat) {
+        public Config create(String namespace) {
+          return this.create(someAppId, namespace);
+        }
+
+        @Override
+        public ConfigFile createConfigFile(String appId, String namespace, final ConfigFileFormat configFileFormat) {
           ConfigRepository someConfigRepository = mock(ConfigRepository.class);
-          return new AbstractConfigFile(namespace, someConfigRepository) {
+          return new AbstractConfigFile(appId, namespace, someConfigRepository) {
 
             @Override
             protected void update(Properties newProperties) {
@@ -159,7 +166,17 @@ public class DefaultConfigManagerTest {
             }
           };
         }
+
+        @Override
+        public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+          return createConfigFile(someAppId, namespace, configFileFormat);
+        }
       };
+    }
+
+    @Override
+    public ConfigFactory getFactory(String namespace) {
+      return getFactory(someAppId, namespace);
     }
   }
 }

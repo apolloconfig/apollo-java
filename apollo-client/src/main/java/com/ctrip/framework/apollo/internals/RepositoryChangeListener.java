@@ -28,4 +28,12 @@ public interface RepositoryChangeListener {
    * @param newProperties the properties after change
    */
   void onRepositoryChange(String namespace, Properties newProperties);
+
+  /**
+   * Invoked when config repository changes.
+   * @param appId the appId of this repository change
+   * @param namespace the namespace of this repository change
+   * @param newProperties the properties after change
+   */
+  void onRepositoryChange(String appId, String namespace, Properties newProperties);
 }

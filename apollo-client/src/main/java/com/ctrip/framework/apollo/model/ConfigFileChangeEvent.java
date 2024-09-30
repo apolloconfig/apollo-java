@@ -22,6 +22,8 @@ import com.ctrip.framework.apollo.enums.PropertyChangeType;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ConfigFileChangeEvent {
+
+  private final String appId;
   private final String namespace;
   private final String oldValue;
   private final String newValue;
@@ -30,17 +32,23 @@ public class ConfigFileChangeEvent {
   /**
    * Constructor.
    *
+   * @param appId the appId of the config file change event
    * @param namespace the namespace of the config file change event
    * @param oldValue the value before change
    * @param newValue the value after change
    * @param changeType the change type
    */
-  public ConfigFileChangeEvent(String namespace, String oldValue, String newValue,
+  public ConfigFileChangeEvent(String appId, String namespace, String oldValue, String newValue,
       PropertyChangeType changeType) {
+    this.appId = appId;
     this.namespace = namespace;
     this.oldValue = oldValue;
     this.newValue = newValue;
     this.changeType = changeType;
+  }
+
+  public String getAppId() {
+    return appId;
   }
 
   public String getNamespace() {
@@ -62,7 +70,8 @@ public class ConfigFileChangeEvent {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ConfigFileChangeEvent{");
-    sb.append("namespace='").append(namespace).append('\'');
+    sb.append(", appId='").append(appId).append('\'');
+    sb.append(", namespace='").append(namespace).append('\'');
     sb.append(", oldValue='").append(oldValue).append('\'');
     sb.append(", newValue='").append(newValue).append('\'');
     sb.append(", changeType=").append(changeType);

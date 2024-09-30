@@ -36,9 +36,9 @@ public class PropertiesConfigFile extends AbstractConfigFile implements
 
   protected AtomicReference<String> m_contentCache;
 
-  public PropertiesConfigFile(String namespace,
+  public PropertiesConfigFile(String appId, String namespace,
       ConfigRepository configRepository) {
-    super(namespace, configRepository);
+    super(appId, namespace, configRepository);
     m_contentCache = new AtomicReference<>();
   }
 

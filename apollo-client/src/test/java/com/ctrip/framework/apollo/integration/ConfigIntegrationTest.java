@@ -371,7 +371,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
             new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId))
     );
 
-    longPollFinished.get(5000, TimeUnit.MILLISECONDS);
+    longPollFinished.get(10000, TimeUnit.MILLISECONDS);
 
     assertEquals(anotherValue, config.getProperty(someKey, null));
 

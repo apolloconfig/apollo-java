@@ -36,7 +36,8 @@ public class MockInjector implements Injector {
   @Override
   public <T> T getInstance(Class<T> clazz) {
     if (delegate != null) {
-      return delegate.getInstance(clazz);
+      T instance = delegate.getInstance(clazz);
+      return instance;
     }
 
     return null;
@@ -73,7 +74,8 @@ public class MockInjector implements Injector {
 
     @Override
     public <T> T getInstance(Class<T> clazz) {
-      return (T) classMap.get(clazz);
+      T instance = (T) classMap.get(clazz);
+      return instance;
     }
 
     @Override

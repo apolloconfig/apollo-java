@@ -49,6 +49,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class XmlConfigFileTest {
 
+  private String someAppId;
   private String someNamespace;
   @Mock
   private ConfigRepository configRepository;
@@ -57,6 +58,7 @@ public class XmlConfigFileTest {
 
   @Before
   public void setUp() throws Exception {
+    someAppId = "someAppId";
     someNamespace = "someName";
 
     when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
@@ -83,7 +85,7 @@ public class XmlConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    XmlConfigFile configFile = new XmlConfigFile(someNamespace, configRepository);
+    XmlConfigFile configFile = new XmlConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(ConfigFileFormat.XML, configFile.getConfigFileFormat());
     assertEquals(someNamespace, configFile.getNamespace());
@@ -95,7 +97,7 @@ public class XmlConfigFileTest {
   public void testWhenHasNoContent() throws Exception {
     when(configRepository.getConfig()).thenReturn(null);
 
-    XmlConfigFile configFile = new XmlConfigFile(someNamespace, configRepository);
+    XmlConfigFile configFile = new XmlConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -105,7 +107,7 @@ public class XmlConfigFileTest {
   public void testWhenConfigRepositoryHasError() throws Exception {
     when(configRepository.getConfig()).thenThrow(new RuntimeException("someError"));
 
-    XmlConfigFile configFile = new XmlConfigFile(someNamespace, configRepository);
+    XmlConfigFile configFile = new XmlConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -121,7 +123,7 @@ public class XmlConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    XmlConfigFile configFile = new XmlConfigFile(someNamespace, configRepository);
+    XmlConfigFile configFile = new XmlConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(someValue, configFile.getContent());
 
@@ -138,7 +140,7 @@ public class XmlConfigFileTest {
 
     configFile.addChangeListener(someListener);
 
-    configFile.onRepositoryChange(someNamespace, anotherProperties);
+    configFile.onRepositoryChange(someAppId, someNamespace, anotherProperties);
 
     ConfigFileChangeEvent changeEvent = configFileChangeFuture.get(500, TimeUnit.MILLISECONDS);
 
@@ -157,7 +159,7 @@ public class XmlConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    XmlConfigFile configFile = new XmlConfigFile(someNamespace, configRepository);
+    XmlConfigFile configFile = new XmlConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(null, configFile.getContent());
 
@@ -194,7 +196,7 @@ public class XmlConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    XmlConfigFile configFile = new XmlConfigFile(someNamespace, configRepository);
+    XmlConfigFile configFile = new XmlConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(someValue, configFile.getContent());
 
@@ -230,12 +232,12 @@ public class XmlConfigFileTest {
 
     when(configRepository.getConfig()).thenThrow(new RuntimeException("someError"));
 
-    XmlConfigFile configFile = new XmlConfigFile(someNamespace, configRepository);
+    XmlConfigFile configFile = new XmlConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
 
-    configFile.onRepositoryChange(someNamespace, someProperties);
+    configFile.onRepositoryChange(someAppId, someNamespace, someProperties);
 
     assertTrue(configFile.hasContent());
     assertEquals(someValue, configFile.getContent());

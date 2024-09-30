@@ -44,6 +44,8 @@ import org.junit.Test;
  */
 public class AbstractConfigTest {
 
+  private static String someAppId = "someAppId";
+
   /**
    * @see AbstractConfig#fireConfigChange(ConfigChangeEvent)
    */
@@ -63,11 +65,11 @@ public class AbstractConfigTest {
 
     Map<String, ConfigChange> changes = new HashMap<>();
     changes.put("key1",
-        new ConfigChange(namespace, "key1", null, "new-value", PropertyChangeType.ADDED));
-    ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(namespace, changes);
+        new ConfigChange(someAppId, namespace, "key1", null, "new-value", PropertyChangeType.ADDED));
+    ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(someAppId, namespace, changes);
 
     abstractConfig.fireConfigChange(configChangeEvent);
-    abstractConfig.fireConfigChange(namespace, changes);
+    abstractConfig.fireConfigChange(someAppId, namespace, changes);
 
     // wait a minute for invoking
     Thread.sleep(100);
@@ -106,8 +108,8 @@ public class AbstractConfigTest {
 
     Map<String, ConfigChange> changes = new HashMap<>();
     changes.put(key,
-        new ConfigChange(namespace, key, "old-value", "new-value", PropertyChangeType.MODIFIED));
-    ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(namespace, changes);
+        new ConfigChange(someAppId, namespace, key, "old-value", "new-value", PropertyChangeType.MODIFIED));
+    ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(someAppId, namespace, changes);
 
     abstractConfig.fireConfigChange(configChangeEvent);
 
@@ -151,9 +153,9 @@ public class AbstractConfigTest {
 
     Map<String, ConfigChange> changes = new HashMap<>();
     changes.put(key,
-        new ConfigChange(namespace, key, "old-value", "new-value", PropertyChangeType.MODIFIED));
+        new ConfigChange(someAppId, namespace, key, "old-value", "new-value", PropertyChangeType.MODIFIED));
 
-    abstractConfig.fireConfigChange(namespace, changes);
+    abstractConfig.fireConfigChange(someAppId, namespace, changes);
 
     assertEquals(Collections.singleton(key), future1.get(500, TimeUnit.MILLISECONDS).changedKeys());
     assertEquals(Collections.singleton(key), future2.get(500, TimeUnit.MILLISECONDS).changedKeys());

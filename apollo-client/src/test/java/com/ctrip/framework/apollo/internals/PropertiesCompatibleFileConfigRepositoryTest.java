@@ -40,6 +40,7 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
   private PropertiesCompatibleConfigFile configFile;
 
   private String someNamespaceName;
+  private String someAppId;
 
   @Mock
   private Properties someProperties;
@@ -47,7 +48,9 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
   @Before
   public void setUp() throws Exception {
     someNamespaceName = "someNamespaceName";
+    someAppId = "someAppId";
     when(configFile.getNamespace()).thenReturn(someNamespaceName);
+    when(configFile.getAppId()).thenReturn(someAppId);
     when(configFile.asProperties()).thenReturn(someProperties);
   }
 
@@ -129,6 +132,6 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
     configFileRepository.onChange(someChangeEvent);
 
     assertSame(anotherProperties, configFileRepository.getConfig());
-    verify(someListener, times(1)).onRepositoryChange(someNamespaceName, anotherProperties);
+    verify(someListener, times(1)).onRepositoryChange(someAppId, someNamespaceName, anotherProperties);
   }
 }
