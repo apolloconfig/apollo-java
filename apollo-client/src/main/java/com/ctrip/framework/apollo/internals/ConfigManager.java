@@ -38,6 +38,4 @@ public interface ConfigManager {
    * @return the config file instance for the namespace
    */
   ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat);
-  
-  
 }

@@ -152,7 +152,6 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "syncRemoteConfig");
 
     try {
-
       ApolloConfig previous = m_configCache.get();
       ApolloConfig current = loadApolloConfig();
 
@@ -161,7 +160,6 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         logger.debug("Remote Config refreshed!");
         m_configCache.set(current);
         this.fireRepositoryChange(m_namespace, this.getConfig());
-
       }
 
       if (current != null) {

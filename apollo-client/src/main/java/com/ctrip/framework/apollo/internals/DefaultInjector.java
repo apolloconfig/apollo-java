@@ -42,8 +42,6 @@ import com.google.inject.Guice;
 import com.google.inject.Singleton;
 import java.util.List;
 
-;
-
 /**
  * Guice injector
  * @author Jason Song(song_s@ctrip.com)

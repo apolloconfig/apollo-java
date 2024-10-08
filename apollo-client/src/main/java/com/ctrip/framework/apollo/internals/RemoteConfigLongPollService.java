@@ -215,7 +215,7 @@ public class RemoteConfigLongPollService {
         transaction.setStatus(ex);
         long sleepTimeInSecond = m_longPollFailSchedulePolicyInSecond.fail();
         if (ex.getCause() instanceof SocketTimeoutException) {
-          Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT,assembleNamespaces());
+          Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT, assembleNamespaces());
         }
         logger.warn(
             "Long polling failed, will retry in {} seconds. appId: {}, cluster: {}, namespaces: {}, long polling url: {}, reason: {}",
