@@ -34,15 +34,14 @@ import java.util.Map;
  */
 public class DefaultConfigManager implements ConfigManager {
 
-  protected Map<String, Config> m_configs = Maps.newConcurrentMap();
-  protected Map<String, Object> m_configLocks = Maps.newConcurrentMap();
-  protected Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
-  protected Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
+  private Map<String, Config> m_configs = Maps.newConcurrentMap();
+  private Map<String, Object> m_configLocks = Maps.newConcurrentMap();
+  private Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
+  private Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
   private ConfigFactoryManager m_factoryManager;
 
   public DefaultConfigManager() {
     m_factoryManager = ApolloInjector.getInstance(ConfigFactoryManager.class);
-
   }
 
   @Override
@@ -69,8 +68,7 @@ public class DefaultConfigManager implements ConfigManager {
   }
 
   @Override
-  public ConfigFile getConfigFile(String namespace,
-      ConfigFileFormat configFileFormat) {
+  public ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
     String namespaceFileName = String.format("%s.%s", namespace, configFileFormat.getValue());
     ConfigFile configFile = m_configFiles.get(namespaceFileName);
 
