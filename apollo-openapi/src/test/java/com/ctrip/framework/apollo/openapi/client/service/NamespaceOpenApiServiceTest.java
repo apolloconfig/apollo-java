@@ -58,7 +58,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   public void testGetNamespace() throws Exception {
     final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
 
-    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace);
+    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, true);
 
     verify(httpClient, times(1)).execute(request.capture());
 
@@ -73,7 +73,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   public void testGetNamespaceWithError() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(404);
 
-    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace);
+    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, true);
   }
 
   @Test
@@ -83,7 +83,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
 
-    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster);
+    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, true);
 
     verify(httpClient, times(1)).execute(request.capture());
 
@@ -98,7 +98,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   public void testGetNamespacesWithError() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(404);
 
-    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster);
+    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, true);
   }
 
   @Test

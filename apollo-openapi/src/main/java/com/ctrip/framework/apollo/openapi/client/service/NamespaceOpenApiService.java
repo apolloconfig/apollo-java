@@ -41,7 +41,7 @@ public class NamespaceOpenApiService extends AbstractOpenApiService implements
   }
 
   @Override
-  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName) {
+  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail) {
     if (Strings.isNullOrEmpty(clusterName)) {
       clusterName = ConfigConsts.CLUSTER_NAME_DEFAULT;
     }
@@ -58,6 +58,8 @@ public class NamespaceOpenApiService extends AbstractOpenApiService implements
         .clustersPathVal(clusterName)
         .namespacesPathVal(namespaceName);
 
+    pathBuilder.addParam("fillItemDetail", fillItemDetail);
+
     try (CloseableHttpResponse response = get(pathBuilder)) {
       return gson.fromJson(EntityUtils.toString(response.getEntity()), OpenNamespaceDTO.class);
     } catch (Throwable ex) {
@@ -68,7 +70,7 @@ public class NamespaceOpenApiService extends AbstractOpenApiService implements
   }
 
   @Override
-  public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName) {
+  public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail) {
     if (Strings.isNullOrEmpty(clusterName)) {
       clusterName = ConfigConsts.CLUSTER_NAME_DEFAULT;
     }
@@ -81,6 +83,8 @@ public class NamespaceOpenApiService extends AbstractOpenApiService implements
         .appsPathVal(appId)
         .clustersPathVal(clusterName)
         .customResource("namespaces");
+
+    pathBuilder.addParam("fillItemDetail", fillItemDetail);
 
     try (CloseableHttpResponse response = get(pathBuilder)) {
       return gson.fromJson(EntityUtils.toString(response.getEntity()), OPEN_NAMESPACE_DTO_LIST_TYPE);

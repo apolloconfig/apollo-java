@@ -26,9 +26,9 @@ import java.util.List;
  */
 public interface NamespaceOpenApiService {
 
-  OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName);
+  OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail);
 
-  List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName);
+  List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail);
 
   OpenAppNamespaceDTO createAppNamespace(OpenAppNamespaceDTO appNamespaceDTO);
 
