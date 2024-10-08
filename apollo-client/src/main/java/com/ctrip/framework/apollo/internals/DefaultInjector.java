@@ -17,6 +17,11 @@
 package com.ctrip.framework.apollo.internals;
 
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
+import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
+import com.ctrip.framework.apollo.monitor.internal.DefaultConfigMonitor;
+import com.ctrip.framework.apollo.monitor.internal.exporter.impl.DefaultApolloClientMetricsExporterFactory;
+import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorContext;
+import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.spi.ApolloInjectorCustomizer;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
@@ -30,13 +35,14 @@ import com.ctrip.framework.apollo.util.factory.DefaultPropertiesFactory;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import com.ctrip.framework.apollo.util.http.DefaultHttpClient;
 import com.ctrip.framework.apollo.util.http.HttpClient;
-
 import com.ctrip.framework.apollo.util.yaml.YamlParser;
 import com.ctrip.framework.foundation.internals.ServiceBootstrap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Singleton;
 import java.util.List;
+
+;
 
 /**
  * Guice injector
@@ -105,6 +111,9 @@ public class DefaultInjector implements Injector {
       bind(RemoteConfigLongPollService.class).in(Singleton.class);
       bind(YamlParser.class).in(Singleton.class);
       bind(PropertiesFactory.class).to(DefaultPropertiesFactory.class).in(Singleton.class);
+      bind(ConfigMonitor.class).to(DefaultConfigMonitor.class).in(Singleton.class);
+      bind(ApolloClientMonitorContext.class).in(Singleton.class);
+      bind(ApolloClientMetricsExporterFactory.class).to(DefaultApolloClientMetricsExporterFactory.class).in(Singleton.class);
     }
   }
 }

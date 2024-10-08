@@ -93,7 +93,12 @@ public class ApolloApplicationContextInitializer implements
       ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE,
       ApolloClientSystemConsts.APOLLO_PROPERTY_ORDER_ENABLE,
       ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE,
-      ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES};
+      ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
+      ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE,
+      ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
+      ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD,
+      ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
+      ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE,};
 
   private final ConfigPropertySourceFactory configPropertySourceFactory = SpringInjector
       .getInstance(ConfigPropertySourceFactory.class);
@@ -132,6 +137,7 @@ public class ApolloApplicationContextInitializer implements
     }
 
     String namespaces = environment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, ConfigConsts.NAMESPACE_APPLICATION);
+    System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, namespaces);
     logger.debug("Apollo bootstrap namespaces: {}", namespaces);
     List<String> namespaceList = NAMESPACE_SPLITTER.splitToList(namespaces);
 
@@ -197,14 +203,14 @@ public class ApolloApplicationContextInitializer implements
     initializeSystemProperty(configurableEnvironment);
 
     Boolean eagerLoadEnabled = configurableEnvironment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED, Boolean.class, false);
-
+    System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED, String.valueOf(eagerLoadEnabled));
     //EnvironmentPostProcessor should not be triggered if you don't want Apollo Loading before Logging System Initialization
     if (!eagerLoadEnabled) {
       return;
     }
 
     Boolean bootstrapEnabled = configurableEnvironment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, Boolean.class, false);
-
+    System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, String.valueOf(bootstrapEnabled));
     if (bootstrapEnabled) {
       DeferredLogger.enable();
       initialize(configurableEnvironment);

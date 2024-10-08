@@ -46,6 +46,11 @@ public class CatMessageProducer implements MessageProducer {
   }
 
   @Override
+  public void logMetricsForCount(String name) {
+     Cat.logMetricForCount(name);
+  }
+
+  @Override
   public Transaction newTransaction(String type, String name) {
     return new CatTransaction(Cat.newTransaction(type, name));
   }

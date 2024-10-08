@@ -97,6 +97,17 @@
 			<artifactId>mockserver-netty</artifactId>
 			<scope>test</scope>
 		</dependency>
+    <dependency>
+      <groupId>com.github.noconnor</groupId>
+      <artifactId>junitperf</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 		<!-- end of test -->
 	</dependencies>
 </project>
