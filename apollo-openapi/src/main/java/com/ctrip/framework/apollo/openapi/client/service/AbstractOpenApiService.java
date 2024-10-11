@@ -18,10 +18,13 @@ package com.ctrip.framework.apollo.openapi.client.service;
 
 import com.ctrip.framework.apollo.openapi.client.exception.ApolloOpenApiException;
 import com.ctrip.framework.apollo.openapi.client.url.OpenApiPathBuilder;
+import com.ctrip.framework.foundation.Foundation;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
@@ -74,6 +77,9 @@ abstract class AbstractOpenApiService {
   }
 
   private CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
+
+    addClientIP(request);
+    
     CloseableHttpResponse response = client.execute(request);
 
     checkHttpResponseStatus(response);
@@ -95,6 +101,12 @@ abstract class AbstractOpenApiService {
     }
 
     throw new ApolloOpenApiException(status.getStatusCode(), status.getReasonPhrase(), message);
+  }
+
+  private void addClientIP(HttpUriRequest request) {
+    ProtocolVersion protocolVersion = request.getProtocolVersion();
+    request.addHeader(HttpHeaders.FORWARDED, String.format("for=%s; proto=%s", Foundation.net().getHostAddress(), protocolVersion.getProtocol()));
+    request.addHeader(HttpHeaders.X_FORWARDED_FOR, Foundation.net().getHostAddress());
   }
 
   protected void checkNotNull(Object value, String name) {
