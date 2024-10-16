@@ -50,13 +50,15 @@ import com.google.common.collect.Lists;
 public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
   private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
 
+  private static final String someAppId = "someAppId";
+
   @Test
   public void testApolloConfig() throws Exception {
     Config applicationConfig = mock(Config.class);
     Config fxApolloConfig = mock(Config.class);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
-    mockConfig(FX_APOLLO_NAMESPACE, fxApolloConfig);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
     TestApolloConfigBean1 bean = getBean("spring/XmlConfigAnnotationTest1.xml", TestApolloConfigBean1.class);
 
@@ -69,7 +71,7 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
   public void testApolloConfigWithWrongFieldType() throws Exception {
     Config applicationConfig = mock(Config.class);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
     getBean("spring/XmlConfigAnnotationTest2.xml", TestApolloConfigBean2.class);
   }
@@ -79,8 +81,8 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
     Config applicationConfig = mock(Config.class);
     Config fxApolloConfig = mock(Config.class);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
-    mockConfig(FX_APOLLO_NAMESPACE, fxApolloConfig);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
     final List<ConfigChangeListener> applicationListeners = Lists.newArrayList();
     final List<ConfigChangeListener> fxApolloListeners = Lists.newArrayList();
@@ -134,7 +136,7 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
   public void testApolloConfigChangeListenerWithWrongParamType() throws Exception {
     Config applicationConfig = mock(Config.class);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
     getBean("spring/XmlConfigAnnotationTest4.xml", TestApolloConfigChangeListenerBean2.class);
   }
@@ -143,7 +145,7 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
   public void testApolloConfigChangeListenerWithWrongParamCount() throws Exception {
     Config applicationConfig = mock(Config.class);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
     getBean("spring/XmlConfigAnnotationTest5.xml", TestApolloConfigChangeListenerBean3.class);
   }
@@ -153,8 +155,8 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
     Config applicationConfig = mock(Config.class);
     Config fxApolloConfig = mock(Config.class);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
-    mockConfig(FX_APOLLO_NAMESPACE, fxApolloConfig);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
     TestApolloConfigChangeListenerWithInterestedKeysBean bean = getBean(
         "spring/XmlConfigAnnotationTest6.xml", TestApolloConfigChangeListenerWithInterestedKeysBean.class);

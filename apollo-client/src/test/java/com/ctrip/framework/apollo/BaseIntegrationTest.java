@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
@@ -117,6 +118,7 @@ public abstract class BaseIntegrationTest {
     metaServiceUrl = configServiceURL =  "http://localhost:" + port;
 
     System.setProperty(ConfigConsts.APOLLO_META_KEY, metaServiceUrl);
+    System.setProperty(ApolloClientSystemConsts.APP_ID, someAppId);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
@@ -140,6 +142,7 @@ public abstract class BaseIntegrationTest {
     ConfigService.reset();
     MockInjector.reset();
     System.clearProperty(ConfigConsts.APOLLO_META_KEY);
+    System.clearProperty(ApolloClientSystemConsts.APP_ID);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     if (mockedConfigService != null) {
@@ -274,6 +277,11 @@ public abstract class BaseIntegrationTest {
     @Override
     public boolean isPropertiesOrderEnabled() {
       return propertiesOrderEnabled;
+    }
+
+    @Override
+    public String getDefaultLocalCacheDir(String appId) {
+      return ClassLoaderUtil.getClassPath() + "/" + appId;
     }
   }
 

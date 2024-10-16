@@ -16,6 +16,7 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,7 @@ import com.google.common.collect.Maps;
  */
 public class SimpleConfig extends AbstractConfig implements RepositoryChangeListener {
   private static final Logger logger = LoggerFactory.getLogger(SimpleConfig.class);
+  private final String m_appId;
   private final String m_namespace;
   private final ConfigRepository m_configRepository;
   private volatile Properties m_configProperties;
@@ -49,6 +52,21 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
    * @param configRepository the config repository for this config instance
    */
   public SimpleConfig(String namespace, ConfigRepository configRepository) {
+    this(null, namespace, configRepository);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param appId        the appId for this config instance
+   * @param namespace        the namespace for this config instance
+   * @param configRepository the config repository for this config instance
+   */
+  public SimpleConfig(String appId, String namespace, ConfigRepository configRepository) {
+    if (appId == null) {
+      appId = ApolloInjector.getInstance(ConfigUtil.class).getAppId();
+    }
+    m_appId = appId;
     m_namespace = namespace;
     m_configRepository = configRepository;
     this.initialize();
@@ -93,13 +111,18 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
 
   @Override
   public synchronized void onRepositoryChange(String namespace, Properties newProperties) {
+    this.onRepositoryChange(m_appId, namespace, newProperties);
+  }
+
+  @Override
+  public synchronized void onRepositoryChange(String appId, String namespace, Properties newProperties) {
     if (newProperties.equals(m_configProperties)) {
       return;
     }
     Properties newConfigProperties = propertiesFactory.getPropertiesInstance();
     newConfigProperties.putAll(newProperties);
 
-    List<ConfigChange> changes = calcPropertyChanges(namespace, m_configProperties, newConfigProperties);
+    List<ConfigChange> changes = calcPropertyChanges(appId, namespace, m_configProperties, newConfigProperties);
     Map<String, ConfigChange> changeMap = Maps.uniqueIndex(changes,
         new Function<ConfigChange, String>() {
           @Override
@@ -111,7 +134,7 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
     updateConfig(newConfigProperties, m_configRepository.getSourceType());
     clearConfigCache();
 
-    this.fireConfigChange(m_namespace, changeMap);
+    this.fireConfigChange(appId, m_namespace, changeMap);
 
     Tracer.logEvent("Apollo.Client.ConfigChanges", m_namespace);
   }

@@ -454,7 +454,7 @@ public abstract class AbstractConfig implements Config {
   /**
    * @param changes map's key is config property's key
    */
-  protected void fireConfigChange(String namespace, Map<String, ConfigChange> changes) {
+  protected void fireConfigChange(String appId, String namespace, Map<String, ConfigChange> changes) {
     final Set<String> changedKeys = changes.keySet();
     final List<ConfigChangeListener> listeners = this.findMatchedConfigChangeListeners(changedKeys);
 
@@ -462,7 +462,7 @@ public abstract class AbstractConfig implements Config {
     for (ConfigChangeListener listener : listeners) {
       Set<String> interestedChangedKeys = resolveInterestedChangedKeys(listener, changedKeys);
       InterestedConfigChangeEvent interestedConfigChangeEvent = new InterestedConfigChangeEvent(
-          namespace, changes, interestedChangedKeys);
+              appId, namespace, changes, interestedChangedKeys);
       this.notifyAsync(listener, interestedConfigChangeEvent);
     }
   }
@@ -567,7 +567,7 @@ public abstract class AbstractConfig implements Config {
     return Collections.unmodifiableSet(interestedChangedKeys);
   }
 
-  List<ConfigChange> calcPropertyChanges(String namespace, Properties previous,
+  List<ConfigChange> calcPropertyChanges(String appId, String namespace, Properties previous,
                                          Properties current) {
     if (previous == null) {
       previous = propertiesFactory.getPropertiesInstance();
@@ -587,12 +587,12 @@ public abstract class AbstractConfig implements Config {
     List<ConfigChange> changes = Lists.newArrayList();
 
     for (String newKey : newKeys) {
-      changes.add(new ConfigChange(namespace, newKey, null, current.getProperty(newKey),
+      changes.add(new ConfigChange(appId, namespace, newKey, null, current.getProperty(newKey),
           PropertyChangeType.ADDED));
     }
 
     for (String removedKey : removedKeys) {
-      changes.add(new ConfigChange(namespace, removedKey, previous.getProperty(removedKey), null,
+      changes.add(new ConfigChange(appId, namespace, removedKey, previous.getProperty(removedKey), null,
           PropertyChangeType.DELETED));
     }
 
@@ -602,7 +602,7 @@ public abstract class AbstractConfig implements Config {
       if (Objects.equal(previousValue, currentValue)) {
         continue;
       }
-      changes.add(new ConfigChange(namespace, commonKey, previousValue, currentValue,
+      changes.add(new ConfigChange(appId, namespace, commonKey, previousValue, currentValue,
           PropertyChangeType.MODIFIED));
     }
 

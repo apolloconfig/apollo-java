@@ -36,8 +36,8 @@ public class YamlConfigFile extends PlainTextConfigFile implements PropertiesCom
   private static final Logger logger = LoggerFactory.getLogger(YamlConfigFile.class);
   private volatile Properties cachedProperties;
 
-  public YamlConfigFile(String namespace, ConfigRepository configRepository) {
-    super(namespace, configRepository);
+  public YamlConfigFile(String appId, String namespace, ConfigRepository configRepository) {
+    super(appId, namespace, configRepository);
     tryTransformToProperties();
   }
 

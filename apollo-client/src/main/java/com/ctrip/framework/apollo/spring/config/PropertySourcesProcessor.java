@@ -20,17 +20,21 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.util.PropertySourcesUtil;
 import com.ctrip.framework.apollo.spring.util.SpringInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -41,7 +45,10 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
-import org.springframework.core.env.*;
+import org.springframework.core.env.CompositePropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.StandardEnvironment;
 
 /**
  * Apollo Property Sources processor for Spring Annotation Based Application. <br /> <br />
@@ -55,7 +62,7 @@ import org.springframework.core.env.*;
  */
 public class PropertySourcesProcessor implements BeanFactoryPostProcessor, EnvironmentAware,
     ApplicationEventPublisherAware, PriorityOrdered {
-  private static final Multimap<Integer, String> NAMESPACE_NAMES = LinkedHashMultimap.create();
+  private static final Map<Integer, Multimap<String, String>> APP_NAMESPACE_NAMES = Maps.newHashMap();
   private static final Set<BeanFactory> AUTO_UPDATE_INITIALIZED_BEAN_FACTORIES = Sets.newConcurrentHashSet();
 
   private final ConfigPropertySourceFactory configPropertySourceFactory = SpringInjector
@@ -65,7 +72,16 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
   private ApplicationEventPublisher applicationEventPublisher;
 
   public static boolean addNamespaces(Collection<String> namespaces, int order) {
-    return NAMESPACE_NAMES.putAll(order, namespaces);
+    return addNamespaces(ApolloInjector.getInstance(ConfigUtil.class).getAppId(), namespaces, order);
+  }
+
+  public static boolean addNamespaces(String appId, Collection<String> namespaces, int order) {
+    Multimap<String, String> multimap = APP_NAMESPACE_NAMES.get(order);
+    if (multimap == null) {
+      multimap = LinkedHashMultimap.create();
+      APP_NAMESPACE_NAMES.put(order, multimap);
+    }
+    return multimap.putAll(appId, namespaces);
   }
 
   @Override
@@ -88,20 +104,27 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
     }
 
     //sort by order asc
-    ImmutableSortedSet<Integer> orders = ImmutableSortedSet.copyOf(NAMESPACE_NAMES.keySet());
+    ImmutableSortedSet<Integer> orders = ImmutableSortedSet.copyOf(APP_NAMESPACE_NAMES.keySet());
     Iterator<Integer> iterator = orders.iterator();
 
     while (iterator.hasNext()) {
       int order = iterator.next();
-      for (String namespace : NAMESPACE_NAMES.get(order)) {
-        Config config = ConfigService.getConfig(namespace);
-
-        composite.addPropertySource(configPropertySourceFactory.getConfigPropertySource(namespace, config));
+      Multimap<String, String> appMultimap = APP_NAMESPACE_NAMES.get(order);
+      // app and namespace
+      Set<String> appIds = appMultimap.keySet();
+      for (String appId : appIds) {
+        Collection<String> namespaces = appMultimap.get(appId);
+        for (String namespace : namespaces) {
+          Config config = ConfigService.getConfig(appId, namespace);
+          composite.addPropertySource(configPropertySourceFactory.getConfigPropertySource(
+              appId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + namespace, config));
+        }
       }
+
     }
 
     // clean up
-    NAMESPACE_NAMES.clear();
+    APP_NAMESPACE_NAMES.clear();
 
     // add after the bootstrap property source or to the first
     if (environment.getPropertySources()
@@ -153,7 +176,7 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
 
   // for test only
   static void reset() {
-    NAMESPACE_NAMES.clear();
+    APP_NAMESPACE_NAMES.clear();
     AUTO_UPDATE_INITIALIZED_BEAN_FACTORIES.clear();
   }
 

@@ -52,6 +52,7 @@ public class ApolloTestingServer implements AutoCloseable {
     private static final Type notificationType = new TypeToken<List<ApolloConfigNotification>>() {
     }.getType();
 
+    private static String someAppId = "someAppId";
     private static Method CONFIG_SERVICE_LOCATOR_CLEAR;
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
@@ -175,7 +176,7 @@ public class ApolloTestingServer implements AutoCloseable {
             logger.debug("load {} from {}", namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
-        return new LocalFileConfigRepository(namespace).getConfig();
+        return new LocalFileConfigRepository(someAppId, namespace).getConfig();
     }
 
     private String mockLongPollBody(String notificationsStr) {

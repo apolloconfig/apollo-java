@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.internals.PropertiesCompatibleFileConfigRepository;
 import java.util.Properties;
 
@@ -58,7 +59,7 @@ public class DefaultConfigFactoryTest {
 
   @Before
   public void setUp() throws Exception {
-    someAppId = "someId";
+    someAppId = "someAppId";
     someEnv = Env.DEV;
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
     defaultConfigFactory = spy(new DefaultConfigFactory());
@@ -80,7 +81,7 @@ public class DefaultConfigFactoryTest {
     LocalFileConfigRepository someLocalConfigRepo = mock(LocalFileConfigRepository.class);
     when(someLocalConfigRepo.getConfig()).thenReturn(someProperties);
 
-    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createConfigRepository(someNamespace);
+    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createConfigRepository(someAppId, someNamespace);
 
     Config result = defaultConfigFactory.create(someNamespace);
 
@@ -95,7 +96,7 @@ public class DefaultConfigFactoryTest {
     someEnv = Env.LOCAL;
 
     LocalFileConfigRepository localFileConfigRepository =
-        defaultConfigFactory.createLocalConfigRepository(someNamespace);
+        defaultConfigFactory.createLocalConfigRepository(someAppId, someNamespace);
 
     assertNull(ReflectionTestUtils.getField(localFileConfigRepository, "m_upstream"));
   }
@@ -113,9 +114,9 @@ public class DefaultConfigFactoryTest {
     when(someRepository.getConfig()).thenReturn(someProperties);
 
     doReturn(someRepository).when(defaultConfigFactory)
-        .createPropertiesCompatibleFileConfigRepository(someNamespace, somePropertiesCompatibleFormat);
+        .createPropertiesCompatibleFileConfigRepository(someAppId, someNamespace, somePropertiesCompatibleFormat);
 
-    Config result = defaultConfigFactory.create(someNamespace);
+    Config result = defaultConfigFactory.create(someAppId, someNamespace);
 
     assertThat("DefaultConfigFactory should create DefaultConfig", result,
         is(instanceOf(DefaultConfig.class)));
@@ -132,9 +133,9 @@ public class DefaultConfigFactoryTest {
     LocalFileConfigRepository someLocalConfigRepo = mock(LocalFileConfigRepository.class);
     when(someLocalConfigRepo.getConfig()).thenReturn(someProperties);
 
-    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createLocalConfigRepository(someNamespace);
-    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createLocalConfigRepository(anotherNamespace);
-    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createLocalConfigRepository(yetAnotherNamespace);
+    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createLocalConfigRepository(someAppId, someNamespace);
+    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createLocalConfigRepository(someAppId, anotherNamespace);
+    doReturn(someLocalConfigRepo).when(defaultConfigFactory).createLocalConfigRepository(someAppId, yetAnotherNamespace);
 
     ConfigFile propertyConfigFile =
         defaultConfigFactory.createConfigFile(someNamespace, ConfigFileFormat.Properties);
@@ -187,27 +188,32 @@ public class DefaultConfigFactoryTest {
 
   @Test
   public void testTrimNamespaceFormat() throws Exception {
-    checkNamespaceName("abc", ConfigFileFormat.Properties, "abc");
-    checkNamespaceName("abc.properties", ConfigFileFormat.Properties, "abc");
-    checkNamespaceName("abcproperties", ConfigFileFormat.Properties, "abcproperties");
-    checkNamespaceName("abc.pRopErties", ConfigFileFormat.Properties, "abc");
-    checkNamespaceName("abc.xml", ConfigFileFormat.XML, "abc");
-    checkNamespaceName("abc.xmL", ConfigFileFormat.XML, "abc");
-    checkNamespaceName("abc.json", ConfigFileFormat.JSON, "abc");
-    checkNamespaceName("abc.jsOn", ConfigFileFormat.JSON, "abc");
-    checkNamespaceName("abc.yaml", ConfigFileFormat.YAML, "abc");
-    checkNamespaceName("abc.yAml", ConfigFileFormat.YAML, "abc");
-    checkNamespaceName("abc.yml", ConfigFileFormat.YML, "abc");
-    checkNamespaceName("abc.yMl", ConfigFileFormat.YML, "abc");
-    checkNamespaceName("abc.proPerties.yml", ConfigFileFormat.YML, "abc.proPerties");
+    checkNamespaceName("abc", ConfigFileFormat.Properties, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.properties", ConfigFileFormat.Properties,  appIdAndNamespace("abc"));
+    checkNamespaceName("abcproperties", ConfigFileFormat.Properties,  appIdAndNamespace("abcproperties"));
+    checkNamespaceName("abc.pRopErties", ConfigFileFormat.Properties,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.xml", ConfigFileFormat.XML,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.xmL", ConfigFileFormat.XML,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.json", ConfigFileFormat.JSON,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.jsOn", ConfigFileFormat.JSON,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yaml", ConfigFileFormat.YAML,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yAml", ConfigFileFormat.YAML,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yml", ConfigFileFormat.YML,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yMl", ConfigFileFormat.YML,  appIdAndNamespace("abc"));
+    checkNamespaceName("abc.proPerties.yml", ConfigFileFormat.YML,  appIdAndNamespace("abc.proPerties"));
   }
+
+  private String appIdAndNamespace(String namespace){
+    return namespace;
+  }
+
 
   private void checkFileFormat(String namespaceName, ConfigFileFormat expectedFormat) {
     assertEquals(expectedFormat, defaultConfigFactory.determineFileFormat(namespaceName));
   }
 
   private void checkNamespaceName(String namespaceName, ConfigFileFormat format, String expectedNamespaceName) {
-    assertEquals(expectedNamespaceName, defaultConfigFactory.trimNamespaceFormat(namespaceName, format));
+    assertEquals(expectedNamespaceName, defaultConfigFactory.trimNamespaceFormat(someAppId, namespaceName, format));
   }
 
   public static class MockConfigUtil extends ConfigUtil {

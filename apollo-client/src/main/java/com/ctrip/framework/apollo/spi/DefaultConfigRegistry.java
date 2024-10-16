@@ -16,33 +16,51 @@
  */
 package com.ctrip.framework.apollo.spi;
 
-import java.util.Map;
-
+import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultConfigRegistry implements ConfigRegistry {
   private static final Logger s_logger = LoggerFactory.getLogger(DefaultConfigRegistry.class);
-  private Map<String, ConfigFactory> m_instances = Maps.newConcurrentMap();
+
+  private ConfigUtil m_configUtil;
+
+  private Table<String, String, ConfigFactory> m_instances = Tables.synchronizedTable(
+      HashBasedTable.create());
+
+  public DefaultConfigRegistry() {
+    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+  }
 
   @Override
   public void register(String namespace, ConfigFactory factory) {
-    if (m_instances.containsKey(namespace)) {
-      s_logger.warn("ConfigFactory({}) is overridden by {}!", namespace, factory.getClass());
+    register(m_configUtil.getAppId(), namespace, factory);
+  }
+
+  @Override
+  public void register(String appId, String namespace, ConfigFactory factory) {
+    if (m_instances.contains(appId, namespace)) {
+      s_logger.warn("ConfigFactory({}-{}) is overridden by {}!", appId, namespace, factory.getClass());
     }
 
-    m_instances.put(namespace, factory);
+    m_instances.put(appId, namespace, factory);
   }
 
   @Override
   public ConfigFactory getFactory(String namespace) {
-    ConfigFactory config = m_instances.get(namespace);
+    return getFactory(m_configUtil.getAppId(), namespace);
+  }
 
+  @Override
+  public ConfigFactory getFactory(String appId, String namespace) {
+    ConfigFactory config = m_instances.get(appId, namespace);
     return config;
   }
 }

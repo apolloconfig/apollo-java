@@ -41,6 +41,8 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
   private static final int DEFAULT_BATCH = 200;
   private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
 
+  private static final String someAppId = "someAppId";
+
   @Test
   public void testAutoUpdateWithOneNamespace() throws Exception {
     int initialTimeout = 1000;
@@ -51,7 +53,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties properties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(initialTimeout),
         BATCH_PROPERTY, String.valueOf(initialBatch));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest1.xml");
 
@@ -63,7 +65,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties newProperties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(newTimeout),
         BATCH_PROPERTY, String.valueOf(newBatch));
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -86,7 +88,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties properties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(initialTimeout),
         BATCH_PROPERTY, String.valueOf(initialBatch));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest1.xml");
 
@@ -98,7 +100,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties newProperties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(newTimeout),
         BATCH_PROPERTY, String.valueOf(newBatch));
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -118,9 +120,9 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties fxApolloProperties = assembleProperties(BATCH_PROPERTY,
         String.valueOf(initialBatch));
 
-    SimpleConfig applicationConfig = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION,
+    SimpleConfig applicationConfig = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION,
         applicationProperties);
-    SimpleConfig fxApolloConfig = prepareConfig(FX_APOLLO_NAMESPACE, fxApolloProperties);
+    SimpleConfig fxApolloConfig = prepareConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloProperties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest3.xml");
 
@@ -163,8 +165,8 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties fxApolloProperties = assembleProperties(TIMEOUT_PROPERTY,
         String.valueOf(someTimeout), BATCH_PROPERTY, String.valueOf(anotherBatch));
 
-    prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, applicationProperties);
-    SimpleConfig fxApolloConfig = prepareConfig(FX_APOLLO_NAMESPACE, fxApolloProperties);
+    prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationProperties);
+    SimpleConfig fxApolloConfig = prepareConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloProperties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest3.xml");
 
@@ -176,7 +178,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties newFxApolloProperties = assembleProperties(TIMEOUT_PROPERTY,
         String.valueOf(someNewTimeout), BATCH_PROPERTY, String.valueOf(someNewBatch));
 
-    fxApolloConfig.onRepositoryChange(FX_APOLLO_NAMESPACE, newFxApolloProperties);
+    fxApolloConfig.onRepositoryChange(someAppId, FX_APOLLO_NAMESPACE, newFxApolloProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -193,7 +195,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties applicationProperties = assembleProperties(TIMEOUT_PROPERTY,
         String.valueOf(initialTimeout));
 
-    SimpleConfig applicationConfig = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION,
+    SimpleConfig applicationConfig = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION,
         applicationProperties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest1.xml");
@@ -207,7 +209,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
         String.valueOf(newTimeout), BATCH_PROPERTY, String.valueOf(newBatch));
 
     applicationConfig
-        .onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newApplicationProperties);
+        .onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newApplicationProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -228,7 +230,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties applicationProperties = assembleProperties(TIMEOUT_PROPERTY,
         String.valueOf(initialTimeout), someIrrelevantKey, someIrrelevantValue);
 
-    SimpleConfig applicationConfig = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION,
+    SimpleConfig applicationConfig = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION,
         applicationProperties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest1.xml");
@@ -242,7 +244,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
         String.valueOf(initialTimeout), anotherIrrelevantKey, anotherIrrelevantValue);
 
     applicationConfig
-        .onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newApplicationProperties);
+        .onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newApplicationProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -258,7 +260,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties properties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(initialTimeout),
         BATCH_PROPERTY, String.valueOf(initialBatch));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest1.xml");
 
@@ -269,7 +271,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
 
     Properties newProperties = new Properties();
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -288,9 +290,9 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties fxApolloProperties = assembleProperties(TIMEOUT_PROPERTY,
         String.valueOf(someTimeout), BATCH_PROPERTY, String.valueOf(anotherBatch));
 
-    SimpleConfig applicationConfig = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION,
+    SimpleConfig applicationConfig = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION,
         applicationProperties);
-    prepareConfig(FX_APOLLO_NAMESPACE, fxApolloProperties);
+    prepareConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloProperties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest3.xml");
 
@@ -318,7 +320,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties properties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(initialTimeout),
         BATCH_PROPERTY, String.valueOf(initialBatch));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest7.xml");
 
@@ -329,7 +331,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
 
     Properties newProperties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(newTimeout));
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(300);
 
@@ -347,7 +349,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties properties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(initialTimeout),
         BATCH_PROPERTY, String.valueOf(initialBatch));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest1.xml");
 
@@ -359,7 +361,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties newProperties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(newTimeout),
         BATCH_PROPERTY, newBatch);
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(300);
 
@@ -377,7 +379,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties properties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(initialTimeout),
         BATCH_PROPERTY, String.valueOf(initialBatch));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest8.xml");
 
@@ -389,7 +391,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties newProperties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(newTimeout),
         BATCH_PROPERTY, String.valueOf(newBatch));
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -408,7 +410,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties properties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(initialTimeout),
         BATCH_PROPERTY, String.valueOf(initialBatch));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
 
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest9.xml");
 
@@ -420,7 +422,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     Properties newProperties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(newTimeout),
         BATCH_PROPERTY, String.valueOf(newBatch));
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 
@@ -467,7 +469,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     properties.setProperty("dateFormat", someDateFormat);
     properties.setProperty("dateProperty", simpleDateFormat.format(someDate));
 
-    SimpleConfig config = prepareConfig(ConfigConsts.NAMESPACE_APPLICATION, properties);
+    SimpleConfig config = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring/XmlConfigPlaceholderTest10.xml");
 
     TestAllKindsOfDataTypesBean bean = context.getBean(TestAllKindsOfDataTypesBean.class);
@@ -496,7 +498,7 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     newProperties.setProperty("dateFormat", someDateFormat);
     newProperties.setProperty("dateProperty", simpleDateFormat.format(someNewDate));
 
-    config.onRepositoryChange(ConfigConsts.NAMESPACE_APPLICATION, newProperties);
+    config.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION, newProperties);
 
     TimeUnit.MILLISECONDS.sleep(100);
 

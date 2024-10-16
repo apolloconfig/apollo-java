@@ -82,7 +82,7 @@ public class CachedCompositePropertySourceTest {
     assertArrayEquals(propertyNames, returnedPropertyNames);
     assertSame(returnedPropertyNames, compositeSource.getPropertyNames());
 
-    listeners.get(0).onChange(new ConfigChangeEvent(null, null));
+    listeners.get(0).onChange(new ConfigChangeEvent(null,null, null));
 
     returnedPropertyNames = compositeSource.getPropertyNames();
     assertArrayEquals(anotherPropertyNames, returnedPropertyNames);
