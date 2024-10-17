@@ -26,9 +26,6 @@ import java.util.List;
  */
 public interface NamespaceOpenApiService {
 
-  /**
-   * @deprecated use {@link NamespaceOpenApiService#getNamespace(String, String, String, String, boolean)} instead
-   */
   default OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName) {
     return getNamespace(appId, env, clusterName, namespaceName, true);
   }
@@ -39,9 +36,6 @@ public interface NamespaceOpenApiService {
    */
   OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail);
 
-  /**
-   * @deprecated use {@link NamespaceOpenApiService#getNamespaces(String, String, String, boolean)} instead
-   */
   default List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName) {
     return getNamespaces(appId, env, clusterName, true);
   }

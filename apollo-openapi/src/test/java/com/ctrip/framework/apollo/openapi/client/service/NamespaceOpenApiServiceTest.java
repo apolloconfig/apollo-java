@@ -37,6 +37,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private String someEnv;
   private String someCluster;
   private String someNamespace;
+  private boolean fillItemDetail;
 
   @Override
   @Before
@@ -47,6 +48,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
     someEnv = "someEnv";
     someCluster = "someCluster";
     someNamespace = "someNamespace";
+    fillItemDetail = true;
 
     StringEntity responseEntity = new StringEntity("{}");
     when(someHttpResponse.getEntity()).thenReturn(responseEntity);
@@ -58,15 +60,33 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   public void testGetNamespace() throws Exception {
     final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
 
-    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, true);
+    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace);
 
     verify(httpClient, times(1)).execute(request.capture());
 
     HttpGet get = request.getValue();
 
     assertEquals(String
-        .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s", someBaseUrl, someEnv, someAppId, someCluster,
-            someNamespace), get.getURI().toString());
+        .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s?fillItemDetail=%s", someBaseUrl, someEnv, someAppId, someCluster,
+            someNamespace, fillItemDetail), get.getURI().toString());
+  }
+
+  @Test
+  public void testGetNamespaceWithFillItemDetailFalse() throws Exception {
+
+    fillItemDetail = false;
+
+    final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
+
+    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, fillItemDetail);
+
+    verify(httpClient, times(1)).execute(request.capture());
+
+    HttpGet get = request.getValue();
+
+    assertEquals(String
+                     .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s?fillItemDetail=%s", someBaseUrl, someEnv, someAppId, someCluster,
+                             someNamespace, fillItemDetail), get.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)
@@ -83,15 +103,36 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
 
-    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, true);
+    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster);
 
     verify(httpClient, times(1)).execute(request.capture());
 
     HttpGet get = request.getValue();
 
     assertEquals(String
-            .format("%s/envs/%s/apps/%s/clusters/%s/namespaces", someBaseUrl, someEnv, someAppId, someCluster),
+            .format("%s/envs/%s/apps/%s/clusters/%s/namespaces?fillItemDetail=%s", someBaseUrl, someEnv, someAppId, someCluster, fillItemDetail),
         get.getURI().toString());
+  }
+
+  @Test
+  public void testGetNamespacesWithFillItemDetailFalse() throws Exception {
+
+    fillItemDetail = false;
+
+    StringEntity responseEntity = new StringEntity("[]");
+    when(someHttpResponse.getEntity()).thenReturn(responseEntity);
+
+    final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
+
+    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, fillItemDetail);
+
+    verify(httpClient, times(1)).execute(request.capture());
+
+    HttpGet get = request.getValue();
+
+    assertEquals(String
+                     .format("%s/envs/%s/apps/%s/clusters/%s/namespaces?fillItemDetail=%s", someBaseUrl, someEnv, someAppId, someCluster, fillItemDetail),
+                 get.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)

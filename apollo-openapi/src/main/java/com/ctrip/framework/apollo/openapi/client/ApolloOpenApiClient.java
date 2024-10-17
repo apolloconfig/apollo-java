@@ -99,11 +99,8 @@ public class ApolloOpenApiClient {
     return appService.getAppsInfo(appIds);
   }
 
-  /**
-   * @deprecated use {@link ApolloOpenApiClient#getNamespaces(String, String, String, boolean)} instead
-   */
   public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName) {
-    return namespaceService.getNamespaces(appId, env, clusterName, true);
+    return namespaceService.getNamespaces(appId, env, clusterName);
   }
 
   /**
@@ -132,11 +129,8 @@ public class ApolloOpenApiClient {
     return clusterService.createCluster(env, openClusterDTO);
   }
 
-  /**
-   * @deprecated use {@link ApolloOpenApiClient#getNamespace(String, String, String, String, boolean)} instead
-   */
   public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName) {
-    return namespaceService.getNamespace(appId, env, clusterName, namespaceName, true);
+    return namespaceService.getNamespace(appId, env, clusterName, namespaceName);
   }
 
   /**
