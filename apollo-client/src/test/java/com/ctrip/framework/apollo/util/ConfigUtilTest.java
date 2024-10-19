@@ -47,6 +47,7 @@ public class ConfigUtilTest {
     System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR);
     System.clearProperty(PropertiesFactory.APOLLO_PROPERTY_ORDER_ENABLE);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE);
+    System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE);
   }
 
   @Test
@@ -247,7 +248,7 @@ public class ConfigUtilTest {
   public void testConfigMapNamespaceWithSystemProperty() {
     String someConfigMapNamespace = "someConfigMapNamespace";
 
-    System.setProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE, someConfigMapNamespace);
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE, someConfigMapNamespace);
 
     ConfigUtil configUtil = new ConfigUtil();
 

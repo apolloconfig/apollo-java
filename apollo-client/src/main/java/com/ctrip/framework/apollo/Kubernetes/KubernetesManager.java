@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.Kubernetes;
 
 import io.kubernetes.client.openapi.ApiClient;
+import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.models.*;
@@ -25,8 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class KubernetesManager {
@@ -35,18 +37,32 @@ public class KubernetesManager {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @PostConstruct
-    public void initClient() {
+    public KubernetesManager() {
         try {
             client = Config.defaultClient();
             Configuration.setDefaultApiClient(client);
             coreV1Api = new CoreV1Api(client);
-
         } catch (Exception e) {
             String errorMessage = "Failed to initialize Kubernetes client: " + e.getMessage();
             log.error(errorMessage, e);
             throw new RuntimeException(errorMessage, e);
         }
+    }
+
+    public KubernetesManager(CoreV1Api coreV1Api) {
+        this.coreV1Api = coreV1Api;
+    }
+
+    public V1ConfigMap buildConfigMap(String name, String namespace, Map<String, String> data) {
+        V1ObjectMeta metadata = new V1ObjectMeta()
+                .name(name)
+                .namespace(namespace);
+
+        return new V1ConfigMap()
+                .apiVersion("v1")
+                .kind("ConfigMap")
+                .metadata(metadata)
+                .data(data);
     }
 
     /**
@@ -60,14 +76,12 @@ public class KubernetesManager {
      */
     public String createConfigMap(String configMapNamespace, String name, Map<String, String> data) {
         if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty()) {
-            log.error("create config map failed due to null or empty parameter: configMapNamespace={}, name={}", configMapNamespace, name);
-            throw new IllegalArgumentException("ConfigMap namespace and name cannot be null or empty");
+            log.error("create configmap failed due to null or empty parameter: configMapNamespace={}, name={}", configMapNamespace, name);
         }
-        V1ConfigMap configMap = new V1ConfigMap()
-                .metadata(new V1ObjectMeta().name(name).namespace(configMapNamespace))
-                .data(data);
+        V1ConfigMap configMap = buildConfigMap(name, configMapNamespace, data);
         try {
             coreV1Api.createNamespacedConfigMap(configMapNamespace, configMap, null, null, null, null);
+            log.info("ConfigMap created successfully: name: {}, namespace: {}", name, configMapNamespace);
             return name;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create ConfigMap: " + e.getMessage(), e);
@@ -77,18 +91,16 @@ public class KubernetesManager {
     /**
      * get value from config map
      *
-     * @param configMapNamespace
+     * @param configMapNamespace configmap namespace
      * @param name               config map name (appId)
      * @return configMap data(all key-value pairs in config map)
      */
     public String loadFromConfigMap(String configMapNamespace, String name) {
         if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() ) {
-            String errorMessage = String.format("Parameters can not be null or empty, configMapNamespace: '%s', name: '%s'", configMapNamespace, name);
-            log.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            log.error("load configmap failed due to null or empty parameter: configMapNamespace={}, name={}", configMapNamespace, name);
         }
         try {
-            log.info("Starting to read ConfigMap: " + name);
+            log.info("Starting to read ConfigMap: {}", name);
             V1ConfigMap configMap = coreV1Api.readNamespacedConfigMap(name, configMapNamespace, null);
             if (configMap == null) {
                 throw new RuntimeException(String.format("ConfigMap does not exist, configMapNamespace: %s, name: %s", configMapNamespace, name));
@@ -120,10 +132,7 @@ public class KubernetesManager {
         }
         try {
             V1ConfigMap configMap = coreV1Api.readNamespacedConfigMap(name, configMapNamespace, null);
-            if (configMap == null) {
-                throw new RuntimeException(String.format("ConfigMap does not exist, configMapNamespace: %s, name: %s", configMapNamespace, name));
-            }
-            if (!configMap.getData().containsKey(key)) {
+            if (!Objects.requireNonNull(configMap.getData()).containsKey(key)) {
                 throw new RuntimeException(String.format("Specified key not found in ConfigMap: %s, configMapNamespace: %s, name: %s", name, configMapNamespace, name));
             }
             return configMap.getData().get(key);
@@ -135,24 +144,45 @@ public class KubernetesManager {
     /**
      * update config map
      *
-     * @param configMapNamespace
+     * @param configMapNamespace configmap namespace
      * @param name               config map name (appId)
      * @param data               new data
      * @return config map name
      */
-    public String updateConfigMap(String configMapNamespace, String name, Map<String, String> data) {
+    // TODO 使用client自带的retry机制，设置重试次数,CAS
+    public boolean updateConfigMap(String configMapNamespace, String name, Map<String, String> data) {
         if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() || data == null || data.isEmpty()) {
             log.error("Parameters can not be null or empty: configMapNamespace={}, name={}", configMapNamespace, name);
-            return null;
+            return false;
         }
-        try {
-            V1ConfigMap configMap = new V1ConfigMap().metadata(new V1ObjectMeta().name(name).namespace(configMapNamespace)).data(data);
-            coreV1Api.replaceNamespacedConfigMap(name, configMapNamespace, configMap, null, null, null, "fieldManagerValue");
-            return name;
-        } catch (Exception e) {
-            log.error("update config map failed", e);
-            return null;
+
+        // retry
+        int maxRetries = 5;
+        int retryCount = 0;
+        long waitTime = 100;
+
+        while (retryCount < maxRetries) {
+            try {
+                V1ConfigMap configmap = coreV1Api.readNamespacedConfigMap(name, configMapNamespace, null);
+                configmap.setData(data);
+                coreV1Api.replaceNamespacedConfigMap(name, configMapNamespace, configmap, null, null, null, null);
+                return true;
+            } catch (ApiException e) {
+                if (e.getCode() == 409) {
+                    retryCount++;
+                    log.warn("Conflict occurred, retrying... (" + retryCount + ")");
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(waitTime);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                    waitTime = Math.min(waitTime * 2, 1000);
+                } else {
+                    System.err.println("Error updating ConfigMap: " + e.getMessage());
+                }
+            }
         }
+        return retryCount < maxRetries;
     }
 
     /**
@@ -168,10 +198,12 @@ public class KubernetesManager {
             return false;
         }
         try {
+            log.info("Check whether ConfigMap exists, configMapName: {}", configMapName);
             coreV1Api.readNamespacedConfigMap(configMapName, configMapNamespace, null);
+            return true;
         } catch (Exception e) {
+            // configmap not exist
             return false;
         }
-        return true;
     }
 }

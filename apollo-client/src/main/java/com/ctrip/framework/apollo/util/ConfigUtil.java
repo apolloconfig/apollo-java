@@ -380,18 +380,18 @@ public class ConfigUtil {
 
   private String getCustomizedConfigMapNamespace() {
     // 1. Get from System Property
-    String configMapNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE);
+    String configMapNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE);
     if (Strings.isNullOrEmpty(configMapNamespace)) {
       // 2. Get from OS environment variable
-      configMapNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE_ENVIRONMENT_VARIABLES);
+      configMapNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE_ENVIRONMENT_VARIABLES);
     }
     if (Strings.isNullOrEmpty(configMapNamespace)) {
       // 3. Get from server.properties
-      configMapNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE, null);
+      configMapNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE, null);
     }
     if (Strings.isNullOrEmpty(configMapNamespace)) {
       // 4. Get from app.properties
-      configMapNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CONFIGMAP_NAMESPACE, null);
+      configMapNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE, null);
     }
     return configMapNamespace;
   }
@@ -399,15 +399,6 @@ public class ConfigUtil {
   public boolean isInLocalMode() {
     try {
       return Env.LOCAL == getApolloEnv();
-    } catch (Throwable ex) {
-      //ignore
-    }
-    return false;
-  }
-
-  public boolean isInKubernetesMode() {
-    try {
-      return Env.KUBERNETES == getApolloEnv();
     } catch (Throwable ex) {
       //ignore
     }
