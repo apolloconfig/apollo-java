@@ -88,6 +88,14 @@ public abstract class Tracer {
           type, name, status, nameValuePairs, ex);
     }
   }
+  
+  public static void logMetricsForCount(String name) {
+    try {
+      getProducer().logMetricsForCount(name);
+    } catch (Throwable ex) {
+      logger.warn("Failed to log metrics for count: {}", name, ex);
+    }
+  }
 
   public static Transaction newTransaction(String type, String name) {
     try {

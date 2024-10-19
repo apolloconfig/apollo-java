@@ -16,6 +16,7 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import java.util.List;
@@ -41,7 +42,7 @@ public abstract class AbstractConfigRepository implements ConfigRepository {
       sync();
       return true;
     } catch (Throwable ex) {
-      Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+      Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
       logger
           .warn("Sync config failed, will retry. Repository {}, reason: {}", this.getClass(), ExceptionUtil
               .getDetailMessage(ex));
