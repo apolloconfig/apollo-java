@@ -93,7 +93,7 @@ public class DefaultApolloClientBootstrapArgsApi extends
   
   private void putAttachmentValue(String argName, Object value) {
     bootstrapArgs.put(argName, value);
-    bootstrapArgsString.put(argName, value.toString());
+    bootstrapArgsString.put(argName, value == null ? null : value.toString());
   }
 
   @Override

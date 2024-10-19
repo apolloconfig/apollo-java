@@ -24,9 +24,15 @@ import java.time.format.DateTimeFormatter;
  * @date 2024/10/19
  */
 public class DateUtil {
-	 public static DateTimeFormatter MEDIUM_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	 
-	 public static String formatLocalDateTime(LocalDateTime localDateTime) {
-		 return localDateTime.format(MEDIUM_FORMATTER);
-	 }
+	 public static final DateTimeFormatter MEDIUM_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+	/**
+	 * Formats a LocalDateTime object to a string using the MEDIUM_FORMATTER.
+	 *
+	 * @param localDateTime the LocalDateTime to format, can be null
+	 * @return the formatted date-time string, or null if the input is null
+	 */
+	public static String formatLocalDateTime(LocalDateTime localDateTime) {
+		return localDateTime != null ? localDateTime.format(MEDIUM_FORMATTER) : null;
+	}
 }

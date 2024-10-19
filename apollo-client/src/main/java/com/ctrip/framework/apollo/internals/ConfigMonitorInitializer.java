@@ -20,6 +20,7 @@ import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorCon
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.jmx.ApolloClientJmxMBeanRegister;
@@ -102,10 +103,14 @@ public class ConfigMonitorInitializer {
 
   private static void initializeMetricsExporter(
   ) {
+    if (StringUtils.isEmpty(m_configUtil.getMonitorExternalType()) || "NONE".equals(m_configUtil.
+            getMonitorExternalType())) {
+      return;
+    }
     ApolloClientMetricsExporterFactory exporterFactory = ApolloInjector.getInstance(
-        ApolloClientMetricsExporterFactory.class);
+            ApolloClientMetricsExporterFactory.class);
     ApolloClientMetricsExporter metricsReporter = exporterFactory.getMetricsReporter(
-        MONITOR_CONTEXT.getApolloClientMonitorEventListeners());
+            MONITOR_CONTEXT.getApolloClientMonitorEventListeners());
     if (metricsReporter != null) {
       MONITOR_CONTEXT.setApolloClientMetricsExporter(metricsReporter);
     }
