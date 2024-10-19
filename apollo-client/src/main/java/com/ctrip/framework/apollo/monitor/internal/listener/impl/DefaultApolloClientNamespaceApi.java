@@ -28,6 +28,7 @@ import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxName
 import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant;
 import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
+import com.ctrip.framework.apollo.util.date.DateUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.time.LocalDateTime;
@@ -182,7 +183,7 @@ public class DefaultApolloClientNamespaceApi extends
     namespaces.forEach((namespace, metrics) -> {
       NamespaceMetricsString namespaceMetricsString = new NamespaceMetricsString();
       namespaceMetricsString.setFirstLoadTimeSpendInMs(metrics.getFirstLoadTimeSpendInMs());
-      namespaceMetricsString.setLatestUpdateTime(metrics.getLatestUpdateTime().toString());
+      namespaceMetricsString.setLatestUpdateTime(DateUtil.formatLocalDateTime(metrics.getLatestUpdateTime()));
       namespaceMetricsString.setUsageCount(metrics.getUsageCount());
       namespaceMetricsString.setReleaseKey(metrics.getReleaseKey());
       namespaceMetricsStringMap.put(namespace, namespaceMetricsString);
