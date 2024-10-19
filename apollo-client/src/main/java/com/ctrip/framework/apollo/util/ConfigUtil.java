@@ -534,10 +534,6 @@ public class ConfigUtil {
             ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
             overrideSystemProperties);
   }
-  
-  
-  private void initClientMonitorExternalType() {
-    monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
 
   private void initPropertyKubernetesCacheEnabled() {
     PropertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
@@ -545,6 +541,8 @@ public class ConfigUtil {
             PropertyKubernetesCacheEnabled);
   }
 
+  private void initClientMonitorExternalType() {
+    monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
     if (Strings.isNullOrEmpty(monitorExternalType)) {
       monitorExternalType = Foundation.app()
               .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "NONE");

@@ -91,35 +91,6 @@ public class KubernetesManager {
     /**
      * get value from config map
      *
-     * @param configMapNamespace configmap namespace
-     * @param name               config map name (appId)
-     * @return configMap data(all key-value pairs in config map)
-     */
-    public String loadFromConfigMap(String configMapNamespace, String name) {
-        if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() ) {
-            log.error("load configmap failed due to null or empty parameter: configMapNamespace={}, name={}", configMapNamespace, name);
-        }
-        try {
-            log.info("Starting to read ConfigMap: {}", name);
-            V1ConfigMap configMap = coreV1Api.readNamespacedConfigMap(name, configMapNamespace, null);
-            if (configMap == null) {
-                throw new RuntimeException(String.format("ConfigMap does not exist, configMapNamespace: %s, name: %s", configMapNamespace, name));
-            }
-            Map<String, String> data = configMap.getData();
-            if (data != null && data.containsKey(name)) {
-                return data.get(name);
-            } else {
-                throw new RuntimeException(String.format("Specified key not found in ConfigMap: %s, configMapNamespace: %s, name: %s", name, configMapNamespace, name));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(String
-                    .format("get config map failed, configMapNamespace: %s, name: %s", configMapNamespace, name));
-        }
-    }
-
-    /**
-     * get value from config map
-     *
      * @param configMapNamespace configMapNamespace
      * @param name               config map name (appId)
      * @param key                config map key (cluster+namespace)

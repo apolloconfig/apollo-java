@@ -32,9 +32,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
-import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -200,27 +198,24 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
     }
 
-    public Properties loadFromK8sConfigMap() throws IOException {
+    public Properties loadFromK8sConfigMap() {
         Preconditions.checkNotNull(configMapName, "ConfigMap name cannot be null");
 
-        Properties properties = null;
         try {
             String jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configUtil.getAppId(), configMapKey);
             if (jsonConfig == null) {
                 // TODO 重试访问idc，default
-                jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configMapName, Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(configUtil, namespace));
+                String fallbackKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(configUtil, namespace);
+                jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configMapName, fallbackKey);
             }
 
             // Convert jsonConfig to properties
-            properties = propertiesFactory.getPropertiesInstance();
+            Properties properties = propertiesFactory.getPropertiesInstance();
             if (jsonConfig != null && !jsonConfig.isEmpty()) {
                 Gson gson = new Gson();
-                Type type = new TypeToken<Map<String, String>>() {
-                }.getType();
+                Type type = new TypeToken<Map<String, String>>() {}.getType();
                 Map<String, String> configMap = gson.fromJson(jsonConfig, type);
-                for (Map.Entry<String, String> entry : configMap.entrySet()) {
-                    properties.setProperty(entry.getKey(), entry.getValue());
-                }
+                configMap.forEach(properties::setProperty);
             }
             return properties;
         } catch (Exception ex) {
