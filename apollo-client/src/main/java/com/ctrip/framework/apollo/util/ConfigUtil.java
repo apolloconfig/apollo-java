@@ -72,6 +72,11 @@ public class ConfigUtil {
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
   private boolean PropertyKubernetesCacheEnabled = false;
+  private boolean clientMonitorEnabled = false;
+  private boolean clientMonitorJmxEnabled = false;
+  private String monitorExternalType = "NONE";
+  private long monitorExternalExportPeriod = 10;
+  private int monitorExceptionQueueSize = 25;
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -88,6 +93,11 @@ public class ConfigUtil {
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
     initPropertyKubernetesCacheEnabled();
+    initClientMonitorEnabled();
+    initClientMonitorJmxEnabled();
+    initClientMonitorExternalType();
+    initClientMonitorExternalExportPeriod();
+    initClientMonitorExceptionQueueSize();
   }
 
   /**
@@ -524,6 +534,10 @@ public class ConfigUtil {
             ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
             overrideSystemProperties);
   }
+  
+  
+  private void initClientMonitorExternalType() {
+    monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
 
   private void initPropertyKubernetesCacheEnabled() {
     PropertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
@@ -531,6 +545,70 @@ public class ConfigUtil {
             PropertyKubernetesCacheEnabled);
   }
 
+    if (Strings.isNullOrEmpty(monitorExternalType)) {
+      monitorExternalType = Foundation.app()
+              .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "NONE");
+    }
+  }
+
+  public String getMonitorExternalType() {
+    return monitorExternalType;
+  }
+
+  private void initClientMonitorExternalExportPeriod() {
+    Integer value = getCustomizedIntegerValue(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD);
+
+    if (value != null) {
+      if (value <= 0) {
+        logger.warn("Config for {} is invalid: {}, remain default value: 10",
+                ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, value);
+      } else {
+        monitorExternalExportPeriod = value;
+      }
+    }
+  }
+
+  public long getMonitorExternalExportPeriod() {
+    return monitorExternalExportPeriod;
+  }
+
+  private void initClientMonitorEnabled() {
+    clientMonitorEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
+            clientMonitorEnabled);
+  }
+
+  public boolean isClientMonitorEnabled() {
+    return clientMonitorEnabled;
+  }
+
+  private void initClientMonitorJmxEnabled() {
+    clientMonitorJmxEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
+            clientMonitorJmxEnabled);
+  }
+
+  public boolean isClientMonitorJmxEnabled() {
+    return clientMonitorJmxEnabled;
+  }
+
+  private void initClientMonitorExceptionQueueSize() {
+    Integer value = getCustomizedIntegerValue(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE);
+
+    if (value != null) {
+      if (value <= 0) {
+        logger.warn("Config for {} is invalid: {}, remain default value: 25",
+                ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, value);
+      } else {
+        monitorExceptionQueueSize = value;
+      }
+    }
+  }
+
+  public int getMonitorExceptionQueueSize() {
+    return monitorExceptionQueueSize;
+  }
+  
   private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
     String enablePropertyNamesCache = System.getProperty(propertyName);
     if (Strings.isNullOrEmpty(enablePropertyNamesCache)) {

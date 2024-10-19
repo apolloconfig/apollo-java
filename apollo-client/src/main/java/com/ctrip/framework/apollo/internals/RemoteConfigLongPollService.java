@@ -16,6 +16,7 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
@@ -33,9 +34,9 @@ import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.ExceptionUtil;
+import com.ctrip.framework.apollo.util.http.HttpClient;
 import com.ctrip.framework.apollo.util.http.HttpRequest;
 import com.ctrip.framework.apollo.util.http.HttpResponse;
-import com.ctrip.framework.apollo.util.http.HttpClient;
 import com.ctrip.framework.foundation.internals.ServiceBootstrap;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -50,6 +51,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
@@ -209,9 +211,12 @@ public class RemoteConfigLongPollService {
         transaction.setStatus(Transaction.SUCCESS);
       } catch (Throwable ex) {
         lastServiceDto = null;
-        Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+        Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
         transaction.setStatus(ex);
         long sleepTimeInSecond = m_longPollFailSchedulePolicyInSecond.fail();
+        if (ex.getCause() instanceof SocketTimeoutException) {
+          Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT, assembleNamespaces());
+        }
         logger.warn(
             "Long polling failed, will retry in {} seconds. appId: {}, cluster: {}, namespaces: {}, long polling url: {}, reason: {}",
             sleepTimeInSecond, appId, cluster, assembleNamespaces(), url, ExceptionUtil.getDetailMessage(ex));

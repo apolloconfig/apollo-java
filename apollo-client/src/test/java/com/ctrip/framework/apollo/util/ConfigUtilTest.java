@@ -275,6 +275,92 @@ public class ConfigUtilTest {
   }
 
   @Test
+  public void testMonitorExternalType() {
+    String someMonitorExternalType = "someType";
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, someMonitorExternalType);
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(someMonitorExternalType, configUtil.getMonitorExternalType());
+  }
+
+  @Test
+  public void testCustomizeMonitorExternalCollectPeriod() {
+    int somePeriod = 5;
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, String.valueOf(somePeriod));
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(somePeriod, configUtil.getMonitorExternalExportPeriod());
+  }
+
+  @Test
+  public void testCustomizeInvalidMonitorExternalCollectPeriod() {
+    String someInvalidPeriod = "a";
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, someInvalidPeriod);
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(10, configUtil.getMonitorExternalExportPeriod()); // Default value
+  }
+
+  @Test
+  public void testClientMonitorEnabled() {
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED, "true");
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertTrue(configUtil.isClientMonitorEnabled());
+  }
+
+  @Test
+  public void testClientMonitorEnabledDefault() {
+    System.clearProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED);
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertFalse(configUtil.isClientMonitorEnabled()); // Default value
+  }
+
+  @Test
+  public void testClientMonitorJmxEnabled() {
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED, "true");
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertTrue(configUtil.isClientMonitorJmxEnabled());
+  }
+
+  @Test
+  public void testClientMonitorJmxEnabledDefault() {
+    System.clearProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED);
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertFalse(configUtil.isClientMonitorJmxEnabled()); // Default value
+  }
+
+  @Test
+  public void testCustomizeMonitorExceptionQueueSize() {
+    int someQueueSize = 10;
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, String.valueOf(someQueueSize));
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(someQueueSize, configUtil.getMonitorExceptionQueueSize());
+  }
+
+  @Test
+  public void testCustomizeInvalidMonitorExceptionQueueSize() {
+    String someInvalidQueueSize = "a";
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, someInvalidQueueSize);
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(25, configUtil.getMonitorExceptionQueueSize()); // Default value
+  }
+
+  @Test
   public void test() {
     ConfigUtil configUtil = new ConfigUtil();
     assertFalse(configUtil.isPropertyNamesCacheEnabled());
