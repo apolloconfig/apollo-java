@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
+
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
@@ -35,9 +37,9 @@ import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.ExceptionUtil;
+import com.ctrip.framework.apollo.util.http.HttpClient;
 import com.ctrip.framework.apollo.util.http.HttpRequest;
 import com.ctrip.framework.apollo.util.http.HttpResponse;
-import com.ctrip.framework.apollo.util.http.HttpClient;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -74,7 +76,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   private volatile AtomicReference<ApolloConfig> m_configCache;
   private final String m_appId;
   private final String m_namespace;
-  private final static ScheduledExecutorService m_executorService;
+  protected final static ScheduledExecutorService m_executorService;
   private final AtomicReference<ServiceDTO> m_longPollServiceDto;
   private final AtomicReference<ApolloNotificationMessages> m_remoteMessages;
   private final RateLimiter m_loadConfigRateLimiter;
@@ -114,7 +116,10 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   @Override
   public Properties getConfig() {
     if (m_configCache.get() == null) {
+      long start = System.currentTimeMillis();
       this.sync();
+      Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND+":"+m_namespace,
+          String.valueOf(System.currentTimeMillis() - start));
     }
     return transformApolloConfigToProperties(m_configCache.get());
   }
@@ -136,10 +141,10 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         new Runnable() {
           @Override
           public void run() {
-            Tracer.logEvent("Apollo.ConfigService", String.format("periodicRefresh: %s", m_namespace));
+            Tracer.logEvent(APOLLO_CONFIGSERVICE, String.format("periodicRefresh: %s", m_namespace));
             logger.debug("refresh config for namespace: {}", m_namespace);
             trySync();
-            Tracer.logEvent("Apollo.Client.Version", Apollo.VERSION);
+            Tracer.logEvent(APOLLO_CLIENT_VERSION, Apollo.VERSION);
           }
         }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
         m_configUtil.getRefreshIntervalTimeUnit());
@@ -161,7 +166,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
       }
 
       if (current != null) {
-        Tracer.logEvent(String.format("Apollo.Client.Configs.%s", current.getNamespaceName()),
+        Tracer.logEvent(String.format(APOLLO_CLIENT_CONFIGS+"%s", current.getNamespaceName()),
             current.getReleaseKey());
       }
 
@@ -192,7 +197,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     String cluster = m_configUtil.getCluster();
     String dataCenter = m_configUtil.getDataCenter();
     String secret = m_configUtil.getAccessKeySecret(appId);
-    Tracer.logEvent("Apollo.Client.ConfigMeta", STRING_JOINER.join(appId, cluster, m_namespace));
+    Tracer.logEvent(APOLLO_CLIENT_CONFIGMETA, STRING_JOINER.join(appId, cluster, m_namespace));
     int maxRetries = m_configNeedForceRefresh.get() ? 2 : 1;
     long onErrorSleepTime = 0; // 0 means no sleep
     Throwable exception = null;
@@ -263,15 +268,17 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                 appId, cluster, m_namespace);
             statusCodeException = new ApolloConfigStatusCodeException(ex.getStatusCode(),
                 message);
+            Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND,m_namespace);
+            
           }
-          Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(statusCodeException));
+          Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(statusCodeException));
           transaction.setStatus(statusCodeException);
           exception = statusCodeException;
           if(ex.getStatusCode() == 404) {
             break retryLoopLabel;
           }
         } catch (Throwable ex) {
-          Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+          Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
           transaction.setStatus(ex);
           exception = ex;
         } finally {

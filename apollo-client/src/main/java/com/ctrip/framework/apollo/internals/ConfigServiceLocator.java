@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
+
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ServiceNameConsts;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
@@ -218,7 +220,7 @@ public class ConfigServiceLocator {
           @Override
           public void run() {
             logger.debug("refresh config services");
-            Tracer.logEvent("Apollo.MetaService", "periodicRefresh");
+            Tracer.logEvent(APOLLO_META_SERVICE, "periodicRefresh");
             tryUpdateConfigServices();
           }
         }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
@@ -258,7 +260,7 @@ public class ConfigServiceLocator {
         setConfigServices(services);
         return;
       } catch (Throwable ex) {
-        Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+        Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
         transaction.setStatus(ex);
         exception = ex;
       } finally {
@@ -302,6 +304,6 @@ public class ConfigServiceLocator {
   }
 
   private void logConfigService(String serviceUrl) {
-    Tracer.logEvent("Apollo.Config.Services", serviceUrl);
+    Tracer.logEvent(APOLLO_CONFIG_SERVICES, serviceUrl);
   }
 }

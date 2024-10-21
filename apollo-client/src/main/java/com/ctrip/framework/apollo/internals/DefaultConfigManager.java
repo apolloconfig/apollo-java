@@ -16,19 +16,22 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import java.util.Map;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
+import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.HashBasedTable;
+import com.ctrip.framework.apollo.tracer.Tracer;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
+import java.util.Map;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -56,7 +59,7 @@ public class DefaultConfigManager implements ConfigManager {
   public Config getConfig(String namespace) {
     return getConfig(m_configUtil.getAppId(), namespace);
   }
-
+    
   @Override
   public Config getConfig(String appId, String namespace) {
     Config config = m_configs.get(appId, namespace);
@@ -74,6 +77,10 @@ public class DefaultConfigManager implements ConfigManager {
         }
       }
     }
+    if (!ConfigSourceType.NONE.equals(config.getSourceType())) {
+      Tracer.logMetricsForCount(APOLLO_CLIENT_NAMESPACE_USAGE + ":" + namespace);
+    }
+
     return config;
   }
 
