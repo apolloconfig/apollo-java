@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.Kubernetes;
+package com.ctrip.framework.apollo.kubernetes;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import io.kubernetes.client.openapi.ApiException;

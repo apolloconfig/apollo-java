@@ -16,7 +16,7 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import com.ctrip.framework.apollo.Kubernetes.KubernetesManager;
+import com.ctrip.framework.apollo.kubernetes.KubernetesManager;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
@@ -28,13 +28,12 @@ import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -52,8 +51,6 @@ public class K8sConfigMapConfigRepositoryTest {
     private static final String defaultValue = "defaultValue";
     private ConfigSourceType someSourceType;
     private V1ConfigMap configMap;
-
-    @Mock
     private CoreV1Api coreV1Api;
 
     @InjectMocks
@@ -88,22 +85,18 @@ public class K8sConfigMapConfigRepositoryTest {
         when(configUtil.getDefaultLocalCacheDir()).thenReturn("/cache");
         when(configUtil.getMetaServerDomainName()).thenReturn("http://meta.server");
 
+        coreV1Api = mock(CoreV1Api.class);
         MockInjector.setInstance(ConfigUtil.class, configUtil);
         MockInjector.setInstance(CoreV1Api.class, coreV1Api);
 
         kubernetesManager = new KubernetesManager(coreV1Api);
         MockInjector.setInstance(KubernetesManager.class, kubernetesManager);
 
-        configmapRepo = mock(K8sConfigMapConfigRepository.class);
+        configmapRepo = new K8sConfigMapConfigRepository(someNamespace, kubernetesManager);
         MockInjector.setInstance(K8sConfigMapConfigRepository.class, configmapRepo);
 
         PropertiesFactory propertiesFactory = mock(PropertiesFactory.class);
-        when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
-            @Override
-            public Properties answer(InvocationOnMock invocation) {
-                return new Properties();
-            }
-        });
+        when(propertiesFactory.getPropertiesInstance()).thenReturn(new Properties());
         MockInjector.setInstance(PropertiesFactory.class, propertiesFactory);
     }
 
@@ -125,14 +118,14 @@ public class K8sConfigMapConfigRepositoryTest {
 //        repo.setConfigMapName(someAppId, false);
 //        assertEquals(someAppId, repo.getConfigMapName());
 //    }
-//
-    @Test(expected = ApolloConfigException.class)
+
+    @Test(expected = IllegalArgumentException.class)
     public void testSetConfigMapNameWithNullAppId() {
         K8sConfigMapConfigRepository repo = new K8sConfigMapConfigRepository(someNamespace);
         repo.setConfigMapName(null, false);
     }
 
-//
+
 //    @Test
 //    public void testOnRepositoryChange() throws Exception {
 //        RepositoryChangeListener someListener = mock(RepositoryChangeListener.class);
@@ -171,18 +164,18 @@ public class K8sConfigMapConfigRepositoryTest {
 //        // 断言 K8sConfigMapConfigRepository 的源类型更新为 anotherSourceType
 //        assertEquals(anotherSourceType, k8sConfigMapConfigRepository.getSourceType());
 //    }
-//
-//    /**
-//     * 测试persistConfigMap方法成功持久化配置信息
-//     */
-//    @Test
-//    public void testPersistConfigMap() {
-//        K8sConfigMapConfigRepository repo = new K8sConfigMapConfigRepository(someNamespace);
-//        doNothing().when(kubernetesManager).updateConfigMap(anyString(), anyString(), anyMap());
-//        repo.persistConfigMap(someProperties);
-//        verify(kubernetesManager, times(1)).updateConfigMap(anyString(), anyString(), anyMap());
-//    }
-//
+
+    /**
+     * 测试persistConfigMap方法成功持久化配置信息
+     */
+    @Test
+    public void testPersistConfigMap() {
+        K8sConfigMapConfigRepository repo = new K8sConfigMapConfigRepository(someNamespace);
+        doNothing().when(kubernetesManager).updateConfigMap(anyString(), anyString(), anyMap());
+        repo.persistConfigMap(someProperties);
+        verify(kubernetesManager, times(1)).updateConfigMap(anyString(), anyString(), anyMap());
+    }
+
 //    /**
 //     * 测试sync方法成功从上游数据源同步
 //     */

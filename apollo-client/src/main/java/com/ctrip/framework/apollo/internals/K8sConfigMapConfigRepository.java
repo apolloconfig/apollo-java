@@ -16,7 +16,7 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import com.ctrip.framework.apollo.Kubernetes.KubernetesManager;
+import com.ctrip.framework.apollo.kubernetes.KubernetesManager;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
@@ -60,7 +60,19 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
      * @param namespace the namespace
      */
     public K8sConfigMapConfigRepository(String namespace) {
-        this(namespace, null);
+        this(namespace, (ConfigRepository) null);
+    }
+
+    public K8sConfigMapConfigRepository(String namespace, KubernetesManager kubernetesManager) {
+        this.namespace = namespace;
+        configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+        kubernetesManager = ApolloInjector.getInstance(KubernetesManager.class);
+        configMapNamespace = configUtil.getConfigMapNamespace();
+        this.kubernetesManager = kubernetesManager;
+
+        this.setConfigMapKey(configUtil.getCluster(), namespace);
+        this.setConfigMapName(configUtil.getAppId(), false);
+        this.setUpstreamRepository(upstream);
     }
 
     public K8sConfigMapConfigRepository(String namespace, ConfigRepository upstream) {
