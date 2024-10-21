@@ -38,11 +38,11 @@ public class DefaultConfigManager implements ConfigManager {
 
   private ConfigUtil m_configUtil;
 
-  private Table<String,String,Config> m_configs = Tables.synchronizedTable(HashBasedTable.<String,String,Config>create());
+  private Table<String, String, Config> m_configs = Tables.synchronizedTable(HashBasedTable.create());
 
   private Map<String, Object> m_configLocks = Maps.newConcurrentMap();
 
-  private Table<String,String, ConfigFile> m_configFiles = HashBasedTable.create();
+  private Table<String, String, ConfigFile> m_configFiles = Tables.synchronizedTable(HashBasedTable.create());
 
   private Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
 

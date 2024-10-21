@@ -96,7 +96,7 @@ public abstract class AbstractSpringIntegrationTest {
 
     when(configRepository.getConfig()).thenReturn(properties);
 
-    SimpleConfig config = new SimpleConfig(appId, ConfigConsts.NAMESPACE_APPLICATION, configRepository);
+    SimpleConfig config = new SimpleConfig(appId, namespaceName, configRepository);
 
     mockConfig(appId, namespaceName, config);
 
@@ -180,8 +180,6 @@ public abstract class AbstractSpringIntegrationTest {
   }
 
   protected static void doSetUp() throws Exception {
-    System.setProperty(ApolloClientSystemConsts.APP_ID, "someAppId");
-
     //as ConfigService is singleton, so we must manually clear its container
     ReflectionUtils.invokeMethod(CONFIG_SERVICE_RESET, null);
     //as PropertySourcesProcessor has some static variables, so we must manually clear them
@@ -196,14 +194,17 @@ public abstract class AbstractSpringIntegrationTest {
     MockInjector.setInstance(ConfigUtil.class, configUtil);
   }
 
-  protected static void doTearDown(){
+  protected static void doTearDown() {
     MockInjector.reset();
     CONFIG_REGISTRY.clear();
+    CONFIG_FILE_REGISTRY.clear();
   }
 
   private static class MockConfigManager implements ConfigManager {
 
     private final ConfigManager delegate;
+
+    private final String defaultAppId = "someAppId";
 
     public MockConfigManager(ConfigManager delegate) {
       this.delegate = delegate;
@@ -211,7 +212,7 @@ public abstract class AbstractSpringIntegrationTest {
 
     @Override
     public Config getConfig(String namespace) {
-      return getConfig("someAppId", namespace);
+      return getConfig(defaultAppId, namespace);
     }
 
     @Override
@@ -225,7 +226,7 @@ public abstract class AbstractSpringIntegrationTest {
 
     @Override
     public ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
-      return this.getConfigFile("someAppId", namespace, configFileFormat);
+      return this.getConfigFile(defaultAppId, namespace, configFileFormat);
     }
 
     @Override

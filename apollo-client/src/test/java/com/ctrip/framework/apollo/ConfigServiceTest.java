@@ -164,7 +164,7 @@ public class ConfigServiceTest {
 
     @Override
     public String getAppId() {
-      return null;
+      return m_appId;
     }
 
     @Override

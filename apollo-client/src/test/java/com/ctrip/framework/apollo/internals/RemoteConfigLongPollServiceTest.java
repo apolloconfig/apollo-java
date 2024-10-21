@@ -253,7 +253,7 @@ public class RemoteConfigLongPollServiceTest {
     }).when(someRepository).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));
 
     remoteConfigLongPollService.submit(someAppId, someNamespace, someRepository);
-    onNotified.get(50000, TimeUnit.MILLISECONDS);
+    onNotified.get(5000, TimeUnit.MILLISECONDS);
     remoteConfigLongPollService.stopLongPollingRefresh();
 
     verify(someRepository, times(1)).onLongPollNotified(any(ServiceDTO.class), any(ApolloNotificationMessages.class));

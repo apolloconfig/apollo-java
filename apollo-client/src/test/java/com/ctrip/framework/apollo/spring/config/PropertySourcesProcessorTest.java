@@ -16,14 +16,16 @@
  */
 package com.ctrip.framework.apollo.spring.config;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import com.ctrip.framework.apollo.BaseIntegrationTest;
-import com.ctrip.framework.apollo.BaseIntegrationTest.MockConfigUtil;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
-import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
@@ -32,15 +34,18 @@ import com.ctrip.framework.apollo.spring.AbstractSpringIntegrationTest;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Lists;
+import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.*;
-
-import java.util.Properties;
+import org.springframework.core.env.CompositePropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.StandardEnvironment;
 
 public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest {
 

@@ -110,7 +110,7 @@ public class ConfigService {
       @Override
       public Config create(String appId, String namespace) {
         if(!StringUtils.equals(appId, m_configUtil.getAppId())){
-          throw new IllegalArgumentException("appId not match");
+          throw new IllegalArgumentException("Provided appId '" + appId + "' does not match the default appId '" + m_configUtil.getAppId() + "'");
         }
         return config;
       }

@@ -16,13 +16,11 @@
  */
 package com.ctrip.framework.apollo.spi;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import java.util.Map;
-
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.google.common.collect.Maps;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -30,7 +28,7 @@ import com.google.common.collect.Maps;
 public class DefaultConfigFactoryManager implements ConfigFactoryManager {
   private ConfigRegistry m_registry;
 
-  private Table<String, String, ConfigFactory> m_factories = HashBasedTable.create();
+  private Table<String, String, ConfigFactory> m_factories = Tables.synchronizedTable(HashBasedTable.create());
 
   private ConfigUtil m_configUtil;
 
