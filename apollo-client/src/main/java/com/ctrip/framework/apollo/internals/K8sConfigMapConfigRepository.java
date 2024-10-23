@@ -47,7 +47,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     private final String namespace;
     private String configMapName;
     private String configMapKey;
-    private final String configMapNamespace;
+    private final String k8sNamespace;
     private final ConfigUtil configUtil;
     private final KubernetesManager kubernetesManager;
     private volatile Properties configMapProperties;
@@ -66,8 +66,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     public K8sConfigMapConfigRepository(String namespace, KubernetesManager kubernetesManager) {
         this.namespace = namespace;
         configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-        kubernetesManager = ApolloInjector.getInstance(KubernetesManager.class);
-        configMapNamespace = configUtil.getConfigMapNamespace();
+        k8sNamespace = configUtil.getK8sNamespace();
         this.kubernetesManager = kubernetesManager;
 
         this.setConfigMapKey(configUtil.getCluster(), namespace);
@@ -79,7 +78,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         this.namespace = namespace;
         configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         kubernetesManager = ApolloInjector.getInstance(KubernetesManager.class);
-        configMapNamespace = configUtil.getConfigMapNamespace();
+        k8sNamespace = configUtil.getK8sNamespace();
 
         this.setConfigMapKey(configUtil.getCluster(), namespace);
         this.setConfigMapName(configUtil.getAppId(), false);
@@ -87,8 +86,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     }
 
     void setConfigMapKey(String cluster, String namespace) {
-        // TODO 兜底key怎么设计不会冲突(cluster初始化时已经设置了层级)
-        // cluster: 用户定义>idc>default,所以已经不需要额外层级设置了
+        // cluster: 用户定义>idc>default
         if (StringUtils.isBlank(cluster)) {
             configMapKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join("default", namespace);
             return;
@@ -105,6 +103,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     }
 
     void setConfigMapName(String appId, boolean syncImmediately) {
+        //configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
         configMapName = appId;
         // 初始化configmap
         this.checkConfigMapName(configMapName);
@@ -117,14 +116,14 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         if (StringUtils.isBlank(configMapName)) {
             throw new IllegalArgumentException("ConfigMap name cannot be null");
         }
-        if (kubernetesManager.checkConfigMapExist(configMapNamespace, configMapName)) {
+        if (kubernetesManager.checkConfigMapExist(k8sNamespace, configMapName)) {
             return;
         }
         // Create an empty configmap, write the new value in the update event
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "createK8sConfigMap");
         transaction.addData("configMapName", configMapName);
         try {
-            kubernetesManager.createConfigMap(configMapNamespace, configMapName, null);
+            kubernetesManager.createConfigMap(k8sNamespace, configMapName, null);
             transaction.setStatus(Transaction.SUCCESS);
         } catch (Throwable ex) {
             Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
@@ -135,12 +134,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
     }
 
-    /**
-     * TODO 测试点：
-     * 1. 从上游成功恢复（开启文件存储）
-     * 2. 从上游成功恢复（没开启文件存储，从remote）
-     * 3. 从k8s成功恢复
-     */
     @Override
     public Properties getConfig() {
         if (configMapProperties == null) {
@@ -148,7 +141,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
         Properties result = propertiesFactory.getPropertiesInstance();
         result.putAll(configMapProperties);
-        logger.info("configmap值：{}", configMapProperties);
+        logger.info("configmap properties: {}", configMapProperties);
         return result;
     }
 
@@ -214,11 +207,11 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         Preconditions.checkNotNull(configMapName, "ConfigMap name cannot be null");
 
         try {
-            String jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configUtil.getAppId(), configMapKey);
+            String jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
             if (jsonConfig == null) {
-                // TODO 重试访问idc，default
-                String fallbackKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(configUtil, namespace);
-                jsonConfig = kubernetesManager.getValueFromConfigMap(configMapNamespace, configMapName, fallbackKey);
+                // TODO 这样重试访问idc，default是否正确
+                String retryKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join("default", namespace);
+                jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, retryKey);
             }
 
             // Convert jsonConfig to properties
@@ -237,7 +230,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
     }
 
-    private boolean trySyncFromUpstream() {
+    public boolean trySyncFromUpstream() {
         if (upstream == null) {
             return false;
         }
@@ -282,7 +275,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     public void persistConfigMap(Properties properties) {
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "persistK8sConfigMap");
         transaction.addData("configMapName", configUtil.getAppId());
-        transaction.addData("configMapNamespace", configUtil.getConfigMapNamespace());
+        transaction.addData("k8sNamespace", configUtil.getK8sNamespace());
         try {
             // Convert properties to a JSON string using Gson
             Gson gson = new Gson();
@@ -291,7 +284,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             data.put(configMapKey, jsonConfig);
 
             // update configmap
-            kubernetesManager.updateConfigMap(configUtil.getConfigMapNamespace(), configUtil.getAppId(), data);
+            kubernetesManager.updateConfigMap(configUtil.getK8sNamespace(), configUtil.getAppId(), data);
             transaction.setStatus(Transaction.SUCCESS);
         } catch (Exception ex) {
             ApolloConfigException exception =

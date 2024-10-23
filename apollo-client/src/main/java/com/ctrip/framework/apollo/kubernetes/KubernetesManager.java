@@ -16,6 +16,7 @@
  */
 package com.ctrip.framework.apollo.kubernetes;
 
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
@@ -35,7 +36,7 @@ public class KubernetesManager {
     private ApiClient client;
     private CoreV1Api coreV1Api;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public KubernetesManager() {
         try {
@@ -44,7 +45,7 @@ public class KubernetesManager {
             coreV1Api = new CoreV1Api(client);
         } catch (Exception e) {
             String errorMessage = "Failed to initialize Kubernetes client: " + e.getMessage();
-            log.error(errorMessage, e);
+            logger.error(errorMessage, e);
             throw new RuntimeException(errorMessage, e);
         }
     }
@@ -68,22 +69,24 @@ public class KubernetesManager {
     /**
      * Creates a Kubernetes ConfigMap.
      *
-     * @param configMapNamespace the namespace of the ConfigMap
+     * @param k8sNamespace the namespace of the ConfigMap
      * @param name               the name of the ConfigMap
      * @param data               the data to be stored in the ConfigMap
      * @return the name of the created ConfigMap
      * @throws RuntimeException if an error occurs while creating the ConfigMap
      */
-    public String createConfigMap(String configMapNamespace, String name, Map<String, String> data) {
-        if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty()) {
-            log.error("create configmap failed due to null or empty parameter: configMapNamespace={}, name={}", configMapNamespace, name);
+    public String createConfigMap(String k8sNamespace, String name, Map<String, String> data) {
+        if (StringUtils.isEmpty(k8sNamespace) || StringUtils.isEmpty(name)) {
+            logger.error("create configmap failed due to null or empty parameter: k8sNamespace={}, name={}", k8sNamespace, name);
+            return null;
         }
-        V1ConfigMap configMap = buildConfigMap(name, configMapNamespace, data);
+        V1ConfigMap configMap = buildConfigMap(name, k8sNamespace, data);
         try {
-            coreV1Api.createNamespacedConfigMap(configMapNamespace, configMap, null, null, null, null);
-            log.info("ConfigMap created successfully: name: {}, namespace: {}", name, configMapNamespace);
+            coreV1Api.createNamespacedConfigMap(k8sNamespace, configMap, null, null, null, null);
+            logger.info("ConfigMap created successfully: name: {}, namespace: {}", name, k8sNamespace);
             return name;
         } catch (Exception e) {
+            logger.error("Failed to create ConfigMap: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to create ConfigMap: " + e.getMessage(), e);
         }
     }
@@ -91,23 +94,24 @@ public class KubernetesManager {
     /**
      * get value from config map
      *
-     * @param configMapNamespace configMapNamespace
+     * @param k8sNamespace k8sNamespace
      * @param name               config map name (appId)
      * @param key                config map key (cluster+namespace)
      * @return value(json string)
      */
-    public String getValueFromConfigMap(String configMapNamespace, String name, String key) {
-        if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() || key == null || key.isEmpty()) {
-            log.error("Parameters can not be null or empty: configMapNamespace={}, name={}", configMapNamespace, name);
+    public String getValueFromConfigMap(String k8sNamespace, String name, String key) {
+        if (StringUtils.isEmpty(k8sNamespace) || StringUtils.isEmpty(name) || StringUtils.isEmpty(key)) {
+            logger.error("Parameters can not be null or empty: k8sNamespace={}, name={}", k8sNamespace, name);
             return null;
         }
         try {
-            V1ConfigMap configMap = coreV1Api.readNamespacedConfigMap(name, configMapNamespace, null);
+            V1ConfigMap configMap = coreV1Api.readNamespacedConfigMap(name, k8sNamespace, null);
             if (!Objects.requireNonNull(configMap.getData()).containsKey(key)) {
-                throw new RuntimeException(String.format("Specified key not found in ConfigMap: %s, configMapNamespace: %s, name: %s", name, configMapNamespace, name));
+                logger.error("Specified key not found in ConfigMap: {}, k8sNamespace: {}, name: {}", name, k8sNamespace, name);
             }
             return configMap.getData().get(key);
         } catch (Exception e) {
+            logger.error("Error occurred while getting value from ConfigMap: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -115,15 +119,15 @@ public class KubernetesManager {
     /**
      * update config map
      *
-     * @param configMapNamespace configmap namespace
+     * @param k8sNamespace configmap namespace
      * @param name               config map name (appId)
      * @param data               new data
      * @return config map name
      */
     // TODO 使用client自带的retry机制，设置重试次数,CAS
-    public boolean updateConfigMap(String configMapNamespace, String name, Map<String, String> data) {
-        if (configMapNamespace == null || configMapNamespace.isEmpty() || name == null || name.isEmpty() || data == null || data.isEmpty()) {
-            log.error("Parameters can not be null or empty: configMapNamespace={}, name={}", configMapNamespace, name);
+    public boolean updateConfigMap(String k8sNamespace, String name, Map<String, String> data) {
+        if (StringUtils.isEmpty(k8sNamespace) || StringUtils.isEmpty(name)) {
+            logger.error("Parameters can not be null or empty: k8sNamespace={}, name={}", k8sNamespace, name);
             return false;
         }
 
@@ -134,14 +138,14 @@ public class KubernetesManager {
 
         while (retryCount < maxRetries) {
             try {
-                V1ConfigMap configmap = coreV1Api.readNamespacedConfigMap(name, configMapNamespace, null);
+                V1ConfigMap configmap = coreV1Api.readNamespacedConfigMap(name, k8sNamespace, null);
                 configmap.setData(data);
-                coreV1Api.replaceNamespacedConfigMap(name, configMapNamespace, configmap, null, null, null, null);
+                coreV1Api.replaceNamespacedConfigMap(name, k8sNamespace, configmap, null, null, null, null);
                 return true;
             } catch (ApiException e) {
                 if (e.getCode() == 409) {
                     retryCount++;
-                    log.warn("Conflict occurred, retrying... (" + retryCount + ")");
+                    logger.warn("Conflict occurred, retrying... ({})", retryCount);
                     try {
                         TimeUnit.MILLISECONDS.sleep(waitTime);
                     } catch (InterruptedException ie) {
@@ -149,31 +153,32 @@ public class KubernetesManager {
                     }
                     waitTime = Math.min(waitTime * 2, 1000);
                 } else {
-                    System.err.println("Error updating ConfigMap: " + e.getMessage());
+                    logger.error("Error updating ConfigMap: {}", e.getMessage(), e);
                 }
             }
         }
-        return retryCount < maxRetries;
+        return false;
     }
 
     /**
      * check config map exist
      *
-     * @param configMapNamespace config map namespace
+     * @param k8sNamespace config map namespace
      * @param configMapName      config map name
      * @return true if config map exist, false otherwise
      */
-    public boolean checkConfigMapExist(String configMapNamespace, String configMapName) {
-        if (configMapNamespace == null || configMapNamespace.isEmpty() || configMapName == null || configMapName.isEmpty()) {
-            log.error("Parameters can not be null or empty: configMapNamespace={}, configMapName={}", configMapNamespace, configMapName);
+    public boolean checkConfigMapExist(String k8sNamespace, String configMapName) {
+        if (StringUtils.isEmpty(k8sNamespace) || StringUtils.isEmpty(configMapName)) {
+            logger.error("Parameters can not be null or empty: k8sNamespace={}, configMapName={}", k8sNamespace, configMapName);
             return false;
         }
         try {
-            log.info("Check whether ConfigMap exists, configMapName: {}", configMapName);
-            coreV1Api.readNamespacedConfigMap(configMapName, configMapNamespace, null);
+            logger.info("Check whether ConfigMap exists, configMapName: {}", configMapName);
+            coreV1Api.readNamespacedConfigMap(configMapName, k8sNamespace, null);
             return true;
         } catch (Exception e) {
             // configmap not exist
+            logger.error("Error checking ConfigMap existence: {}", e.getMessage(), e);
             return false;
         }
     }

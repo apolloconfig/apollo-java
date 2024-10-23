@@ -76,12 +76,12 @@ public class ApolloClientSystemConsts {
   /**
    * kubernetes configmap cache namespace
    */
-  public static final String APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE = "apollo.cache.kubernetes.configmap-namespace";
+  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE = "apollo.cache.kubernetes.namespace";
 
   /**
    * kubernetes configmap cache namespace environment variables
    */
-  public static final String APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE";
+  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_KUBERNETES_NAMESPACE";
 
   /**
    * apollo client access key

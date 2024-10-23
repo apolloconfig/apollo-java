@@ -190,7 +190,7 @@ public class KubernetesManagerTest {
     }
 
     /**
-     * 测试参数configMapNamespace和configMapName都为空时，checkConfigMapExist方法返回false
+     * 测试参数k8sNamespace和configMapName都为空时，checkConfigMapExist方法返回false
      */
     @Test
     public void testCheckConfigMapExistWithEmptyNamespaceAndName() {

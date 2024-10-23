@@ -47,7 +47,7 @@ public class ConfigUtilTest {
     System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR);
     System.clearProperty(PropertiesFactory.APOLLO_PROPERTY_ORDER_ENABLE);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE);
-    System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE);
+    System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
   }
 
   @Test
@@ -245,21 +245,21 @@ public class ConfigUtilTest {
   }
 
   @Test
-  public void testConfigMapNamespaceWithSystemProperty() {
-    String someConfigMapNamespace = "someConfigMapNamespace";
+  public void testK8sNamespaceWithSystemProperty() {
+    String someK8sNamespace = "someK8sNamespace";
 
-    System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE, someConfigMapNamespace);
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, someK8sNamespace);
 
     ConfigUtil configUtil = new ConfigUtil();
 
-    assertEquals(someConfigMapNamespace, configUtil.getConfigMapNamespace());
+    assertEquals(someK8sNamespace, configUtil.getK8sNamespace());
   }
 
   @Test
-  public void testConfigMapNamespaceWithDefault() {
+  public void testK8sNamespaceWithDefault() {
     ConfigUtil configUtil = new ConfigUtil();
 
-    assertEquals(ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT, configUtil.getConfigMapNamespace());
+    assertEquals(ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT, configUtil.getK8sNamespace());
   }
 
   @Test

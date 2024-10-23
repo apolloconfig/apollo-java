@@ -71,7 +71,7 @@ public class ConfigUtil {
   private boolean propertyNamesCacheEnabled = false;
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
-  private boolean PropertyKubernetesCacheEnabled = false;
+  private boolean propertyKubernetesCacheEnabled = false;
   private boolean clientMonitorEnabled = false;
   private boolean clientMonitorJmxEnabled = false;
   private String monitorExternalType = "NONE";
@@ -378,11 +378,11 @@ public class ConfigUtil {
     return cacheRoot;
   }
 
-  public String getConfigMapNamespace() {
-    String configMapNamespace = getCustomizedConfigMapNamespace();
+  public String getK8sNamespace() {
+    String k8sNamespace = getCustomizedConfigMapNamespace();
 
-    if (!Strings.isNullOrEmpty(configMapNamespace)) {
-      return configMapNamespace;
+    if (!Strings.isNullOrEmpty(k8sNamespace)) {
+      return k8sNamespace;
     }
 
     return ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT;
@@ -390,20 +390,20 @@ public class ConfigUtil {
 
   private String getCustomizedConfigMapNamespace() {
     // 1. Get from System Property
-    String configMapNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE);
-    if (Strings.isNullOrEmpty(configMapNamespace)) {
+    String k8sNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
       // 2. Get from OS environment variable
-      configMapNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE_ENVIRONMENT_VARIABLES);
+      k8sNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES);
     }
-    if (Strings.isNullOrEmpty(configMapNamespace)) {
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
       // 3. Get from server.properties
-      configMapNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE, null);
+      k8sNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
     }
-    if (Strings.isNullOrEmpty(configMapNamespace)) {
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
       // 4. Get from app.properties
-      configMapNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_CONFIGMAP_NAMESPACE, null);
+      k8sNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
     }
-    return configMapNamespace;
+    return k8sNamespace;
   }
 
   public boolean isInLocalMode() {
@@ -510,7 +510,7 @@ public class ConfigUtil {
   }
 
   public boolean isPropertyKubernetesCacheEnabled() {
-    return PropertyKubernetesCacheEnabled;
+    return propertyKubernetesCacheEnabled;
   }
 
   public boolean isOverrideSystemProperties() {
@@ -536,9 +536,9 @@ public class ConfigUtil {
   }
 
   private void initPropertyKubernetesCacheEnabled() {
-    PropertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
+    propertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
             ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES,
-            PropertyKubernetesCacheEnabled);
+            propertyKubernetesCacheEnabled);
   }
 
   private void initClientMonitorExternalType() {
