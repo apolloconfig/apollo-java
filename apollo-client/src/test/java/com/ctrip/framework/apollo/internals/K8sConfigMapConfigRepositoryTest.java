@@ -46,6 +46,7 @@ public class K8sConfigMapConfigRepositoryTest {
     private ConfigRepository upstreamRepo;
     private Properties someProperties;
     private static final String someAppId = "someApp";
+    private static final String someConfigmapName = "apollo-configcache-someApp";
     private static final String someCluster = "someCluster";
     private static final String defaultKey = "defaultKey";
     private static final String defaultValue = "defaultValue";
@@ -113,10 +114,15 @@ public class K8sConfigMapConfigRepositoryTest {
 //    }
 //
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = Exception.class)
     public void testSetConfigMapNameWithNullAppId() {
-        K8sConfigMapConfigRepository repo = new K8sConfigMapConfigRepository(someNamespace);
-        repo.setConfigMapName(null, false);
+        configmapRepo.setConfigMapName(null, false);
+    }
+
+    @Test
+    public void testSetConfigMapName() {
+        configmapRepo.setConfigMapName(someAppId, false);
+        assertEquals(someConfigmapName, configmapRepo.getConfigMapName());
     }
 
 

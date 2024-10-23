@@ -85,6 +85,14 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         this.setUpstreamRepository(upstream);
     }
 
+    public String getConfigMapKey() {
+        return configMapKey;
+    }
+
+    public String getConfigMapName() {
+        return configMapName;
+    }
+
     void setConfigMapKey(String cluster, String namespace) {
         // cluster: 用户定义>idc>default
         if (StringUtils.isBlank(cluster)) {
@@ -95,6 +103,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     }
 
     void setConfigMapName(String appId, boolean syncImmediately) {
+        Preconditions.checkNotNull(appId, "AppId cannot be null");
         configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
         // 初始化configmap
         this.checkConfigMapName(configMapName);
