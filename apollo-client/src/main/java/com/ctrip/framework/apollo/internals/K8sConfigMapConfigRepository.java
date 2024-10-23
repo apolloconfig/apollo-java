@@ -94,17 +94,8 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         configMapKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(cluster, namespace);
     }
 
-    public String getConfigMapKey() {
-        return configMapKey;
-    }
-
-    public String getConfigMapName() {
-        return configMapName;
-    }
-
     void setConfigMapName(String appId, boolean syncImmediately) {
-        //configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
-        configMapName = appId;
+        configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
         // 初始化configmap
         this.checkConfigMapName(configMapName);
         if (syncImmediately) {
@@ -274,8 +265,8 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
 
     public void persistConfigMap(Properties properties) {
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "persistK8sConfigMap");
-        transaction.addData("configMapName", configUtil.getAppId());
-        transaction.addData("k8sNamespace", configUtil.getK8sNamespace());
+        transaction.addData("configMapName", configMapName);
+        transaction.addData("k8sNamespace", k8sNamespace);
         try {
             // Convert properties to a JSON string using Gson
             Gson gson = new Gson();
@@ -284,7 +275,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             data.put(configMapKey, jsonConfig);
 
             // update configmap
-            kubernetesManager.updateConfigMap(configUtil.getK8sNamespace(), configUtil.getAppId(), data);
+            kubernetesManager.updateConfigMap(k8sNamespace, configMapName, data);
             transaction.setStatus(Transaction.SUCCESS);
         } catch (Exception ex) {
             ApolloConfigException exception =

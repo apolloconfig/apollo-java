@@ -112,12 +112,6 @@ public class K8sConfigMapConfigRepositoryTest {
 //        assertEquals(someCluster +"-"+ someNamespace, configmapRepo.getConfigMapKey());
 //    }
 //
-//    @Test
-//    public void testSetConfigMapName() {
-//        K8sConfigMapConfigRepository repo = new K8sConfigMapConfigRepository(someNamespace);
-//        repo.setConfigMapName(someAppId, false);
-//        assertEquals(someAppId, repo.getConfigMapName());
-//    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetConfigMapNameWithNullAppId() {
