@@ -93,7 +93,7 @@ public class K8sConfigMapConfigRepositoryTest {
         kubernetesManager = new KubernetesManager(coreV1Api);
         MockInjector.setInstance(KubernetesManager.class, kubernetesManager);
 
-        configmapRepo = new K8sConfigMapConfigRepository(someNamespace, kubernetesManager);
+        //configmapRepo = new K8sConfigMapConfigRepository(someNamespace, kubernetesManager);
         MockInjector.setInstance(K8sConfigMapConfigRepository.class, configmapRepo);
 
         PropertiesFactory propertiesFactory = mock(PropertiesFactory.class);

@@ -20,7 +20,6 @@ import com.ctrip.framework.apollo.core.utils.StringUtils;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.models.*;
 import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
@@ -41,7 +40,6 @@ public class KubernetesManager {
     public KubernetesManager() {
         try {
             client = Config.defaultClient();
-            Configuration.setDefaultApiClient(client);
             coreV1Api = new CoreV1Api(client);
         } catch (Exception e) {
             String errorMessage = "Failed to initialize Kubernetes client: " + e.getMessage();

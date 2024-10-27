@@ -54,25 +54,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     private volatile ConfigRepository upstream;
     private volatile ConfigSourceType sourceType = ConfigSourceType.CONFIGMAP;
 
-    /**
-     * Constructor
-     *
-     * @param namespace the namespace
-     */
-    public K8sConfigMapConfigRepository(String namespace) {
-        this(namespace, (ConfigRepository) null);
-    }
-
-    public K8sConfigMapConfigRepository(String namespace, KubernetesManager kubernetesManager) {
-        this.namespace = namespace;
-        configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-        k8sNamespace = configUtil.getK8sNamespace();
-        this.kubernetesManager = kubernetesManager;
-
-        this.setConfigMapKey(configUtil.getCluster(), namespace);
-        this.setConfigMapName(configUtil.getAppId(), false);
-        this.setUpstreamRepository(upstream);
-    }
 
     public K8sConfigMapConfigRepository(String namespace, ConfigRepository upstream) {
         this.namespace = namespace;
@@ -85,27 +66,22 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         this.setUpstreamRepository(upstream);
     }
 
-    public String getConfigMapKey() {
-        return configMapKey;
-    }
-
-    public String getConfigMapName() {
+    String getConfigMapName() {
         return configMapName;
     }
 
     void setConfigMapKey(String cluster, String namespace) {
-        // cluster: 用户定义>idc>default
+        // cluster: User Definition >idc>default
         if (StringUtils.isBlank(cluster)) {
-            configMapKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join("default", namespace);
+            configMapKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join("default", namespace);
             return;
         }
-        configMapKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(cluster, namespace);
+        configMapKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join(cluster, namespace);
     }
 
     void setConfigMapName(String appId, boolean syncImmediately) {
         Preconditions.checkNotNull(appId, "AppId cannot be null");
         configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
-        // 初始化configmap
         this.checkConfigMapName(configMapName);
         if (syncImmediately) {
             this.sync();
@@ -141,7 +117,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
         Properties result = propertiesFactory.getPropertiesInstance();
         result.putAll(configMapProperties);
-        logger.info("configmap properties: {}", configMapProperties);
         return result;
     }
 
@@ -152,7 +127,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
      */
     @Override
     public void setUpstreamRepository(ConfigRepository upstreamConfigRepository) {
-        // 设置上游数据源
         if (upstreamConfigRepository == null) {
             return;
         }
@@ -191,7 +165,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
             transaction.setStatus(ex);
             exception = ex;
-            throw new ApolloConfigException("Load config from Kubernetes ConfigMap failed!", ex);
         } finally {
             transaction.complete();
         }
@@ -210,7 +183,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             String jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
             if (jsonConfig == null) {
                 // TODO 这样重试访问idc，default是否正确
-                String retryKey = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join("default", namespace);
+                String retryKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join("default", namespace);
                 jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, retryKey);
             }
 
@@ -235,7 +208,6 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             return false;
         }
         try {
-            logger.info("Start sync from the upstream data source, upstream.getConfig:{}, upstream.getSourceType():{}", upstream.getConfig(), upstream.getSourceType());
             updateConfigMapProperties(upstream.getConfig(), upstream.getSourceType());
             return true;
         } catch (Throwable ex) {
@@ -248,7 +220,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
 
     private synchronized void updateConfigMapProperties(Properties newProperties, ConfigSourceType sourceType) {
         this.sourceType = sourceType;
-        if (newProperties.equals(configMapProperties)) {
+        if (newProperties == null || newProperties.equals(configMapProperties)) {
             return;
         }
         this.configMapProperties = newProperties;
@@ -263,7 +235,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
      */
     @Override
     public void onRepositoryChange(String namespace, Properties newProperties) {
-        if (newProperties.equals(configMapProperties)) {
+        if (newProperties == null || newProperties.equals(configMapProperties)) {
             return;
         }
         Properties newFileProperties = propertiesFactory.getPropertiesInstance();
