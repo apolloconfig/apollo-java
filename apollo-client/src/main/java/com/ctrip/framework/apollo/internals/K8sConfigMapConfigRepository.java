@@ -66,6 +66,10 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         this.setUpstreamRepository(upstream);
     }
 
+    String getConfigMapKey() {
+        return configMapKey;
+    }
+
     String getConfigMapName() {
         return configMapName;
     }
