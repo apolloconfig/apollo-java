@@ -184,12 +184,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         Preconditions.checkNotNull(configMapName, "ConfigMap name cannot be null");
 
         try {
-            String jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
-            if (jsonConfig == null) {
-                // TODO 这样重试访问idc，default是否正确
-                String retryKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join("default", namespace);
-                jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, retryKey);
-            }
+            String jsonConfig = loadConfigFromK8sWithRetry();
 
             // Convert jsonConfig to properties
             Properties properties = propertiesFactory.getPropertiesInstance();
@@ -205,6 +200,29 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             throw new ApolloConfigException(String
                     .format("Load config from Kubernetes ConfigMap %s failed!", configMapName), ex);
         }
+    }
+
+    private String loadConfigFromK8sWithRetry() {
+        String jsonConfig = null;
+
+        // Try to load from the specified cluster
+        if (!configMapKey.equals("default")) {
+            jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
+        }
+
+        // Try to load from the data center cluster
+        if (StringUtils.isBlank(jsonConfig) && !configUtil.getDataCenter().equals(configMapKey)) {
+            String dataCenterKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join(configUtil.getDataCenter(), namespace);
+            jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, dataCenterKey);
+        }
+
+        // Fallback to the default cluster
+        if (StringUtils.isBlank(jsonConfig)) {
+            String defaultKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join("default", namespace);
+            jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, defaultKey);
+        }
+
+        return jsonConfig;
     }
 
     public boolean trySyncFromUpstream() {
