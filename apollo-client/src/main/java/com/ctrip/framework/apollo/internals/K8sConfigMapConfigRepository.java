@@ -53,6 +53,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     private volatile Properties configMapProperties;
     private volatile ConfigRepository upstream;
     private volatile ConfigSourceType sourceType = ConfigSourceType.CONFIGMAP;
+    private static final Gson GSON = new Gson();
 
 
     public K8sConfigMapConfigRepository(String namespace, ConfigRepository upstream) {
@@ -189,9 +190,8 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
             // Convert jsonConfig to properties
             Properties properties = propertiesFactory.getPropertiesInstance();
             if (jsonConfig != null && !jsonConfig.isEmpty()) {
-                Gson gson = new Gson();
                 Type type = new TypeToken<Map<String, String>>() {}.getType();
-                Map<String, String> configMap = gson.fromJson(jsonConfig, type);
+                Map<String, String> configMap = GSON.fromJson(jsonConfig, type);
                 configMap.forEach(properties::setProperty);
             }
             return properties;
@@ -272,8 +272,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         transaction.addData("k8sNamespace", k8sNamespace);
         try {
             // Convert properties to a JSON string using Gson
-            Gson gson = new Gson();
-            String jsonConfig = gson.toJson(properties);
+            String jsonConfig = GSON.toJson(properties);
             Map<String, String> data = new HashMap<>();
             data.put(configMapKey, jsonConfig);
 

@@ -20,7 +20,8 @@ import com.ctrip.framework.apollo.core.utils.StringUtils;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.openapi.models.V1ConfigMap;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +94,7 @@ public class KubernetesManager {
      * get value from config map
      *
      * @param k8sNamespace k8sNamespace
-     * @param name               config map name (appId)
+     * @param name               config map name
      * @param key                config map key (cluster+namespace)
      * @return value(json string)
      */
@@ -118,11 +119,11 @@ public class KubernetesManager {
      * update config map
      *
      * @param k8sNamespace configmap namespace
-     * @param name               config map name (appId)
+     * @param name               config map name
      * @param data               new data
      * @return config map name
      */
-    // TODO 使用client自带的retry机制，设置重试次数,CAS
+    // Set the retry times using the client retry mechanism (CAS)
     public boolean updateConfigMap(String k8sNamespace, String name, Map<String, String> data) {
         if (StringUtils.isEmpty(k8sNamespace) || StringUtils.isEmpty(name)) {
             logger.error("Parameters can not be null or empty: k8sNamespace={}, name={}", k8sNamespace, name);
