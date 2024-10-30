@@ -35,10 +35,10 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class KubernetesManager {
+    private static final Logger logger = LoggerFactory.getLogger(KubernetesManager.class);
+
     private ApiClient client;
     private CoreV1Api coreV1Api;
-
-    private static final Logger logger = LoggerFactory.getLogger(KubernetesManager.class);
 
     public KubernetesManager() {
         try {
@@ -201,7 +201,7 @@ public class KubernetesManager {
             return true;
         } catch (Exception e) {
             // configmap not exist
-            logger.error("Error checking ConfigMap existence: {}", e.getMessage(), e);
+            logger.info("ConfigMap not existence");
             return false;
         }
     }
