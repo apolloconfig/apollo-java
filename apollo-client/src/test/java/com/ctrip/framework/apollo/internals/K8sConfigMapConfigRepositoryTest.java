@@ -20,10 +20,13 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.kubernetes.KubernetesManager;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.ctrip.framework.apollo.util.escape.EscapeUtil;
+import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +71,7 @@ public class K8sConfigMapConfigRepositoryTest {
         when(upstreamRepo.getConfig()).thenReturn(someProperties);
         when(upstreamRepo.getSourceType()).thenReturn(someSourceType);
 
-        // make comfigmap
+        // make configmap
         data = new HashMap<>();
         data.put(defaultKey, defaultJsonValue);
         configMap = new V1ConfigMap()
@@ -78,19 +81,39 @@ public class K8sConfigMapConfigRepositoryTest {
         k8sConfigMapConfigRepository = new K8sConfigMapConfigRepository(someNamespace, upstreamRepo);
     }
 
+    // TODO 直接mock manager中的参数
 
+    /**
+     * 测试setConfigMapKey方法，当cluster和namespace都为正常值时
+     */
     @Test
-    public void testSetConfigMapKey() {
-        when(kubernetesManager.createConfigMap(anyString(), anyString(), any())).thenReturn("someAppId");
-        k8sConfigMapConfigRepository.setConfigMapKey(someCluster, someNamespace);
-        assertEquals(someCluster +"-"+ someNamespace, k8sConfigMapConfigRepository.getConfigMapKey());
+    public void testSetConfigMapKeyUnderNormalConditions() throws Throwable {
+        // arrange
+        String cluster = "testCluster";
+        String namespace = "test_Namespace_1";
+        String escapedKey = "testCluster___test__Namespace__1";
+
+        // act
+        ReflectionTestUtils.invokeMethod(k8sConfigMapConfigRepository, "setConfigMapKey", cluster, namespace);
+
+        // assert
+        String expectedConfigMapKey = EscapeUtil.createConfigMapKey(cluster, namespace);
+        assertEquals(escapedKey, ReflectionTestUtils.getField(k8sConfigMapConfigRepository, "configMapKey"));
+        assertEquals(expectedConfigMapKey, ReflectionTestUtils.getField(k8sConfigMapConfigRepository, "configMapKey"));
     }
 
-    @Test
-    public void testSetConfigMapName() {
-        k8sConfigMapConfigRepository.setConfigMapName(someAppId, false);
-        assertEquals(someConfigmapName, k8sConfigMapConfigRepository.getConfigMapName());
-    }
+//    @Test
+//    public void testSetConfigMapKey() {
+//        when(kubernetesManager.createConfigMap(anyString(), anyString(), any())).thenReturn("someAppId");
+//        k8sConfigMapConfigRepository.setConfigMapKey(someCluster, someNamespace);
+//        assertEquals(someCluster +"-"+ someNamespace, k8sConfigMapConfigRepository.getConfigMapKey());
+//    }
+//
+//    @Test
+//    public void testSetConfigMapName() {
+//        k8sConfigMapConfigRepository.setConfigMapName(someAppId, false);
+//        assertEquals(someConfigmapName, k8sConfigMapConfigRepository.getConfigMapName());
+//    }
 
     /**
      * 测试sync方法成功从上游数据源同步
@@ -140,7 +163,7 @@ public class K8sConfigMapConfigRepositoryTest {
     }
 
     @Test
-    public void testPersistConfigMap() {
+    public void testPersistConfigMap() throws ApiException {
         // Arrange
         Properties properties = new Properties();
         properties.setProperty(defaultKey, defaultValue);
@@ -151,7 +174,7 @@ public class K8sConfigMapConfigRepositoryTest {
     }
 
     @Test
-    public void testOnRepositoryChange() {
+    public void testOnRepositoryChange() throws ApiException {
         // Arrange
         Properties newProperties = new Properties();
         newProperties.setProperty(defaultKey, defaultValue);

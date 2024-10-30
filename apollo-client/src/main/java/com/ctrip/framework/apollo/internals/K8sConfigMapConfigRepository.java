@@ -27,7 +27,7 @@ import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.ExceptionUtil;
-import com.google.common.base.Joiner;
+import com.ctrip.framework.apollo.util.escape.EscapeUtil;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -67,24 +67,16 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         this.setUpstreamRepository(upstream);
     }
 
-    String getConfigMapKey() {
-        return configMapKey;
-    }
-
-    String getConfigMapName() {
-        return configMapName;
-    }
-
-    void setConfigMapKey(String cluster, String namespace) {
+    private void setConfigMapKey(String cluster, String namespace) {
         // cluster: User Definition >idc>default
         if (StringUtils.isBlank(cluster)) {
-            configMapKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join("default", namespace);
+            configMapKey = EscapeUtil.createConfigMapKey("default", namespace);
             return;
         }
-        configMapKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join(cluster, namespace);
+        configMapKey = EscapeUtil.createConfigMapKey(cluster, namespace);
     }
 
-    void setConfigMapName(String appId, boolean syncImmediately) {
+    private void setConfigMapName(String appId, boolean syncImmediately) {
         Preconditions.checkNotNull(appId, "AppId cannot be null");
         configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
         this.checkConfigMapName(configMapName);
@@ -181,11 +173,11 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
     }
 
-    public Properties loadFromK8sConfigMap() {
+    Properties loadFromK8sConfigMap() {
         Preconditions.checkNotNull(configMapName, "ConfigMap name cannot be null");
 
         try {
-            String jsonConfig = loadConfigFromK8sWithRetry();
+            String jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
 
             // Convert jsonConfig to properties
             Properties properties = propertiesFactory.getPropertiesInstance();
@@ -202,30 +194,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         }
     }
 
-    private String loadConfigFromK8sWithRetry() {
-        String jsonConfig = null;
-
-        // Try to load from the specified cluster
-        if (!configMapKey.equals("default")) {
-            jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
-        }
-
-        // Try to load from the data center cluster
-        if (StringUtils.isBlank(jsonConfig) && !configUtil.getDataCenter().equals(configMapKey)) {
-            String dataCenterKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join(configUtil.getDataCenter(), namespace);
-            jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, dataCenterKey);
-        }
-
-        // Fallback to the default cluster
-        if (StringUtils.isBlank(jsonConfig)) {
-            String defaultKey = Joiner.on(ConfigConsts.CONFIGMAP_KEY_SEPARATOR).join("default", namespace);
-            jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, defaultKey);
-        }
-
-        return jsonConfig;
-    }
-
-    public boolean trySyncFromUpstream() {
+    private boolean trySyncFromUpstream() {
         if (upstream == null) {
             return false;
         }
@@ -266,7 +235,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         this.fireRepositoryChange(namespace, newProperties);
     }
 
-    public void persistConfigMap(Properties properties) {
+    void persistConfigMap(Properties properties) {
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "persistK8sConfigMap");
         transaction.addData("configMapName", configMapName);
         transaction.addData("k8sNamespace", k8sNamespace);
