@@ -48,6 +48,7 @@ public class ConfigUtilTest {
     System.clearProperty(PropertiesFactory.APOLLO_PROPERTY_ORDER_ENABLE);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
+    System.clearProperty(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE);
   }
 
   @Test
@@ -260,6 +261,17 @@ public class ConfigUtilTest {
     ConfigUtil configUtil = new ConfigUtil();
 
     assertEquals(ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT, configUtil.getK8sNamespace());
+  }
+
+  @Test
+  public void testKubernetesCacheEnabledWithSystemProperty() {
+    boolean someKubernetesCacheEnabled = true;
+
+    System.setProperty(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE, String.valueOf(someKubernetesCacheEnabled));
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertTrue(configUtil.isPropertyKubernetesCacheEnabled());
   }
 
   @Test

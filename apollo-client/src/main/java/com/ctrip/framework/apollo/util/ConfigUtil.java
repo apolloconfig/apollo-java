@@ -379,7 +379,7 @@ public class ConfigUtil {
   }
 
   public String getK8sNamespace() {
-    String k8sNamespace = getCustomizedConfigMapNamespace();
+    String k8sNamespace = getCacheKubernetesNamespace();
 
     if (!Strings.isNullOrEmpty(k8sNamespace)) {
       return k8sNamespace;
@@ -388,7 +388,7 @@ public class ConfigUtil {
     return ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT;
   }
 
-  private String getCustomizedConfigMapNamespace() {
+  private String getCacheKubernetesNamespace() {
     // 1. Get from System Property
     String k8sNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
     if (Strings.isNullOrEmpty(k8sNamespace)) {

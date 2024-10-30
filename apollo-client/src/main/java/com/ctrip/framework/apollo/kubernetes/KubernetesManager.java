@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.kubernetes;
 
 import com.ctrip.framework.apollo.core.utils.StringUtils;
+import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +38,7 @@ public class KubernetesManager {
     private ApiClient client;
     private CoreV1Api coreV1Api;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(KubernetesManager.class);
 
     public KubernetesManager() {
         try {
@@ -53,7 +55,7 @@ public class KubernetesManager {
         this.coreV1Api = coreV1Api;
     }
 
-    public V1ConfigMap buildConfigMap(String name, String namespace, Map<String, String> data) {
+    private V1ConfigMap buildConfigMap(String name, String namespace, Map<String, String> data) {
         V1ObjectMeta metadata = new V1ObjectMeta()
                 .name(name)
                 .namespace(namespace);
@@ -124,13 +126,12 @@ public class KubernetesManager {
      * @return config map name
      */
     // Set the retry times using the client retry mechanism (CAS)
-    public boolean updateConfigMap(String k8sNamespace, String name, Map<String, String> data) {
+    public boolean updateConfigMap(String k8sNamespace, String name, Map<String, String> data) throws ApiException {
         if (StringUtils.isEmpty(k8sNamespace) || StringUtils.isEmpty(name)) {
             logger.error("Parameters can not be null or empty: k8sNamespace={}, name={}", k8sNamespace, name);
             return false;
         }
 
-        // retry
         int maxRetries = 5;
         int retryCount = 0;
         long waitTime = 100;
@@ -138,7 +139,25 @@ public class KubernetesManager {
         while (retryCount < maxRetries) {
             try {
                 V1ConfigMap configmap = coreV1Api.readNamespacedConfigMap(name, k8sNamespace, null);
-                configmap.setData(data);
+                Map<String, String> existingData = configmap.getData();
+                if (existingData == null) {
+                    existingData = new HashMap<>();
+                }
+
+                // Determine if the data contains its own kv and de-weight it
+                Map<String, String> finalExistingData = existingData;
+                boolean containsEntry = data.entrySet().stream()
+                        .allMatch(entry -> entry.getValue().equals(finalExistingData.get(entry.getKey())));
+
+                if (containsEntry) {
+                    logger.info("Data is identical or already contains the entry, no update needed.");
+                    return true;
+                }
+
+                // Add new entries to the existing data
+                existingData.putAll(data);
+                configmap.setData(existingData);
+
                 coreV1Api.replaceNamespacedConfigMap(name, k8sNamespace, configmap, null, null, null, null);
                 return true;
             } catch (ApiException e) {
@@ -146,17 +165,22 @@ public class KubernetesManager {
                     retryCount++;
                     logger.warn("Conflict occurred, retrying... ({})", retryCount);
                     try {
-                        TimeUnit.MILLISECONDS.sleep(waitTime);
+                        // Scramble the time, so that different machines in the distributed retry time is different
+                        // The random ratio ranges from 0.9 to 1.1
+                        TimeUnit.MILLISECONDS.sleep((long) (waitTime * (0.9 + Math.random() * 0.2)));
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                     }
                     waitTime = Math.min(waitTime * 2, 1000);
                 } else {
                     logger.error("Error updating ConfigMap: {}", e.getMessage(), e);
+                    throw e;
                 }
             }
         }
-        return false;
+        String errorMessage = String.format("Failed to update ConfigMap after %d retries: k8sNamespace=%s, name=%s", maxRetries, k8sNamespace, name);
+        logger.error(errorMessage);
+        throw new ApolloConfigException(errorMessage);
     }
 
     /**

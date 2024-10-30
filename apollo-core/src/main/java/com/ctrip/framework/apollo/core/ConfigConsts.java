@@ -20,7 +20,6 @@ public interface ConfigConsts {
   String NAMESPACE_APPLICATION = "application";
   String CLUSTER_NAME_DEFAULT = "default";
   String CLUSTER_NAMESPACE_SEPARATOR = "+";
-  String CONFIGMAP_KEY_SEPARATOR = "-";
   String APOLLO_CONFIG_CACHE = "apollo-configcache-";
   String APOLLO_CLUSTER_KEY = "apollo.cluster";
   String APOLLO_META_KEY = "apollo.meta";
