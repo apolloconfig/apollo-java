@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -139,10 +140,14 @@ public class KubernetesManager {
             try {
                 V1ConfigMap configmap = coreV1Api.readNamespacedConfigMap(name, k8sNamespace, null);
                 Map<String, String> existingData = configmap.getData();
+                if (existingData == null) {
+                    existingData = new HashMap<>();
+                }
 
                 // Determine if the data contains its own kv and de-weight it
+                Map<String, String> finalExistingData = existingData;
                 boolean containsEntry = data.entrySet().stream()
-                        .allMatch(entry -> entry.getValue().equals(existingData.get(entry.getKey())));
+                        .allMatch(entry -> entry.getValue().equals(finalExistingData.get(entry.getKey())));
 
                 if (containsEntry) {
                     logger.info("Data is identical or already contains the entry, no update needed.");

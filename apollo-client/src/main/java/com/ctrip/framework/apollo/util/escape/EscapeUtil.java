@@ -21,15 +21,22 @@ package com.ctrip.framework.apollo.util.escape;
  */
 public class EscapeUtil {
 
+    private static final String SINGLE_UNDERSCORE = "_";
+    private static final String DOUBLE_UNDERSCORE = "__";
+    private static final String TRIPLE_UNDERSCORE = "___";
+
     // Escapes a single underscore in a namespace
     public static String escapeNamespace(String namespace) {
-        return namespace.replace("_", "__");
+        if (namespace == null || namespace.isEmpty()) {
+            throw new IllegalArgumentException("Namespace cannot be null or empty");
+        }
+        return namespace.replace(SINGLE_UNDERSCORE, DOUBLE_UNDERSCORE);
     }
 
     // Concatenate the cluster and the escaped namespace, using three underscores as delimiters
     public static String createConfigMapKey(String cluster, String namespace) {
         String escapedNamespace = escapeNamespace(namespace);
-        return cluster + "___" + escapedNamespace;
+        return String.join(TRIPLE_UNDERSCORE, cluster, escapedNamespace);
     }
 
 }
