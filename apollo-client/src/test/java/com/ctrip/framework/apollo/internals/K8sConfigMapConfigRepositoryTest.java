@@ -81,8 +81,6 @@ public class K8sConfigMapConfigRepositoryTest {
         k8sConfigMapConfigRepository = new K8sConfigMapConfigRepository(someNamespace, upstreamRepo);
     }
 
-    // TODO 直接mock manager中的参数
-
     /**
      * 测试setConfigMapKey方法，当cluster和namespace都为正常值时
      */
@@ -101,19 +99,6 @@ public class K8sConfigMapConfigRepositoryTest {
         assertEquals(escapedKey, ReflectionTestUtils.getField(k8sConfigMapConfigRepository, "configMapKey"));
         assertEquals(expectedConfigMapKey, ReflectionTestUtils.getField(k8sConfigMapConfigRepository, "configMapKey"));
     }
-
-//    @Test
-//    public void testSetConfigMapKey() {
-//        when(kubernetesManager.createConfigMap(anyString(), anyString(), any())).thenReturn("someAppId");
-//        k8sConfigMapConfigRepository.setConfigMapKey(someCluster, someNamespace);
-//        assertEquals(someCluster +"-"+ someNamespace, k8sConfigMapConfigRepository.getConfigMapKey());
-//    }
-//
-//    @Test
-//    public void testSetConfigMapName() {
-//        k8sConfigMapConfigRepository.setConfigMapName(someAppId, false);
-//        assertEquals(someConfigmapName, k8sConfigMapConfigRepository.getConfigMapName());
-//    }
 
     /**
      * 测试sync方法成功从上游数据源同步
