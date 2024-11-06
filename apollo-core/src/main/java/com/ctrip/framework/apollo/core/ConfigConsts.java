@@ -20,10 +20,12 @@ public interface ConfigConsts {
   String NAMESPACE_APPLICATION = "application";
   String CLUSTER_NAME_DEFAULT = "default";
   String CLUSTER_NAMESPACE_SEPARATOR = "+";
+  String APOLLO_CONFIG_CACHE = "apollo-configcache-";
   String APOLLO_CLUSTER_KEY = "apollo.cluster";
   String APOLLO_META_KEY = "apollo.meta";
   String CONFIG_FILE_CONTENT_KEY = "content";
   String NO_APPID_PLACEHOLDER = "ApolloNoAppIdPlaceHolder";
+  String KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT = "default";
   String APOLLO_AUTO_UPDATE_INJECTED_SPRING_PROPERTIES = "ApolloAutoUpdateInjectedSpringProperties";
   long NOTIFICATION_ID_PLACEHOLDER = -1;
 }

@@ -47,6 +47,8 @@ public class ConfigUtilTest {
     System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR);
     System.clearProperty(PropertiesFactory.APOLLO_PROPERTY_ORDER_ENABLE);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE);
+    System.clearProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
+    System.clearProperty(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE);
   }
 
   @Test
@@ -241,6 +243,35 @@ public class ConfigUtilTest {
     doReturn(false).when(configUtil).isOSWindows();
 
     assertEquals("/opt/data/" + someAppId, configUtil.getDefaultLocalCacheDir(someAppId));
+  }
+
+  @Test
+  public void testK8sNamespaceWithSystemProperty() {
+    String someK8sNamespace = "someK8sNamespace";
+
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, someK8sNamespace);
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(someK8sNamespace, configUtil.getK8sNamespace());
+  }
+
+  @Test
+  public void testK8sNamespaceWithDefault() {
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertEquals(ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT, configUtil.getK8sNamespace());
+  }
+
+  @Test
+  public void testKubernetesCacheEnabledWithSystemProperty() {
+    boolean someKubernetesCacheEnabled = true;
+
+    System.setProperty(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE, String.valueOf(someKubernetesCacheEnabled));
+
+    ConfigUtil configUtil = new ConfigUtil();
+
+    assertTrue(configUtil.isPropertyKubernetesCacheEnabled());
   }
 
   @Test

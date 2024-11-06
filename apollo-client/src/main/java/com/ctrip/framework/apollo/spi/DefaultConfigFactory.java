@@ -33,6 +33,7 @@ import com.ctrip.framework.apollo.internals.TxtConfigFile;
 import com.ctrip.framework.apollo.internals.XmlConfigFile;
 import com.ctrip.framework.apollo.internals.YamlConfigFile;
 import com.ctrip.framework.apollo.internals.YmlConfigFile;
+import com.ctrip.framework.apollo.internals.K8sConfigMapConfigRepository;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +122,9 @@ public class DefaultConfigFactory implements ConfigFactory {
   }
 
   ConfigRepository createConfigRepository(String appId, String namespace) {
-    if (m_configUtil.isPropertyFileCacheEnabled()) {
+    if (m_configUtil.isPropertyKubernetesCacheEnabled()) {
+      return createConfigMapConfigRepository(namespace);
+    } else if (m_configUtil.isPropertyFileCacheEnabled()) {
       return createLocalConfigRepository(appId, namespace);
     }
     return createRemoteConfigRepository(appId, namespace);
@@ -144,6 +147,14 @@ public class DefaultConfigFactory implements ConfigFactory {
     return new LocalFileConfigRepository(appId, namespace, createRemoteConfigRepository(appId, namespace));
   }
 
+  /**
+   * Creates a Kubernetes config map repository for a given namespace
+   * @param namespace the namespace of the repository
+   * @return the newly created repository for the given namespace
+   */
+  private ConfigRepository createConfigMapConfigRepository(String namespace) {
+    return new K8sConfigMapConfigRepository(namespace, createLocalConfigRepository(namespace));
+  }
   RemoteConfigRepository createRemoteConfigRepository(String appId, String namespace) {
     return new RemoteConfigRepository(appId, namespace);
   }

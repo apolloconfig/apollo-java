@@ -113,6 +113,20 @@
       "defaultValue": false
     },
     {
+      "name": "apollo.cache.kubernetes.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ctrip.framework.apollo.util.ConfigUtil",
+      "description": "enable kubernetes configmap cache.",
+      "defaultValue": false
+    },
+    {
+      "name": "apollo.cache.kubernetes.namespace",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.util.ConfigUtil",
+      "description": "kubernetes configmap namespace.",
+      "defaultValue": "default"
+    },
+    {
       "name": "apollo.property.order.enable",
       "type": "java.lang.Boolean",
       "sourceType": "com.ctrip.framework.apollo.util.factory.PropertiesFactory",
