@@ -123,7 +123,7 @@ public class DefaultConfigFactory implements ConfigFactory {
 
   ConfigRepository createConfigRepository(String appId, String namespace) {
     if (m_configUtil.isPropertyKubernetesCacheEnabled()) {
-      return createConfigMapConfigRepository(namespace);
+      return createConfigMapConfigRepository(appId, namespace);
     } else if (m_configUtil.isPropertyFileCacheEnabled()) {
       return createLocalConfigRepository(appId, namespace);
     }
@@ -152,8 +152,8 @@ public class DefaultConfigFactory implements ConfigFactory {
    * @param namespace the namespace of the repository
    * @return the newly created repository for the given namespace
    */
-  private ConfigRepository createConfigMapConfigRepository(String namespace) {
-    return new K8sConfigMapConfigRepository(namespace, createLocalConfigRepository(namespace));
+  private ConfigRepository createConfigMapConfigRepository(String appId, String namespace) {
+    return new K8sConfigMapConfigRepository(appId, namespace, createLocalConfigRepository(appId, namespace));
   }
   RemoteConfigRepository createRemoteConfigRepository(String appId, String namespace) {
     return new RemoteConfigRepository(appId, namespace);
