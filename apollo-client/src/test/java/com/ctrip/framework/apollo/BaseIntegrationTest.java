@@ -121,9 +121,10 @@ public abstract class BaseIntegrationTest {
     System.setProperty(ApolloClientSystemConsts.APP_ID, someAppId);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
-    MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
+    MockConfigUtil mockConfigUtil = new MockConfigUtil();
+    MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
 
-    configDir = new File(ClassLoaderUtil.getClassPath() + "config-cache");
+    configDir = new File(mockConfigUtil.getDefaultLocalCacheDir(someAppId)+ "/config-cache");
     if (configDir.exists()) {
       configDir.delete();
     }
