@@ -161,7 +161,7 @@ public class DefaultConfigFactory implements ConfigFactory {
 
   PropertiesCompatibleFileConfigRepository createPropertiesCompatibleFileConfigRepository(
       String appId, String namespace, ConfigFileFormat format) {
-    String actualNamespaceName = trimNamespaceFormat(appId, namespace, format);
+    String actualNamespaceName = trimNamespaceFormat(namespace, format);
     PropertiesCompatibleConfigFile configFile = (PropertiesCompatibleConfigFile) ConfigService
         .getConfigFile(actualNamespaceName, format);
 
@@ -180,7 +180,7 @@ public class DefaultConfigFactory implements ConfigFactory {
     return ConfigFileFormat.Properties;
   }
 
-  String trimNamespaceFormat(String appId, String namespaceName, ConfigFileFormat format) {
+  String trimNamespaceFormat(String namespaceName, ConfigFileFormat format) {
     String extension = "." + format.getValue();
     if (!namespaceName.toLowerCase().endsWith(extension)) {
       return namespaceName;

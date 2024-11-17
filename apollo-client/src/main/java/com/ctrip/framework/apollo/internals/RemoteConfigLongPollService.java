@@ -114,10 +114,9 @@ public class RemoteConfigLongPollService {
   }
 
   public boolean submit(String appId, String namespace, RemoteConfigRepository remoteConfigRepository) {
-    boolean result = false;
     Multimap<String, RemoteConfigRepository> repositoryMultimap = m_longPollNamespaces.computeIfAbsent(
                    appId, k -> Multimaps.synchronizedSetMultimap(HashMultimap.create()));
-    result = repositoryMultimap.put(namespace, remoteConfigRepository);
+    boolean result = repositoryMultimap.put(namespace, remoteConfigRepository);
     m_notifications.put(appId, namespace, INIT_NOTIFICATION_ID);
     if (m_longPollStarted.get(appId) == null) {
       startLongPolling(appId);

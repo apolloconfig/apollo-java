@@ -73,8 +73,7 @@ public class MockInjector implements Injector {
 
     @Override
     public <T> T getInstance(Class<T> clazz) {
-      T instance = (T) classMap.get(clazz);
-      return instance;
+      return (T) classMap.get(clazz);
     }
 
     @Override

@@ -131,6 +131,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         method);
 
     ReflectionUtils.makeAccessible(method);
+    String appId = annotation.appId();
     String[] namespaces = annotation.value();
     String[] annotatedInterestedKeys = annotation.interestedKeys();
     String[] annotatedInterestedKeyPrefixes = annotation.interestedKeyPrefixes();
@@ -145,7 +146,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     Set<String> resolvedNamespaces = processResolveNamespaceValue(namespaces);
 
     for (String namespace : resolvedNamespaces) {
-      Config config = ConfigService.getConfig(namespace);
+      Config config = ConfigService.getConfig(appId, namespace);
 
       if (interestedKeys == null && interestedKeyPrefixes == null) {
         config.addChangeListener(configChangeListener);

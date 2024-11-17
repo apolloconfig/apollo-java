@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.spring.annotation;
 
+import org.springframework.core.Ordered;
+
 import java.lang.annotation.*;
 
 /**
@@ -48,4 +50,10 @@ public @interface MultipleConfig {
    * @return
    */
   String secret() default "";
+
+  /**
+   * multiple config order sort.
+   * @return
+   */
+  int order() default Ordered.LOWEST_PRECEDENCE;
 }

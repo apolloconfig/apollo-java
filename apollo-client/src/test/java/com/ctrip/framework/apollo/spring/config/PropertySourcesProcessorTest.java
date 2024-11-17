@@ -55,8 +55,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   private MutablePropertySources propertySources;
   private ApplicationEventPublisher applicationEventPublisher;
 
-  private final static String someAppId = "someAppId";
-
   @Override
   @Before
   public void setUp() throws Exception {

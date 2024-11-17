@@ -88,7 +88,8 @@ public class ConfigChange {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ConfigChange{");
-    sb.append("namespace='").append(namespace).append('\'');
+    sb.append("appid='").append(appId).append('\'');
+    sb.append(", namespace='").append(namespace).append('\'');
     sb.append(", propertyName='").append(propertyName).append('\'');
     sb.append(", oldValue='").append(oldValue).append('\'');
     sb.append(", newValue='").append(newValue).append('\'');

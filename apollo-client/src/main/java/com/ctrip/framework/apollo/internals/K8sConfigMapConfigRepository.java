@@ -221,7 +221,7 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
 
     @Override
     public void onRepositoryChange(String namespace, Properties newProperties) {
-
+        this.onRepositoryChange(appId, namespace, newProperties);
     }
 
     /**

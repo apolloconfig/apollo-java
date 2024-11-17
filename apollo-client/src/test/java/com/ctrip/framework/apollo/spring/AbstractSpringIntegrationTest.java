@@ -20,10 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.ctrip.framework.apollo.ConfigServiceTest;
-import com.ctrip.framework.apollo.ConfigServiceTest.MockConfigUtil;
-import com.ctrip.framework.apollo.build.ApolloInjector;
-import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.internals.ConfigRepository;
 import com.ctrip.framework.apollo.internals.DefaultInjector;
@@ -37,9 +33,7 @@ import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,8 +52,6 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.google.common.collect.Maps;
-import org.springframework.util.ReflectionUtils.FieldCallback;
-import org.springframework.util.ReflectionUtils.FieldFilter;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -69,6 +61,8 @@ public abstract class AbstractSpringIntegrationTest {
   private static final Map<String, ConfigFile> CONFIG_FILE_REGISTRY = Maps.newHashMap();
   private static Method CONFIG_SERVICE_RESET;
   private static Method PROPERTY_SOURCES_PROCESSOR_RESET;
+
+  public final static String someAppId = "someAppId";
 
   static {
     try {
@@ -204,7 +198,7 @@ public abstract class AbstractSpringIntegrationTest {
 
     private final ConfigManager delegate;
 
-    private final String defaultAppId = "someAppId";
+    private final String defaultAppId = someAppId;
 
     public MockConfigManager(ConfigManager delegate) {
       this.delegate = delegate;
@@ -253,7 +247,7 @@ public abstract class AbstractSpringIntegrationTest {
     }
 
     public String getAppId() {
-      return "someAppId";
+      return someAppId;
     }
   }
 }

@@ -57,6 +57,7 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
 
     configMap.put(configUtil.getAppId(), this.resolveNamespaces(namespaces));
 
+    PropertySourcesProcessor.addNamespaces(configUtil.getAppId(), Lists.newArrayList(this.resolveNamespaces(namespaces)), order);
     AnnotationAttributes[] multipleConfigs = attributes.getAnnotationArray("multipleConfigs");
     if (multipleConfigs != null) {
       for (AnnotationAttributes multipleConfig : multipleConfigs) {
@@ -64,17 +65,19 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
         String[] multipleNamespaces = this.resolveNamespaces(multipleConfig.getStringArray("namespaces"));
         configMap.put(appId, multipleNamespaces);
         String secret = resolveSecret(multipleConfig.getString("secret"));
+        int multipleOrder = multipleConfig.getNumber("order");
 
         // put multiple secret into system property
         System.setProperty("apollo.accesskey." + appId + ".secret", secret);
+        PropertySourcesProcessor.addNamespaces(appId, Lists.newArrayList(multipleNamespaces), multipleOrder);
       }
     }
 
 
     // put appId and namespace into PropertySourcesProcessor
-    for (Map.Entry<String, String[]> configEntry : configMap.entrySet()) {
+/*    for (Map.Entry<String, String[]> configEntry : configMap.entrySet()) {
       PropertySourcesProcessor.addNamespaces(configEntry.getKey(), Lists.newArrayList(configEntry.getValue()), order);
-    }
+    }*/
 
     Map<String, Object> propertySourcesPlaceholderPropertyValues = new HashMap<>();
     // to make sure the default PropertySourcesPlaceholderConfigurer's priority is higher than PropertyPlaceholderConfigurer
@@ -105,7 +108,9 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
 
   private String resolveSecret(String secret){
     if (this.environment == null) {
-      logger.warn("secret placeholder {} is not supported for Spring version prior to 3.2.x", secret);
+      if (secret.contains("${")) {
+        logger.warn("secret placeholder {} is not supported for Spring version prior to 3.2.x", secret);
+      }
       return secret;
     }
     return this.environment.resolveRequiredPlaceholders(secret);

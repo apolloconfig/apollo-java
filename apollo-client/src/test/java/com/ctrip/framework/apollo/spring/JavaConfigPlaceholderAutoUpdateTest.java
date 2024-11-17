@@ -52,7 +52,6 @@ import org.springframework.stereotype.Component;
 
 public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrationTest {
 
-  private static final String someAppId = "someAppId";
   private static final String TIMEOUT_PROPERTY = "timeout";
   private static final int DEFAULT_TIMEOUT = 100;
   private static final String BATCH_PROPERTY = "batch";

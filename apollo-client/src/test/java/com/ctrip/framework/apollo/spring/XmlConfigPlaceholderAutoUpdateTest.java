@@ -41,8 +41,6 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
   private static final int DEFAULT_BATCH = 200;
   private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
 
-  private static final String someAppId = "someAppId";
-
   @Test
   public void testAutoUpdateWithOneNamespace() throws Exception {
     int initialTimeout = 1000;

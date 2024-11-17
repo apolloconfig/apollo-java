@@ -36,7 +36,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class XmlConfigPlaceholderTest extends AbstractSpringIntegrationTest {
 
-  private static final String someAppId = "someAppId";
   private static final String TIMEOUT_PROPERTY = "timeout";
   private static final int DEFAULT_TIMEOUT = 100;
   private static final String BATCH_PROPERTY = "batch";

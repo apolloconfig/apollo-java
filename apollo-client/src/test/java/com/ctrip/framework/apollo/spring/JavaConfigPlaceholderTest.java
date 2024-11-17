@@ -60,7 +60,6 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
   private static final String DATE_FORMAT_JSON_PROPERTY1 = "jsonDateProperty1";
   private static final String DATE_FORMAT_JSON_PROPERTY2 = "jsonDateProperty2";
   private static final String DATE_FORMAT_JSON_PROPERTY3 = "jsonDateProperty3";
-  private static final String someAppId = "someAppId";
 
   @Test
   public void testPropertySourceWithNoNamespace() throws Exception {

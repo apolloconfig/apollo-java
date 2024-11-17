@@ -50,8 +50,6 @@ import com.google.common.collect.Lists;
 public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
   private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
 
-  private static final String someAppId = "someAppId";
-
   @Test
   public void testApolloConfig() throws Exception {
     Config applicationConfig = mock(Config.class);

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.internals.PropertiesCompatibleFileConfigRepository;
 import java.util.Properties;
 
@@ -59,7 +58,7 @@ public class DefaultConfigFactoryTest {
 
   @Before
   public void setUp() throws Exception {
-    someAppId = "someAppId";
+    someAppId = "someId";
     someEnv = Env.DEV;
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
     defaultConfigFactory = spy(new DefaultConfigFactory());
@@ -189,18 +188,18 @@ public class DefaultConfigFactoryTest {
   @Test
   public void testTrimNamespaceFormat() throws Exception {
     checkNamespaceName("abc", ConfigFileFormat.Properties, appIdAndNamespace("abc"));
-    checkNamespaceName("abc.properties", ConfigFileFormat.Properties,  appIdAndNamespace("abc"));
-    checkNamespaceName("abcproperties", ConfigFileFormat.Properties,  appIdAndNamespace("abcproperties"));
-    checkNamespaceName("abc.pRopErties", ConfigFileFormat.Properties,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.xml", ConfigFileFormat.XML,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.xmL", ConfigFileFormat.XML,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.json", ConfigFileFormat.JSON,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.jsOn", ConfigFileFormat.JSON,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.yaml", ConfigFileFormat.YAML,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.yAml", ConfigFileFormat.YAML,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.yml", ConfigFileFormat.YML,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.yMl", ConfigFileFormat.YML,  appIdAndNamespace("abc"));
-    checkNamespaceName("abc.proPerties.yml", ConfigFileFormat.YML,  appIdAndNamespace("abc.proPerties"));
+    checkNamespaceName("abc.properties", ConfigFileFormat.Properties, appIdAndNamespace("abc"));
+    checkNamespaceName("abcproperties", ConfigFileFormat.Properties, appIdAndNamespace("abcproperties"));
+    checkNamespaceName("abc.pRopErties", ConfigFileFormat.Properties, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.xml", ConfigFileFormat.XML, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.xmL", ConfigFileFormat.XML, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.json", ConfigFileFormat.JSON, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.jsOn", ConfigFileFormat.JSON, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yaml", ConfigFileFormat.YAML, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yAml", ConfigFileFormat.YAML, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yml", ConfigFileFormat.YML, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.yMl", ConfigFileFormat.YML, appIdAndNamespace("abc"));
+    checkNamespaceName("abc.proPerties.yml", ConfigFileFormat.YML, appIdAndNamespace("abc.proPerties"));
   }
 
   private String appIdAndNamespace(String namespace){
@@ -213,7 +212,7 @@ public class DefaultConfigFactoryTest {
   }
 
   private void checkNamespaceName(String namespaceName, ConfigFileFormat format, String expectedNamespaceName) {
-    assertEquals(expectedNamespaceName, defaultConfigFactory.trimNamespaceFormat(someAppId, namespaceName, format));
+    assertEquals(expectedNamespaceName, defaultConfigFactory.trimNamespaceFormat(namespaceName, format));
   }
 
   public static class MockConfigUtil extends ConfigUtil {

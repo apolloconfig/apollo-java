@@ -18,10 +18,8 @@ package com.ctrip.framework.apollo;
 
 import static org.junit.Assert.assertEquals;
 
-import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
-import java.lang.reflect.Field;
 import java.util.Set;
 
 import org.junit.After;

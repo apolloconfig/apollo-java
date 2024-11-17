@@ -415,7 +415,7 @@ public class BootstrapConfigTest {
     }
 
     @AfterClass
-    public static void afterClass() throws NoSuchFieldException, IllegalAccessException {
+    public static void afterClass() {
       System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
       System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED);
 

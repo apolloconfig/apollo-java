@@ -37,7 +37,6 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.enums.Env;
 import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -118,13 +117,12 @@ public abstract class BaseIntegrationTest {
     metaServiceUrl = configServiceURL =  "http://localhost:" + port;
 
     System.setProperty(ConfigConsts.APOLLO_META_KEY, metaServiceUrl);
-    System.setProperty(ApolloClientSystemConsts.APP_ID, someAppId);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     MockConfigUtil mockConfigUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
-
     configDir = new File(mockConfigUtil.getDefaultLocalCacheDir(someAppId)+ "/config-cache");
+
     if (configDir.exists()) {
       configDir.delete();
     }
@@ -282,7 +280,12 @@ public abstract class BaseIntegrationTest {
 
     @Override
     public String getDefaultLocalCacheDir(String appId) {
-      return ClassLoaderUtil.getClassPath() + "/" + appId;
+      String path = ClassLoaderUtil.getClassPath() + "/" + appId;
+      if(isOSWindows()){
+        // because there is an extra / in front of the windows system
+        path = path.substring(1,path.length()-1);
+      }
+      return path;
     }
   }
 
