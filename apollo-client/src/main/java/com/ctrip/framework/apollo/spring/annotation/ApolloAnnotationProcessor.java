@@ -131,7 +131,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         method);
 
     ReflectionUtils.makeAccessible(method);
-    String appId = annotation.appId();
+    String appId = StringUtils.defaultIfBlank(annotation.appId(), configUtil.getAppId());
     String[] namespaces = annotation.value();
     String[] annotatedInterestedKeys = annotation.interestedKeys();
     String[] annotatedInterestedKeyPrefixes = annotation.interestedKeyPrefixes();

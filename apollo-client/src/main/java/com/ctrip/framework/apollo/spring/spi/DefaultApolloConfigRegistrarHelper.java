@@ -53,17 +53,15 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
     final String[] namespaces = attributes.getStringArray("value");
     final int order = attributes.getNumber("order");
 
-    Map<String, String[]> configMap = new HashMap<>();
-
-    configMap.put(configUtil.getAppId(), this.resolveNamespaces(namespaces));
-
+    // put main appId
     PropertySourcesProcessor.addNamespaces(configUtil.getAppId(), Lists.newArrayList(this.resolveNamespaces(namespaces)), order);
+
+    // put multiple appId into
     AnnotationAttributes[] multipleConfigs = attributes.getAnnotationArray("multipleConfigs");
     if (multipleConfigs != null) {
       for (AnnotationAttributes multipleConfig : multipleConfigs) {
         String appId = multipleConfig.getString("appId");
         String[] multipleNamespaces = this.resolveNamespaces(multipleConfig.getStringArray("namespaces"));
-        configMap.put(appId, multipleNamespaces);
         String secret = resolveSecret(multipleConfig.getString("secret"));
         int multipleOrder = multipleConfig.getNumber("order");
 
@@ -72,12 +70,6 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
         PropertySourcesProcessor.addNamespaces(appId, Lists.newArrayList(multipleNamespaces), multipleOrder);
       }
     }
-
-
-    // put appId and namespace into PropertySourcesProcessor
-/*    for (Map.Entry<String, String[]> configEntry : configMap.entrySet()) {
-      PropertySourcesProcessor.addNamespaces(configEntry.getKey(), Lists.newArrayList(configEntry.getValue()), order);
-    }*/
 
     Map<String, Object> propertySourcesPlaceholderPropertyValues = new HashMap<>();
     // to make sure the default PropertySourcesPlaceholderConfigurer's priority is higher than PropertyPlaceholderConfigurer

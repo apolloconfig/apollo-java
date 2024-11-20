@@ -59,7 +59,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   @Before
   public void setUp() throws Exception {
     System.setProperty(ApolloClientSystemConsts.APP_ID, someAppId);
-    //MockInjector.setInstance(ConfigUtil.class, new BaseIntegrationTest.MockConfigUtil());
     super.setUp();
     propertySources = mock(MutablePropertySources.class);
     environment = mock(ConfigurableEnvironment.class);
@@ -77,6 +76,7 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   public void tearDown() throws Exception {
     super.tearDown();
     PropertySourcesProcessor.reset();
+    System.clearProperty(ApolloClientSystemConsts.APP_ID);
   }
 
   @Test

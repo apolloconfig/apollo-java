@@ -463,6 +463,10 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
     System.setProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE, "true");
+    // Because Configutil has been initialized a long time ago,
+    // setting this system variable does not cause configutil to reload,
+    // thereby getting the value of this system variable.
+    // Therefore, we need to re -initialize the Configutil here to get the value of the system variable loaded to the configutil.
     MockConfigUtil configUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, configUtil);
 

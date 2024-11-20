@@ -178,14 +178,16 @@ public abstract class AbstractSpringIntegrationTest {
     ReflectionUtils.invokeMethod(CONFIG_SERVICE_RESET, null);
     //as PropertySourcesProcessor has some static variables, so we must manually clear them
     ReflectionUtils.invokeMethod(PROPERTY_SOURCES_PROCESSOR_RESET, null);
+
+    MockConfigUtil configUtil = new MockConfigUtil();
+    configUtil.setAutoUpdateInjectedSpringProperties(true);
+    MockInjector.setInstance(ConfigUtil.class, configUtil);
+
     DefaultInjector defaultInjector = new DefaultInjector();
     ConfigManager defaultConfigManager = defaultInjector.getInstance(ConfigManager.class);
     MockInjector.setInstance(ConfigManager.class, new MockConfigManager(defaultConfigManager));
     MockInjector.setDelegate(defaultInjector);
 
-    MockConfigUtil configUtil = new MockConfigUtil();
-    configUtil.setAutoUpdateInjectedSpringProperties(true);
-    MockInjector.setInstance(ConfigUtil.class, configUtil);
   }
 
   protected static void doTearDown() {
