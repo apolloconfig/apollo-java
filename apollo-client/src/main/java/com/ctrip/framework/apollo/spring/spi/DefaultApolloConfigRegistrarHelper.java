@@ -100,7 +100,7 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
 
   private String resolveSecret(String secret){
     if (this.environment == null) {
-      if (secret.contains("${")) {
+      if (secret != null && secret.contains("${")) {
         logger.warn("secret placeholder {} is not supported for Spring version prior to 3.2.x", secret);
       }
       return secret;

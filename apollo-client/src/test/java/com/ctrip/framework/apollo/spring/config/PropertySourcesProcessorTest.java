@@ -58,7 +58,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   @Override
   @Before
   public void setUp() throws Exception {
-    System.setProperty(ApolloClientSystemConsts.APP_ID, someAppId);
     super.setUp();
     propertySources = mock(MutablePropertySources.class);
     environment = mock(ConfigurableEnvironment.class);
@@ -68,7 +67,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     processor = new PropertySourcesProcessor();
     processor.setEnvironment(environment);
     processor.setApplicationEventPublisher(applicationEventPublisher);
-
   }
 
   @Override
@@ -76,7 +74,7 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   public void tearDown() throws Exception {
     super.tearDown();
     PropertySourcesProcessor.reset();
-    System.clearProperty(ApolloClientSystemConsts.APP_ID);
+    //System.clearProperty(ApolloClientSystemConsts.APP_ID);
   }
 
   @Test
