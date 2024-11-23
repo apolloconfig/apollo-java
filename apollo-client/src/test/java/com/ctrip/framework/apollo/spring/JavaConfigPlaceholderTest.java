@@ -70,7 +70,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
     when(config.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     check(someTimeout, someBatch, AppConfig1.class);
   }
@@ -78,7 +78,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
   @Test
   public void testPropertySourceWithNoConfig() throws Exception {
     Config config = mock(Config.class);
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
     check(DEFAULT_TIMEOUT, DEFAULT_BATCH, AppConfig1.class);
   }
 
@@ -91,7 +91,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
     when(config.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     check(someTimeout, someBatch, AppConfig2.class);
   }
@@ -107,7 +107,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     PropertiesCompatibleConfigFile configFile = mock(PropertiesCompatibleConfigFile.class);
     when(configFile.asProperties()).thenReturn(properties);
 
-    mockConfigFile("application.yaml", configFile);
+    mockConfigFile(someAppId, "application.yaml", configFile);
 
     check(someTimeout, someBatch, AppConfig9.class);
   }
@@ -123,7 +123,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     PropertiesCompatibleConfigFile configFile = mock(PropertiesCompatibleConfigFile.class);
     when(configFile.asProperties()).thenReturn(properties);
 
-    mockConfigFile("application.yaml", configFile);
+    mockConfigFile(someAppId, "application.yaml", configFile);
 
     check(someTimeout, someBatch, AppConfig10.class);
   }
@@ -135,11 +135,11 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
 
     Config application = mock(Config.class);
     when(application.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, application);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, application);
 
     Config fxApollo = mock(Config.class);
     when(application.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
-    mockConfig(FX_APOLLO_NAMESPACE, fxApollo);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApollo);
 
     check(someTimeout, someBatch, AppConfig3.class);
   }
@@ -157,11 +157,11 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     PropertiesCompatibleConfigFile configFile = mock(PropertiesCompatibleConfigFile.class);
     when(configFile.asProperties()).thenReturn(properties);
 
-    mockConfigFile("application.yml", configFile);
+    mockConfigFile(someAppId, "application.yml", configFile);
 
     Config fxApollo = mock(Config.class);
     when(fxApollo.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(anotherTimeout));
-    mockConfig(FX_APOLLO_NAMESPACE, fxApollo);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApollo);
 
     check(someTimeout, someBatch, AppConfig11.class);
   }
@@ -176,11 +176,11 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     Config fxApollo = mock(Config.class);
     when(fxApollo.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
     when(fxApollo.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
-    mockConfig(FX_APOLLO_NAMESPACE, fxApollo);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApollo);
 
     Config application = mock(Config.class);
     when(application.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(anotherTimeout));
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, application);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, application);
 
     check(someTimeout, someBatch, AppConfig6.class);
   }
@@ -195,11 +195,11 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     Config fxApollo = mock(Config.class);
     when(fxApollo.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
     when(fxApollo.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
-    mockConfig(FX_APOLLO_NAMESPACE, fxApollo);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApollo);
 
     Config application = mock(Config.class);
     when(application.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(anotherTimeout));
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, application);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, application);
 
     check(someTimeout, someBatch, AppConfig6.class);
   }
@@ -213,11 +213,11 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     Config application = mock(Config.class);
     when(application.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
     when(application.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, application);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, application);
 
     Config fxApollo = mock(Config.class);
     when(fxApollo.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(anotherTimeout));
-    mockConfig(FX_APOLLO_NAMESPACE, fxApollo);
+    mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApollo);
 
     check(anotherTimeout, someBatch, AppConfig2.class, AppConfig4.class);
   }
@@ -231,7 +231,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
     when(config.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig5.class);
 
@@ -250,7 +250,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(TIMEOUT_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someTimeout));
     when(config.getProperty(eq(BATCH_PROPERTY), Mockito.nullable(String.class))).thenReturn(String.valueOf(someBatch));
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig7.class);
 
@@ -272,7 +272,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(String.format("%s.%s", a, b)), Mockito.nullable(String.class)))
         .thenReturn(String.valueOf(someValue));
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(NestedPropertyConfig1.class);
 
@@ -293,7 +293,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(b), Mockito.nullable(String.class))).thenReturn(b);
     when(config.getProperty(eq(c), Mockito.nullable(String.class))).thenReturn(String.valueOf(someValue));
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(NestedPropertyConfig1.class);
 
@@ -311,7 +311,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(a), Mockito.nullable(String.class))).thenReturn(a);
     when(config.getProperty(eq(b), Mockito.nullable(String.class))).thenReturn(b);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(NestedPropertyConfig1.class);
 
@@ -334,7 +334,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(String.format("%s.%s", a, b)), Mockito.nullable(String.class))).thenReturn(nestedProperty);
     when(config.getProperty(eq(nestedKey), Mockito.nullable(String.class))).thenReturn(String.valueOf(someValue));
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(NestedPropertyConfig1.class);
 
@@ -356,7 +356,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(b), Mockito.nullable(String.class))).thenReturn(b);
     when(config.getProperty(eq(String.format("%s.%s", a, b)), Mockito.nullable(String.class))).thenReturn(nestedProperty);
 
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(NestedPropertyConfig1.class);
 
@@ -374,7 +374,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(JSON_PROPERTY), Mockito.nullable(String.class))).thenReturn(someJson);
     when(config.getProperty(eq(OTHER_JSON_PROPERTY), Mockito.nullable(String.class))).thenReturn(otherJson);
     when(config.getProperty(eq("a"), Mockito.nullable(String.class))).thenReturn(JSON_PROPERTY);
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
         AppConfig8.class);
@@ -405,7 +405,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(DATE_FORMAT_JSON_PROPERTY1), Mockito.nullable(String.class))).thenReturn(dateFormatJson1);
     when(config.getProperty(eq(DATE_FORMAT_JSON_PROPERTY2), Mockito.nullable(String.class))).thenReturn(dateFormatJson2);
     when(config.getProperty(eq(DATE_FORMAT_JSON_PROPERTY3), Mockito.nullable(String.class))).thenReturn(dateFormatJson3);
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
         AppConfig12.class);
@@ -424,7 +424,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq(JSON_PROPERTY), Mockito.nullable(String.class))).thenReturn(someInvalidJson);
     when(config.getProperty(eq(OTHER_JSON_PROPERTY), Mockito.nullable(String.class))).thenReturn(someInvalidJson);
     when(config.getProperty(eq("a"), Mockito.nullable(String.class))).thenReturn(JSON_PROPERTY);
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     new AnnotationConfigApplicationContext(AppConfig8.class).getBean(TestJsonPropertyBean.class);
   }
@@ -432,7 +432,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
   @Test(expected = BeanCreationException.class)
   public void testApolloJsonValueWithNoPropertyValue() throws Exception {
     Config config = mock(Config.class);
-    mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
     new AnnotationConfigApplicationContext(AppConfig8.class);
   }

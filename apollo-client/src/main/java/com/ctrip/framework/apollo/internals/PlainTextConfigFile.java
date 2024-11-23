@@ -24,8 +24,8 @@ import java.util.Properties;
  */
 public abstract class PlainTextConfigFile extends AbstractConfigFile {
 
-  public PlainTextConfigFile(String namespace, ConfigRepository configRepository) {
-    super(namespace, configRepository);
+  public PlainTextConfigFile(String appId, String namespace, ConfigRepository configRepository) {
+    super(appId, namespace, configRepository);
   }
 
   @Override

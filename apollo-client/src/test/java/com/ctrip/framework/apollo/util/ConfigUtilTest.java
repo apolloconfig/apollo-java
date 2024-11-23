@@ -225,7 +225,7 @@ public class ConfigUtilTest {
 
     doReturn(someAppId).when(configUtil).getAppId();
 
-    assertEquals(someCacheDir + File.separator + someAppId, configUtil.getDefaultLocalCacheDir());
+    assertEquals(someCacheDir + File.separator + someAppId, configUtil.getDefaultLocalCacheDir(someAppId));
   }
 
   @Test
@@ -238,11 +238,11 @@ public class ConfigUtilTest {
 
     doReturn(true).when(configUtil).isOSWindows();
 
-    assertEquals("C:\\opt\\data\\" + someAppId, configUtil.getDefaultLocalCacheDir());
+    assertEquals("C:\\opt\\data\\" + someAppId, configUtil.getDefaultLocalCacheDir(someAppId));
 
     doReturn(false).when(configUtil).isOSWindows();
 
-    assertEquals("/opt/data/" + someAppId, configUtil.getDefaultLocalCacheDir());
+    assertEquals("/opt/data/" + someAppId, configUtil.getDefaultLocalCacheDir(someAppId));
   }
 
   @Test

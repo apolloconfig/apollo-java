@@ -39,6 +39,18 @@ public class PureApolloConfig extends DefaultConfig implements RepositoryChangeL
     super(namespace, configRepository);
   }
 
+  /**
+   * Constructor.
+   *
+   * @param appId            the appId of this config instance
+   * @param namespace        the namespace of this config instance
+   * @param configRepository the config repository for this config instance
+   */
+  public PureApolloConfig(String appId, String namespace,
+      ConfigRepository configRepository) {
+    super(appId, namespace, configRepository);
+  }
+
   @Override
   public String getProperty(String key, String defaultValue) {
     // step 1: check local cached properties file

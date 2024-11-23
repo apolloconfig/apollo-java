@@ -69,4 +69,13 @@ public @interface EnableApolloConfig {
    * @return
    */
   int order() default Ordered.LOWEST_PRECEDENCE;
+
+  /**
+   * Additional appId and namespace configurations. Will not participate in bootstrap
+   * e.g.
+   *   @EnableApolloConfig(value = {"someNamespace", "anotherNamespace"},
+   *       multipleConfigs = {@MultipleConfig(appId = "anotherAppId", namespaces = {"yetAnotherNamespace"}, secert="${xxxx.secret}")})
+   * @since 2.4.0
+   */
+  MultipleConfig[] multipleConfigs() default {};
 }

@@ -62,6 +62,7 @@ public class BootstrapConfigTest {
   @DirtiesContext
   public static class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOn extends
       AbstractSpringIntegrationTest {
+
     private static final String someProperty = "someProperty";
     private static final String someValue = "someValue";
 
@@ -90,7 +91,7 @@ public class BootstrapConfigTest {
       when(mockedConfig.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.TRUE.toString());
       when(mockedConfig.getProperty(eq(someProperty), Mockito.nullable(String.class))).thenReturn(someValue);
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, mockedConfig);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, mockedConfig);
     }
 
     @AfterClass
@@ -134,8 +135,8 @@ public class BootstrapConfigTest {
       when(config.getPropertyNames()).thenReturn(Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
       when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.TRUE.toString());
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
-      mockConfig(FX_APOLLO_NAMESPACE, config);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
+      mockConfig(someAppId, FX_APOLLO_NAMESPACE, config);
     }
 
     @AfterClass
@@ -170,11 +171,11 @@ public class BootstrapConfigTest {
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
           String.format("%s, %s", "application.yml", FX_APOLLO_NAMESPACE));
 
-      prepareYamlConfigFile("application.yml", readYamlContentAsConfigFileProperties("case6.yml"));
+      prepareYamlConfigFile(someAppId, "application.yml", readYamlContentAsConfigFileProperties("case6.yml"));
       Config anotherConfig = mock(Config.class);
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
-      mockConfig(FX_APOLLO_NAMESPACE, anotherConfig);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
+      mockConfig(someAppId, FX_APOLLO_NAMESPACE, anotherConfig);
     }
 
     @AfterClass
@@ -212,7 +213,7 @@ public class BootstrapConfigTest {
       when(config.getPropertyNames()).thenReturn(Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
       when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.FALSE.toString());
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
     }
 
     @AfterClass
@@ -244,7 +245,7 @@ public class BootstrapConfigTest {
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, "application.yml");
 
-      prepareYamlConfigFile("application.yml", readYamlContentAsConfigFileProperties("case7.yml"));
+      prepareYamlConfigFile(someAppId, "application.yml", readYamlContentAsConfigFileProperties("case7.yml"));
     }
 
     @AfterClass
@@ -278,7 +279,7 @@ public class BootstrapConfigTest {
 
       Config config = mock(Config.class);
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
     }
 
     @AfterClass
@@ -311,7 +312,7 @@ public class BootstrapConfigTest {
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, "application.yml");
 
-      prepareYamlConfigFile("application.yml", readYamlContentAsConfigFileProperties("case8.yml"));
+      prepareYamlConfigFile(someAppId, "application.yml", readYamlContentAsConfigFileProperties("case8.yml"));
     }
 
     @AfterClass
@@ -347,7 +348,7 @@ public class BootstrapConfigTest {
       when(config.getPropertyNames()).thenReturn(Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
       when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.FALSE.toString());
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
     }
 
     @AfterClass
@@ -376,7 +377,7 @@ public class BootstrapConfigTest {
 
       Config config = mock(Config.class);
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
     }
 
     @AfterClass
@@ -400,7 +401,7 @@ public class BootstrapConfigTest {
           AbstractSpringIntegrationTest {
 
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws Exception {
       doSetUp();
 
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
@@ -408,7 +409,7 @@ public class BootstrapConfigTest {
 
       Config config = mock(Config.class);
 
-      mockConfig(ConfigConsts.NAMESPACE_APPLICATION, config);
+      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
     }
 
     @AfterClass

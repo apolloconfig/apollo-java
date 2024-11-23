@@ -106,9 +106,11 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     Preconditions.checkArgument(Config.class.isAssignableFrom(field.getType()),
         "Invalid type: %s for field: %s, should be Config", field.getType(), field);
 
+    final String appId = StringUtils.defaultIfBlank(annotation.appId(), configUtil.getAppId());
     final String namespace = annotation.value();
+    final String resolvedAppId = this.environment.resolveRequiredPlaceholders(appId);
     final String resolvedNamespace = this.environment.resolveRequiredPlaceholders(namespace);
-    Config config = ConfigService.getConfig(resolvedNamespace);
+    Config config = ConfigService.getConfig(resolvedAppId, resolvedNamespace);
 
     ReflectionUtils.makeAccessible(field);
     ReflectionUtils.setField(field, bean, config);
@@ -129,6 +131,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
         method);
 
     ReflectionUtils.makeAccessible(method);
+    String appId = StringUtils.defaultIfBlank(annotation.appId(), configUtil.getAppId());
     String[] namespaces = annotation.value();
     String[] annotatedInterestedKeys = annotation.interestedKeys();
     String[] annotatedInterestedKeyPrefixes = annotation.interestedKeyPrefixes();
@@ -143,7 +146,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     Set<String> resolvedNamespaces = processResolveNamespaceValue(namespaces);
 
     for (String namespace : resolvedNamespaces) {
-      Config config = ConfigService.getConfig(namespace);
+      Config config = ConfigService.getConfig(appId, namespace);
 
       if (interestedKeys == null && interestedKeyPrefixes == null) {
         config.addChangeListener(configChangeListener);

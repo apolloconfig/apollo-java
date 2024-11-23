@@ -16,9 +16,12 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.IOException;
@@ -47,6 +50,7 @@ import com.google.common.util.concurrent.RateLimiter;
 public class DefaultConfig extends AbstractConfig implements RepositoryChangeListener {
 
   private static final Logger logger = DeferredLoggerFactory.getLogger(DefaultConfig.class);
+  private final String m_appId;
   private final String m_namespace;
   private final Properties m_resourceProperties;
   private final AtomicReference<Properties> m_configProperties;
@@ -62,8 +66,23 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @param configRepository the config repository for this config instance
    */
   public DefaultConfig(String namespace, ConfigRepository configRepository) {
+    this(null, namespace , configRepository);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param appId        the appId of this config instance
+   * @param namespace        the namespace of this config instance
+   * @param configRepository the config repository for this config instance
+   */
+  public DefaultConfig(String appId, String namespace, ConfigRepository configRepository) {
+    if (appId == null) {
+      appId = ApolloInjector.getInstance(ConfigUtil.class).getAppId();
+    }
+    m_appId = appId;
     m_namespace = namespace;
-    m_resourceProperties = loadFromResource(m_namespace);
+    m_resourceProperties = loadFromResource(m_appId, m_namespace);
     m_configRepository = configRepository;
     m_configProperties = new AtomicReference<>();
     m_warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -219,6 +238,11 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   @Override
   public synchronized void onRepositoryChange(String namespace, Properties newProperties) {
+    this.onRepositoryChange(m_appId, m_namespace, newProperties);
+  }
+
+  @Override
+  public synchronized void onRepositoryChange(String appId, String namespace, Properties newProperties) {
     if (newProperties.equals(m_configProperties.get())) {
       return;
     }
@@ -235,7 +259,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
       return;
     }
 
-    this.fireConfigChange(m_namespace, actualChanges);
+    this.fireConfigChange(m_appId, m_namespace, actualChanges);
 
     Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
   }
@@ -248,7 +272,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
   private Map<String, ConfigChange> updateAndCalcConfigChanges(Properties newConfigProperties,
       ConfigSourceType sourceType) {
     List<ConfigChange> configChanges =
-        calcPropertyChanges(m_namespace, m_configProperties.get(), newConfigProperties);
+        calcPropertyChanges(m_appId, m_namespace, m_configProperties.get(), newConfigProperties);
 
     ImmutableMap.Builder<String, ConfigChange> actualChanges =
         new ImmutableMap.Builder<>();
@@ -299,10 +323,16 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
     return actualChanges.build();
   }
 
-  private Properties loadFromResource(String namespace) {
-    String name = String.format("META-INF/config/%s.properties", namespace);
+  private Properties loadFromResource(String appId, String namespace) {
+    String name = String.format("META-INF/config/%s+%s.properties", appId, namespace);
     InputStream in = ClassLoaderUtil.getLoader().getResourceAsStream(name);
     Properties properties = null;
+
+    if (StringUtils.equals(ApolloInjector.getInstance(ConfigUtil.class).getAppId(), appId)
+        && in == null) {
+      name = String.format("META-INF/config/%s.properties", namespace);
+      in = ClassLoaderUtil.getLoader().getResourceAsStream(name);
+    }
 
     if (in != null) {
       properties = propertiesFactory.getPropertiesInstance();
@@ -311,7 +341,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
         properties.load(in);
       } catch (IOException ex) {
         Tracer.logError(ex);
-        logger.error("Load resource config for namespace {} failed", namespace, ex);
+        logger.error("Load resource config for appId {} namespace {} failed", appId, namespace, ex);
       } finally {
         try {
           in.close();

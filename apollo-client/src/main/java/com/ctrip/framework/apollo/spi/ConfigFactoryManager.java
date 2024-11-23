@@ -27,4 +27,12 @@ public interface ConfigFactoryManager {
    * @return the config factory for this namespace
    */
   ConfigFactory getFactory(String namespace);
+
+  /**
+   * Get the config factory for the namespace.
+   *
+   * @param namespace the namespace
+   * @return the config factory for this namespace
+   */
+  ConfigFactory getFactory(String appId, String namespace);
 }

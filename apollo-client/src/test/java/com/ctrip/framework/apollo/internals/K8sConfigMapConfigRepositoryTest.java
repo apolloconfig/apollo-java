@@ -78,7 +78,7 @@ public class K8sConfigMapConfigRepositoryTest {
                 .metadata(new V1ObjectMeta().name(someAppId).namespace(someNamespace))
                 .data(data);
 
-        k8sConfigMapConfigRepository = new K8sConfigMapConfigRepository(someNamespace, upstreamRepo);
+        k8sConfigMapConfigRepository = new K8sConfigMapConfigRepository(someAppId, someNamespace, upstreamRepo);
     }
 
     /**
@@ -164,7 +164,7 @@ public class K8sConfigMapConfigRepositoryTest {
         Properties newProperties = new Properties();
         newProperties.setProperty(defaultKey, defaultValue);
         // Act
-        k8sConfigMapConfigRepository.onRepositoryChange(someNamespace, newProperties);
+        k8sConfigMapConfigRepository.onRepositoryChange(someAppId, someNamespace, newProperties);
         // Assert
         verify(kubernetesManager, times(1)).updateConfigMap(anyString(), anyString(), anyMap());
     }

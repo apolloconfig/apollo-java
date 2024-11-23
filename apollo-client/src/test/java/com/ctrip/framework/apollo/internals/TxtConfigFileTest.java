@@ -31,12 +31,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TxtConfigFileTest {
 
+  private String someAppId;
   private String someNamespace;
   @Mock
   private ConfigRepository configRepository;
 
   @Before
   public void setUp() throws Exception {
+    someAppId = "someAppId";
     someNamespace = "someName";
   }
 
@@ -49,9 +51,10 @@ public class TxtConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    TxtConfigFile configFile = new TxtConfigFile(someNamespace, configRepository);
+    TxtConfigFile configFile = new TxtConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(ConfigFileFormat.TXT, configFile.getConfigFileFormat());
+    assertEquals(someAppId, configFile.getAppId());
     assertEquals(someNamespace, configFile.getNamespace());
     assertTrue(configFile.hasContent());
     assertEquals(someValue, configFile.getContent());

@@ -44,6 +44,7 @@ import java.util.Properties;
 public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         implements RepositoryChangeListener {
     private static final Logger logger = DeferredLoggerFactory.getLogger(K8sConfigMapConfigRepository.class);
+    private final String appId;
     private final String namespace;
     private String configMapName;
     private String configMapKey;
@@ -55,8 +56,8 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
     private volatile ConfigSourceType sourceType = ConfigSourceType.CONFIGMAP;
     private static final Gson GSON = new Gson();
 
-
-    public K8sConfigMapConfigRepository(String namespace, ConfigRepository upstream) {
+    public K8sConfigMapConfigRepository(String appId, String namespace, ConfigRepository upstream) {
+        this.appId = appId;
         this.namespace = namespace;
         configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         kubernetesManager = ApolloInjector.getInstance(KubernetesManager.class);
@@ -218,6 +219,11 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
         persistConfigMap(configMapProperties);
     }
 
+    @Override
+    public void onRepositoryChange(String namespace, Properties newProperties) {
+        this.onRepositoryChange(appId, namespace, newProperties);
+    }
+
     /**
      * Update the memory
      *
@@ -225,14 +231,14 @@ public class K8sConfigMapConfigRepository extends AbstractConfigRepository
      * @param newProperties the properties after change
      */
     @Override
-    public void onRepositoryChange(String namespace, Properties newProperties) {
+    public void onRepositoryChange(String appId, String namespace, Properties newProperties) {
         if (newProperties == null || newProperties.equals(configMapProperties)) {
             return;
         }
         Properties newFileProperties = propertiesFactory.getPropertiesInstance();
         newFileProperties.putAll(newProperties);
         updateConfigMapProperties(newFileProperties, upstream.getSourceType());
-        this.fireRepositoryChange(namespace, newProperties);
+        this.fireRepositoryChange(appId, namespace, newProperties);
     }
 
     void persistConfigMap(Properties properties) {

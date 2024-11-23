@@ -38,10 +38,12 @@ public class DefaultConfigFactoryFileCachePropertyTest {
 
   private DefaultConfigFactory configFactory;
   private ConfigUtil someConfigUtil;
+  private String someAppId;
   private String someNamespace;
 
   @Before
   public void setUp() throws Exception {
+    someAppId = "someAppId";
     someNamespace = "someNamespace";
     someConfigUtil = mock(ConfigUtil.class);
     MockInjector.setInstance(ConfigUtil.class, someConfigUtil);
@@ -53,11 +55,11 @@ public class DefaultConfigFactoryFileCachePropertyTest {
     LocalFileConfigRepository someLocalConfigRepository = mock(LocalFileConfigRepository.class);
     when(someConfigUtil.isPropertyFileCacheEnabled()).thenReturn(true);
     doReturn(someLocalConfigRepository).when(configFactory)
-        .createLocalConfigRepository(someNamespace);
-    ConfigRepository configRepository = configFactory.createConfigRepository(someNamespace);
+        .createLocalConfigRepository(someAppId, someNamespace);
+    ConfigRepository configRepository = configFactory.createConfigRepository(someAppId, someNamespace);
     assertSame(someLocalConfigRepository, configRepository);
-    verify(configFactory, times(1)).createLocalConfigRepository(someNamespace);
-    verify(configFactory, never()).createRemoteConfigRepository(someNamespace);
+    verify(configFactory, times(1)).createLocalConfigRepository(someAppId, someNamespace);
+    verify(configFactory, never()).createRemoteConfigRepository(someAppId, someNamespace);
   }
 
   @Test
@@ -65,11 +67,11 @@ public class DefaultConfigFactoryFileCachePropertyTest {
     RemoteConfigRepository someRemoteConfigRepository = mock(RemoteConfigRepository.class);
     when(someConfigUtil.isPropertyFileCacheEnabled()).thenReturn(false);
     doReturn(someRemoteConfigRepository).when(configFactory)
-        .createRemoteConfigRepository(someNamespace);
-    ConfigRepository configRepository = configFactory.createConfigRepository(someNamespace);
+        .createRemoteConfigRepository(someAppId, someNamespace);
+    ConfigRepository configRepository = configFactory.createConfigRepository(someAppId, someNamespace);
     assertSame(someRemoteConfigRepository, configRepository);
-    verify(configFactory, never()).createLocalConfigRepository(someNamespace);
-    verify(configFactory, times(1)).createRemoteConfigRepository(someNamespace);
+    verify(configFactory, never()).createLocalConfigRepository(someAppId, someNamespace);
+    verify(configFactory, times(1)).createRemoteConfigRepository(someAppId, someNamespace);
   }
 
   @After
