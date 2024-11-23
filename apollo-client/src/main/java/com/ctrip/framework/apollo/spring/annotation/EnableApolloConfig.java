@@ -73,8 +73,8 @@ public @interface EnableApolloConfig {
   /**
    * Additional appId and namespace configurations. Will not participate in bootstrap
    * e.g.
-   *   @EnableApolloConfig(value = {"mainAppId", "APPLICATION_YAML_NAMESPACE"},
-   *       multipleConfigs = {@MultipleConfig(appId = "multipleAppId", namespaces = {"namespace2"}, secert="${xxxx.secret}")})
+   *   @EnableApolloConfig(value = {"someNamespace", "anotherNamespace"},
+   *       multipleConfigs = {@MultipleConfig(appId = "anotherAppId", namespaces = {"yetAnotherNamespace"}, secert="${xxxx.secret}")})
    * @since 2.4.0
    */
   MultipleConfig[] multipleConfigs() default {};

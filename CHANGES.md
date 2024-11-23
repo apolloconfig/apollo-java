@@ -13,7 +13,5 @@ Apollo Java 2.4.0
 * [Feature support pulling configuration information from multiple AppIds](https://github.com/apolloconfig/apollo-java/pull/70)
 
 
-
-
 ------------------
 All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/4?closed=1)
