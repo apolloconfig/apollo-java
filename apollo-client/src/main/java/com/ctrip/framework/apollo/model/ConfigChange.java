@@ -24,6 +24,7 @@ import com.ctrip.framework.apollo.enums.PropertyChangeType;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ConfigChange {
+  private final String appId;
   private final String namespace;
   private final String propertyName;
   private String oldValue;
@@ -32,21 +33,22 @@ public class ConfigChange {
 
   /**
    * Constructor.
+   * @param appId the appId of the key
    * @param namespace the namespace of the key
    * @param propertyName the key whose value is changed
    * @param oldValue the value before change
    * @param newValue the value after change
    * @param changeType the change type
    */
-  public ConfigChange(String namespace, String propertyName, String oldValue, String newValue,
+  public ConfigChange(String appId, String namespace, String propertyName, String oldValue, String newValue,
                       PropertyChangeType changeType) {
+    this.appId = appId;
     this.namespace = namespace;
     this.propertyName = propertyName;
     this.oldValue = oldValue;
     this.newValue = newValue;
     this.changeType = changeType;
   }
-
   public String getPropertyName() {
     return propertyName;
   }
@@ -75,6 +77,10 @@ public class ConfigChange {
     this.changeType = changeType;
   }
 
+  public String getAppId() {
+    return appId;
+  }
+
   public String getNamespace() {
     return namespace;
   }
@@ -82,7 +88,8 @@ public class ConfigChange {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ConfigChange{");
-    sb.append("namespace='").append(namespace).append('\'');
+    sb.append("appid='").append(appId).append('\'');
+    sb.append(", namespace='").append(namespace).append('\'');
     sb.append(", propertyName='").append(propertyName).append('\'');
     sb.append(", oldValue='").append(oldValue).append('\'');
     sb.append(", newValue='").append(newValue).append('\'');

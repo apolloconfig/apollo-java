@@ -19,11 +19,13 @@ package com.ctrip.framework.apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.ctrip.framework.apollo.internals.ConfigMonitorInitializer;
 import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigRegistry;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 
 /**
  * Entry point for client config use
@@ -91,6 +93,10 @@ public class ConfigService {
     return s_instance.getManager().getConfig(namespace);
   }
 
+  public static Config getConfig(String appId, String namespace) {
+    return s_instance.getManager().getConfig(appId, namespace);
+  }
+
   public static ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
     return s_instance.getManager().getConfigFile(namespace, configFileFormat);
   }
@@ -111,13 +117,29 @@ public class ConfigService {
    */
   static void setConfig(String namespace, final Config config) {
     s_instance.getRegistry().register(namespace, new ConfigFactory() {
+
+      private final ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+
       @Override
       public Config create(String namespace) {
         return config;
       }
 
       @Override
+      public Config create(String appId, String namespace) {
+        if(!StringUtils.equals(appId, m_configUtil.getAppId())){
+          throw new IllegalArgumentException("Provided appId '" + appId + "' does not match the default appId '" + m_configUtil.getAppId() + "'");
+        }
+        return config;
+      }
+
+      @Override
       public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+        return null;
+      }
+
+      @Override
+      public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
         return null;
       }
 

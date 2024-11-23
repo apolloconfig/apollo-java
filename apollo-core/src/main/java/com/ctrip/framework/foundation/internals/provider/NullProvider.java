@@ -85,6 +85,11 @@ public class NullProvider implements ApplicationProvider, NetworkProvider, Serve
   }
 
   @Override
+  public String getAccessKeySecret(String appId) {
+    return null;
+  }
+
+  @Override
   public String getHostAddress() {
     return null;
   }

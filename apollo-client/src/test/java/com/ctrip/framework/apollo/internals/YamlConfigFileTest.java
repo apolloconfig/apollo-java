@@ -39,6 +39,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class YamlConfigFileTest {
 
+  private String someAppId;
   private String someNamespace;
   @Mock
   private ConfigRepository configRepository;
@@ -51,6 +52,7 @@ public class YamlConfigFileTest {
 
   @Before
   public void setUp() throws Exception {
+    someAppId = "someAppId";
     someNamespace = "someName";
 
     MockInjector.setInstance(YamlParser.class, yamlParser);
@@ -84,7 +86,7 @@ public class YamlConfigFileTest {
     when(configRepository.getSourceType()).thenReturn(someSourceType);
     when(yamlParser.yamlToProperties(someContent)).thenReturn(yamlProperties);
 
-    YamlConfigFile configFile = new YamlConfigFile(someNamespace, configRepository);
+    YamlConfigFile configFile = new YamlConfigFile(someAppId, someNamespace, configRepository);
 
     assertSame(someContent, configFile.getContent());
     assertSame(yamlProperties, configFile.asProperties());
@@ -110,7 +112,7 @@ public class YamlConfigFileTest {
     when(configRepository.getSourceType()).thenReturn(someSourceType);
     when(yamlParser.yamlToProperties(someContent)).thenReturn(yamlProperties);
 
-    YamlConfigFile configFile = new YamlConfigFile(someNamespace, configRepository);
+    YamlConfigFile configFile = new YamlConfigFile(someAppId, someNamespace, configRepository);
 
     assertSame(someContent, configFile.getContent());
     assertSame(yamlProperties, configFile.asProperties());
@@ -124,7 +126,7 @@ public class YamlConfigFileTest {
   public void testWhenHasNoContent() throws Exception {
     when(configRepository.getConfig()).thenReturn(null);
 
-    YamlConfigFile configFile = new YamlConfigFile(someNamespace, configRepository);
+    YamlConfigFile configFile = new YamlConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -147,7 +149,7 @@ public class YamlConfigFileTest {
     when(yamlParser.yamlToProperties(someInvalidContent))
         .thenThrow(new RuntimeException("some exception"));
 
-    YamlConfigFile configFile = new YamlConfigFile(someNamespace, configRepository);
+    YamlConfigFile configFile = new YamlConfigFile(someAppId, someNamespace, configRepository);
 
     assertSame(someInvalidContent, configFile.getContent());
 
@@ -166,7 +168,7 @@ public class YamlConfigFileTest {
   public void testWhenConfigRepositoryHasError() throws Exception {
     when(configRepository.getConfig()).thenThrow(new RuntimeException("someError"));
 
-    YamlConfigFile configFile = new YamlConfigFile(someNamespace, configRepository);
+    YamlConfigFile configFile = new YamlConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -198,7 +200,7 @@ public class YamlConfigFileTest {
     when(yamlParser.yamlToProperties(someValue)).thenReturn(someYamlProperties);
     when(yamlParser.yamlToProperties(anotherValue)).thenReturn(anotherYamlProperties);
 
-    YamlConfigFile configFile = new YamlConfigFile(someNamespace, configRepository);
+    YamlConfigFile configFile = new YamlConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(someValue, configFile.getContent());
     assertEquals(someSourceType, configFile.getSourceType());
@@ -210,7 +212,7 @@ public class YamlConfigFileTest {
     ConfigSourceType anotherSourceType = ConfigSourceType.REMOTE;
     when(configRepository.getSourceType()).thenReturn(anotherSourceType);
 
-    configFile.onRepositoryChange(someNamespace, anotherProperties);
+    configFile.onRepositoryChange(someAppId, someNamespace, anotherProperties);
 
     assertEquals(anotherValue, configFile.getContent());
     assertEquals(anotherSourceType, configFile.getSourceType());
@@ -233,14 +235,14 @@ public class YamlConfigFileTest {
     when(configRepository.getSourceType()).thenReturn(someSourceType);
     when(yamlParser.yamlToProperties(someValue)).thenReturn(someYamlProperties);
 
-    YamlConfigFile configFile = new YamlConfigFile(someNamespace, configRepository);
+    YamlConfigFile configFile = new YamlConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
     assertEquals(ConfigSourceType.NONE, configFile.getSourceType());
     assertTrue(configFile.asProperties().isEmpty());
 
-    configFile.onRepositoryChange(someNamespace, someProperties);
+    configFile.onRepositoryChange(someAppId, someNamespace, someProperties);
 
     assertTrue(configFile.hasContent());
     assertEquals(someValue, configFile.getContent());

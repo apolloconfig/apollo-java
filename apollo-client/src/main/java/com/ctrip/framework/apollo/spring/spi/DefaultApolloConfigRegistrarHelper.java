@@ -16,7 +16,9 @@
  */
 package com.ctrip.framework.apollo.spring.spi;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.spi.Ordered;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.spring.annotation.ApolloAnnotationProcessor;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.ctrip.framework.apollo.spring.annotation.SpringValueProcessor;
@@ -24,9 +26,8 @@ import com.ctrip.framework.apollo.spring.config.PropertySourcesProcessor;
 import com.ctrip.framework.apollo.spring.property.AutoUpdateConfigChangeListener;
 import com.ctrip.framework.apollo.spring.property.SpringValueDefinitionProcessor;
 import com.ctrip.framework.apollo.spring.util.BeanRegistrationUtil;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -35,9 +36,14 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrarHelper {
   private static final Logger logger = LoggerFactory.getLogger(
       DefaultApolloConfigRegistrarHelper.class);
+
+  private final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   private Environment environment;
 
@@ -47,8 +53,26 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
         .fromMap(importingClassMetadata.getAnnotationAttributes(EnableApolloConfig.class.getName()));
     final String[] namespaces = attributes.getStringArray("value");
     final int order = attributes.getNumber("order");
-    final String[] resolvedNamespaces = this.resolveNamespaces(namespaces);
-    PropertySourcesProcessor.addNamespaces(Lists.newArrayList(resolvedNamespaces), order);
+
+    // put main appId
+    PropertySourcesProcessor.addNamespaces(configUtil.getAppId(), Lists.newArrayList(this.resolveNamespaces(namespaces)), order);
+
+    // put multiple appId into
+    AnnotationAttributes[] multipleConfigs = attributes.getAnnotationArray("multipleConfigs");
+    if (multipleConfigs != null) {
+      for (AnnotationAttributes multipleConfig : multipleConfigs) {
+        String appId = multipleConfig.getString("appId");
+        String[] multipleNamespaces = this.resolveNamespaces(multipleConfig.getStringArray("namespaces"));
+        String secret = resolveSecret(multipleConfig.getString("secret"));
+        int multipleOrder = multipleConfig.getNumber("order");
+
+        // put multiple secret into system property
+        if (!StringUtils.isBlank(secret)) {
+          System.setProperty("apollo.accesskey." + appId + ".secret", secret);
+        }
+        PropertySourcesProcessor.addNamespaces(appId, Lists.newArrayList(multipleNamespaces), multipleOrder);
+      }
+    }
 
     Map<String, Object> propertySourcesPlaceholderPropertyValues = new HashMap<>();
     // to make sure the default PropertySourcesPlaceholderConfigurer's priority is higher than PropertyPlaceholderConfigurer
@@ -75,6 +99,16 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
       resolvedNamespaces[i] = this.environment.resolveRequiredPlaceholders(namespaces[i]);
     }
     return resolvedNamespaces;
+  }
+
+  private String resolveSecret(String secret){
+    if (this.environment == null) {
+      if (secret != null && secret.contains("${")) {
+        logger.warn("secret placeholder {} is not supported for Spring version prior to 3.2.x", secret);
+      }
+      return secret;
+    }
+    return this.environment.resolveRequiredPlaceholders(secret);
   }
 
   private void logNamespacePlaceholderNotSupportedMessage(String[] namespaces) {

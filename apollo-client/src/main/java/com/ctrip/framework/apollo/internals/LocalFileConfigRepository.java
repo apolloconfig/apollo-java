@@ -50,6 +50,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     implements RepositoryChangeListener {
   private static final Logger logger = DeferredLoggerFactory.getLogger(LocalFileConfigRepository.class);
   private static final String CONFIG_DIR = "/config-cache";
+  private final String m_appId;
   private final String m_namespace;
   private File m_baseDir;
   private final ConfigUtil m_configUtil;
@@ -63,11 +64,12 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
    *
    * @param namespace the namespace
    */
-  public LocalFileConfigRepository(String namespace) {
-    this(namespace, null);
+  public LocalFileConfigRepository(String appId, String namespace) {
+    this(appId, namespace, null);
   }
 
-  public LocalFileConfigRepository(String namespace, ConfigRepository upstream) {
+  public LocalFileConfigRepository(String appId, String namespace, ConfigRepository upstream) {
+    m_appId = appId;
     m_namespace = namespace;
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     this.setLocalCacheDir(findLocalCacheDir(), false);
@@ -84,7 +86,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
 
   private File findLocalCacheDir() {
     try {
-      String defaultCacheDir = m_configUtil.getDefaultLocalCacheDir();
+      String defaultCacheDir = m_configUtil.getDefaultLocalCacheDir(m_appId);
       Path path = Paths.get(defaultCacheDir);
       if (!Files.exists(path)) {
         Files.createDirectories(path);
@@ -129,13 +131,18 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
 
   @Override
   public void onRepositoryChange(String namespace, Properties newProperties) {
+    this.onRepositoryChange(m_appId, namespace, newProperties);
+  }
+
+  @Override
+  public void onRepositoryChange(String appId, String namespace, Properties newProperties) {
     if (newProperties.equals(m_fileProperties)) {
       return;
     }
     Properties newFileProperties = propertiesFactory.getPropertiesInstance();
     newFileProperties.putAll(newProperties);
     updateFileProperties(newFileProperties, m_upstream.getSourceType());
-    this.fireRepositoryChange(namespace, newProperties);
+    this.fireRepositoryChange(appId, namespace, newProperties);
   }
 
   @Override
@@ -151,7 +158,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     Throwable exception = null;
     try {
       transaction.addData("Basedir", m_baseDir.getAbsolutePath());
-      m_fileProperties = this.loadFromLocalCacheFile(m_baseDir, m_namespace);
+      m_fileProperties = this.loadFromLocalCacheFile(m_baseDir, m_appId, m_namespace);
       m_sourceType = ConfigSourceType.LOCAL;
       transaction.setStatus(Transaction.SUCCESS);
     } catch (Throwable ex) {
@@ -192,13 +199,13 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
       return;
     }
     this.m_fileProperties = newProperties;
-    persistLocalCacheFile(m_baseDir, m_namespace);
+    persistLocalCacheFile(m_baseDir, m_appId, m_namespace);
   }
 
-  private Properties loadFromLocalCacheFile(File baseDir, String namespace) throws IOException {
+  private Properties loadFromLocalCacheFile(File baseDir, String appId, String namespace) throws IOException {
     Preconditions.checkNotNull(baseDir, "Basedir cannot be null");
 
-    File file = assembleLocalCacheFile(baseDir, namespace);
+    File file = assembleLocalCacheFile(baseDir, appId, namespace);
     Properties properties = null;
 
     if (file.isFile() && file.canRead()) {
@@ -230,11 +237,11 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     return properties;
   }
 
-  void persistLocalCacheFile(File baseDir, String namespace) {
+  void persistLocalCacheFile(File baseDir, String appId, String namespace) {
     if (baseDir == null) {
       return;
     }
-    File file = assembleLocalCacheFile(baseDir, namespace);
+    File file = assembleLocalCacheFile(baseDir, appId, namespace);
 
     OutputStream out = null;
 
@@ -288,10 +295,10 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     }
   }
 
-  File assembleLocalCacheFile(File baseDir, String namespace) {
+  File assembleLocalCacheFile(File baseDir, String appId, String namespace) {
     String fileName =
         String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
-            .join(m_configUtil.getAppId(), m_configUtil.getCluster(), namespace));
+            .join(appId, m_configUtil.getCluster(), namespace));
     return new File(baseDir, fileName);
   }
 }

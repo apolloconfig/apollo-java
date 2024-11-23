@@ -71,6 +71,7 @@ public class ConfigUtil {
   private boolean propertyNamesCacheEnabled = false;
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
+  private boolean propertyKubernetesCacheEnabled = false;
   private boolean clientMonitorEnabled = false;
   private boolean clientMonitorJmxEnabled = false;
   private String monitorExternalType = "NONE";
@@ -91,6 +92,7 @@ public class ConfigUtil {
     initPropertyNamesCacheEnabled();
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
+    initPropertyKubernetesCacheEnabled();
     initClientMonitorEnabled();
     initClientMonitorJmxEnabled();
     initClientMonitorExternalType();
@@ -318,6 +320,17 @@ public class ConfigUtil {
     return String.format(cacheRoot, getAppId());
   }
 
+  public String getDefaultLocalCacheDir(String appId) {
+    String cacheRoot = getCustomizedCacheRoot();
+
+    if (!Strings.isNullOrEmpty(cacheRoot)) {
+      return cacheRoot + File.separator + appId;
+    }
+
+    cacheRoot = isOSWindows() ? "C:\\opt\\data\\%s" : "/opt/data/%s";
+    return String.format(cacheRoot, appId);
+  }
+
   private String getCustomizedCacheRoot() {
     // 1. Get from System Property
     String cacheRoot = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR);
@@ -374,6 +387,34 @@ public class ConfigUtil {
       }
     }
     return cacheRoot;
+  }
+
+  public String getK8sNamespace() {
+    String k8sNamespace = getCacheKubernetesNamespace();
+
+    if (!Strings.isNullOrEmpty(k8sNamespace)) {
+      return k8sNamespace;
+    }
+
+    return ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT;
+  }
+
+  private String getCacheKubernetesNamespace() {
+    // 1. Get from System Property
+    String k8sNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 2. Get from OS environment variable
+      k8sNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES);
+    }
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 3. Get from server.properties
+      k8sNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+    }
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 4. Get from app.properties
+      k8sNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+    }
+    return k8sNamespace;
   }
 
   public boolean isInLocalMode() {
@@ -479,6 +520,10 @@ public class ConfigUtil {
     return propertyFileCacheEnabled;
   }
 
+  public boolean isPropertyKubernetesCacheEnabled() {
+    return propertyKubernetesCacheEnabled;
+  }
+
   public boolean isOverrideSystemProperties() {
     return overrideSystemProperties;
   }
@@ -500,11 +545,15 @@ public class ConfigUtil {
             ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
             overrideSystemProperties);
   }
-  
-  
+
+  private void initPropertyKubernetesCacheEnabled() {
+    propertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
+            ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES,
+            propertyKubernetesCacheEnabled);
+  }
+
   private void initClientMonitorExternalType() {
     monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
-
     if (Strings.isNullOrEmpty(monitorExternalType)) {
       monitorExternalType = Foundation.app()
               .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "NONE");
@@ -586,5 +635,9 @@ public class ConfigUtil {
       }
     }
     return defaultVal;
+  }
+
+  public String getAccessKeySecret(String appId){
+    return Foundation.app().getAccessKeySecret(appId);
   }
 }

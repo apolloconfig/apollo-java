@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,6 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.enums.Env;
 import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -119,9 +119,10 @@ public abstract class BaseIntegrationTest {
     System.setProperty(ConfigConsts.APOLLO_META_KEY, metaServiceUrl);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
-    MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
+    MockConfigUtil mockConfigUtil = new MockConfigUtil();
+    MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
+    configDir = new File(mockConfigUtil.getDefaultLocalCacheDir(someAppId)+ "/config-cache");
 
-    configDir = new File(ClassLoaderUtil.getClassPath() + "config-cache");
     if (configDir.exists()) {
       configDir.delete();
     }
@@ -274,6 +275,16 @@ public abstract class BaseIntegrationTest {
     @Override
     public boolean isPropertiesOrderEnabled() {
       return propertiesOrderEnabled;
+    }
+
+    @Override
+    public String getDefaultLocalCacheDir(String appId) {
+      String path = ClassLoaderUtil.getClassPath() + "/" + appId;
+      if(isOSWindows()){
+        // because there is an extra / in front of the windows system
+        path = Paths.get(path.substring(1)).toString();
+      }
+      return path;
     }
   }
 

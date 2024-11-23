@@ -50,6 +50,13 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 @Documented
 public @interface ApolloConfig {
   /**
+   * Apollo appId for the config, if not specified then default to the global appid
+   *
+   * @since 2.4.0
+   */
+  String appId() default "";
+  
+  /**
    * Apollo namespace for the config, if not specified then default to application
    */
   String value() default ConfigConsts.NAMESPACE_APPLICATION;

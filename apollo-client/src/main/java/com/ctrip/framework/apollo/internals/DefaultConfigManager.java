@@ -25,8 +25,12 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.google.common.collect.HashBasedTable;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import java.util.Map;
 
 /**
@@ -35,29 +39,41 @@ import java.util.Map;
 public class DefaultConfigManager implements ConfigManager {
   private ConfigFactoryManager m_factoryManager;
 
-  private Map<String, Config> m_configs = Maps.newConcurrentMap();
+  private ConfigUtil m_configUtil;
+
+  private Table<String, String, Config> m_configs = Tables.synchronizedTable(HashBasedTable.create());
+
   private Map<String, Object> m_configLocks = Maps.newConcurrentMap();
-  private Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
+
+  private Table<String, String, ConfigFile> m_configFiles = Tables.synchronizedTable(HashBasedTable.create());
+
   private Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
+
 
   public DefaultConfigManager() {
     m_factoryManager = ApolloInjector.getInstance(ConfigFactoryManager.class);
+    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   @Override
   public Config getConfig(String namespace) {
-    Config config = m_configs.get(namespace);
+    return getConfig(m_configUtil.getAppId(), namespace);
+  }
     
+  @Override
+  public Config getConfig(String appId, String namespace) {
+    Config config = m_configs.get(appId, namespace);
+
     if (config == null) {
-      Object lock = m_configLocks.computeIfAbsent(namespace, key -> new Object());
+      Object lock = m_configLocks.computeIfAbsent(String.format("%s.%s", appId, namespace), key -> new Object());
       synchronized (lock) {
-        config = m_configs.get(namespace);
+        config = m_configs.get(appId, namespace);
 
         if (config == null) {
-          ConfigFactory factory = m_factoryManager.getFactory(namespace);
+          ConfigFactory factory = m_factoryManager.getFactory(appId, namespace);
 
-          config = factory.create(namespace);
-          m_configs.put(namespace, config);
+          config = factory.create(appId, namespace);
+          m_configs.put(appId, namespace, config);
         }
       }
     }
@@ -70,19 +86,25 @@ public class DefaultConfigManager implements ConfigManager {
 
   @Override
   public ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+    return getConfigFile(m_configUtil.getAppId(), namespace, configFileFormat);
+  }
+
+  @Override
+  public ConfigFile getConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
     String namespaceFileName = String.format("%s.%s", namespace, configFileFormat.getValue());
-    ConfigFile configFile = m_configFiles.get(namespaceFileName);
+    String lockNamespaceFileName = String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue());
+    ConfigFile configFile = m_configFiles.get(appId, namespaceFileName);
 
     if (configFile == null) {
-      Object lock = m_configFileLocks.computeIfAbsent(namespaceFileName, key -> new Object());
+      Object lock = m_configFileLocks.computeIfAbsent(lockNamespaceFileName, key -> new Object());
       synchronized (lock) {
-        configFile = m_configFiles.get(namespaceFileName);
+        configFile = m_configFiles.get(appId, namespaceFileName);
 
         if (configFile == null) {
-          ConfigFactory factory = m_factoryManager.getFactory(namespaceFileName);
+          ConfigFactory factory = m_factoryManager.getFactory(appId, namespaceFileName);
 
-          configFile = factory.createConfigFile(namespaceFileName, configFileFormat);
-          m_configFiles.put(namespaceFileName, configFile);
+          configFile = factory.createConfigFile(appId, namespaceFileName, configFileFormat);
+          m_configFiles.put(appId, namespaceFileName, configFile);
         }
       }
     }

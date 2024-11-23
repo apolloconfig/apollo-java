@@ -340,6 +340,10 @@ public class StringUtils {
     return true;
   }
 
+  public static String defaultIfBlank(String s, String appId) {
+    return isBlank(s) ? appId : s;
+  }
+
   public interface StringFormatter<T> {
     String format(T obj);
   }
