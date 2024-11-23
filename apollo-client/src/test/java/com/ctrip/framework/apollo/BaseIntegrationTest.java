@@ -17,7 +17,6 @@
 package com.ctrip.framework.apollo;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
-import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
@@ -29,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -141,7 +141,6 @@ public abstract class BaseIntegrationTest {
     ConfigService.reset();
     MockInjector.reset();
     System.clearProperty(ConfigConsts.APOLLO_META_KEY);
-    System.clearProperty(ApolloClientSystemConsts.APP_ID);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     if (mockedConfigService != null) {
@@ -283,7 +282,7 @@ public abstract class BaseIntegrationTest {
       String path = ClassLoaderUtil.getClassPath() + "/" + appId;
       if(isOSWindows()){
         // because there is an extra / in front of the windows system
-        path = path.substring(1,path.length()-1);
+        path = Paths.get(path.substring(1)).toString();
       }
       return path;
     }

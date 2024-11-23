@@ -57,8 +57,6 @@ public class BootstrapConfigTest {
   private static final String TEST_BEAN_CONDITIONAL_ON_KEY = "apollo.test.testBean";
   private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
 
-  private static final String someAppId = "someAppId";
-
   @RunWith(SpringJUnit4ClassRunner.class)
   @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
   @DirtiesContext

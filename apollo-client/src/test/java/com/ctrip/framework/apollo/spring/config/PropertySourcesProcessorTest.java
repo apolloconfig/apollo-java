@@ -74,7 +74,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   public void tearDown() throws Exception {
     super.tearDown();
     PropertySourcesProcessor.reset();
-    //System.clearProperty(ApolloClientSystemConsts.APP_ID);
   }
 
   @Test

@@ -62,7 +62,7 @@ public abstract class AbstractSpringIntegrationTest {
   private static Method CONFIG_SERVICE_RESET;
   private static Method PROPERTY_SOURCES_PROCESSOR_RESET;
 
-  public final static String someAppId = "someAppId";
+  protected static String someAppId = "someAppId";
 
   static {
     try {

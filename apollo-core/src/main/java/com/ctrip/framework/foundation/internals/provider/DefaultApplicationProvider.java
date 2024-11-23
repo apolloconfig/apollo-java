@@ -122,7 +122,7 @@ public class DefaultApplicationProvider implements ApplicationProvider {
     if (Objects.equals(appId, m_appId)) {
       return getAccessKeySecret();
     }
-    return System.getProperty("apollo.accesskey." + appId + ".secret", "");
+    return System.getProperty("apollo.accesskey." + appId + ".secret", null);
   }
 
   private void initAppId() {

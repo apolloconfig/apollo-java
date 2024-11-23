@@ -66,7 +66,9 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
         int multipleOrder = multipleConfig.getNumber("order");
 
         // put multiple secret into system property
-        System.setProperty("apollo.accesskey." + appId + ".secret", secret);
+        if(secret != null){
+          System.setProperty("apollo.accesskey." + appId + ".secret", secret);
+        }
         PropertySourcesProcessor.addNamespaces(appId, Lists.newArrayList(multipleNamespaces), multipleOrder);
       }
     }

@@ -57,11 +57,7 @@ import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +77,7 @@ public class RemoteConfigLongPollService {
   private final AtomicBoolean m_longPollingStopped;
   private SchedulePolicy m_longPollFailSchedulePolicyInSecond;
   private RateLimiter m_longPollRateLimiter;
-  private final ConcurrentHashMap<String, Boolean> m_longPollStarted;
+  private final ConcurrentMap<String, Boolean> m_longPollStarted;
   private final Map<String, Multimap<String, RemoteConfigRepository>> m_longPollNamespaces;
   private final Table<String, String, Long> m_notifications;
   private final Map<String, ApolloNotificationMessages> m_remoteNotificationMessages;//namespaceName -> watchedKey -> notificationId
