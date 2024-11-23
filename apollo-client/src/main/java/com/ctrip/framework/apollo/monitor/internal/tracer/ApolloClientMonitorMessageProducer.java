@@ -25,8 +25,10 @@ import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEven
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventPublisher;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
+import com.ctrip.framework.apollo.util.date.DateUtil;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +99,7 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
         publishNamespaceNotFoundEvent(name);
         break;
       case APOLLO_CLIENT_CONFIGMETA:
-        // 不需要收集
+        // No need to collect
         break;
       default:
         break;
@@ -124,7 +126,7 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
     ApolloClientMonitorEventPublisher.publish(
         ApolloClientMonitorEventFactory.getInstance().createEvent(META_FRESH)
             .withTag(TAG_BOOTSTRAP)
-            .putAttachment(META_FRESH, LocalDate.now().toString()));
+            .putAttachment(META_FRESH, DateUtil.formatLocalDateTime(LocalDateTime.now())));
   }
 
   private void publishConfigServiceEvent(String name) {
