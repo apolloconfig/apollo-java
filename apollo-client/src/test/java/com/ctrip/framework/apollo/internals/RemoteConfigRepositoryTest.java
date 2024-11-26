@@ -31,10 +31,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.build.MockInjector;
-import com.ctrip.framework.apollo.core.dto.ApolloConfig;
-import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
-import com.ctrip.framework.apollo.core.dto.ApolloNotificationMessages;
-import com.ctrip.framework.apollo.core.dto.ServiceDTO;
+import com.ctrip.framework.apollo.core.dto.*;
+import com.ctrip.framework.apollo.core.enums.ConfigSyncType;
+import com.ctrip.framework.apollo.core.enums.ConfigurationChangeType;
 import com.ctrip.framework.apollo.core.signature.Signature;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
@@ -53,6 +52,7 @@ import com.google.common.net.UrlEscapers;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -151,6 +151,116 @@ public class RemoteConfigRepositoryTest {
     assertEquals(configurations, config);
     assertEquals(ConfigSourceType.REMOTE, remoteConfigRepository.getSourceType());
     remoteConfigLongPollService.stopLongPollingRefresh();
+  }
+
+  @Test
+  public void testLoadConfigWithIncrementalSync() throws Exception {
+
+    String someKey = "someKey";
+    String someValue = "someValue";
+    String someKey1 = "someKey1";
+    String someValue1 = "someKey1";
+    Map<String, String> configurations = Maps.newHashMap();
+    configurations.put(someKey, someValue);
+    configurations.put(someKey1, someValue1);
+    ApolloConfig someApolloConfig = assembleApolloConfig(configurations);
+
+    when(someResponse.getStatusCode()).thenReturn(200);
+    when(someResponse.getBody()).thenReturn(someApolloConfig);
+
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+
+   remoteConfigRepository.sync();
+
+
+    List<ConfigurationChange> configurationChanges=new ArrayList<>();
+    String someNewValue = "someNewValue";
+    configurationChanges.add(new ConfigurationChange(someKey, someNewValue, ConfigurationChangeType.MODIFIED));
+    configurationChanges.add(new ConfigurationChange(someKey1, null, ConfigurationChangeType.DELETED));
+    String someKey2 = "someKey2";
+    String someValue2 = "someValue2";
+    configurationChanges.add(new ConfigurationChange(someKey2, someValue2, ConfigurationChangeType.ADDED));
+    ApolloConfig someApolloConfigWithIncrementalSync = assembleApolloConfigWithIncrementalSync(configurationChanges);
+
+    when(someResponse.getStatusCode()).thenReturn(200);
+    when(someResponse.getBody()).thenReturn(someApolloConfigWithIncrementalSync);
+
+    remoteConfigRepository.sync();
+
+    Properties config = remoteConfigRepository.getConfig();
+
+    assertEquals(2, config.size());
+    assertEquals("someNewValue", config.getProperty("someKey"));
+    assertEquals("someValue2", config.getProperty("someKey2"));
+    assertEquals(ConfigSourceType.REMOTE, remoteConfigRepository.getSourceType());
+    remoteConfigLongPollService.stopLongPollingRefresh();
+  }
+
+  @Test
+  public void testMergeConfigurations() throws Exception {
+    String key1 = "key1";
+    String value1 = "value1";
+    String anotherValue1 = "anotherValue1";
+
+    String key3 = "key3";
+    String value3 = "value3";
+    Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1,key3,value3);
+
+    List<ConfigurationChange> configurationChanges=new ArrayList<>();
+    configurationChanges.add(new ConfigurationChange(key1, anotherValue1, ConfigurationChangeType.MODIFIED));
+    String key2 = "key2";
+    String value2 = "value2";
+    configurationChanges.add(new ConfigurationChange(key2, value2, ConfigurationChangeType.ADDED));
+    configurationChanges.add(new ConfigurationChange(key3, null, ConfigurationChangeType.DELETED));
+
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    Map<String, String> result=remoteConfigRepository.mergeConfigurations(previousConfigurations, configurationChanges);
+
+    assertEquals(2, result.size());
+    assertEquals(anotherValue1, result.get(key1));
+    assertEquals(value2, result.get(key2));
+  }
+  @Test
+  public void testMergeConfigurationWithPreviousConfigurationsIsNULL() throws Exception {
+    String key1 = "key1";
+    String value1 = "value1";
+
+    String key3 = "key3";
+    String value3 = "value3";
+
+    Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1,key3,value3);
+
+
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    Map<String, String> result=remoteConfigRepository.mergeConfigurations(previousConfigurations, null);
+
+    assertEquals(2, result.size());
+    assertEquals(value1, result.get(key1));
+    assertEquals(value3, result.get(key3));
+  }
+
+  @Test
+  public void testMergeConfigurationWithChangesIsNULL() throws Exception {
+    String key1 = "key1";
+    String value1 = "value1";
+    String anotherValue1 = "anotherValue1";
+
+    String key3 = "key3";
+    String value3 = "value3";
+
+    List<ConfigurationChange> configurationChanges=new ArrayList<>();
+    configurationChanges.add(new ConfigurationChange(key1, anotherValue1, ConfigurationChangeType.MODIFIED));
+    String key2 = "key2";
+    String value2 = "value2";
+    configurationChanges.add(new ConfigurationChange(key2, value2, ConfigurationChangeType.ADDED));
+    configurationChanges.add(new ConfigurationChange(key3, null, ConfigurationChangeType.DELETED));
+
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    Map<String, String> result=remoteConfigRepository.mergeConfigurations(null, configurationChanges);
+
+    assertEquals(2, result.size());
+    assertEquals(anotherValue1, result.get(key1));
+    assertEquals(value2, result.get(key2));
   }
 
   @Test
@@ -372,6 +482,17 @@ public class RemoteConfigRepositoryTest {
 
     apolloConfig.setConfigurations(configurations);
 
+    return apolloConfig;
+  }
+  private ApolloConfig assembleApolloConfigWithIncrementalSync(List<ConfigurationChange> configurationChanges) {
+    String someAppId = "appId";
+    String someClusterName = "cluster";
+    String someReleaseKey = "1";
+    ApolloConfig apolloConfig =
+            new ApolloConfig(someAppId, someClusterName, someNamespace, someReleaseKey);
+
+    apolloConfig.setConfigSyncType(ConfigSyncType.INCREMENTALSYNC.getValue());
+    apolloConfig.setConfigurationChanges(configurationChanges);
     return apolloConfig;
   }
 

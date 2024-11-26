@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.core.dto;
 
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +34,10 @@ public class ApolloConfig {
   private Map<String, String> configurations;
 
   private String releaseKey;
+
+  private String configSyncType;
+
+  private List<ConfigurationChange> configurationChanges;
 
   public ApolloConfig() {
   }
@@ -62,6 +68,14 @@ public class ApolloConfig {
     return releaseKey;
   }
 
+  public String getConfigSyncType() {
+    return configSyncType;
+  }
+
+  public List<ConfigurationChange> getConfigurationChanges() {
+    return configurationChanges;
+  }
+
   public Map<String, String> getConfigurations() {
     return configurations;
   }
@@ -82,9 +96,19 @@ public class ApolloConfig {
     this.releaseKey = releaseKey;
   }
 
+  public void setConfigSyncType(String configSyncType) {
+    this.configSyncType = configSyncType;
+  }
+
+
   public void setConfigurations(Map<String, String> configurations) {
     this.configurations = configurations;
   }
+
+  public void setConfigurationChanges(List<ConfigurationChange> configurationChanges) {
+    this.configurationChanges = configurationChanges;
+  }
+
 
   @Override
   public String toString() {
