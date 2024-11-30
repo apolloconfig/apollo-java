@@ -103,8 +103,7 @@ public class ConfigMonitorInitializer {
 
   private static void initializeMetricsExporter(
   ) {
-    if (StringUtils.isEmpty(m_configUtil.getMonitorExternalType()) || "NONE".equals(m_configUtil.
-            getMonitorExternalType())) {
+    if (StringUtils.isBlank(m_configUtil.getMonitorExternalType())) {
       return;
     }
     ApolloClientMetricsExporterFactory exporterFactory = ApolloInjector.getInstance(

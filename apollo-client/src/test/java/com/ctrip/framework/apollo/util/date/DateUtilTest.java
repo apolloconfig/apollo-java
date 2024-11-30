@@ -16,25 +16,27 @@
  */
 package com.ctrip.framework.apollo.util.date;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-/**
- * @author Rawven
- * @date 2024/10/19
- */
-public class DateUtil {
-	 public static final DateTimeFormatter MEDIUM_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+public class DateUtilTest {
 
-	/**
-	 * Formats a LocalDateTime object to a string using the MEDIUM_FORMATTER.
-	 *
-	 * @param localDateTime the LocalDateTime to format, can be null
-	 * @return the formatted date-time string, or null if the input is null
-	 */
-	public static Optional<String> formatLocalDateTime(LocalDateTime localDateTime) {
-		return Optional.ofNullable(localDateTime)
-				.map(dt -> dt.format(MEDIUM_FORMATTER));
-	}
+    @Test
+    public void testFormatLocalDateTime_validDate() {
+        LocalDateTime dateTime = LocalDateTime.of(2024, 12, 1, 10, 30, 0);
+        
+        Optional<String> formattedDate = DateUtil.formatLocalDateTime(dateTime);
+
+        assertTrue(formattedDate.isPresent()); 
+        assertEquals("2024-12-01 10:30:00", formattedDate.get());
+    }
+
+    @Test
+    public void testFormatLocalDateTime_nullDate() {
+        Optional<String> result = DateUtil.formatLocalDateTime(null);
+        
+        assertFalse(result.isPresent()); 
+    }
 }
