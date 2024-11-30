@@ -23,6 +23,7 @@ import static com.ctrip.framework.apollo.spring.config.PropertySourcesConstants.
 
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxBootstrapArgsMBean;
 import com.ctrip.framework.apollo.monitor.internal.listener.AbstractApolloClientMonitorEventListener;
@@ -33,6 +34,8 @@ import com.google.common.collect.Maps;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 
 /**
@@ -76,7 +79,8 @@ public class DefaultApolloClientBootstrapArgsApi extends
     putAttachmentValue(APP_ID, configUtil.getAppId());
     putAttachmentValue(ENV, configUtil.getApolloEnv());
     putAttachmentValue(VERSION, Apollo.VERSION);
-    putAttachmentValue(META_FRESH, DateUtil.formatLocalDateTime(LocalDateTime.now()));
+    Optional<String> date = DateUtil.formatLocalDateTime(LocalDateTime.now());
+    date.ifPresent(s -> putAttachmentValue(META_FRESH, s));
     putAttachmentValue(CONFIG_SERVICE_URL,"");
 
   }
@@ -92,8 +96,11 @@ public class DefaultApolloClientBootstrapArgsApi extends
   }
   
   private void putAttachmentValue(String argName, Object value) {
+    if(StringUtils.isBlank(argName) || value == null) {
+      return;
+    }
     bootstrapArgs.put(argName, value);
-    bootstrapArgsString.put(argName, value == null ? null : value.toString());
+    bootstrapArgsString.put(argName, value.toString());
   }
 
   @Override

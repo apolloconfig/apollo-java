@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Rawven
@@ -123,10 +124,11 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
   }
 
   private void publishMetaServiceEvent() {
+    Optional<String> date = DateUtil.formatLocalDateTime(LocalDateTime.now());
     ApolloClientMonitorEventPublisher.publish(
         ApolloClientMonitorEventFactory.getInstance().createEvent(META_FRESH)
             .withTag(TAG_BOOTSTRAP)
-            .putAttachment(META_FRESH, DateUtil.formatLocalDateTime(LocalDateTime.now())));
+            .putAttachment(META_FRESH, date.orElse("")));
   }
 
   private void publishConfigServiceEvent(String name) {

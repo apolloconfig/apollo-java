@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 
@@ -183,7 +184,8 @@ public class DefaultApolloClientNamespaceApi extends
     namespaces.forEach((namespace, metrics) -> {
       NamespaceMetricsString namespaceMetricsString = new NamespaceMetricsString();
       namespaceMetricsString.setFirstLoadTimeSpendInMs(metrics.getFirstLoadTimeSpendInMs());
-      namespaceMetricsString.setLatestUpdateTime(DateUtil.formatLocalDateTime(metrics.getLatestUpdateTime()));
+      Optional<String> date = DateUtil.formatLocalDateTime(metrics.getLatestUpdateTime());
+      date.ifPresent(namespaceMetricsString::setLatestUpdateTime);
       namespaceMetricsString.setUsageCount(metrics.getUsageCount());
       namespaceMetricsString.setReleaseKey(metrics.getReleaseKey());
       namespaceMetricsStringMap.put(namespace, namespaceMetricsString);

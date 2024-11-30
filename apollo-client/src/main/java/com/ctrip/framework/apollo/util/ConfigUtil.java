@@ -73,7 +73,7 @@ public class ConfigUtil {
   private boolean overrideSystemProperties = true;
   private boolean clientMonitorEnabled = false;
   private boolean clientMonitorJmxEnabled = false;
-  private String monitorExternalType = "NONE";
+  private String monitorExternalType = "";
   private long monitorExternalExportPeriod = 10;
   private int monitorExceptionQueueSize = 25;
 
@@ -507,7 +507,7 @@ public class ConfigUtil {
 
     if (Strings.isNullOrEmpty(monitorExternalType)) {
       monitorExternalType = Foundation.app()
-              .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "NONE");
+              .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "");
     }
   }
 
