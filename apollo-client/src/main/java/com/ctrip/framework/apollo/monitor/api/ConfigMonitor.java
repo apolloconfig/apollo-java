@@ -39,7 +39,7 @@ public interface ConfigMonitor {
   /**
    * get running params monitor api
    */
-  ApolloClientBootstrapArgsMonitorApi getRunningParamsMonitorApi();
+  ApolloClientBootstrapArgsMonitorApi getBootstrapArgsMonitorApi();
 
   /**
    * get monitor external system data
