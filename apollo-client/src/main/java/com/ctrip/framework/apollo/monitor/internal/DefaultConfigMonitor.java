@@ -49,7 +49,7 @@ public class DefaultConfigMonitor implements ConfigMonitor {
   }
 
   @Override
-  public ApolloClientBootstrapArgsMonitorApi getRunningParamsMonitorApi() {
+  public ApolloClientBootstrapArgsMonitorApi getBootstrapArgsMonitorApi() {
     return apolloClientMonitorContext.getBootstrapArgsApi();
   }
 

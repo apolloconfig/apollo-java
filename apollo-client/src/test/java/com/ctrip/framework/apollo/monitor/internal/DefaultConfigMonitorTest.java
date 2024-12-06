@@ -18,7 +18,6 @@ package com.ctrip.framework.apollo.monitor.internal;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientExceptionMonitorApi;
@@ -65,7 +64,7 @@ public class DefaultConfigMonitorTest {
   public void testApis(){
     assertSame(exceptionMonitorApi, configMonitor.getExceptionMonitorApi());
     assertSame(namespaceMonitorApi, configMonitor.getNamespaceMonitorApi());
-    assertSame(bootstrapArgsMonitorApi, configMonitor.getRunningParamsMonitorApi());
+    assertSame(bootstrapArgsMonitorApi, configMonitor.getBootstrapArgsMonitorApi());
     assertSame(threadPoolMonitorApi, configMonitor.getThreadPoolMonitorApi());
   }
 
