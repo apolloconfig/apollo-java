@@ -119,7 +119,7 @@ public class LocalFileConfigRepositoryTest {
     someProperties.setProperty(someKey, someValue);
     createLocalCachePropertyFile(someProperties);
 
-    LocalFileConfigRepository localRepo = new LocalFileConfigRepository(someNamespace);
+    LocalFileConfigRepository localRepo = new LocalFileConfigRepository(someAppId, someNamespace);
     localRepo.setLocalCacheDir(someBaseDir, true);
     Properties properties = localRepo.getConfig();
 
@@ -135,7 +135,7 @@ public class LocalFileConfigRepositoryTest {
 
     Files.write(defaultKey + "=" + someValue, file, Charsets.UTF_8);
 
-    LocalFileConfigRepository localRepo = new LocalFileConfigRepository(someNamespace, upstreamRepo);
+    LocalFileConfigRepository localRepo = new LocalFileConfigRepository(someAppId, someNamespace, upstreamRepo);
     localRepo.setLocalCacheDir(someBaseDir, true);
 
     Properties properties = localRepo.getConfig();
@@ -147,7 +147,7 @@ public class LocalFileConfigRepositoryTest {
   @Test
   public void testLoadConfigWithNoLocalFile() throws Exception {
     LocalFileConfigRepository localFileConfigRepository =
-        new LocalFileConfigRepository(someNamespace, upstreamRepo);
+        new LocalFileConfigRepository(someAppId, someNamespace, upstreamRepo);
     localFileConfigRepository.setLocalCacheDir(someBaseDir, true);
 
     Properties result = localFileConfigRepository.getConfig();
@@ -161,14 +161,14 @@ public class LocalFileConfigRepositoryTest {
   @Test
   public void testLoadConfigWithNoLocalFileMultipleTimes() throws Exception {
     LocalFileConfigRepository localRepo =
-        new LocalFileConfigRepository(someNamespace, upstreamRepo);
+        new LocalFileConfigRepository(someAppId, someNamespace, upstreamRepo);
     localRepo.setLocalCacheDir(someBaseDir, true);
 
     Properties someProperties = localRepo.getConfig();
 
     LocalFileConfigRepository
         anotherLocalRepoWithNoFallback =
-        new LocalFileConfigRepository(someNamespace);
+        new LocalFileConfigRepository(someAppId, someNamespace);
     anotherLocalRepoWithNoFallback.setLocalCacheDir(someBaseDir, true);
 
     Properties anotherProperties = anotherLocalRepoWithNoFallback.getConfig();
@@ -184,8 +184,10 @@ public class LocalFileConfigRepositoryTest {
     RepositoryChangeListener someListener = mock(RepositoryChangeListener.class);
 
     LocalFileConfigRepository localFileConfigRepository =
-        new LocalFileConfigRepository(someNamespace, upstreamRepo);
+        new LocalFileConfigRepository(someAppId, someNamespace, upstreamRepo);
 
+    assertEquals(ConfigSourceType.LOCAL, localFileConfigRepository.getSourceType());
+    localFileConfigRepository.initialize();
     assertEquals(someSourceType, localFileConfigRepository.getSourceType());
 
     localFileConfigRepository.setLocalCacheDir(someBaseDir, true);
@@ -199,11 +201,11 @@ public class LocalFileConfigRepositoryTest {
     ConfigSourceType anotherSourceType = ConfigSourceType.NONE;
     when(upstreamRepo.getSourceType()).thenReturn(anotherSourceType);
 
-    localFileConfigRepository.onRepositoryChange(someNamespace, anotherProperties);
+    localFileConfigRepository.onRepositoryChange(someAppId, someNamespace, anotherProperties);
 
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someNamespace), captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
 
     assertEquals(anotherProperties, captor.getValue());
     assertEquals(anotherSourceType, localFileConfigRepository.getSourceType());

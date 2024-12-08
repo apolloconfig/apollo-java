@@ -38,6 +38,18 @@ import org.slf4j.LoggerFactory;
 public class ConfigUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigUtil.class);
+
+  /**
+   * qps limit: discovery config service from meta
+   * <p>
+   * 1 times per second
+   */
+  private int discoveryQPS = 1;
+  /** 1 second */
+  private int discoveryConnectTimeout = 1000;
+  /** 1 second */
+  private int discoveryReadTimeout = 1000;
+
   private int refreshInterval = 5;
   private TimeUnit refreshIntervalTimeUnit = TimeUnit.MINUTES;
   private int connectTimeout = 1000; //1 second
@@ -59,6 +71,12 @@ public class ConfigUtil {
   private boolean propertyNamesCacheEnabled = false;
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
+  private boolean propertyKubernetesCacheEnabled = false;
+  private boolean clientMonitorEnabled = false;
+  private boolean clientMonitorJmxEnabled = false;
+  private String monitorExternalType = "NONE";
+  private long monitorExternalExportPeriod = 10;
+  private int monitorExceptionQueueSize = 25;
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -74,6 +92,12 @@ public class ConfigUtil {
     initPropertyNamesCacheEnabled();
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
+    initPropertyKubernetesCacheEnabled();
+    initClientMonitorEnabled();
+    initClientMonitorJmxEnabled();
+    initClientMonitorExternalType();
+    initClientMonitorExternalExportPeriod();
+    initClientMonitorExceptionQueueSize();
   }
 
   /**
@@ -210,24 +234,63 @@ public class ConfigUtil {
     return refreshIntervalTimeUnit;
   }
 
-  private void initQPS() {
-    String customizedLoadConfigQPS = System.getProperty("apollo.loadConfigQPS");
-    if (!Strings.isNullOrEmpty(customizedLoadConfigQPS)) {
+  static Integer getCustomizedIntegerValue(String systemKey) {
+    String customizedValue = System.getProperty(systemKey);
+    if (!Strings.isNullOrEmpty(customizedValue)) {
       try {
-        loadConfigQPS = Integer.parseInt(customizedLoadConfigQPS);
+        return Integer.parseInt(customizedValue);
       } catch (Throwable ex) {
-        logger.error("Config for apollo.loadConfigQPS is invalid: {}", customizedLoadConfigQPS);
+        logger.error("Config for {} is invalid: {}", systemKey, customizedValue);
+      }
+    }
+    return null;
+  }
+
+  private void initQPS() {
+    {
+      Integer value = getCustomizedIntegerValue("apollo.discoveryConnectTimeout");
+      if (null != value) {
+        discoveryConnectTimeout = value;
+      }
+    }
+    {
+      Integer value = getCustomizedIntegerValue("apollo.discoveryReadTimeout");
+      if (null != value) {
+        discoveryReadTimeout = value;
+      }
+    }
+    {
+      Integer value = getCustomizedIntegerValue("apollo.discoveryQPS");
+      if (null != value) {
+        discoveryQPS = value;
       }
     }
 
-    String customizedLongPollQPS = System.getProperty("apollo.longPollQPS");
-    if (!Strings.isNullOrEmpty(customizedLongPollQPS)) {
-      try {
-        longPollQPS = Integer.parseInt(customizedLongPollQPS);
-      } catch (Throwable ex) {
-        logger.error("Config for apollo.longPollQPS is invalid: {}", customizedLongPollQPS);
+    {
+      Integer value = getCustomizedIntegerValue("apollo.loadConfigQPS");
+      if (null != value) {
+        loadConfigQPS = value;
       }
     }
+
+    {
+      Integer value = getCustomizedIntegerValue("apollo.longPollQPS");
+      if (null != value) {
+        longPollQPS = value;
+      }
+    }
+  }
+
+  public int getDiscoveryQPS() {
+    return discoveryQPS;
+  }
+
+  public int getDiscoveryConnectTimeout() {
+    return discoveryConnectTimeout;
+  }
+
+  public int getDiscoveryReadTimeout() {
+    return discoveryReadTimeout;
   }
 
   public int getLoadConfigQPS() {
@@ -255,6 +318,17 @@ public class ConfigUtil {
 
     cacheRoot = isOSWindows() ? "C:\\opt\\data\\%s" : "/opt/data/%s";
     return String.format(cacheRoot, getAppId());
+  }
+
+  public String getDefaultLocalCacheDir(String appId) {
+    String cacheRoot = getCustomizedCacheRoot();
+
+    if (!Strings.isNullOrEmpty(cacheRoot)) {
+      return cacheRoot + File.separator + appId;
+    }
+
+    cacheRoot = isOSWindows() ? "C:\\opt\\data\\%s" : "/opt/data/%s";
+    return String.format(cacheRoot, appId);
   }
 
   private String getCustomizedCacheRoot() {
@@ -313,6 +387,34 @@ public class ConfigUtil {
       }
     }
     return cacheRoot;
+  }
+
+  public String getK8sNamespace() {
+    String k8sNamespace = getCacheKubernetesNamespace();
+
+    if (!Strings.isNullOrEmpty(k8sNamespace)) {
+      return k8sNamespace;
+    }
+
+    return ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT;
+  }
+
+  private String getCacheKubernetesNamespace() {
+    // 1. Get from System Property
+    String k8sNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 2. Get from OS environment variable
+      k8sNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES);
+    }
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 3. Get from server.properties
+      k8sNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+    }
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 4. Get from app.properties
+      k8sNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+    }
+    return k8sNamespace;
   }
 
   public boolean isInLocalMode() {
@@ -418,6 +520,10 @@ public class ConfigUtil {
     return propertyFileCacheEnabled;
   }
 
+  public boolean isPropertyKubernetesCacheEnabled() {
+    return propertyKubernetesCacheEnabled;
+  }
+
   public boolean isOverrideSystemProperties() {
     return overrideSystemProperties;
   }
@@ -440,6 +546,78 @@ public class ConfigUtil {
             overrideSystemProperties);
   }
 
+  private void initPropertyKubernetesCacheEnabled() {
+    propertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
+            ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES,
+            propertyKubernetesCacheEnabled);
+  }
+
+  private void initClientMonitorExternalType() {
+    monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
+    if (Strings.isNullOrEmpty(monitorExternalType)) {
+      monitorExternalType = Foundation.app()
+              .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "NONE");
+    }
+  }
+
+  public String getMonitorExternalType() {
+    return monitorExternalType;
+  }
+
+  private void initClientMonitorExternalExportPeriod() {
+    Integer value = getCustomizedIntegerValue(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD);
+
+    if (value != null) {
+      if (value <= 0) {
+        logger.warn("Config for {} is invalid: {}, remain default value: 10",
+                ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, value);
+      } else {
+        monitorExternalExportPeriod = value;
+      }
+    }
+  }
+
+  public long getMonitorExternalExportPeriod() {
+    return monitorExternalExportPeriod;
+  }
+
+  private void initClientMonitorEnabled() {
+    clientMonitorEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
+            clientMonitorEnabled);
+  }
+
+  public boolean isClientMonitorEnabled() {
+    return clientMonitorEnabled;
+  }
+
+  private void initClientMonitorJmxEnabled() {
+    clientMonitorJmxEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
+            clientMonitorJmxEnabled);
+  }
+
+  public boolean isClientMonitorJmxEnabled() {
+    return clientMonitorJmxEnabled;
+  }
+
+  private void initClientMonitorExceptionQueueSize() {
+    Integer value = getCustomizedIntegerValue(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE);
+
+    if (value != null) {
+      if (value <= 0) {
+        logger.warn("Config for {} is invalid: {}, remain default value: 25",
+                ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, value);
+      } else {
+        monitorExceptionQueueSize = value;
+      }
+    }
+  }
+
+  public int getMonitorExceptionQueueSize() {
+    return monitorExceptionQueueSize;
+  }
+  
   private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
     String enablePropertyNamesCache = System.getProperty(propertyName);
     if (Strings.isNullOrEmpty(enablePropertyNamesCache)) {
@@ -457,5 +635,9 @@ public class ConfigUtil {
       }
     }
     return defaultVal;
+  }
+
+  public String getAccessKeySecret(String appId){
+    return Foundation.app().getAccessKeySecret(appId);
   }
 }

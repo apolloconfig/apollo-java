@@ -64,6 +64,42 @@
       "defaultValue": ""
     },
     {
+      "name": "apollo.client.monitor.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "apollo.client.monitor.jmx.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor jmx enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "apollo.client.monitor.external.type",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor external monitoring system type.",
+      "defaultValue": ""
+    },
+
+    {
+      "name": "apollo.client.monitor.external.export-period",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor external metrics export period.",
+      "defaultValue": ""
+    },
+    {
+      "name": "apollo.client.monitor.exception-queue-size",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.core.ApolloClientSystemConsts",
+      "description": "apollo client monitor exception-queue-size.",
+      "defaultValue": ""
+    },
+    {
       "name": "apollo.meta",
       "type": "java.net.URI",
       "sourceType": "com.ctrip.framework.apollo.core.ConfigConsts",
@@ -75,6 +111,20 @@
       "sourceType": "com.ctrip.framework.apollo.util.ConfigUtil",
       "description": "enable property names cache.",
       "defaultValue": false
+    },
+    {
+      "name": "apollo.cache.kubernetes.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ctrip.framework.apollo.util.ConfigUtil",
+      "description": "enable kubernetes configmap cache.",
+      "defaultValue": false
+    },
+    {
+      "name": "apollo.cache.kubernetes.namespace",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.util.ConfigUtil",
+      "description": "kubernetes configmap namespace.",
+      "defaultValue": "default"
     },
     {
       "name": "apollo.property.order.enable",

@@ -16,12 +16,16 @@
  */
 package com.ctrip.framework.apollo.spring.config;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
-import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
@@ -30,15 +34,18 @@ import com.ctrip.framework.apollo.spring.AbstractSpringIntegrationTest;
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Lists;
+import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.*;
-
-import java.util.Properties;
+import org.springframework.core.env.CompositePropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.StandardEnvironment;
 
 public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest {
 
@@ -71,12 +78,13 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
 
   @Test
   public void testInitializePropertySources() {
+    String someAppId = "someAppId";
     String namespaceName = "someNamespace";
     String anotherNamespaceName = "anotherNamespace";
     Config config = mock(Config.class);
     Config anotherConfig = mock(Config.class);
-    mockConfig(namespaceName, config);
-    mockConfig(anotherNamespaceName, anotherConfig);
+    mockConfig(someAppId, namespaceName, config);
+    mockConfig(someAppId, anotherNamespaceName, anotherConfig);
     PropertySourcesProcessor.addNamespaces(Lists.newArrayList(namespaceName, anotherNamespaceName),
         0);
 
@@ -94,17 +102,18 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     ConfigPropertySource anotherPropertySource = (ConfigPropertySource) Lists.newArrayList(
         compositePropertySource.getPropertySources()).get(1);
 
-    assertEquals(namespaceName, propertySource.getName());
+    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + namespaceName, propertySource.getName());
     assertSame(config, propertySource.getSource());
-    assertEquals(anotherNamespaceName, anotherPropertySource.getName());
+    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + anotherNamespaceName, anotherPropertySource.getName());
     assertSame(anotherConfig, anotherPropertySource.getSource());
   }
 
   @Test
   public void testApplicationEvent() {
+    String someAppId = "someAppId";
     String namespaceName = "someNamespace";
     Config config = mock(Config.class);
-    mockConfig(namespaceName, config);
+    mockConfig(someAppId, namespaceName, config);
     PropertySourcesProcessor.addNamespaces(Lists.newArrayList(namespaceName), 0);
     ConfigChangeEvent someConfigChangeEvent = mock(ConfigChangeEvent.class);
 
@@ -149,6 +158,6 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     processor.postProcessBeanFactory(beanFactory);
 
     assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME));
-    assertEquals(propertySources.iterator().next().getName(), StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
+    assertEquals(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, propertySources.iterator().next().getName());
   }
 }

@@ -59,6 +59,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Documented
 public @interface ApolloConfigChangeListener {
+
+  /**
+   * Apollo appId for the config, if not specified then default to application
+   * @return
+   */
+  String appId() default "";
+
   /**
    * Apollo namespace for the config, if not specified then default to application
    */

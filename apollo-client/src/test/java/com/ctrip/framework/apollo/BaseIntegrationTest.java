@@ -16,36 +16,29 @@
  */
 package com.ctrip.framework.apollo;
 
+import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.MetaDomainConsts;
+import com.ctrip.framework.apollo.core.dto.ApolloConfig;
+import com.ctrip.framework.apollo.core.dto.ServiceDTO;
+import com.ctrip.framework.apollo.internals.RemoteConfigLongPollService;
+import com.google.common.base.Joiner;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.junit.After;
-import org.junit.Before;
 
 import com.ctrip.framework.apollo.build.MockInjector;
-import com.ctrip.framework.apollo.core.dto.ServiceDTO;
 import com.ctrip.framework.apollo.core.enums.Env;
 import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -54,7 +47,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Jason Song(song_s@ctrip.com)
  */
 public abstract class BaseIntegrationTest {
-  private static final Logger logger = LoggerFactory.getLogger(BaseIntegrationTest.class);
+  protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private static final String someAppName = "someAppName";
   private static final String someInstanceId = "someInstanceId";
@@ -67,25 +60,55 @@ public abstract class BaseIntegrationTest {
   protected static int refreshInterval;
   protected static TimeUnit refreshTimeUnit;
   protected static boolean propertiesOrderEnabled;
-  private Server server;
-  protected Gson gson = new Gson();
+  private MockedConfigService mockedConfigService;
 
-  @Rule
-  public TestRule watcher = new TestWatcher() {
-    protected void starting(Description description) {
-      logger.info("Starting test: " + description.getMethodName());
-    }
+  protected final String defaultNamespace = ConfigConsts.NAMESPACE_APPLICATION;
 
-    protected void finished(Description description) {
-      logger.info("Finished test: " + description.getMethodName());
-    }
-  };
+  private File configDir;
 
-  @Before
+
+  protected MockedConfigService newMockedConfigService() {
+    this.mockedConfigService = new MockedConfigService(port);
+    this.mockedConfigService.init();
+    this.mockMetaServer();
+    return this.mockedConfigService;
+  }
+
+  protected void mockMetaServer() {
+    mockMetaServer(false);
+  }
+
+  protected void mockMetaServer(boolean failedAtFirstTime) {
+    final ServiceDTO someServiceDTO = new ServiceDTO();
+    someServiceDTO.setAppName(someAppName);
+    someServiceDTO.setInstanceId(someInstanceId);
+    someServiceDTO.setHomepageUrl(configServiceURL);
+    this.mockedConfigService.mockMetaServer(failedAtFirstTime, someServiceDTO);
+  }
+
+  public void mockConfigs(
+      int mockedStatusCode,
+      ApolloConfig apolloConfig
+  ) {
+    this.mockConfigs(false, mockedStatusCode, apolloConfig);
+  }
+
+  public void mockConfigs(
+      boolean failedAtFirstTime,
+      int mockedStatusCode,
+      ApolloConfig apolloConfig
+  ) {
+    this.mockedConfigService.mockConfigs(
+        failedAtFirstTime, mockedStatusCode, apolloConfig
+    );
+  }
+
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "1003171";
     someClusterName = "someClusterName";
     someDataCenter = "someDC";
+
     refreshInterval = 5;
     refreshTimeUnit = TimeUnit.MINUTES;
     propertiesOrderEnabled = false;
@@ -96,72 +119,51 @@ public abstract class BaseIntegrationTest {
     System.setProperty(ConfigConsts.APOLLO_META_KEY, metaServiceUrl);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
-    MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
+    MockConfigUtil mockConfigUtil = new MockConfigUtil();
+    MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
+    configDir = new File(mockConfigUtil.getDefaultLocalCacheDir(someAppId)+ "/config-cache");
+
+    if (configDir.exists()) {
+      configDir.delete();
+    }
+    configDir.mkdirs();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
+    // get the instance will trigger long poll task execute, so move it from setup to tearDown
+    RemoteConfigLongPollService remoteConfigLongPollService
+        = ApolloInjector.getInstance(RemoteConfigLongPollService.class);
+    ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
+    recursiveDelete(configDir);
+
     //as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
     MockInjector.reset();
     System.clearProperty(ConfigConsts.APOLLO_META_KEY);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
-    if (server != null && server.isStarted()) {
-      server.stop();
+    if (mockedConfigService != null) {
+      mockedConfigService.close();
+      mockedConfigService = null;
     }
   }
 
-  /**
-   * init and start a jetty server, remember to call server.stop when the task is finished
-   *
-   * @param handlers
-   * @throws Exception
-   */
-  protected Server startServerWithHandlers(ContextHandler... handlers) throws Exception {
-    server = new Server(port);
-
-    ContextHandlerCollection contexts = new ContextHandlerCollection();
-    contexts.setHandlers(handlers);
-    contexts.addHandler(mockMetaServerHandler());
-
-    server.setHandler(contexts);
-    server.start();
-
-    return server;
-  }
-
-  protected ContextHandler mockMetaServerHandler() {
-    return mockMetaServerHandler(false);
-  }
-
-  protected ContextHandler mockMetaServerHandler(final boolean failedAtFirstTime) {
-    final ServiceDTO someServiceDTO = new ServiceDTO();
-    someServiceDTO.setAppName(someAppName);
-    someServiceDTO.setInstanceId(someInstanceId);
-    someServiceDTO.setHomepageUrl(configServiceURL);
-    final AtomicInteger counter = new AtomicInteger(0);
-
-    ContextHandler context = new ContextHandler("/services/config");
-    context.setHandler(new AbstractHandler() {
-      @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request,
-          HttpServletResponse response) throws IOException, ServletException {
-        if (failedAtFirstTime && counter.incrementAndGet() == 1) {
-          response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          baseRequest.setHandled(true);
-          return;
-        }
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        response.getWriter().println(gson.toJson(Lists.newArrayList(someServiceDTO)));
-
-        baseRequest.setHandled(true);
+  private void recursiveDelete(File file) {
+    if (!file.exists()) {
+      return;
+    }
+    if (file.isDirectory()) {
+      for (File f : file.listFiles()) {
+        recursiveDelete(f);
       }
-    });
+    }
+    try {
+      Files.deleteIfExists(file.toPath());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-    return context;
   }
 
   protected void setRefreshInterval(int refreshInterval) {
@@ -174,6 +176,38 @@ public abstract class BaseIntegrationTest {
 
   protected void setPropertiesOrderEnabled(boolean propertiesOrderEnabled) {
     BaseIntegrationTest.propertiesOrderEnabled = propertiesOrderEnabled;
+  }
+
+  protected void createLocalCachePropertyFile(Properties properties) {
+    createLocalCachePropertyFile(defaultNamespace, properties);
+  }
+
+  protected void createLocalCachePropertyFile(String namespace, Properties properties) {
+    String filename = assembleLocalCacheFileName(namespace);
+    File file = new File(configDir, filename);
+    try (FileOutputStream in = new FileOutputStream(file)) {
+      properties.store(in, "Persisted by " + this.getClass().getSimpleName());
+    } catch (IOException e) {
+      throw new IllegalStateException("fail to save " + namespace + " to file", e);
+    }
+  }
+
+  private String assembleLocalCacheFileName(String namespace) {
+    return String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
+        .join(someAppId, someClusterName, namespace));
+  }
+
+  protected ApolloConfig assembleApolloConfig(
+      String namespace,
+      String releaseKey,
+      Map<String, String> configurations
+  ) {
+    ApolloConfig apolloConfig =
+        new ApolloConfig(someAppId, someClusterName, namespace, releaseKey);
+
+    apolloConfig.setConfigurations(configurations);
+
+    return apolloConfig;
   }
 
   public static class MockConfigUtil extends ConfigUtil {
@@ -241,6 +275,16 @@ public abstract class BaseIntegrationTest {
     @Override
     public boolean isPropertiesOrderEnabled() {
       return propertiesOrderEnabled;
+    }
+
+    @Override
+    public String getDefaultLocalCacheDir(String appId) {
+      String path = ClassLoaderUtil.getClassPath() + "/" + appId;
+      if(isOSWindows()){
+        // because there is an extra / in front of the windows system
+        path = Paths.get(path.substring(1)).toString();
+      }
+      return path;
     }
   }
 

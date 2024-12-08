@@ -27,13 +27,13 @@ import com.ctrip.framework.apollo.internals.SimpleConfig;
 import com.ctrip.framework.apollo.internals.YamlConfigFile;
 import com.ctrip.framework.apollo.spring.config.PropertySourcesProcessor;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,17 +52,17 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.google.common.collect.Maps;
-import org.springframework.util.ReflectionUtils.FieldCallback;
-import org.springframework.util.ReflectionUtils.FieldFilter;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
 public abstract class AbstractSpringIntegrationTest {
-  private static final Map<String, Config> CONFIG_REGISTRY = Maps.newHashMap();
+  private static final Table<String, String, Config> CONFIG_REGISTRY = HashBasedTable.create();
   private static final Map<String, ConfigFile> CONFIG_FILE_REGISTRY = Maps.newHashMap();
   private static Method CONFIG_SERVICE_RESET;
   private static Method PROPERTY_SOURCES_PROCESSOR_RESET;
+
+  protected static String someAppId = "someAppId";
 
   static {
     try {
@@ -85,14 +85,14 @@ public abstract class AbstractSpringIntegrationTest {
     doTearDown();
   }
 
-  protected SimpleConfig prepareConfig(String namespaceName, Properties properties) {
+  protected SimpleConfig prepareConfig(String appId, String namespaceName, Properties properties) {
     ConfigRepository configRepository = mock(ConfigRepository.class);
 
     when(configRepository.getConfig()).thenReturn(properties);
 
-    SimpleConfig config = new SimpleConfig(ConfigConsts.NAMESPACE_APPLICATION, configRepository);
+    SimpleConfig config = new SimpleConfig(appId, namespaceName, configRepository);
 
-    mockConfig(namespaceName, config);
+    mockConfig(appId, namespaceName, config);
 
     return config;
   }
@@ -113,15 +113,15 @@ public abstract class AbstractSpringIntegrationTest {
     return properties;
   }
 
-  protected static YamlConfigFile prepareYamlConfigFile(String namespaceNameWithFormat, Properties properties) {
+  protected static YamlConfigFile prepareYamlConfigFile(String appId, String namespaceNameWithFormat, Properties properties) {
     ConfigRepository configRepository = mock(ConfigRepository.class);
 
     when(configRepository.getConfig()).thenReturn(properties);
 
     // spy it for testing after
-    YamlConfigFile configFile = spy(new YamlConfigFile(namespaceNameWithFormat, configRepository));
+    YamlConfigFile configFile = spy(new YamlConfigFile(appId, namespaceNameWithFormat, configRepository));
 
-    mockConfigFile(namespaceNameWithFormat, configFile);
+    mockConfigFile(appId, namespaceNameWithFormat, configFile);
 
     return configFile;
   }
@@ -161,33 +161,46 @@ public abstract class AbstractSpringIntegrationTest {
   }
 
 
-  protected static void mockConfig(String namespace, Config config) {
-    CONFIG_REGISTRY.put(namespace, config);
+  protected static void mockConfig(String appId, String namespace, Config config) {
+    CONFIG_REGISTRY.put(appId, namespace, config);
   }
 
   protected static void mockConfigFile(String namespaceNameWithFormat, ConfigFile configFile) {
     CONFIG_FILE_REGISTRY.put(namespaceNameWithFormat, configFile);
   }
 
-  protected static void doSetUp() {
+  protected static void mockConfigFile(String appId,String namespaceNameWithFormat, ConfigFile configFile) {
+    CONFIG_FILE_REGISTRY.put(appId + "+" + namespaceNameWithFormat, configFile);
+  }
+
+  protected static void doSetUp() throws Exception {
     //as ConfigService is singleton, so we must manually clear its container
     ReflectionUtils.invokeMethod(CONFIG_SERVICE_RESET, null);
     //as PropertySourcesProcessor has some static variables, so we must manually clear them
     ReflectionUtils.invokeMethod(PROPERTY_SOURCES_PROCESSOR_RESET, null);
+
+    MockConfigUtil configUtil = new MockConfigUtil();
+    configUtil.setAutoUpdateInjectedSpringProperties(true);
+    MockInjector.setInstance(ConfigUtil.class, configUtil);
+
     DefaultInjector defaultInjector = new DefaultInjector();
     ConfigManager defaultConfigManager = defaultInjector.getInstance(ConfigManager.class);
     MockInjector.setInstance(ConfigManager.class, new MockConfigManager(defaultConfigManager));
     MockInjector.setDelegate(defaultInjector);
+
   }
 
   protected static void doTearDown() {
     MockInjector.reset();
     CONFIG_REGISTRY.clear();
+    CONFIG_FILE_REGISTRY.clear();
   }
 
   private static class MockConfigManager implements ConfigManager {
 
     private final ConfigManager delegate;
+
+    private final String defaultAppId = someAppId;
 
     public MockConfigManager(ConfigManager delegate) {
       this.delegate = delegate;
@@ -195,16 +208,26 @@ public abstract class AbstractSpringIntegrationTest {
 
     @Override
     public Config getConfig(String namespace) {
-      Config config = CONFIG_REGISTRY.get(namespace);
+      return getConfig(defaultAppId, namespace);
+    }
+
+    @Override
+    public Config getConfig(String appId, String namespace) {
+      Config config = CONFIG_REGISTRY.get(appId, namespace);
       if (config != null) {
         return config;
       }
-      return delegate.getConfig(namespace);
+      return delegate.getConfig(appId, namespace);
     }
 
     @Override
     public ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
-      ConfigFile configFile = CONFIG_FILE_REGISTRY.get(String.format("%s.%s", namespace, configFileFormat.getValue()));
+      return this.getConfigFile(defaultAppId, namespace, configFileFormat);
+    }
+
+    @Override
+    public ConfigFile getConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+      ConfigFile configFile = CONFIG_FILE_REGISTRY.get(String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue()));
       if (configFile != null) {
         return configFile;
       }
@@ -223,6 +246,10 @@ public abstract class AbstractSpringIntegrationTest {
     @Override
     public boolean isAutoUpdateInjectedSpringPropertiesEnabled() {
       return isAutoUpdateInjectedSpringProperties;
+    }
+
+    public String getAppId() {
+      return someAppId;
     }
   }
 }

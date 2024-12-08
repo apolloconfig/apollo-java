@@ -43,7 +43,7 @@ public class PropertiesCompatibleFileConfigRepository extends AbstractConfigRepo
 
     if (cachedProperties != current) {
       cachedProperties = current;
-      this.fireRepositoryChange(configFile.getNamespace(), cachedProperties);
+      this.fireRepositoryChange(configFile.getAppId(), configFile.getNamespace(), cachedProperties);
     }
   }
 

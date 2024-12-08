@@ -32,6 +32,10 @@ import java.lang.annotation.Target;
  * // in Apollo is someJsonPropertyKey={"someString":"someValue", "someInt":10}.
  * &#064;ApolloJsonValue("${someJsonPropertyKey:someDefaultValue}")
  * private SomeObject someObject;
+ * // Suppose SomeObject has a field of type Date named 'time', then the possible config
+ * // in Apollo is someJsonPropertyKey={"time":"2024/01/04"}.
+ * &#064;ApolloJsonValue(value="${someJsonPropertyKey:someDefaultValue}", datePattern="yyyy/MM/dd")
+ * private SomeObject someObject;
  * </pre>
  *
  * Create by zhangzheng on 2018/3/6
@@ -47,4 +51,9 @@ public @interface ApolloJsonValue {
    * The actual value expression: e.g. "${someJsonPropertyKey:someDefaultValue}".
    */
   String value();
+
+  /**
+   * The datePattern follows the same rule as required by {@link java.text.SimpleDateFormat}.
+   */
+  String datePattern() default "";
 }

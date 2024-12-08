@@ -74,6 +74,16 @@ public class ApolloClientSystemConsts {
   public static final String DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES = "APOLLO_CACHEDIR";
 
   /**
+   * kubernetes configmap cache namespace
+   */
+  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE = "apollo.cache.kubernetes.namespace";
+
+  /**
+   * kubernetes configmap cache namespace environment variables
+   */
+  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_KUBERNETES_NAMESPACE";
+
+  /**
    * apollo client access key
    */
   public static final String APOLLO_ACCESS_KEY_SECRET = "apollo.access-key.secret";
@@ -158,7 +168,41 @@ public class ApolloClientSystemConsts {
   public static final String APOLLO_CACHE_FILE_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_FILE_ENABLE";
 
   /**
+   * enable property names cache
+   */
+  public static final String APOLLO_KUBERNETES_CACHE_ENABLE = "apollo.cache.kubernetes.enable";
+
+  /**
+   * enable property names cache environment variables
+   */
+  public static final String APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_KUBERNETES_CACHE_ENABLE";
+
+  /**
    * enable apollo overrideSystemProperties
    */
   public static final String APOLLO_OVERRIDE_SYSTEM_PROPERTIES = "apollo.override-system-properties";
+
+  /**
+   * apollo client monitor enabled
+   */
+  public static final String APOLLO_CLIENT_MONITOR_ENABLED = "apollo.client.monitor.enabled";
+  
+  /**
+   * apollo client monitor exception save size
+   */
+  public static final String APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE = "apollo.client.monitor.exception-queue-size";
+  /**
+   * apollo client monitor jmx enabled
+   */
+  public static final String APOLLO_CLIENT_MONITOR_JMX_ENABLED = "apollo.client.monitor.jmx.enabled";
+
+  /**
+   * apollo client monitor form {such as jmx,prometheus}
+   */
+  public static final String APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE = "apollo.client.monitor.external.type";
+
+  /**
+   * apollo client monitor collect period
+   */
+  public static final String APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD = "apollo.client.monitor.external.export-period";
 }

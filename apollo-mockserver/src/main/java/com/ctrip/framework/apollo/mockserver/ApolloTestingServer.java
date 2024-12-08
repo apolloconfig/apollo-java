@@ -22,6 +22,8 @@ import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.utils.ResourceUtils;
 import com.ctrip.framework.apollo.internals.ConfigServiceLocator;
+import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -34,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -41,15 +44,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Objects;
 
 public class ApolloTestingServer implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmbeddedApollo.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApolloTestingServer.class);
     private static final Type notificationType = new TypeToken<List<ApolloConfigNotification>>() {
     }.getType();
 
+    private static String someAppId = "someAppId";
     private static Method CONFIG_SERVICE_LOCATOR_CLEAR;
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
+
+    private static ConfigUtil CONFIG_UTIL;
+
+    private static Method RESOURCES_UTILS_CLEAR;
+    private static ResourceUtils RESOURCES_UTILS;
 
     private static final Gson GSON = new Gson();
     private final Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace = Maps.newConcurrentMap();
@@ -67,6 +77,13 @@ public class ApolloTestingServer implements AutoCloseable {
             CONFIG_SERVICE_LOCATOR = ApolloInjector.getInstance(ConfigServiceLocator.class);
             CONFIG_SERVICE_LOCATOR_CLEAR = ConfigServiceLocator.class.getDeclaredMethod("initConfigServices");
             CONFIG_SERVICE_LOCATOR_CLEAR.setAccessible(true);
+
+            CONFIG_UTIL = ApolloInjector.getInstance(ConfigUtil.class);
+
+            RESOURCES_UTILS = ApolloInjector.getInstance(ResourceUtils.class);
+            RESOURCES_UTILS_CLEAR = ResourceUtils.class.getDeclaredMethod("loadConfigFileFromDefaultSearchLocations",
+                    new Class[] {String.class});
+            RESOURCES_UTILS_CLEAR.setAccessible(true);
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
         }
@@ -135,8 +152,7 @@ public class ApolloTestingServer implements AutoCloseable {
     }
 
     private String loadConfigFor(String namespace) {
-        String filename = String.format("mockdata-%s.properties", namespace);
-        final Properties prop = ResourceUtils.readConfigFile(filename, new Properties());
+        final Properties prop = loadPropertiesOfNamespace(namespace);
         Map<String, String> configurations = Maps.newHashMap();
         for (String propertyName : prop.stringPropertyNames()) {
             configurations.put(propertyName, prop.getProperty(propertyName));
@@ -146,6 +162,21 @@ public class ApolloTestingServer implements AutoCloseable {
         Map<String, String> mergedConfigurations = mergeOverriddenProperties(namespace, configurations);
         apolloConfig.setConfigurations(mergedConfigurations);
         return GSON.toJson(apolloConfig);
+    }
+
+    private Properties loadPropertiesOfNamespace(String namespace) {
+        String filename = String.format("mockdata-%s.properties", namespace);
+        Object mockdataPropertiesExits = null;
+        try {
+            mockdataPropertiesExits = RESOURCES_UTILS_CLEAR.invoke(RESOURCES_UTILS, filename);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("invoke resources util locator clear failed.", e);
+        }
+        if (!Objects.isNull(mockdataPropertiesExits)) {
+            logger.debug("load {} from {}", namespace, filename);
+            return ResourceUtils.readConfigFile(filename, new Properties());
+        }
+        return new LocalFileConfigRepository(someAppId, namespace).getConfig();
     }
 
     private String mockLongPollBody(String notificationsStr) {

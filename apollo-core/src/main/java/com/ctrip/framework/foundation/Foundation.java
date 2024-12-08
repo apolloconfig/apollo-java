@@ -44,6 +44,7 @@ public abstract class Foundation {
         synchronized (LOCK) {
           if (s_manager == null) {
             s_manager = ServiceBootstrap.loadPrimary(ProviderManager.class);
+            s_manager.initialize();
           }
         }
       }

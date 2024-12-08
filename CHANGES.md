@@ -2,14 +2,16 @@ Changes by Version
 ==================
 Release Notes.
 
-Apollo Java 2.2.0
+Apollo Java 2.4.0
 
 ------------------
-* [refactor(apollo-client): Optimize the exception message when failing to retrieve configuration information.](https://github.com/apolloconfig/apollo-java/pull/22)
-* [Add JUnit5 extension support for apollo mock server.](https://github.com/apolloconfig/apollo-java/pull/25)
-* [Support concurrent loading of Config for different namespaces.](https://github.com/apolloconfig/apollo-java/pull/31)
-* [Fix snakeyaml 2.x compatibility issues](https://github.com/apolloconfig/apollo-java/pull/35)
-* [feat(openapi): create app](https://github.com/apolloconfig/apollo-java/pull/32)
+
+* [Fix the Cannot enhance @Configuration bean definition issue](https://github.com/apolloconfig/apollo-java/pull/82)
+* [Feature openapi query namespace support not fill item](https://github.com/apolloconfig/apollo-java/pull/83)
+* [Add more observability in apollo config client](https://github.com/apolloconfig/apollo-java/pull/74)
+* [Feature Support Kubernetes ConfigMap cache for Apollo java, golang client](https://github.com/apolloconfig/apollo-java/pull/79)
+* [Feature support pulling configuration information from multiple AppIds](https://github.com/apolloconfig/apollo-java/pull/70)
+
 
 ------------------
-All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/2?closed=1)
+All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/4?closed=1)

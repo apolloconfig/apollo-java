@@ -16,6 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
@@ -43,8 +45,9 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractConfigFile implements ConfigFile, RepositoryChangeListener {
   private static final Logger logger = DeferredLoggerFactory.getLogger(AbstractConfigFile.class);
-  private static ExecutorService m_executorService;
+  protected static ExecutorService m_executorService;
   protected final ConfigRepository m_configRepository;
+  protected final String m_appId;
   protected final String m_namespace;
   protected final AtomicReference<Properties> m_configProperties;
   private final List<ConfigFileChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
@@ -57,8 +60,9 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
         .create("ConfigFile", true));
   }
 
-  public AbstractConfigFile(String namespace, ConfigRepository configRepository) {
+  public AbstractConfigFile(String appId, String namespace, ConfigRepository configRepository) {
     m_configRepository = configRepository;
+    m_appId = appId;
     m_namespace = namespace;
     m_configProperties = new AtomicReference<>();
     propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
@@ -81,6 +85,11 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
   }
 
   @Override
+  public String getAppId() {
+    return m_appId;
+  }
+
+  @Override
   public String getNamespace() {
     return m_namespace;
   }
@@ -89,6 +98,11 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
 
   @Override
   public synchronized void onRepositoryChange(String namespace, Properties newProperties) {
+    this.onRepositoryChange(m_appId, m_namespace, newProperties);
+  }
+
+  @Override
+  public synchronized void onRepositoryChange(String appId, String namespace, Properties newProperties) {
     if (newProperties.equals(m_configProperties.get())) {
       return;
     }
@@ -110,9 +124,9 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
       changeType = PropertyChangeType.DELETED;
     }
 
-    this.fireConfigChange(new ConfigFileChangeEvent(m_namespace, oldValue, newValue, changeType));
+    this.fireConfigChange(new ConfigFileChangeEvent(m_appId, m_namespace, oldValue, newValue, changeType));
 
-    Tracer.logEvent("Apollo.Client.ConfigChanges", m_namespace);
+    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
   }
 
   @Override

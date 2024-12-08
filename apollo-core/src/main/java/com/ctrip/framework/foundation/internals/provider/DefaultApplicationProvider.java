@@ -26,6 +26,7 @@ import com.ctrip.framework.foundation.spi.provider.Provider;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Properties;
 import org.slf4j.Logger;
 
@@ -114,6 +115,14 @@ public class DefaultApplicationProvider implements ApplicationProvider {
   @Override
   public Class<? extends Provider> getType() {
     return ApplicationProvider.class;
+  }
+
+  @Override
+  public String getAccessKeySecret(String appId){
+    if (Objects.equals(appId, m_appId)) {
+      return getAccessKeySecret();
+    }
+    return System.getProperty("apollo.accesskey." + appId + ".secret", null);
   }
 
   private void initAppId() {

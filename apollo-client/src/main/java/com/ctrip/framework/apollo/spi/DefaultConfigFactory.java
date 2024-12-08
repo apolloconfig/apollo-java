@@ -33,6 +33,7 @@ import com.ctrip.framework.apollo.internals.TxtConfigFile;
 import com.ctrip.framework.apollo.internals.XmlConfigFile;
 import com.ctrip.framework.apollo.internals.YamlConfigFile;
 import com.ctrip.framework.apollo.internals.YmlConfigFile;
+import com.ctrip.framework.apollo.internals.K8sConfigMapConfigRepository;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,11 @@ public class DefaultConfigFactory implements ConfigFactory {
 
   @Override
   public Config create(String namespace) {
+    return this.create(m_configUtil.getAppId(), namespace);
+  }
+
+  @Override
+  public Config create(String appId, String namespace) {
     ConfigFileFormat format = determineFileFormat(namespace);
 
     ConfigRepository configRepository = null;
@@ -73,72 +79,88 @@ public class DefaultConfigFactory implements ConfigFactory {
     // calling the method `createLocalConfigRepository(...)` is more suitable
     // for ConfigFileFormat.Properties
     if (ConfigFileFormat.isPropertiesCompatible(format) &&
-        format != ConfigFileFormat.Properties) {
-      configRepository = createPropertiesCompatibleFileConfigRepository(namespace, format);
+            format != ConfigFileFormat.Properties) {
+      configRepository = createPropertiesCompatibleFileConfigRepository(appId, namespace, format);
     } else {
-      configRepository = createConfigRepository(namespace);
+      configRepository = createConfigRepository(appId, namespace);
     }
 
     logger.debug("Created a configuration repository of type [{}] for namespace [{}]",
-        configRepository.getClass().getName(), namespace);
+            configRepository.getClass().getName(), namespace);
 
-    return this.createRepositoryConfig(namespace, configRepository);
-  }
-
-  protected Config createRepositoryConfig(String namespace, ConfigRepository configRepository) {
-    return new DefaultConfig(namespace, configRepository);
+    return this.createRepositoryConfig(appId, namespace, configRepository);
   }
 
   @Override
   public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
-    ConfigRepository configRepository = createConfigRepository(namespace);
+    return this.createConfigFile(m_configUtil.getAppId(), namespace, configFileFormat);
+  }
+
+  protected Config createRepositoryConfig(String appId, String namespace, ConfigRepository configRepository) {
+    return new DefaultConfig(appId, namespace, configRepository);
+  }
+
+  @Override
+  public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+    ConfigRepository configRepository = createConfigRepository(appId, namespace);
     switch (configFileFormat) {
       case Properties:
-        return new PropertiesConfigFile(namespace, configRepository);
+        return new PropertiesConfigFile(appId, namespace, configRepository);
       case XML:
-        return new XmlConfigFile(namespace, configRepository);
+        return new XmlConfigFile(appId, namespace, configRepository);
       case JSON:
-        return new JsonConfigFile(namespace, configRepository);
+        return new JsonConfigFile(appId, namespace, configRepository);
       case YAML:
-        return new YamlConfigFile(namespace, configRepository);
+        return new YamlConfigFile(appId, namespace, configRepository);
       case YML:
-        return new YmlConfigFile(namespace, configRepository);
+        return new YmlConfigFile(appId, namespace, configRepository);
       case TXT:
-        return new TxtConfigFile(namespace, configRepository);
+        return new TxtConfigFile(appId, namespace, configRepository);
     }
 
     return null;
   }
 
-  ConfigRepository createConfigRepository(String namespace) {
-    if (m_configUtil.isPropertyFileCacheEnabled()) {
-      return createLocalConfigRepository(namespace);
+  ConfigRepository createConfigRepository(String appId, String namespace) {
+    if (m_configUtil.isPropertyKubernetesCacheEnabled()) {
+      return createConfigMapConfigRepository(appId, namespace);
+    } else if (m_configUtil.isPropertyFileCacheEnabled()) {
+      return createLocalConfigRepository(appId, namespace);
     }
-    return createRemoteConfigRepository(namespace);
+    return createRemoteConfigRepository(appId, namespace);
   }
 
   /**
    * Creates a local repository for a given namespace
    *
+   * @param appId the appId of the repository
    * @param namespace the namespace of the repository
    * @return the newly created repository for the given namespace
    */
-  LocalFileConfigRepository createLocalConfigRepository(String namespace) {
+  LocalFileConfigRepository createLocalConfigRepository(String appId, String namespace) {
     if (m_configUtil.isInLocalMode()) {
       logger.warn(
           "==== Apollo is in local mode! Won't pull configs from remote server for namespace {} ! ====",
           namespace);
-      return new LocalFileConfigRepository(namespace);
+      return new LocalFileConfigRepository(appId, namespace);
     }
-    return new LocalFileConfigRepository(namespace, createRemoteConfigRepository(namespace));
+    return new LocalFileConfigRepository(appId, namespace, createRemoteConfigRepository(appId, namespace));
   }
 
-  RemoteConfigRepository createRemoteConfigRepository(String namespace) {
-    return new RemoteConfigRepository(namespace);
+  /**
+   * Creates a Kubernetes config map repository for a given namespace
+   * @param namespace the namespace of the repository
+   * @return the newly created repository for the given namespace
+   */
+  private ConfigRepository createConfigMapConfigRepository(String appId, String namespace) {
+    return new K8sConfigMapConfigRepository(appId, namespace, createLocalConfigRepository(appId, namespace));
+  }
+  RemoteConfigRepository createRemoteConfigRepository(String appId, String namespace) {
+    return new RemoteConfigRepository(appId, namespace);
   }
 
   PropertiesCompatibleFileConfigRepository createPropertiesCompatibleFileConfigRepository(
-      String namespace, ConfigFileFormat format) {
+      String appId, String namespace, ConfigFileFormat format) {
     String actualNamespaceName = trimNamespaceFormat(namespace, format);
     PropertiesCompatibleConfigFile configFile = (PropertiesCompatibleConfigFile) ConfigService
         .getConfigFile(actualNamespaceName, format);
