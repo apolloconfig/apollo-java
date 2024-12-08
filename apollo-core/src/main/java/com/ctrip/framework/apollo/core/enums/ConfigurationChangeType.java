@@ -17,9 +17,19 @@
 package com.ctrip.framework.apollo.core.enums;
 
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author jason
  */
 public enum ConfigurationChangeType {
-  ADDED, MODIFIED, DELETED
+  ADDED, MODIFIED, DELETED, UNKNOWN;
+
+  public static ConfigurationChangeType fromString(String changeType) {
+    ConfigurationChangeType configurationChangeType = ConfigurationChangeTypeUtils.transformChangeType(
+        changeType);
+    Preconditions.checkArgument(configurationChangeType != UNKNOWN,
+        String.format("ConfigurationChangeType %s is invalid", changeType));
+    return configurationChangeType;
+  }
 }

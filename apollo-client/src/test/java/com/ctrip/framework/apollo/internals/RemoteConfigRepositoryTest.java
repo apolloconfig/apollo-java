@@ -169,18 +169,18 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getStatusCode()).thenReturn(200);
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
 
    remoteConfigRepository.sync();
 
 
     List<ConfigurationChange> configurationChanges=new ArrayList<>();
     String someNewValue = "someNewValue";
-    configurationChanges.add(new ConfigurationChange(someKey, someNewValue, ConfigurationChangeType.MODIFIED));
-    configurationChanges.add(new ConfigurationChange(someKey1, null, ConfigurationChangeType.DELETED));
+    configurationChanges.add(new ConfigurationChange(someKey, someNewValue, "MODIFIED"));
+    configurationChanges.add(new ConfigurationChange(someKey1, null, "DELETED"));
     String someKey2 = "someKey2";
     String someValue2 = "someValue2";
-    configurationChanges.add(new ConfigurationChange(someKey2, someValue2, ConfigurationChangeType.ADDED));
+    configurationChanges.add(new ConfigurationChange(someKey2, someValue2,"ADDED"));
     ApolloConfig someApolloConfigWithIncrementalSync = assembleApolloConfigWithIncrementalSync(configurationChanges);
 
     when(someResponse.getStatusCode()).thenReturn(200);
@@ -208,13 +208,13 @@ public class RemoteConfigRepositoryTest {
     Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1,key3,value3);
 
     List<ConfigurationChange> configurationChanges=new ArrayList<>();
-    configurationChanges.add(new ConfigurationChange(key1, anotherValue1, ConfigurationChangeType.MODIFIED));
+    configurationChanges.add(new ConfigurationChange(key1, anotherValue1, "MODIFIED"));
     String key2 = "key2";
     String value2 = "value2";
-    configurationChanges.add(new ConfigurationChange(key2, value2, ConfigurationChangeType.ADDED));
-    configurationChanges.add(new ConfigurationChange(key3, null, ConfigurationChangeType.DELETED));
+    configurationChanges.add(new ConfigurationChange(key2, value2, "ADDED"));
+    configurationChanges.add(new ConfigurationChange(key3, null, "DELETED"));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
     Map<String, String> result=remoteConfigRepository.mergeConfigurations(previousConfigurations, configurationChanges);
 
     assertEquals(2, result.size());
@@ -232,7 +232,7 @@ public class RemoteConfigRepositoryTest {
     Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1,key3,value3);
 
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
     Map<String, String> result=remoteConfigRepository.mergeConfigurations(previousConfigurations, null);
 
     assertEquals(2, result.size());
@@ -250,13 +250,13 @@ public class RemoteConfigRepositoryTest {
     String value3 = "value3";
 
     List<ConfigurationChange> configurationChanges=new ArrayList<>();
-    configurationChanges.add(new ConfigurationChange(key1, anotherValue1, ConfigurationChangeType.MODIFIED));
+    configurationChanges.add(new ConfigurationChange(key1, anotherValue1, "MODIFIED"));
     String key2 = "key2";
     String value2 = "value2";
-    configurationChanges.add(new ConfigurationChange(key2, value2, ConfigurationChangeType.ADDED));
-    configurationChanges.add(new ConfigurationChange(key3, null, ConfigurationChangeType.DELETED));
+    configurationChanges.add(new ConfigurationChange(key2, value2, "ADDED"));
+    configurationChanges.add(new ConfigurationChange(key3, null, "DELETED"));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
     Map<String, String> result=remoteConfigRepository.mergeConfigurations(null, configurationChanges);
 
     assertEquals(2, result.size());

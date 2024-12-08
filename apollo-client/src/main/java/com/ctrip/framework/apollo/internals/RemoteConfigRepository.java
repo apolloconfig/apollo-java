@@ -26,6 +26,7 @@ import com.ctrip.framework.apollo.core.dto.ApolloNotificationMessages;
 import com.ctrip.framework.apollo.core.dto.ConfigurationChange;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
 import com.ctrip.framework.apollo.core.enums.ConfigSyncType;
+import com.ctrip.framework.apollo.core.enums.ConfigurationChangeType;
 import com.ctrip.framework.apollo.core.schedule.ExponentialSchedulePolicy;
 import com.ctrip.framework.apollo.core.schedule.SchedulePolicy;
 import com.ctrip.framework.apollo.core.signature.Signature;
@@ -254,23 +255,21 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
           }
 
           ApolloConfig result = response.getBody();
+
           if(result!=null){
+
             ConfigSyncType configSyncType=ConfigSyncType.fromString(result.getConfigSyncType());
 
-            if(configSyncType!=null&&configSyncType.equals(ConfigSyncType.INCREMENTALSYNC)){
-
-              Map<String, String> previousConfigurations=null;
+            if (configSyncType == ConfigSyncType.INCREMENTALSYNC) {
 
               ApolloConfig previousConfig = m_configCache.get();
 
-              if(previousConfig!=null){
-                previousConfigurations=previousConfig.getConfigurations();
-              }
+              Map<String, String> previousConfigurations =
+                  (previousConfig != null) ? previousConfig.getConfigurations() : null;
 
               result.setConfigurations(mergeConfigurations(previousConfigurations,result.getConfigurationChanges()));
 
             }
-
           }
 
           logger.debug("Loaded config for {}: {}", m_namespace, result);
@@ -382,7 +381,8 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     return services;
   }
 
-  public Map<String, String> mergeConfigurations(Map<String, String> previousConfigurations,List<ConfigurationChange> configurationChanges) {
+  Map<String, String> mergeConfigurations(Map<String, String> previousConfigurations,
+      List<ConfigurationChange> configurationChanges) {
     Map<String, String> newConfigurations = new HashMap<>();
 
     if(previousConfigurations!=null){
@@ -394,7 +394,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     }
 
     for (ConfigurationChange change : configurationChanges) {
-      switch (change.getConfigurationChangeType()) {
+      switch (ConfigurationChangeType.fromString(change.getConfigurationChangeType())) {
         case ADDED:
         case MODIFIED:
           newConfigurations.put(change.getKey(), change.getNewValue());

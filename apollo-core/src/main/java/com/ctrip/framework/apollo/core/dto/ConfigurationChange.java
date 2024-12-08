@@ -26,7 +26,7 @@ import com.ctrip.framework.apollo.core.enums.ConfigurationChangeType;
 public class ConfigurationChange {
   private final String key;
   private final String newValue;
-  private final ConfigurationChangeType configurationChangeType;
+  private final String configurationChangeType;
 
   /**
    * Constructor.
@@ -34,7 +34,7 @@ public class ConfigurationChange {
    * @param newValue the value after change
    * @param configurationChangeType the change type
    */
-  public ConfigurationChange(String key, String newValue, ConfigurationChangeType configurationChangeType) {
+  public ConfigurationChange(String key, String newValue, String configurationChangeType) {
     this.key = key;
     this.newValue = newValue;
     this.configurationChangeType = configurationChangeType;
@@ -47,7 +47,7 @@ public class ConfigurationChange {
     return newValue;
   }
 
-  public ConfigurationChangeType getConfigurationChangeType() {
+  public String getConfigurationChangeType() {
     return configurationChangeType;
   }
 
