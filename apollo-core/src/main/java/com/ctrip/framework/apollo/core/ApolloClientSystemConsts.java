@@ -84,6 +84,16 @@ public class ApolloClientSystemConsts {
   public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_KUBERNETES_NAMESPACE";
 
   /**
+   * max number of pods that can write the configmap cache in Kubernetes
+   */
+  public static final String APOLLO_CACHE_KUBERNETES_MAX_WRITE_PODS = "apollo.cache.kubernetes.max-write-pods";
+
+  /**
+   * max number of pods that can write the configmap cache in Kubernetes environment variables
+   */
+  public static final String APOLLO_CACHE_KUBERNETES_MAX_WRITE_PODS_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_KUBERNETES_MAX_WRITE_PODS";
+
+  /**
    * apollo client access key
    */
   public static final String APOLLO_ACCESS_KEY_SECRET = "apollo.access-key.secret";
