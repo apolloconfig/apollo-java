@@ -17,7 +17,6 @@
 package com.ctrip.framework.apollo.core.dto;
 
 
-import com.ctrip.framework.apollo.core.enums.ConfigurationChangeType;
 
 /**
  * Holds the information for a Configuration change.

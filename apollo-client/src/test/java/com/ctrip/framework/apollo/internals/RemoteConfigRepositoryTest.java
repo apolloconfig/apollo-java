@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.dto.*;
 import com.ctrip.framework.apollo.core.enums.ConfigSyncType;
-import com.ctrip.framework.apollo.core.enums.ConfigurationChangeType;
 import com.ctrip.framework.apollo.core.signature.Signature;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
@@ -487,7 +486,7 @@ public class RemoteConfigRepositoryTest {
     ApolloConfig apolloConfig =
             new ApolloConfig(someAppId, someClusterName, someNamespace, someReleaseKey);
 
-    apolloConfig.setConfigSyncType(ConfigSyncType.INCREMENTALSYNC.getValue());
+    apolloConfig.setConfigSyncType(ConfigSyncType.INCREMENTAL_SYNC.getValue());
     apolloConfig.setConfigurationChanges(configurationChanges);
     return apolloConfig;
   }

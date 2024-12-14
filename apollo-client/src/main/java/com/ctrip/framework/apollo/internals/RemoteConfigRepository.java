@@ -260,7 +260,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
 
             ConfigSyncType configSyncType=ConfigSyncType.fromString(result.getConfigSyncType());
 
-            if (configSyncType == ConfigSyncType.INCREMENTALSYNC) {
+            if (configSyncType == ConfigSyncType.INCREMENTAL_SYNC) {
 
               ApolloConfig previousConfig = m_configCache.get();
 

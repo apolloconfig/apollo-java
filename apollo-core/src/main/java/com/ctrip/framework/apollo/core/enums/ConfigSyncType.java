@@ -18,15 +18,13 @@ package com.ctrip.framework.apollo.core.enums;
 
 import com.ctrip.framework.apollo.core.utils.StringUtils;
 
-import java.util.stream.Stream;
-
 /**
  * This enum represents all the possible Configuration sync  from apollo-config
  *
  * @author jason
  */
 public enum ConfigSyncType {
-  FULLSYNC("FullSync"), INCREMENTALSYNC("IncrementalSync");
+  FULL_SYNC("FullSync"), INCREMENTAL_SYNC("IncrementalSync"), UNKNOWN("UnKnown");
 
   private final String value;
 
@@ -46,14 +44,14 @@ public enum ConfigSyncType {
    */
   public static ConfigSyncType fromString(String value) {
     if (StringUtils.isEmpty(value)) {
-         return FULLSYNC;
+      return FULL_SYNC;
     }
     for (ConfigSyncType type : values()) {
             if (type.value.equals(value)) {
                 return type;
              }
          }
-       throw new IllegalArgumentException("Invalid ConfigSyncType: " + value);
+    return UNKNOWN;
 
   }
 
