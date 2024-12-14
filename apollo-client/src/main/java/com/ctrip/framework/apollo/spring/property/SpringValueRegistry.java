@@ -84,12 +84,15 @@ public class SpringValueRegistry {
     Iterator<Multimap<String, SpringValue>> iterator = registry.values().iterator();
     while (!Thread.currentThread().isInterrupted() && iterator.hasNext()) {
       Multimap<String, SpringValue> springValues = iterator.next();
-      Iterator<Entry<String, SpringValue>> springValueIterator = springValues.entries().iterator();
-      while (springValueIterator.hasNext()) {
-        Entry<String, SpringValue> springValue = springValueIterator.next();
-        if (!springValue.getValue().isTargetBeanValid()) {
-          // clear unused spring values
-          springValueIterator.remove();
+      synchronized (springValues) {
+        Iterator<Entry<String, SpringValue>> springValueIterator = springValues.entries()
+            .iterator();
+        while (springValueIterator.hasNext()) {
+          Entry<String, SpringValue> springValue = springValueIterator.next();
+          if (!springValue.getValue().isTargetBeanValid()) {
+            // clear unused spring values
+            springValueIterator.remove();
+          }
         }
       }
     }
