@@ -256,9 +256,9 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
 
           ApolloConfig result = response.getBody();
 
-          if(result!=null){
+          if (result != null) {
 
-            ConfigSyncType configSyncType=ConfigSyncType.fromString(result.getConfigSyncType());
+            ConfigSyncType configSyncType = ConfigSyncType.fromString(result.getConfigSyncType());
 
             if (configSyncType == ConfigSyncType.INCREMENTAL_SYNC) {
 
@@ -267,7 +267,8 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
               Map<String, String> previousConfigurations =
                   (previousConfig != null) ? previousConfig.getConfigurations() : null;
 
-              result.setConfigurations(mergeConfigurations(previousConfigurations,result.getConfigurationChanges()));
+              result.setConfigurations(
+                  mergeConfigurations(previousConfigurations, result.getConfigurationChanges()));
 
             }
           }
@@ -385,8 +386,8 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
       List<ConfigurationChange> configurationChanges) {
     Map<String, String> newConfigurations = new HashMap<>();
 
-    if(previousConfigurations!=null){
-      newConfigurations=Maps.newHashMap(previousConfigurations);
+    if (previousConfigurations != null) {
+      newConfigurations = Maps.newHashMap(previousConfigurations);
     }
 
     if (configurationChanges == null) {

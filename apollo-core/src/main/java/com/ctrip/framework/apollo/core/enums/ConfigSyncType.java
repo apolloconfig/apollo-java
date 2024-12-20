@@ -47,7 +47,7 @@ public enum ConfigSyncType {
       return FULL_SYNC;
     }
     for (ConfigSyncType type : values()) {
-            if (type.value.equals(value)) {
+      if (type.value.equals(value)) {
                 return type;
              }
          }
