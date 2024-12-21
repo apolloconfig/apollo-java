@@ -265,20 +265,16 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
           ApolloConfig result = response.getBody();
 
           if (result != null) {
-
             ConfigSyncType configSyncType = ConfigSyncType.fromString(result.getConfigSyncType());
 
             if (configSyncType == ConfigSyncType.INCREMENTAL_SYNC) {
-
               ApolloConfig previousConfig = m_configCache.get();
-
               Map<String, String> previousConfigurations =
                   (previousConfig != null) ? previousConfig.getConfigurations() : null;
-
               result.setConfigurations(
                   mergeConfigurations(previousConfigurations, result.getConfigurationChanges()));
-
             }
+            
           }
 
           logger.debug("Loaded config for {}: {}", m_namespace, result);
