@@ -17,20 +17,22 @@
 package com.ctrip.framework.apollo.core.dto;
 
 
-
 /**
  * Holds the information for a Configuration change.
+ *
  * @author jason
  */
 public class ConfigurationChange {
+
   private final String key;
   private final String newValue;
   private final String configurationChangeType;
 
   /**
    * Constructor.
-   * @param key the key whose value is changed
-   * @param newValue the value after change
+   *
+   * @param key                     the key whose value is changed
+   * @param newValue                the value after change
    * @param configurationChangeType the change type
    */
   public ConfigurationChange(String key, String newValue, String configurationChangeType) {
@@ -42,6 +44,7 @@ public class ConfigurationChange {
   public String getKey() {
     return key;
   }
+
   public String getNewValue() {
     return newValue;
   }

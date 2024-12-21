@@ -21,7 +21,8 @@ import com.ctrip.framework.apollo.core.utils.StringUtils;
 /**
  * A utility class for the {@link ConfigurationChangeType} enum.
  * <p>
- * The class provides simple functionalities that extend the capabilities of {@link ConfigurationChangeType}
+ * The class provides simple functionalities that extend the capabilities of
+ * {@link ConfigurationChangeType}
  *
  * @author json
  */
@@ -43,7 +44,6 @@ public final class ConfigurationChangeTypeUtils {
     try {
       return ConfigurationChangeType.valueOf(cleanedChangeType);
     } catch (IllegalArgumentException e) {
-
       return ConfigurationChangeType.UNKNOWN;
     }
   }

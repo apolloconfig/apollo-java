@@ -24,14 +24,13 @@ import com.ctrip.framework.apollo.core.utils.StringUtils;
  * @author jason
  */
 public enum ConfigSyncType {
-  FULL_SYNC("FullSync"), INCREMENTAL_SYNC("IncrementalSync"), UNKNOWN("UnKnown");
+  FULL_SYNC("FullSync"), INCREMENTAL_SYNC("IncrementalSync"), UNKNOWN("Unknown");
 
   private final String value;
 
   ConfigSyncType(String value) {
     this.value = value;
   }
-
 
 
   /**
@@ -48,9 +47,9 @@ public enum ConfigSyncType {
     }
     for (ConfigSyncType type : values()) {
       if (type.value.equals(value)) {
-                return type;
-             }
-         }
+        return type;
+      }
+    }
     return UNKNOWN;
 
   }

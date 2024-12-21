@@ -43,9 +43,9 @@ public class ApolloConfig {
   }
 
   public ApolloConfig(String appId,
-                      String cluster,
-                      String namespaceName,
-                      String releaseKey) {
+      String cluster,
+      String namespaceName,
+      String releaseKey) {
     this.appId = appId;
     this.cluster = cluster;
     this.namespaceName = namespaceName;

@@ -31,7 +31,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.build.MockInjector;
-import com.ctrip.framework.apollo.core.dto.*;
+import com.ctrip.framework.apollo.core.dto.ApolloConfig;
+import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
+import com.ctrip.framework.apollo.core.dto.ApolloNotificationMessages;
+import com.ctrip.framework.apollo.core.dto.ConfigurationChange;
+import com.ctrip.framework.apollo.core.dto.ServiceDTO;
 import com.ctrip.framework.apollo.core.enums.ConfigSyncType;
 import com.ctrip.framework.apollo.core.signature.Signature;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
@@ -145,7 +149,8 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getStatusCode()).thenReturn(200);
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -168,19 +173,20 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getStatusCode()).thenReturn(200);
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
 
-   remoteConfigRepository.sync();
+    remoteConfigRepository.sync();
 
-
-    List<ConfigurationChange> configurationChanges=new ArrayList<>();
+    List<ConfigurationChange> configurationChanges = new ArrayList<>();
     String someNewValue = "someNewValue";
     configurationChanges.add(new ConfigurationChange(someKey, someNewValue, "MODIFIED"));
     configurationChanges.add(new ConfigurationChange(someKey1, null, "DELETED"));
     String someKey2 = "someKey2";
     String someValue2 = "someValue2";
-    configurationChanges.add(new ConfigurationChange(someKey2, someValue2,"ADDED"));
-    ApolloConfig someApolloConfigWithIncrementalSync = assembleApolloConfigWithIncrementalSync(configurationChanges);
+    configurationChanges.add(new ConfigurationChange(someKey2, someValue2, "ADDED"));
+    ApolloConfig someApolloConfigWithIncrementalSync = assembleApolloConfigWithIncrementalSync(
+        configurationChanges);
 
     when(someResponse.getStatusCode()).thenReturn(200);
     when(someResponse.getBody()).thenReturn(someApolloConfigWithIncrementalSync);
@@ -204,22 +210,25 @@ public class RemoteConfigRepositoryTest {
 
     String key3 = "key3";
     String value3 = "value3";
-    Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1,key3,value3);
+    Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1, key3, value3);
 
-    List<ConfigurationChange> configurationChanges=new ArrayList<>();
+    List<ConfigurationChange> configurationChanges = new ArrayList<>();
     configurationChanges.add(new ConfigurationChange(key1, anotherValue1, "MODIFIED"));
     String key2 = "key2";
     String value2 = "value2";
     configurationChanges.add(new ConfigurationChange(key2, value2, "ADDED"));
     configurationChanges.add(new ConfigurationChange(key3, null, "DELETED"));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
-    Map<String, String> result=remoteConfigRepository.mergeConfigurations(previousConfigurations, configurationChanges);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
+    Map<String, String> result = remoteConfigRepository.mergeConfigurations(previousConfigurations,
+        configurationChanges);
 
     assertEquals(2, result.size());
     assertEquals(anotherValue1, result.get(key1));
     assertEquals(value2, result.get(key2));
   }
+
   @Test
   public void testMergeConfigurationWithPreviousConfigurationsIsNULL() throws Exception {
     String key1 = "key1";
@@ -228,11 +237,12 @@ public class RemoteConfigRepositoryTest {
     String key3 = "key3";
     String value3 = "value3";
 
-    Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1,key3,value3);
+    Map<String, String> previousConfigurations = ImmutableMap.of(key1, value1, key3, value3);
 
-
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
-    Map<String, String> result=remoteConfigRepository.mergeConfigurations(previousConfigurations, null);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
+    Map<String, String> result = remoteConfigRepository.mergeConfigurations(previousConfigurations,
+        null);
 
     assertEquals(2, result.size());
     assertEquals(value1, result.get(key1));
@@ -248,15 +258,17 @@ public class RemoteConfigRepositoryTest {
     String key3 = "key3";
     String value3 = "value3";
 
-    List<ConfigurationChange> configurationChanges=new ArrayList<>();
+    List<ConfigurationChange> configurationChanges = new ArrayList<>();
     configurationChanges.add(new ConfigurationChange(key1, anotherValue1, "MODIFIED"));
     String key2 = "key2";
     String value2 = "value2";
     configurationChanges.add(new ConfigurationChange(key2, value2, "ADDED"));
     configurationChanges.add(new ConfigurationChange(key3, null, "DELETED"));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,someNamespace);
-    Map<String, String> result=remoteConfigRepository.mergeConfigurations(null, configurationChanges);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
+    Map<String, String> result = remoteConfigRepository.mergeConfigurations(null,
+        configurationChanges);
 
     assertEquals(2, result.size());
     assertEquals(anotherValue1, result.get(key1));
@@ -281,7 +293,8 @@ public class RemoteConfigRepositoryTest {
       }
     });
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -318,7 +331,8 @@ public class RemoteConfigRepositoryTest {
       }
     }).when(httpClient).doGet(any(HttpRequest.class), any(Class.class));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -331,7 +345,8 @@ public class RemoteConfigRepositoryTest {
 
     when(someResponse.getStatusCode()).thenReturn(500);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
 
     //must stop the long polling before exception occurred
     remoteConfigLongPollService.stopLongPollingRefresh();
@@ -344,7 +359,8 @@ public class RemoteConfigRepositoryTest {
 
     when(someResponse.getStatusCode()).thenReturn(404);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
 
     //must stop the long polling before exception occurred
     remoteConfigLongPollService.stopLongPollingRefresh();
@@ -361,7 +377,8 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
     RepositoryChangeListener someListener = mock(RepositoryChangeListener.class);
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
     remoteConfigRepository.addChangeListener(someListener);
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
@@ -372,7 +389,8 @@ public class RemoteConfigRepositoryTest {
 
     remoteConfigRepository.sync();
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace),
+        captor.capture());
 
     assertEquals(newConfigurations, captor.getValue());
   }
@@ -395,9 +413,11 @@ public class RemoteConfigRepositoryTest {
         return null;
       }
 
-    }).when(someListener).onRepositoryChange(any(String.class), any(String.class), any(Properties.class));
+    }).when(someListener)
+        .onRepositoryChange(any(String.class), any(String.class), any(Properties.class));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
     remoteConfigRepository.addChangeListener(someListener);
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
@@ -421,12 +441,14 @@ public class RemoteConfigRepositoryTest {
 
     remoteConfigLongPollService.stopLongPollingRefresh();
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace),
+        captor.capture());
     assertEquals(newConfigurations, captor.getValue());
 
     final ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor = ArgumentCaptor
         .forClass(HttpRequest.class);
-    verify(httpClient, atLeast(1)).doGet(httpRequestArgumentCaptor.capture(), eq(ApolloConfig.class));
+    verify(httpClient, atLeast(1)).doGet(httpRequestArgumentCaptor.capture(),
+        eq(ApolloConfig.class));
 
     HttpRequest request = httpRequestArgumentCaptor.getValue();
 
@@ -449,7 +471,8 @@ public class RemoteConfigRepositoryTest {
     notificationMessages.put(someKey, someNotificationId);
     notificationMessages.put(anotherKey, anotherNotificationId);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
     ApolloConfig someApolloConfig = mock(ApolloConfig.class);
     when(someApolloConfig.getReleaseKey()).thenReturn(someReleaseKey);
 
@@ -479,12 +502,14 @@ public class RemoteConfigRepositoryTest {
 
     return apolloConfig;
   }
-  private ApolloConfig assembleApolloConfigWithIncrementalSync(List<ConfigurationChange> configurationChanges) {
+
+  private ApolloConfig assembleApolloConfigWithIncrementalSync(
+      List<ConfigurationChange> configurationChanges) {
     String someAppId = "appId";
     String someClusterName = "cluster";
     String someReleaseKey = "1";
     ApolloConfig apolloConfig =
-            new ApolloConfig(someAppId, someClusterName, someNamespace, someReleaseKey);
+        new ApolloConfig(someAppId, someClusterName, someNamespace, someReleaseKey);
 
     apolloConfig.setConfigSyncType(ConfigSyncType.INCREMENTAL_SYNC.getValue());
     apolloConfig.setConfigurationChanges(configurationChanges);
@@ -539,8 +564,8 @@ public class RemoteConfigRepositoryTest {
     }
 
     @Override
-    public String getAccessKeySecret(String appId){
-      if(appId.equals(someAppId)){
+    public String getAccessKeySecret(String appId) {
+      if (appId.equals(someAppId)) {
         return someSecret;
       }
       return null;
@@ -555,8 +580,8 @@ public class RemoteConfigRepositoryTest {
         return (HttpResponse<T>) someResponse;
       }
       throw new ApolloConfigStatusCodeException(someResponse.getStatusCode(),
-              String.format("Http request failed due to status code: %d",
-          someResponse.getStatusCode()));
+          String.format("Http request failed due to status code: %d",
+              someResponse.getStatusCode()));
     }
 
     @Override
