@@ -67,9 +67,7 @@ import org.slf4j.Logger;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class RemoteConfigRepository extends AbstractConfigRepository {
-
-  private static final Logger logger = DeferredLoggerFactory.getLogger(
-      RemoteConfigRepository.class);
+  private static final Logger logger = DeferredLoggerFactory.getLogger(RemoteConfigRepository.class);
   private static final Joiner STRING_JOINER = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR);
   private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
   private static final Escaper pathEscaper = UrlEscapers.urlPathSegmentEscaper();
@@ -98,7 +96,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   /**
    * Constructor.
    *
-   * @param appId     the appId
+   * @param appId the appId
    * @param namespace the namespace
    */
   public RemoteConfigRepository(String appId, String namespace) {
@@ -113,8 +111,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     m_remoteMessages = new AtomicReference<>();
     m_loadConfigRateLimiter = RateLimiter.create(m_configUtil.getLoadConfigQPS());
     m_configNeedForceRefresh = new AtomicBoolean(true);
-    m_loadConfigFailSchedulePolicy = new ExponentialSchedulePolicy(
-        m_configUtil.getOnErrorRetryInterval(),
+    m_loadConfigFailSchedulePolicy = new ExponentialSchedulePolicy(m_configUtil.getOnErrorRetryInterval(),
         m_configUtil.getOnErrorRetryInterval() * 8);
     this.schedulePeriodicRefresh();
     this.scheduleLongPollingRefresh();
@@ -125,7 +122,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     if (m_configCache.get() == null) {
       long start = System.currentTimeMillis();
       this.sync();
-      Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND + ":" + m_namespace,
+      Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND+":"+m_namespace,
           String.valueOf(System.currentTimeMillis() - start));
     }
     return transformApolloConfigToProperties(m_configCache.get());
@@ -148,8 +145,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         new Runnable() {
           @Override
           public void run() {
-            Tracer.logEvent(APOLLO_CONFIGSERVICE,
-                String.format("periodicRefresh: %s", m_namespace));
+            Tracer.logEvent(APOLLO_CONFIGSERVICE, String.format("periodicRefresh: %s", m_namespace));
             logger.debug("refresh config for namespace: {}", m_namespace);
             trySync();
             Tracer.logEvent(APOLLO_CLIENT_VERSION, Apollo.VERSION);
@@ -174,7 +170,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
       }
 
       if (current != null) {
-        Tracer.logEvent(String.format(APOLLO_CLIENT_CONFIGS + "%s", current.getNamespaceName()),
+        Tracer.logEvent(String.format(APOLLO_CLIENT_CONFIGS+"%s", current.getNamespaceName()),
             current.getReleaseKey());
       }
 
@@ -225,8 +221,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         if (onErrorSleepTime > 0) {
           logger.warn(
               "Load config failed, will retry in {} {}. appId: {}, cluster: {}, namespaces: {}",
-              onErrorSleepTime, m_configUtil.getOnErrorRetryIntervalTimeUnit(), appId, cluster,
-              m_namespace);
+              onErrorSleepTime, m_configUtil.getOnErrorRetryIntervalTimeUnit(), appId, cluster, m_namespace);
 
           try {
             m_configUtil.getOnErrorRetryIntervalTimeUnit().sleep(onErrorSleepTime);
@@ -236,7 +231,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         }
 
         url = assembleQueryConfigUrl(configService.getHomepageUrl(), appId, cluster, m_namespace,
-            dataCenter, m_remoteMessages.get(), m_configCache.get());
+                dataCenter, m_remoteMessages.get(), m_configCache.get());
 
         logger.debug("Loading config from {}", url);
 
@@ -274,7 +269,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
               result.setConfigurations(
                   mergeConfigurations(previousConfigurations, result.getConfigurationChanges()));
             }
-            
+
           }
 
           logger.debug("Loaded config for {}: {}", m_namespace, result);
@@ -290,14 +285,13 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                 appId, cluster, m_namespace);
             statusCodeException = new ApolloConfigStatusCodeException(ex.getStatusCode(),
                 message);
-            Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND, m_namespace);
+            Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND,m_namespace);
 
           }
-          Tracer.logEvent(APOLLO_CONFIG_EXCEPTION,
-              ExceptionUtil.getDetailMessage(statusCodeException));
+          Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(statusCodeException));
           transaction.setStatus(statusCodeException);
           exception = statusCodeException;
-          if (ex.getStatusCode() == 404) {
+          if(ex.getStatusCode() == 404) {
             break retryLoopLabel;
           }
         } catch (Throwable ex) {
@@ -321,7 +315,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   }
 
   String assembleQueryConfigUrl(String uri, String appId, String cluster, String namespace,
-      String dataCenter, ApolloNotificationMessages remoteMessages, ApolloConfig previousConfig) {
+                                String dataCenter, ApolloNotificationMessages remoteMessages, ApolloConfig previousConfig) {
 
     String path = "configs/%s/%s/%s";
     List<String> pathParams =
@@ -366,8 +360,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     remoteConfigLongPollService.submit(m_appId, m_namespace, this);
   }
 
-  public void onLongPollNotified(ServiceDTO longPollNotifiedServiceDto,
-      ApolloNotificationMessages remoteMessages) {
+  public void onLongPollNotified(ServiceDTO longPollNotifiedServiceDto, ApolloNotificationMessages remoteMessages) {
     m_longPollServiceDto.set(longPollNotifiedServiceDto);
     m_remoteMessages.set(remoteMessages);
     m_executorService.submit(new Runnable() {

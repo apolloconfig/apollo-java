@@ -293,8 +293,7 @@ public class RemoteConfigRepositoryTest {
       }
     });
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -331,8 +330,7 @@ public class RemoteConfigRepositoryTest {
       }
     }).when(httpClient).doGet(any(HttpRequest.class), any(Class.class));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
@@ -345,8 +343,7 @@ public class RemoteConfigRepositoryTest {
 
     when(someResponse.getStatusCode()).thenReturn(500);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     //must stop the long polling before exception occurred
     remoteConfigLongPollService.stopLongPollingRefresh();
@@ -359,8 +356,7 @@ public class RemoteConfigRepositoryTest {
 
     when(someResponse.getStatusCode()).thenReturn(404);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     //must stop the long polling before exception occurred
     remoteConfigLongPollService.stopLongPollingRefresh();
@@ -377,8 +373,7 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
     RepositoryChangeListener someListener = mock(RepositoryChangeListener.class);
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
     remoteConfigRepository.addChangeListener(someListener);
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
@@ -389,8 +384,7 @@ public class RemoteConfigRepositoryTest {
 
     remoteConfigRepository.sync();
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace),
-        captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
 
     assertEquals(newConfigurations, captor.getValue());
   }
@@ -413,11 +407,9 @@ public class RemoteConfigRepositoryTest {
         return null;
       }
 
-    }).when(someListener)
-        .onRepositoryChange(any(String.class), any(String.class), any(Properties.class));
+    }).when(someListener).onRepositoryChange(any(String.class), any(String.class), any(Properties.class));
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
     remoteConfigRepository.addChangeListener(someListener);
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
@@ -441,14 +433,12 @@ public class RemoteConfigRepositoryTest {
 
     remoteConfigLongPollService.stopLongPollingRefresh();
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace),
-        captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
     assertEquals(newConfigurations, captor.getValue());
 
     final ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor = ArgumentCaptor
         .forClass(HttpRequest.class);
-    verify(httpClient, atLeast(1)).doGet(httpRequestArgumentCaptor.capture(),
-        eq(ApolloConfig.class));
+    verify(httpClient, atLeast(1)).doGet(httpRequestArgumentCaptor.capture(), eq(ApolloConfig.class));
 
     HttpRequest request = httpRequestArgumentCaptor.getValue();
 
@@ -471,8 +461,7 @@ public class RemoteConfigRepositoryTest {
     notificationMessages.put(someKey, someNotificationId);
     notificationMessages.put(anotherKey, anotherNotificationId);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
     ApolloConfig someApolloConfig = mock(ApolloConfig.class);
     when(someApolloConfig.getReleaseKey()).thenReturn(someReleaseKey);
 
@@ -564,8 +553,8 @@ public class RemoteConfigRepositoryTest {
     }
 
     @Override
-    public String getAccessKeySecret(String appId) {
-      if (appId.equals(someAppId)) {
+    public String getAccessKeySecret(String appId){
+      if(appId.equals(someAppId)){
         return someSecret;
       }
       return null;
@@ -580,8 +569,8 @@ public class RemoteConfigRepositoryTest {
         return (HttpResponse<T>) someResponse;
       }
       throw new ApolloConfigStatusCodeException(someResponse.getStatusCode(),
-          String.format("Http request failed due to status code: %d",
-              someResponse.getStatusCode()));
+              String.format("Http request failed due to status code: %d",
+          someResponse.getStatusCode()));
     }
 
     @Override
