@@ -149,8 +149,7 @@ public class RemoteConfigRepositoryTest {
     when(someResponse.getStatusCode()).thenReturn(200);
     when(someResponse.getBody()).thenReturn(someApolloConfig);
 
-    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
-        someNamespace);
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     Properties config = remoteConfigRepository.getConfig();
 
