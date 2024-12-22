@@ -32,7 +32,6 @@ public enum ConfigSyncType {
     this.value = value;
   }
 
-
   /**
    * Transforms a given string to its matching {@link ConfigSyncType}.
    *
