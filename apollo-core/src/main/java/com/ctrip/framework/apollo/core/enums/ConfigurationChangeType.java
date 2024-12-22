@@ -20,7 +20,7 @@ package com.ctrip.framework.apollo.core.enums;
 import com.google.common.base.Preconditions;
 
 /**
- * @author jason
+ * @since 2.0.0
  */
 public enum ConfigurationChangeType {
   ADDED, MODIFIED, DELETED, UNKNOWN;
