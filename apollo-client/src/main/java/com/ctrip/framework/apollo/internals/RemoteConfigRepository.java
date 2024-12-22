@@ -269,7 +269,6 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
               result.setConfigurations(
                   mergeConfigurations(previousConfigurations, result.getConfigurationChanges()));
             }
-
           }
 
           logger.debug("Loaded config for {}: {}", m_namespace, result);
