@@ -50,7 +50,6 @@ public enum ConfigSyncType {
       }
     }
     return UNKNOWN;
-
   }
 
   /**
