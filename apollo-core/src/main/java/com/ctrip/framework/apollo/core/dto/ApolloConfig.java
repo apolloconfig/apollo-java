@@ -100,7 +100,6 @@ public class ApolloConfig {
     this.configSyncType = configSyncType;
   }
 
-
   public void setConfigurations(Map<String, String> configurations) {
     this.configurations = configurations;
   }
