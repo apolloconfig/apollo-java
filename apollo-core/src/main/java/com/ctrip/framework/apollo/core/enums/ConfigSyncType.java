@@ -19,7 +19,7 @@ package com.ctrip.framework.apollo.core.enums;
 import com.ctrip.framework.apollo.core.utils.StringUtils;
 
 /**
- * This enum represents all the possible Configuration sync  from apollo-config
+ * This enum represents all the possible Configuration sync types
  *
  * @author jason
  */
