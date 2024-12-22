@@ -24,7 +24,7 @@ import com.ctrip.framework.apollo.core.utils.StringUtils;
  * The class provides simple functionalities that extend the capabilities of
  * {@link ConfigurationChangeType}
  *
- * @author json
+ * @since 2.0.0
  */
 public final class ConfigurationChangeTypeUtils {
 
