@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 
 /**
  *  This enum represents all the possible Configuration Change types
+ *
  * @since 2.0.0
  */
 public enum ConfigurationChangeType {
