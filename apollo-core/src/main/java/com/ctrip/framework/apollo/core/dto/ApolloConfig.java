@@ -108,7 +108,6 @@ public class ApolloConfig {
     this.configurationChanges = configurationChanges;
   }
 
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ApolloConfig{");
