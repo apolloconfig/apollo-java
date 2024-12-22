@@ -21,7 +21,7 @@ import com.ctrip.framework.apollo.core.utils.StringUtils;
 /**
  * This enum represents all the possible Configuration sync types
  *
- * @author jason
+ * @since 2.0.0
  */
 public enum ConfigSyncType {
   FULL_SYNC("FullSync"), INCREMENTAL_SYNC("IncrementalSync"), UNKNOWN("Unknown");
