@@ -268,7 +268,13 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                   (previousConfig != null) ? previousConfig.getConfigurations() : null;
               result.setConfigurations(
                   mergeConfigurations(previousConfigurations, result.getConfigurationChanges()));
+            } else if (configSyncType == ConfigSyncType.UNKNOWN) {
+              String message = String.format(
+                  "Apollo Config Sync type invalid - configSyncType: %s",
+                  result.getConfigSyncType());
+              throw new ApolloConfigException(message, exception);
             }
+
           }
 
           logger.debug("Loaded config for {}: {}", m_namespace, result);

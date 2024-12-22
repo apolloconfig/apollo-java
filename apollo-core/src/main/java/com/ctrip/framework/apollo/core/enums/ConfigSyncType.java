@@ -37,8 +37,6 @@ public enum ConfigSyncType {
    *
    * @param value the string that matches
    * @return the matching {@link ConfigSyncType}
-   * @throws IllegalArgumentException in case the <code>value</code> is empty or there is no
-   *                                  matching {@link ConfigSyncType}
    */
   public static ConfigSyncType fromString(String value) {
     if (StringUtils.isEmpty(value)) {

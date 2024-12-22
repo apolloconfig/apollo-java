@@ -274,6 +274,24 @@ public class RemoteConfigRepositoryTest {
     assertEquals(value2, result.get(key2));
   }
 
+  @Test(expected = ApolloConfigException.class)
+  public void testGetRemoteConfigWithUnknownSync() throws Exception {
+
+    ApolloConfig someApolloConfigWithUnknownSync = assembleApolloConfigWithUnknownSync(
+        new ArrayList<>());
+
+    when(someResponse.getStatusCode()).thenReturn(200);
+    when(someResponse.getBody()).thenReturn(someApolloConfigWithUnknownSync);
+
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId,
+        someNamespace);
+
+    //must stop the long polling before exception occurred
+    remoteConfigLongPollService.stopLongPollingRefresh();
+
+    remoteConfigRepository.getConfig();
+  }
+
   @Test
   public void testLoadConfigWithOrderedProperties() throws Exception {
     String someKey = "someKey";
@@ -500,6 +518,19 @@ public class RemoteConfigRepositoryTest {
         new ApolloConfig(someAppId, someClusterName, someNamespace, someReleaseKey);
 
     apolloConfig.setConfigSyncType(ConfigSyncType.INCREMENTAL_SYNC.getValue());
+    apolloConfig.setConfigurationChanges(configurationChanges);
+    return apolloConfig;
+  }
+
+  private ApolloConfig assembleApolloConfigWithUnknownSync(
+      List<ConfigurationChange> configurationChanges) {
+    String someAppId = "appId";
+    String someClusterName = "cluster";
+    String someReleaseKey = "1";
+    ApolloConfig apolloConfig =
+        new ApolloConfig(someAppId, someClusterName, someNamespace, someReleaseKey);
+
+    apolloConfig.setConfigSyncType(ConfigSyncType.UNKNOWN.getValue());
     apolloConfig.setConfigurationChanges(configurationChanges);
     return apolloConfig;
   }
