@@ -20,7 +20,7 @@ package com.ctrip.framework.apollo.core.dto;
 /**
  * Holds the information for a Configuration change.
  *
- * @author jason
+ * @since 2.0.0
  */
 public class ConfigurationChange {
 
