@@ -53,7 +53,6 @@ public class ConfigurationChange {
     return configurationChangeType;
   }
 
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ConfigChange{");
