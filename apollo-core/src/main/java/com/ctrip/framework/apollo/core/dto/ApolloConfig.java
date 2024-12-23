@@ -16,7 +16,6 @@
  */
 package com.ctrip.framework.apollo.core.dto;
 
-
 import java.util.List;
 import java.util.Map;
 

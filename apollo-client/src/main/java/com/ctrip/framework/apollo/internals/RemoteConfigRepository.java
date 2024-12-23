@@ -270,7 +270,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                   mergeConfigurations(previousConfigurations, result.getConfigurationChanges()));
             } else if (configSyncType == ConfigSyncType.UNKNOWN) {
               String message = String.format(
-                  "Apollo Config Sync type invalid - configSyncType: %s",
+                  "Invalid config sync type - %s",
                   result.getConfigSyncType());
               throw new ApolloConfigException(message, exception);
             }
