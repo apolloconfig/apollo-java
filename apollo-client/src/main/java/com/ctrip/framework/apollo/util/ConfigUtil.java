@@ -74,7 +74,7 @@ public class ConfigUtil {
   private boolean propertyKubernetesCacheEnabled = false;
   private boolean clientMonitorEnabled = false;
   private boolean clientMonitorJmxEnabled = false;
-  private String monitorExternalType = "NONE";
+  private String monitorExternalType = "";
   private long monitorExternalExportPeriod = 10;
   private int monitorExceptionQueueSize = 25;
 
@@ -556,7 +556,7 @@ public class ConfigUtil {
     monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
     if (Strings.isNullOrEmpty(monitorExternalType)) {
       monitorExternalType = Foundation.app()
-              .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "NONE");
+              .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "");
     }
   }
 

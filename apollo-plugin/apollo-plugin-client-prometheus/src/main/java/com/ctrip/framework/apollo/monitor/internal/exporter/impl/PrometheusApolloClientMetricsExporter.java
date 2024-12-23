@@ -40,7 +40,7 @@ public class PrometheusApolloClientMetricsExporter extends
 
   private static final String PROMETHEUS = "prometheus";
   private final Logger logger = DeferredLoggerFactory.getLogger(
-      DefaultApolloClientNamespaceApi.class);
+      PrometheusApolloClientMetricsExporter.class);
   protected CollectorRegistry registry;
   protected Map<String, Collector.Describable> map;
 
