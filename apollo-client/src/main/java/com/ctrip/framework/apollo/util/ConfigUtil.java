@@ -72,13 +72,11 @@ public class ConfigUtil {
   private boolean propertyFileCacheEnabled = true;
   private boolean overrideSystemProperties = true;
   private boolean propertyKubernetesCacheEnabled = false;
-  private int propertyKubernetesMaxWritePods = 3;
   private boolean clientMonitorEnabled = false;
   private boolean clientMonitorJmxEnabled = false;
   private String monitorExternalType = "";
   private long monitorExternalExportPeriod = 10;
   private int monitorExceptionQueueSize = 25;
-
 
   public ConfigUtil() {
     warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
@@ -95,7 +93,6 @@ public class ConfigUtil {
     initPropertyFileCacheEnabled();
     initOverrideSystemProperties();
     initPropertyKubernetesCacheEnabled();
-    initPropertyKubernetesMaxWritePods();
     initClientMonitorEnabled();
     initClientMonitorJmxEnabled();
     initClientMonitorExternalType();
@@ -393,44 +390,31 @@ public class ConfigUtil {
   }
 
   public String getK8sNamespace() {
-    return getK8sConfigProperties(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE,
-            ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES,
-            ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT);
-  }
+    String k8sNamespace = getCacheKubernetesNamespace();
 
-  private void initPropertyKubernetesMaxWritePods() {
-    String propertyKubernetesMaxWritePodsStr = getK8sConfigProperties(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_MAX_WRITE_PODS,
-            ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_MAX_WRITE_PODS_ENVIRONMENT_VARIABLES,
-            String.valueOf(propertyKubernetesMaxWritePods));
-    if (!Strings.isNullOrEmpty(propertyKubernetesMaxWritePodsStr)) {
-      try {
-        propertyKubernetesMaxWritePods = Integer.parseInt(propertyKubernetesMaxWritePodsStr);
-      } catch (Throwable ex) {
-        logger.error("Config for {} is invalid: {}",
-                ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, propertyKubernetesMaxWritePodsStr);
-      }
-    }
-  }
-
-  private String getK8sConfigProperties(String key, String environmentKey, String defaultValue) {
-    // 1. Get from System Property
-    String k8sNamespace = System.getProperty(key);
-    if (Strings.isNullOrEmpty(k8sNamespace)) {
-      // 2. Get from OS environment variable
-      k8sNamespace = System.getenv(environmentKey);
-    }
-    if (Strings.isNullOrEmpty(k8sNamespace)) {
-      // 3. Get from server.properties
-      k8sNamespace = Foundation.server().getProperty(key, null);
-    }
-    if (Strings.isNullOrEmpty(k8sNamespace)) {
-      // 4. Get from app.properties
-      k8sNamespace = Foundation.app().getProperty(key, null);
-    }
     if (!Strings.isNullOrEmpty(k8sNamespace)) {
       return k8sNamespace;
     }
-    return defaultValue;
+
+    return ConfigConsts.KUBERNETES_CACHE_CONFIG_MAP_NAMESPACE_DEFAULT;
+  }
+
+  private String getCacheKubernetesNamespace() {
+    // 1. Get from System Property
+    String k8sNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 2. Get from OS environment variable
+      k8sNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES);
+    }
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 3. Get from server.properties
+      k8sNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+    }
+    if (Strings.isNullOrEmpty(k8sNamespace)) {
+      // 4. Get from app.properties
+      k8sNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+    }
+    return k8sNamespace;
   }
 
   public boolean isInLocalMode() {
@@ -540,10 +524,6 @@ public class ConfigUtil {
     return propertyKubernetesCacheEnabled;
   }
 
-  public int getPropertyKubernetesMaxWritePods() {
-    return propertyKubernetesMaxWritePods;
-  }
-
   public boolean isOverrideSystemProperties() {
     return overrideSystemProperties;
   }
@@ -637,7 +617,7 @@ public class ConfigUtil {
   public int getMonitorExceptionQueueSize() {
     return monitorExceptionQueueSize;
   }
-  
+
   private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
     String enablePropertyNamesCache = System.getProperty(propertyName);
     if (Strings.isNullOrEmpty(enablePropertyNamesCache)) {

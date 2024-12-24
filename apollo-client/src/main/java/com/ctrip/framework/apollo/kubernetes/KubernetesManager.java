@@ -16,10 +16,8 @@
  */
 package com.ctrip.framework.apollo.kubernetes;
 
-import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
-import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import io.kubernetes.client.openapi.ApiClient;
@@ -40,21 +38,29 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Manages Kubernetes ConfigMap operations.
+ * Required Kubernetes permissions:
+ * - pods: [get, list] - For pod selection and write eligibility
+ * - configmaps: [get, create, update] - For ConfigMap operations
+ */
 @Service
 public class KubernetesManager {
     private static final Logger logger = LoggerFactory.getLogger(KubernetesManager.class);
 
+    private static final String RUNNING_POD_FIELD_SELECTOR = "status.phase=Running";
+
+    private static final int MAX_SEARCH_NUM = 100;
+
     private ApiClient client;
     private CoreV1Api coreV1Api;
-    private int propertyKubernetesMaxWritePods;
+    private int propertyKubernetesMaxWritePods = 3;
     private String localPodName = System.getenv("HOSTNAME");
 
     public KubernetesManager() {
         try {
             client = Config.defaultClient();
             coreV1Api = new CoreV1Api(client);
-            ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-            propertyKubernetesMaxWritePods = configUtil.getPropertyKubernetesMaxWritePods();
         } catch (Exception e) {
             String errorMessage = "Failed to initialize Kubernetes client: " + e.getMessage();
             logger.error(errorMessage, e);
@@ -244,8 +250,8 @@ public class KubernetesManager {
             String labelSelector = "app=" + appName;
 
             V1PodList v1PodList = coreV1Api.listNamespacedPod(k8sNamespace, null, null,
-                    null, null, labelSelector,
-                    null, null, null
+                    null, RUNNING_POD_FIELD_SELECTOR, labelSelector,
+                    MAX_SEARCH_NUM, null, null
                     , null, null);
 
             return v1PodList.getItems().stream()

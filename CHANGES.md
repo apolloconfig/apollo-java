@@ -14,6 +14,7 @@ Apollo Java 2.4.0
 * [Fix monitor arg cause npe](https://github.com/apolloconfig/apollo-java/pull/86)
 * [Fix the concurrent issue in SpringValueRegistry.scanAndClean](https://github.com/apolloconfig/apollo-java/pull/95)
 * [Feature support incremental configuration synchronization client](https://github.com/apolloconfig/apollo-java/pull/90)
+* [Feature reduce conflicts when update configmap in k8](https://github.com/apolloconfig/apollo-java/pull/93)
 
 ------------------
 All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/4?closed=1)

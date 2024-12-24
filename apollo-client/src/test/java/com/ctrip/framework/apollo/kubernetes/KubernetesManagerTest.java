@@ -182,8 +182,8 @@ public class KubernetesManagerTest {
         // assert
         assertTrue(success);
         Mockito.verify(coreV1Api, Mockito.times(1)).listNamespacedPod(namespace, null, null,
-                null, null, "app=app",
-                null, null, null
+                null, "status.phase=Running", "app=app",
+                100, null, null
                 , null, null);
     }
 
