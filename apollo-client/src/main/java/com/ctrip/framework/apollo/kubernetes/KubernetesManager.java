@@ -40,9 +40,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Manages Kubernetes ConfigMap operations.
+ * Required Kubernetes permissions:
+ * - pods: [get, list] - For pod selection and write eligibility
+ * - configmaps: [get, create, update] - For ConfigMap operations
+ */
 @Service
 public class KubernetesManager {
     private static final Logger logger = LoggerFactory.getLogger(KubernetesManager.class);
+
+    private static final String RUNNING_POD_FIELD_SELECTOR = "status.phase=Running";
+
+    private static final int MAX_SEARCH_NUM = 1000;
 
     private ApiClient client;
     private CoreV1Api coreV1Api;
@@ -244,8 +254,8 @@ public class KubernetesManager {
             String labelSelector = "app=" + appName;
 
             V1PodList v1PodList = coreV1Api.listNamespacedPod(k8sNamespace, null, null,
-                    null, null, labelSelector,
-                    null, null, null
+                    null, RUNNING_POD_FIELD_SELECTOR, labelSelector,
+                    MAX_SEARCH_NUM, null, null
                     , null, null);
 
             return v1PodList.getItems().stream()

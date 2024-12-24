@@ -127,6 +127,13 @@
       "defaultValue": "default"
     },
     {
+      "name": "apollo.cache.kubernetes.max-write-pods",
+      "type": "java.lang.String",
+      "sourceType": "com.ctrip.framework.apollo.util.ConfigUtil",
+      "description": "max number of pods that can write the configmap cache in Kubernetes.",
+      "defaultValue": "3"
+    },
+    {
       "name": "apollo.property.order.enable",
       "type": "java.lang.Boolean",
       "sourceType": "com.ctrip.framework.apollo.util.factory.PropertiesFactory",
