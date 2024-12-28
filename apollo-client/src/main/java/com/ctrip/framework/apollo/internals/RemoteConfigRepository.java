@@ -23,7 +23,10 @@ import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloNotificationMessages;
+import com.ctrip.framework.apollo.core.dto.ConfigurationChange;
 import com.ctrip.framework.apollo.core.dto.ServiceDTO;
+import com.ctrip.framework.apollo.core.enums.ConfigSyncType;
+import com.ctrip.framework.apollo.core.enums.ConfigurationChangeType;
 import com.ctrip.framework.apollo.core.schedule.ExponentialSchedulePolicy;
 import com.ctrip.framework.apollo.core.schedule.SchedulePolicy;
 import com.ctrip.framework.apollo.core.signature.Signature;
@@ -49,6 +52,7 @@ import com.google.common.net.UrlEscapers;
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.Gson;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -255,6 +259,24 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
 
           ApolloConfig result = response.getBody();
 
+          if (result != null) {
+            ConfigSyncType configSyncType = ConfigSyncType.fromString(result.getConfigSyncType());
+
+            if (configSyncType == ConfigSyncType.INCREMENTAL_SYNC) {
+              ApolloConfig previousConfig = m_configCache.get();
+              Map<String, String> previousConfigurations =
+                  (previousConfig != null) ? previousConfig.getConfigurations() : null;
+              result.setConfigurations(
+                  mergeConfigurations(previousConfigurations, result.getConfigurationChanges()));
+            } else if (configSyncType == ConfigSyncType.UNKNOWN) {
+              String message = String.format(
+                  "Invalid config sync type - %s",
+                  result.getConfigSyncType());
+              throw new ApolloConfigException(message, exception);
+            }
+
+          }
+
           logger.debug("Loaded config for {}: {}", m_namespace, result);
 
           return result;
@@ -269,7 +291,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
             statusCodeException = new ApolloConfigStatusCodeException(ex.getStatusCode(),
                 message);
             Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND,m_namespace);
-            
+
           }
           Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(statusCodeException));
           transaction.setStatus(statusCodeException);
@@ -362,5 +384,35 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     }
 
     return services;
+  }
+
+  Map<String, String> mergeConfigurations(Map<String, String> previousConfigurations,
+      List<ConfigurationChange> configurationChanges) {
+    Map<String, String> newConfigurations = new HashMap<>();
+
+    if (previousConfigurations != null) {
+      newConfigurations = Maps.newHashMap(previousConfigurations);
+    }
+
+    if (configurationChanges == null) {
+      return newConfigurations;
+    }
+
+    for (ConfigurationChange change : configurationChanges) {
+      switch (ConfigurationChangeType.fromString(change.getConfigurationChangeType())) {
+        case ADDED:
+        case MODIFIED:
+          newConfigurations.put(change.getKey(), change.getNewValue());
+          break;
+        case DELETED:
+          newConfigurations.remove(change.getKey());
+          break;
+        default:
+          //do nothing
+          break;
+      }
+    }
+
+    return newConfigurations;
   }
 }
