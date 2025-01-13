@@ -18,27 +18,44 @@ package com.ctrip.framework.apollo.kubernetes;
 
 import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Manages Kubernetes ConfigMap operations.
+ * Required Kubernetes permissions:
+ * - pods: [get, list] - For pod selection and write eligibility
+ * - configmaps: [get, create, update] - For ConfigMap operations
+ */
 @Service
 public class KubernetesManager {
     private static final Logger logger = LoggerFactory.getLogger(KubernetesManager.class);
 
+    private static final String RUNNING_POD_FIELD_SELECTOR = "status.phase=Running";
+
+    private static final int MAX_SEARCH_NUM = 100;
+
     private ApiClient client;
     private CoreV1Api coreV1Api;
+    private int propertyKubernetesMaxWritePods = 3;
+    private String localPodName = System.getenv("HOSTNAME");
 
     public KubernetesManager() {
         try {
@@ -51,8 +68,11 @@ public class KubernetesManager {
         }
     }
 
-    public KubernetesManager(CoreV1Api coreV1Api) {
+    @VisibleForTesting
+    public KubernetesManager(CoreV1Api coreV1Api, String localPodName, int propertyKubernetesMaxWritePods) {
         this.coreV1Api = coreV1Api;
+        this.localPodName = localPodName;
+        this.propertyKubernetesMaxWritePods = propertyKubernetesMaxWritePods;
     }
 
     private V1ConfigMap buildConfigMap(String name, String namespace, Map<String, String> data) {
@@ -132,6 +152,10 @@ public class KubernetesManager {
             return false;
         }
 
+        if (!isWritePod(k8sNamespace)) {
+            return true;
+        }
+
         int maxRetries = 5;
         int retryCount = 0;
         long waitTime = 100;
@@ -203,6 +227,45 @@ public class KubernetesManager {
             // configmap not exist
             logger.info("ConfigMap not existence");
             return false;
+        }
+    }
+
+    /**
+     * check pod whether pod can write configmap
+     *
+     * @param k8sNamespace config map namespace
+     * @return true if this pod can write configmap, false otherwise
+     */
+    private boolean isWritePod(String k8sNamespace) {
+        try {
+            if (Strings.isNullOrEmpty(localPodName)) {
+                return true;
+            }
+            V1Pod localPod = coreV1Api.readNamespacedPod(localPodName, k8sNamespace, null);
+            V1ObjectMeta localMetadata = localPod.getMetadata();
+            if (localMetadata == null || localMetadata.getLabels() == null) {
+                return true;
+            }
+            String appName = localMetadata.getLabels().get("app");
+            String labelSelector = "app=" + appName;
+
+            V1PodList v1PodList = coreV1Api.listNamespacedPod(k8sNamespace, null, null,
+                    null, RUNNING_POD_FIELD_SELECTOR, labelSelector,
+                    MAX_SEARCH_NUM, null, null
+                    , null, null);
+
+            return v1PodList.getItems().stream()
+                    .map(V1Pod::getMetadata)
+                    .filter(Objects::nonNull)
+                    //Make each node selects the same write nodes by sorting
+                    .filter(metadata -> metadata.getCreationTimestamp() != null)
+                    .sorted(Comparator.comparing(V1ObjectMeta::getCreationTimestamp))
+                    .map(V1ObjectMeta::getName)
+                    .limit(propertyKubernetesMaxWritePods)
+                    .anyMatch(localPodName::equals);
+        } catch (Exception e) {
+            logger.info("Error determining write pod eligibility:{}", e.getMessage(), e);
+            return true;
         }
     }
 }

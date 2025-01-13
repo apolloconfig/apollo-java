@@ -617,7 +617,7 @@ public class ConfigUtil {
   public int getMonitorExceptionQueueSize() {
     return monitorExceptionQueueSize;
   }
-  
+
   private boolean getPropertyBoolean(String propertyName, String envName, boolean defaultVal) {
     String enablePropertyNamesCache = System.getProperty(propertyName);
     if (Strings.isNullOrEmpty(enablePropertyNamesCache)) {
