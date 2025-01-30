@@ -20,6 +20,7 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorContext;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -47,6 +48,11 @@ public class ConfigMonitorInitializerTest {
 		MockInjector.setInstance(ApolloClientMonitorContext.class, mockMonitorContext);
 		MockInjector.setInstance(ApolloClientMetricsExporterFactory.class, mockExporterFactory);
 		resetConfigMonitorInitializer();
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		MockInjector.reset();
 	}
 
 	@Test

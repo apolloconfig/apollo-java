@@ -24,6 +24,7 @@ import com.ctrip.framework.apollo.util.escape.EscapeUtil;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -79,6 +80,11 @@ public class K8sConfigMapConfigRepositoryTest {
                 .data(data);
 
         k8sConfigMapConfigRepository = new K8sConfigMapConfigRepository(someAppId, someNamespace, upstreamRepo);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        MockInjector.reset();
     }
 
     /**

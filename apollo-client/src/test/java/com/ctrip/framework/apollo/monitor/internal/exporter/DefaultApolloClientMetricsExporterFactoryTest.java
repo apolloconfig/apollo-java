@@ -23,6 +23,7 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.exporter.impl.DefaultApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -46,6 +47,11 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
     MockitoAnnotations.initMocks(this);
     MockInjector.setInstance(ConfigUtil.class, configUtil);
     factory = new DefaultApolloClientMetricsExporterFactory();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    MockInjector.reset();
   }
 
   @Test

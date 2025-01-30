@@ -24,6 +24,7 @@ import com.ctrip.framework.apollo.monitor.api.ApolloClientExceptionMonitorApi;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -57,7 +58,11 @@ public class DefaultConfigMonitorTest {
     MockInjector.setInstance(ApolloClientMonitorContext.class, monitorContext);
     
     configMonitor = new DefaultConfigMonitor();
+  }
 
+  @After
+  public void tearDown() throws Exception {
+    MockInjector.reset();
   }
 
   @Test
