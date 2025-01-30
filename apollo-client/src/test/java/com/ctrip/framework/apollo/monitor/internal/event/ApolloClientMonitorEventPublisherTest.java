@@ -22,6 +22,7 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorContext;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,6 +46,11 @@ public class ApolloClientMonitorEventPublisherTest {
     MockInjector.setInstance(ApolloClientMonitorContext.class, mockCollectorManager);
     MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
     ApolloClientMonitorEventPublisher.reset();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    MockInjector.reset();
   }
 
   @Test

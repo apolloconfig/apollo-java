@@ -23,6 +23,7 @@ import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -58,6 +59,11 @@ public class KubernetesManagerTest {
 
         MockInjector.setInstance(KubernetesManager.class, kubernetesManager);
         MockInjector.setInstance(CoreV1Api.class, coreV1Api);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        MockInjector.reset();
     }
 
     /**
