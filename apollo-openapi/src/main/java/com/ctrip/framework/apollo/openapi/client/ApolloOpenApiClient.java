@@ -22,6 +22,7 @@ import com.ctrip.framework.apollo.openapi.client.service.ClusterOpenApiService;
 import com.ctrip.framework.apollo.openapi.client.service.ItemOpenApiService;
 import com.ctrip.framework.apollo.openapi.client.service.NamespaceOpenApiService;
 import com.ctrip.framework.apollo.openapi.client.service.ReleaseOpenApiService;
+import com.ctrip.framework.apollo.openapi.client.service.OrganizationOpenApiService;
 import com.ctrip.framework.apollo.openapi.dto.*;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -45,6 +46,7 @@ public class ApolloOpenApiClient {
   private final String portalUrl;
   private final String token;
   private final AppOpenApiService appService;
+  private final OrganizationOpenApiService organizationOpenService;
   private final ItemOpenApiService itemService;
   private final ReleaseOpenApiService releaseService;
   private final NamespaceOpenApiService namespaceService;
@@ -54,7 +56,7 @@ public class ApolloOpenApiClient {
   private ApolloOpenApiClient(String portalUrl, String token, RequestConfig requestConfig) {
     this.portalUrl = portalUrl;
     this.token = token;
-    CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig)
+      CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig)
         .setDefaultHeaders(Lists.newArrayList(new BasicHeader("Authorization", token))).build();
 
     String baseUrl = this.portalUrl + ApolloOpenApiConstants.OPEN_API_V1_PREFIX;
@@ -63,6 +65,7 @@ public class ApolloOpenApiClient {
     namespaceService = new NamespaceOpenApiService(client, baseUrl, GSON);
     itemService = new ItemOpenApiService(client, baseUrl, GSON);
     releaseService = new ReleaseOpenApiService(client, baseUrl, GSON);
+    organizationOpenService = new OrganizationOpenApiService(client, baseUrl, GSON);
   }
 
   public void createApp(OpenCreateAppDTO req) {
@@ -82,6 +85,14 @@ public class ApolloOpenApiClient {
   public List<OpenAppDTO> getAllApps() {
     return appService.getAllApps();
   }
+
+  /**
+   * Get all  Organizations
+   */
+  public List<OpenOrganizationDto> getOrganization() {
+    return organizationOpenService.getOrganizations();
+  }
+
 
   /**
    * Get applications which can be operated by current open api client.
