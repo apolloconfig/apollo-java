@@ -56,7 +56,7 @@ public class ApolloOpenApiClient {
   private ApolloOpenApiClient(String portalUrl, String token, RequestConfig requestConfig) {
     this.portalUrl = portalUrl;
     this.token = token;
-      CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig)
+    CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig)
         .setDefaultHeaders(Lists.newArrayList(new BasicHeader("Authorization", token))).build();
 
     String baseUrl = this.portalUrl + ApolloOpenApiConstants.OPEN_API_V1_PREFIX;
