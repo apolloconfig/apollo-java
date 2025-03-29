@@ -87,12 +87,11 @@ public class ApolloOpenApiClient {
   }
 
   /**
-   * Get all  Organizations
+   * Get all organizations
    */
-  public List<OpenOrganizationDto> getOrganization() {
+  public List<OpenOrganizationDto> getOrganizations() {
     return organizationOpenService.getOrganizations();
   }
-
 
   /**
    * Get applications which can be operated by current open api client.
