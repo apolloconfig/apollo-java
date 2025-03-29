@@ -29,12 +29,13 @@ import java.util.List;
 
 public class OrganizationOpenApiService extends AbstractOpenApiService implements
         com.ctrip.framework.apollo.openapi.api.OrganizationOpenApiService{
+    private static final Type ORGANIZATIONS_DTO_LIST_TYPE = new TypeToken<List<OpenOrganizationDto>>() {
+    }.getType();
+
     public OrganizationOpenApiService(CloseableHttpClient client, String baseUrl, Gson gson) {
         super(client, baseUrl, gson);
     }
 
-    private static final Type ORGANIZATIONS_DTO_LIST_TYPE = new TypeToken<List<OpenOrganizationDto>>() {
-    }.getType();
 
     @Override
     public List<OpenOrganizationDto> getOrganizations() {
