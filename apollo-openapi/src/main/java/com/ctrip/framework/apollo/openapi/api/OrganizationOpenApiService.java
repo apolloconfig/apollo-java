@@ -22,9 +22,9 @@ import java.util.List;
 
 public interface OrganizationOpenApiService {
 
-  /**
-   * Retrieves all organizations
-   * @since 2.5.0
-   */
+    /**
+     * Retrieves all organizations
+     * @since 2.5.0
+     */
     List<OpenOrganizationDto> getOrganizations();
 }

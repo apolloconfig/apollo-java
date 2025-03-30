@@ -36,7 +36,6 @@ public class OrganizationOpenApiService extends AbstractOpenApiService implement
         super(client, baseUrl, gson);
     }
 
-
     @Override
     public List<OpenOrganizationDto> getOrganizations() {
         OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder()
