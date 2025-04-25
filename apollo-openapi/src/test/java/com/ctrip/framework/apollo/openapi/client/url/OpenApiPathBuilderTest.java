@@ -224,6 +224,20 @@ public class OpenApiPathBuilderTest {
         .addParam("operator", operator)
         .buildPath(baseURL);
     assertEquals(expected, actual);
+
+    // InstanceOpenApiService path check
+    path = String.format("envs/%s/apps/%s/clusters/%s/namespaces/%s/instances",
+            tools.escapePath(env), tools.escapePath(appId), tools.escapePath(clusterName),
+            tools.escapePath(namespaceName));
+    expected = String.format("%s/%s", baseURL, path);
+    actual = OpenApiPathBuilder.newBuilder()
+            .envsPathVal(env)
+            .appsPathVal(appId)
+            .clustersPathVal(clusterName)
+            .namespacesPathVal(namespaceName)
+            .customResource("instances")
+            .buildPath(baseURL);
+    assertEquals(expected, actual);
   }
 
   @Test(expected = IllegalArgumentException.class)
