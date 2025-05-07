@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.openapi.client;
 
 import com.ctrip.framework.apollo.openapi.client.constant.ApolloOpenApiConstants;
+import com.ctrip.framework.apollo.openapi.client.extend.ApolloStandardHttpRequestRetryHandler;
 import com.ctrip.framework.apollo.openapi.client.service.AppOpenApiService;
 import com.ctrip.framework.apollo.openapi.client.service.ClusterOpenApiService;
 import com.ctrip.framework.apollo.openapi.client.service.ItemOpenApiService;
@@ -55,10 +56,11 @@ public class ApolloOpenApiClient {
   private final InstanceOpenApiService instanceService;
   private static final Gson GSON = new GsonBuilder().setDateFormat(ApolloOpenApiConstants.JSON_DATE_FORMAT).create();
 
-  private ApolloOpenApiClient(String portalUrl, String token, RequestConfig requestConfig) {
+  private ApolloOpenApiClient(String portalUrl, String token, RequestConfig requestConfig, int retryCount) {
     this.portalUrl = portalUrl;
     this.token = token;
     CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig)
+        .setRetryHandler(retryCount > 0 ? new ApolloStandardHttpRequestRetryHandler(retryCount) : null)
         .setDefaultHeaders(Lists.newArrayList(new BasicHeader("Authorization", token))).build();
 
     String baseUrl = this.portalUrl + ApolloOpenApiConstants.OPEN_API_V1_PREFIX;
@@ -273,6 +275,7 @@ public class ApolloOpenApiClient {
     private String token;
     private int connectTimeout = -1;
     private int readTimeout = -1;
+    private int retryCount = -1;
 
     /**
      * @param portalUrl The apollo portal url, e.g http://localhost:8070
@@ -306,6 +309,11 @@ public class ApolloOpenApiClient {
       return this;
     }
 
+    public ApolloOpenApiClientBuilder withRetryCount(int retryCount) {
+      this.retryCount = retryCount;
+      return this;
+    }
+
     public ApolloOpenApiClient build() {
       Preconditions.checkArgument(!Strings.isNullOrEmpty(portalUrl), "Portal url should not be null or empty!");
       Preconditions.checkArgument(portalUrl.startsWith("http://") || portalUrl.startsWith("https://"), "Portal url should start with http:// or https://" );
@@ -322,7 +330,7 @@ public class ApolloOpenApiClient {
       RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(connectTimeout)
           .setSocketTimeout(readTimeout).build();
 
-      return new ApolloOpenApiClient(portalUrl, token, requestConfig);
+      return new ApolloOpenApiClient(portalUrl, token, requestConfig, retryCount);
     }
   }
 }
