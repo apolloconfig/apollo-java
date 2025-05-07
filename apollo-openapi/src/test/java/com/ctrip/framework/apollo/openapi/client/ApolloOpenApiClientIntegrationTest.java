@@ -19,6 +19,7 @@ package com.ctrip.framework.apollo.openapi.client;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.ctrip.framework.apollo.openapi.client.extend.IdempotentHttpMethod;
 import com.ctrip.framework.apollo.openapi.dto.NamespaceReleaseDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenAppNamespaceDTO;
@@ -63,6 +64,8 @@ class ApolloOpenApiClientIntegrationTest {
         .withToken(someToken)
         .withReadTimeout(2000 * 1000)
         .withConnectTimeout(2000 * 1000)
+        .withRetryCount(3)
+        .withIdempotentHttpMethods(IdempotentHttpMethod.safe())
         .build();
   }
 
