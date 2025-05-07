@@ -63,6 +63,7 @@ class ApolloOpenApiClientIntegrationTest {
         .withToken(someToken)
         .withReadTimeout(2000 * 1000)
         .withConnectTimeout(2000 * 1000)
+        .withRetryCount(3)
         .build();
   }
 
