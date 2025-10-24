@@ -19,7 +19,6 @@ package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
-import com.ctrip.framework.apollo.monitor.internal.listener.impl.DefaultApolloClientNamespaceApi;
 import com.google.common.collect.Maps;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
@@ -28,7 +27,6 @@ import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.common.TextFormat;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 

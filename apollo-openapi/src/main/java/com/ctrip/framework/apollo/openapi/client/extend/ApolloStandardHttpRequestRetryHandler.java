@@ -16,13 +16,7 @@
  */
 package com.ctrip.framework.apollo.openapi.client.extend;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import org.apache.http.HttpRequest;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;

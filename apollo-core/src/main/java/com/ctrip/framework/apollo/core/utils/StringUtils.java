@@ -16,9 +16,6 @@
  */
 package com.ctrip.framework.apollo.core.utils;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 public class StringUtils {
 
   public static final String EMPTY = "";

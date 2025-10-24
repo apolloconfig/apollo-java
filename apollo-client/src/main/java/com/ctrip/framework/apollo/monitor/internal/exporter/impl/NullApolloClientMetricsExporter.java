@@ -17,7 +17,6 @@
 package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
 
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
-import com.ctrip.framework.apollo.monitor.internal.exporter.AbstractApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import java.util.List;
