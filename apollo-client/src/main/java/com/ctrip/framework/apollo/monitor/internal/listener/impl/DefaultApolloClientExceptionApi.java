@@ -20,7 +20,6 @@ import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorCon
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.TAG_ERROR;
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.THROWABLE;
 
-import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientExceptionMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.jmx.mbean.ApolloClientJmxExceptionMBean;

@@ -34,7 +34,6 @@ import com.google.common.collect.Maps;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 

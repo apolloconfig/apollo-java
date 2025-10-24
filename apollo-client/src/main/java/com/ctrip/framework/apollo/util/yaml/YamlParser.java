@@ -30,8 +30,6 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.parser.ParserException;
 
 import com.ctrip.framework.apollo.core.utils.StringUtils;
 import org.yaml.snakeyaml.representer.Representer;
