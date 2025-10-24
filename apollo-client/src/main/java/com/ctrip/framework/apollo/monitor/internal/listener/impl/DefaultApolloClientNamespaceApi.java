@@ -20,7 +20,6 @@ package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
 
 import com.ctrip.framework.apollo.Config;
-import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi;
@@ -36,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 
