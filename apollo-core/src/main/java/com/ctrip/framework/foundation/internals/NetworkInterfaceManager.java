@@ -93,9 +93,7 @@ public enum NetworkInterfaceManager {
   }
 
   private String getProperty(String name) {
-    String value = null;
-
-    value = System.getProperty(name);
+    String value = System.getProperty(name);
 
     if (value == null) {
       value = System.getenv(name);
