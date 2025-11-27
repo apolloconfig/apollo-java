@@ -72,7 +72,7 @@ public class DefaultConfigFactory implements ConfigFactory {
   public Config create(String appId, String namespace) {
     ConfigFileFormat format = determineFileFormat(namespace);
 
-    ConfigRepository configRepository = null;
+    ConfigRepository configRepository;
 
     // although ConfigFileFormat.Properties are compatible with themselves we
     // should not create a PropertiesCompatibleFileConfigRepository for them

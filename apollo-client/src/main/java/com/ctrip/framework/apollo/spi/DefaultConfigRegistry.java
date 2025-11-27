@@ -60,7 +60,6 @@ public class DefaultConfigRegistry implements ConfigRegistry {
 
   @Override
   public ConfigFactory getFactory(String appId, String namespace) {
-    ConfigFactory config = m_instances.get(appId, namespace);
-    return config;
+    return m_instances.get(appId, namespace);
   }
 }
