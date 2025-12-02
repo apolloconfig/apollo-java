@@ -19,7 +19,6 @@ package com.ctrip.framework.apollo.config.data.extension.webclient.customizer.sp
 import com.ctrip.framework.apollo.config.data.extension.properties.ApolloClientProperties;
 import com.ctrip.framework.apollo.core.spi.Ordered;
 import org.apache.commons.logging.Log;
-import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer;
@@ -37,11 +36,15 @@ public interface ApolloClientWebClientCustomizerFactory extends Ordered {
    * @param binder                 properties binder
    * @param bindHandler            properties binder Handler
    * @param log                    deferred log
-   * @param bootstrapContext       bootstrapContext
+   * @param bootstrapContext       bootstrapContext (can be either
+   *                               org.springframework.boot.ConfigurableBootstrapContext for
+   *                               Spring Boot 3.x or
+   *                               org.springframework.boot.bootstrap.ConfigurableBootstrapContext
+   *                               for Spring Boot 4.x)
    * @return WebClientCustomizer instance or null
    */
   @Nullable
   WebClientCustomizer createWebClientCustomizer(ApolloClientProperties apolloClientProperties,
       Binder binder, BindHandler bindHandler, Log log,
-      ConfigurableBootstrapContext bootstrapContext);
+      Object bootstrapContext);
 }

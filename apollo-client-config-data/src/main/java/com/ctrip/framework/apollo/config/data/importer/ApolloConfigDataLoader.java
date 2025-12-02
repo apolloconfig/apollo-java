@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.config.data.importer;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
+import com.ctrip.framework.apollo.config.data.util.BootstrapRegistryHelper;
 import com.ctrip.framework.apollo.config.data.util.Slf4jLogMessageFormatter;
 import com.ctrip.framework.apollo.spring.config.ConfigPropertySource;
 import com.ctrip.framework.apollo.spring.config.ConfigPropertySourceFactory;
@@ -26,8 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
-import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
-import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoader;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
@@ -55,22 +54,24 @@ public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigData
   @Override
   public ConfigData load(ConfigDataLoaderContext context, ApolloConfigDataResource resource)
       throws IOException, ConfigDataResourceNotFoundException {
-    ConfigurableBootstrapContext bootstrapContext = context.getBootstrapContext();
-    Binder binder = bootstrapContext.get(Binder.class);
+    Object bootstrapContext = context.getBootstrapContext();
+    Binder binder = BootstrapRegistryHelper.get(bootstrapContext, Binder.class);
     BindHandler bindHandler = this.getBindHandler(context);
-    bootstrapContext.registerIfAbsent(ApolloConfigDataLoaderInitializer.class, InstanceSupplier
-        .from(() -> new ApolloConfigDataLoaderInitializer(this.logFactory, binder, bindHandler,
-            bootstrapContext)));
-    ApolloConfigDataLoaderInitializer apolloConfigDataLoaderInitializer = bootstrapContext
-        .get(ApolloConfigDataLoaderInitializer.class);
+    BootstrapRegistryHelper.registerIfAbsentFromSupplier(bootstrapContext,
+        ApolloConfigDataLoaderInitializer.class,
+        () -> new ApolloConfigDataLoaderInitializer(this.logFactory, binder, bindHandler,
+            bootstrapContext));
+    ApolloConfigDataLoaderInitializer apolloConfigDataLoaderInitializer =
+        BootstrapRegistryHelper.get(bootstrapContext, ApolloConfigDataLoaderInitializer.class);
     // init apollo client
     List<PropertySource<?>> initialPropertySourceList = apolloConfigDataLoaderInitializer
         .initApolloClient();
     // load config
-    bootstrapContext.registerIfAbsent(ConfigPropertySourceFactory.class,
-        InstanceSupplier.from(() -> SpringInjector.getInstance(ConfigPropertySourceFactory.class)));
-    ConfigPropertySourceFactory configPropertySourceFactory = bootstrapContext
-        .get(ConfigPropertySourceFactory.class);
+    BootstrapRegistryHelper.registerIfAbsentFromSupplier(bootstrapContext,
+        ConfigPropertySourceFactory.class,
+        () -> SpringInjector.getInstance(ConfigPropertySourceFactory.class));
+    ConfigPropertySourceFactory configPropertySourceFactory =
+        BootstrapRegistryHelper.get(bootstrapContext, ConfigPropertySourceFactory.class);
     String namespace = resource.getNamespace();
     Config config = ConfigService.getConfig(namespace);
     ConfigPropertySource configPropertySource = configPropertySourceFactory
@@ -83,7 +84,7 @@ public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigData
   }
 
   private BindHandler getBindHandler(ConfigDataLoaderContext context) {
-    return context.getBootstrapContext().getOrElse(BindHandler.class, null);
+    return BootstrapRegistryHelper.getOrElse(context.getBootstrapContext(), BindHandler.class, null);
   }
 
   @Override
