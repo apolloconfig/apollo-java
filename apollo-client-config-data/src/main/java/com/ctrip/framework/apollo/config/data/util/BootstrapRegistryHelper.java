@@ -50,17 +50,11 @@ public class BootstrapRegistryHelper {
 
       Class<?> bootstrapRegistryClass;
       Class<?> bootstrapContextClass;
-      if (SPRING_BOOT_4_PRESENT) {
-        bootstrapRegistryClass = ClassUtils.forName(
-            "org.springframework.boot.bootstrap.BootstrapRegistry", classLoader);
-        bootstrapContextClass = ClassUtils.forName(
-            "org.springframework.boot.bootstrap.BootstrapContext", classLoader);
-      } else {
-        bootstrapRegistryClass = ClassUtils.forName(
-            "org.springframework.boot.BootstrapRegistry", classLoader);
-        bootstrapContextClass = ClassUtils.forName(
-            "org.springframework.boot.BootstrapContext", classLoader);
-      }
+      String bootstrapPackage = SPRING_BOOT_4_PRESENT
+          ? "org.springframework.boot.bootstrap"
+          : "org.springframework.boot";
+      bootstrapRegistryClass = ClassUtils.forName(bootstrapPackage + ".BootstrapRegistry", classLoader);
+      bootstrapContextClass = ClassUtils.forName(bootstrapPackage + ".BootstrapContext", classLoader);
 
       Class<?> instanceSupplierClass = findInnerClass(bootstrapRegistryClass, "InstanceSupplier");
       REGISTER_IF_ABSENT_METHOD = bootstrapRegistryClass.getMethod("registerIfAbsent",
@@ -69,8 +63,18 @@ public class BootstrapRegistryHelper {
       INSTANCE_SUPPLIER_FROM_METHOD = instanceSupplierClass.getMethod("from", Supplier.class);
       GET_METHOD = bootstrapContextClass.getMethod("get", Class.class);
       GET_OR_ELSE_METHOD = bootstrapContextClass.getMethod("getOrElse", Class.class, Object.class);
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(
+          "Failed to initialize BootstrapRegistryHelper: Bootstrap classes not found. "
+              + "Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
+    } catch (NoSuchMethodException e) {
+      throw new IllegalStateException(
+          "Failed to initialize BootstrapRegistryHelper: Required method not found. "
+              + "Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     } catch (Exception e) {
-      throw new IllegalStateException("Failed to initialize BootstrapRegistryHelper", e);
+      throw new IllegalStateException(
+          "Failed to initialize BootstrapRegistryHelper: Unexpected error during reflection setup. "
+              + "Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     }
   }
 
@@ -94,8 +98,10 @@ public class BootstrapRegistryHelper {
   public static Object getBootstrapContext(ApplicationStartingEvent event) {
     try {
       return GET_BOOTSTRAP_CONTEXT_METHOD.invoke(event);
-    } catch (Exception e) {
-      throw new IllegalStateException("Failed to invoke getBootstrapContext on event", e);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(
+          "Failed to invoke ApplicationStartingEvent.getBootstrapContext() via reflection. "
+              + "Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     }
   }
 
@@ -111,8 +117,10 @@ public class BootstrapRegistryHelper {
     try {
       Object wrappedSupplier = INSTANCE_SUPPLIER_OF_METHOD.invoke(null, instance);
       REGISTER_IF_ABSENT_METHOD.invoke(bootstrapContext, type, wrappedSupplier);
-    } catch (Exception e) {
-      throw new IllegalStateException("Failed to register instance in bootstrap context", e);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(
+          "Failed to invoke BootstrapRegistry.registerIfAbsent() for type " + type.getName()
+              + " via reflection. Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     }
   }
 
@@ -129,8 +137,10 @@ public class BootstrapRegistryHelper {
     try {
       Object wrappedSupplier = INSTANCE_SUPPLIER_FROM_METHOD.invoke(null, instanceSupplier);
       REGISTER_IF_ABSENT_METHOD.invoke(bootstrapContext, type, wrappedSupplier);
-    } catch (Exception e) {
-      throw new IllegalStateException("Failed to register instance in bootstrap context", e);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(
+          "Failed to invoke BootstrapRegistry.registerIfAbsent() with supplier for type "
+              + type.getName() + " via reflection. Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     }
   }
 
@@ -146,8 +156,10 @@ public class BootstrapRegistryHelper {
   public static <T> T get(Object bootstrapContext, Class<T> type) {
     try {
       return (T) GET_METHOD.invoke(bootstrapContext, type);
-    } catch (Exception e) {
-      throw new IllegalStateException("Failed to get instance from bootstrap context", e);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(
+          "Failed to invoke BootstrapContext.get() for type " + type.getName()
+              + " via reflection. Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     }
   }
 
@@ -164,8 +176,10 @@ public class BootstrapRegistryHelper {
   public static <T> T getOrElse(Object bootstrapContext, Class<T> type, T defaultValue) {
     try {
       return (T) GET_OR_ELSE_METHOD.invoke(bootstrapContext, type, defaultValue);
-    } catch (Exception e) {
-      throw new IllegalStateException("Failed to get instance from bootstrap context", e);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(
+          "Failed to invoke BootstrapContext.getOrElse() for type " + type.getName()
+              + " via reflection. Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     }
   }
 
