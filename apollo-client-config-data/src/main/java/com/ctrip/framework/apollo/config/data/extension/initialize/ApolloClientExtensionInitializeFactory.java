@@ -23,7 +23,6 @@ import com.ctrip.framework.apollo.config.data.extension.webclient.ApolloClientLo
 import com.ctrip.framework.apollo.config.data.extension.websocket.ApolloClientWebsocketExtensionInitializer;
 import com.ctrip.framework.apollo.config.data.util.Slf4jLogMessageFormatter;
 import org.apache.commons.logging.Log;
-import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.logging.DeferredLogFactory;
@@ -42,7 +41,7 @@ public class ApolloClientExtensionInitializeFactory {
   private final ApolloClientWebsocketExtensionInitializer apolloClientWebsocketExtensionInitializer;
 
   public ApolloClientExtensionInitializeFactory(DeferredLogFactory logFactory,
-      ConfigurableBootstrapContext bootstrapContext) {
+      Object bootstrapContext) {
     this.log = logFactory.getLog(ApolloClientExtensionInitializeFactory.class);
     this.apolloClientPropertiesFactory = new ApolloClientPropertiesFactory();
     this.apolloClientLongPollingExtensionInitializer = new ApolloClientLongPollingExtensionInitializer(
