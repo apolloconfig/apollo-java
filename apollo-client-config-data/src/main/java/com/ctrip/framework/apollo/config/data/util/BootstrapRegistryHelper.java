@@ -18,6 +18,7 @@ package com.ctrip.framework.apollo.config.data.util;
 
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
+import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.util.ClassUtils;
 
@@ -33,7 +34,8 @@ import org.springframework.util.ClassUtils;
 public class BootstrapRegistryHelper {
 
   private static final boolean SPRING_BOOT_4_PRESENT;
-  private static final Method GET_BOOTSTRAP_CONTEXT_METHOD;
+  private static final Method GET_BOOTSTRAP_CONTEXT_FROM_EVENT_METHOD;
+  private static final Method GET_BOOTSTRAP_CONTEXT_FROM_LOADER_CONTEXT_METHOD;
   private static final Method REGISTER_IF_ABSENT_METHOD;
   private static final Method INSTANCE_SUPPLIER_OF_METHOD;
   private static final Method INSTANCE_SUPPLIER_FROM_METHOD;
@@ -46,7 +48,8 @@ public class BootstrapRegistryHelper {
         "org.springframework.boot.bootstrap.ConfigurableBootstrapContext", classLoader);
 
     try {
-      GET_BOOTSTRAP_CONTEXT_METHOD = ApplicationStartingEvent.class.getMethod("getBootstrapContext");
+      GET_BOOTSTRAP_CONTEXT_FROM_EVENT_METHOD = ApplicationStartingEvent.class.getMethod("getBootstrapContext");
+      GET_BOOTSTRAP_CONTEXT_FROM_LOADER_CONTEXT_METHOD = ConfigDataLoaderContext.class.getMethod("getBootstrapContext");
 
       Class<?> bootstrapRegistryClass;
       Class<?> bootstrapContextClass;
@@ -97,10 +100,27 @@ public class BootstrapRegistryHelper {
    */
   public static Object getBootstrapContext(ApplicationStartingEvent event) {
     try {
-      return GET_BOOTSTRAP_CONTEXT_METHOD.invoke(event);
+      return GET_BOOTSTRAP_CONTEXT_FROM_EVENT_METHOD.invoke(event);
     } catch (ReflectiveOperationException e) {
       throw new IllegalStateException(
           "Failed to invoke ApplicationStartingEvent.getBootstrapContext() via reflection. "
+              + "Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
+    }
+  }
+
+  /**
+   * Get the bootstrap context from a ConfigDataLoaderContext using reflection to support both
+   * Spring Boot 3.x and 4.x.
+   *
+   * @param context the ConfigDataLoaderContext
+   * @return the bootstrap context (either from old or new package)
+   */
+  public static Object getBootstrapContext(ConfigDataLoaderContext context) {
+    try {
+      return GET_BOOTSTRAP_CONTEXT_FROM_LOADER_CONTEXT_METHOD.invoke(context);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(
+          "Failed to invoke ConfigDataLoaderContext.getBootstrapContext() via reflection. "
               + "Spring Boot 4.x detected: " + SPRING_BOOT_4_PRESENT, e);
     }
   }

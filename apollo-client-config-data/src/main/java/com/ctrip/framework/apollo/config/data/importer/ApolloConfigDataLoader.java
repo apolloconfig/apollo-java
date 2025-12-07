@@ -54,7 +54,7 @@ public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigData
   @Override
   public ConfigData load(ConfigDataLoaderContext context, ApolloConfigDataResource resource)
       throws IOException, ConfigDataResourceNotFoundException {
-    Object bootstrapContext = context.getBootstrapContext();
+    Object bootstrapContext = BootstrapRegistryHelper.getBootstrapContext(context);
     Binder binder = BootstrapRegistryHelper.get(bootstrapContext, Binder.class);
     BindHandler bindHandler = this.getBindHandler(context);
     BootstrapRegistryHelper.registerIfAbsentFromSupplier(bootstrapContext,
@@ -84,7 +84,8 @@ public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigData
   }
 
   private BindHandler getBindHandler(ConfigDataLoaderContext context) {
-    return BootstrapRegistryHelper.getOrElse(context.getBootstrapContext(), BindHandler.class, null);
+    Object bootstrapContext = BootstrapRegistryHelper.getBootstrapContext(context);
+    return BootstrapRegistryHelper.getOrElse(bootstrapContext, BindHandler.class, null);
   }
 
   @Override
