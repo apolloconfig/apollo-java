@@ -24,7 +24,6 @@ import com.ctrip.framework.apollo.util.http.HttpClient;
 import com.ctrip.framework.foundation.internals.ServiceBootstrap;
 import java.util.List;
 import org.apache.commons.logging.Log;
-import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.logging.DeferredLogFactory;
@@ -40,10 +39,10 @@ public class ApolloClientLongPollingExtensionInitializer implements
 
   private final Log log;
 
-  private final ConfigurableBootstrapContext bootstrapContext;
+  private final Object bootstrapContext;
 
   public ApolloClientLongPollingExtensionInitializer(DeferredLogFactory logFactory,
-      ConfigurableBootstrapContext bootstrapContext) {
+      Object bootstrapContext) {
     this.log = logFactory.getLog(ApolloClientLongPollingExtensionInitializer.class);
     this.bootstrapContext = bootstrapContext;
   }

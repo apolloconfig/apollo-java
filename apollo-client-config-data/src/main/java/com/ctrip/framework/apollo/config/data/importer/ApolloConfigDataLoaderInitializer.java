@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
-import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -54,11 +53,11 @@ class ApolloConfigDataLoaderInitializer {
 
   private final BindHandler bindHandler;
 
-  private final ConfigurableBootstrapContext bootstrapContext;
+  private final Object bootstrapContext;
 
   public ApolloConfigDataLoaderInitializer(DeferredLogFactory logFactory,
       Binder binder, BindHandler bindHandler,
-      ConfigurableBootstrapContext bootstrapContext) {
+      Object bootstrapContext) {
     this.logFactory = logFactory;
     this.log = logFactory.getLog(ApolloConfigDataLoaderInitializer.class);
     this.binder = binder;

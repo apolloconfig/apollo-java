@@ -16,8 +16,7 @@
  */
 package com.ctrip.framework.apollo.config.data.listener;
 
-import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
-import org.springframework.boot.ConfigurableBootstrapContext;
+import com.ctrip.framework.apollo.config.data.util.BootstrapRegistryHelper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
@@ -30,8 +29,8 @@ public class ApolloSpringApplicationRegisterListener implements
 
   @Override
   public void onApplicationEvent(ApplicationStartingEvent event) {
-    ConfigurableBootstrapContext bootstrapContext = event.getBootstrapContext();
-    bootstrapContext.registerIfAbsent(SpringApplication.class,
-        InstanceSupplier.of(event.getSpringApplication()));
+    Object bootstrapContext = BootstrapRegistryHelper.getBootstrapContext(event);
+    BootstrapRegistryHelper.registerIfAbsent(bootstrapContext, SpringApplication.class,
+        event.getSpringApplication());
   }
 }
