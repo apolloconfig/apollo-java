@@ -60,7 +60,7 @@ public class Signature {
       String query = url.getQuery();
 
       String pathWithQuery = path;
-      if (query != null && query.length() > 0) {
+      if (query != null && !query.isEmpty()) {
         pathWithQuery += "?" + query;
       }
       return pathWithQuery;
