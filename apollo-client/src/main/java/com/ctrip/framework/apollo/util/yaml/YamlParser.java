@@ -73,7 +73,7 @@ public class YamlParser {
   private boolean process(MatchCallback callback, Yaml yaml, String content) {
     int count = 0;
     if (logger.isDebugEnabled()) {
-      logger.debug("Loading from YAML: " + content);
+      logger.debug("Loading from YAML: {}", content);
     }
     for (Object object : yaml.loadAll(content)) {
       if (object != null && process(asMap(object), callback)) {
@@ -81,7 +81,7 @@ public class YamlParser {
       }
     }
     if (logger.isDebugEnabled()) {
-      logger.debug("Loaded " + count + " document" + (count > 1 ? "s" : "") + " from YAML resource: " + content);
+      logger.debug("Loaded {} document{} from YAML resource: {}", count, count > 1 ? "s" : "", content);
     }
     return (count > 0);
   }
@@ -118,7 +118,7 @@ public class YamlParser {
     properties.putAll(getFlattenedMap(map));
 
     if (logger.isDebugEnabled()) {
-      logger.debug("Merging document (no matchers set): " + map);
+      logger.debug("Merging document (no matchers set): {}", map);
     }
     callback.process(properties, map);
     return true;
