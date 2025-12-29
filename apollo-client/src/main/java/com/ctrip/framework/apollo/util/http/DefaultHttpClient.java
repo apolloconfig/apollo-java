@@ -97,7 +97,7 @@ public class DefaultHttpClient implements HttpClient {
       conn.setRequestMethod("GET");
 
       Map<String, String> headers = httpRequest.getHeaders();
-      if (headers != null && headers.size() > 0) {
+      if (headers != null && !headers.isEmpty()) {
         for (Map.Entry<String, String> entry : headers.entrySet()) {
           conn.setRequestProperty(entry.getKey(), entry.getValue());
         }

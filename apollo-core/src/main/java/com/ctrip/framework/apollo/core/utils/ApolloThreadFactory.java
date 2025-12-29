@@ -60,7 +60,7 @@ public class ApolloThreadFactory implements ThreadFactory {
           return !thread.isAlive() || thread.isInterrupted() || thread.isDaemon();
         }
       });
-      if (alives.size() > 0) {
+      if (!alives.isEmpty()) {
         log.info("Alive apollo threads: {}", alives);
         try {
           TimeUnit.SECONDS.sleep(2);
