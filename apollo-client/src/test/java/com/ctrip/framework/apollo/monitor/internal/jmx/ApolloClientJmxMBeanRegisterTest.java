@@ -16,21 +16,23 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.jmx;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 
 public class ApolloClientJmxMBeanRegisterTest {
 
   private MBeanServer mockMBeanServer;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     mockMBeanServer = mock(MBeanServer.class);

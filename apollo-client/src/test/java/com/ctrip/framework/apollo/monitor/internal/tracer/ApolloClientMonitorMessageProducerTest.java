@@ -16,12 +16,13 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.tracer;
 
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
-import static org.junit.Assert.*;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_CONFIGS;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
 
@@ -29,7 +30,7 @@ public class ApolloClientMonitorMessageProducerTest {
 
   private ApolloClientMonitorMessageProducer producer;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
 

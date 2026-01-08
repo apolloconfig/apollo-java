@@ -16,21 +16,22 @@
  */
 package com.ctrip.framework.foundation.internals.provider;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import java.io.File;
 import java.io.FileInputStream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultApplicationProviderTest {
   private DefaultApplicationProvider defaultApplicationProvider;
   String PREDEFINED_APP_ID = "110402";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     defaultApplicationProvider = new DefaultApplicationProvider();
   }
@@ -76,7 +77,7 @@ public class DefaultApplicationProviderTest {
 
     defaultApplicationProvider.initialize(new FileInputStream(appProperties));
 
-    assertEquals(null, defaultApplicationProvider.getAppId());
+      assertNull(defaultApplicationProvider.getAppId());
     assertFalse(defaultApplicationProvider.isAppIdSet());
   }
 }

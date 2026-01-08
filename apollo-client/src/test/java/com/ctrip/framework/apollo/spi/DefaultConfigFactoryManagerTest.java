@@ -16,19 +16,18 @@
  */
 package com.ctrip.framework.apollo.spi;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -36,13 +35,13 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 public class DefaultConfigFactoryManagerTest {
   private DefaultConfigFactoryManager defaultConfigFactoryManager;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MockInjector.setInstance(ConfigRegistry.class, new MockConfigRegistry());
     defaultConfigFactoryManager = new DefaultConfigFactoryManager();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

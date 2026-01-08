@@ -16,13 +16,13 @@
  */
 package com.ctrip.framework.apollo.core.utils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.BaseIntegrationTest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by gl49 on 2018/6/8.
@@ -35,7 +35,7 @@ public class NetUtilTest extends BaseIntegrationTest {
     ContextHandler handler = mockServerHandler(HttpServletResponse.SC_OK, someResponse);
     startServerWithHandlers(handler);
 
-    assertTrue(NetUtil.pingUrl("http://localhost:" + PORT));
+      assertTrue(NetUtil.pingUrl("http://localhost:" + PORT));
   }
 
   @Test

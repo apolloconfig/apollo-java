@@ -16,13 +16,13 @@
  */
 package com.ctrip.framework.apollo.tracer.internals;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.ctrip.framework.apollo.tracer.internals.cat.CatMessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducerManager;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -30,14 +30,14 @@ import static org.junit.Assert.*;
 public class DefaultMessageProducerManagerTest {
   private MessageProducerManager messageProducerManager;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     messageProducerManager = new DefaultMessageProducerManager();
   }
 
   @Test
   public void testGetProducer() throws Exception {
-    assertTrue(messageProducerManager.getProducer() instanceof CatMessageProducer);
+      assertInstanceOf(CatMessageProducer.class, messageProducerManager.getProducer());
   }
 
 }

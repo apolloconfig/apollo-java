@@ -16,19 +16,20 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 import java.util.Properties;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TxtConfigFileTest {
 
   private String someAppId;
@@ -36,7 +37,7 @@ public class TxtConfigFileTest {
   @Mock
   private ConfigRepository configRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "someAppId";
     someNamespace = "someName";

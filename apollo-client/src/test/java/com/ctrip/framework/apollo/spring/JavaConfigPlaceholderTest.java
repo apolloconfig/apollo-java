@@ -16,9 +16,8 @@
  */
 package com.ctrip.framework.apollo.spring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,8 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Properties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -416,7 +416,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     assertEquals("2024-01-20 00:00:00.000", simpleDateFormat.format(datePropertyBean.getPattern3().getStartTime()));
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloJsonValueWithInvalidJson() throws Exception {
     String someInvalidJson = "someInvalidJson";
 
@@ -426,15 +426,16 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     when(config.getProperty(eq("a"), Mockito.nullable(String.class))).thenReturn(JSON_PROPERTY);
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
 
-    new AnnotationConfigApplicationContext(AppConfig8.class).getBean(TestJsonPropertyBean.class);
+    assertThrows(BeanCreationException.class,()->
+    new AnnotationConfigApplicationContext(AppConfig8.class).getBean(TestJsonPropertyBean.class));
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloJsonValueWithNoPropertyValue() throws Exception {
     Config config = mock(Config.class);
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
-
-    new AnnotationConfigApplicationContext(AppConfig8.class);
+      assertThrows(BeanCreationException.class,()->
+    new AnnotationConfigApplicationContext(AppConfig8.class));
   }
 
   private void check(int expectedTimeout, int expectedBatch, Class<?>... annotatedClasses) {
@@ -702,7 +703,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
       if (b != jsonBean.b) {
         return false;
       }
-      return a != null ? a.equals(jsonBean.a) : jsonBean.a == null;
+      return Objects.equals(a, jsonBean.a);
     }
 
     @Override

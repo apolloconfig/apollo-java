@@ -16,22 +16,21 @@
  */
 package com.ctrip.framework.apollo;
 
-import static org.junit.Assert.assertEquals;
-
-import com.ctrip.framework.apollo.core.MetaDomainConsts;
-import com.ctrip.framework.apollo.enums.ConfigSourceType;
-import java.util.Set;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
+import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
+import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.internals.AbstractConfig;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -40,14 +39,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 public class ConfigServiceTest {
   private static String someAppId;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "someAppId";
 
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     //as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
@@ -64,7 +63,7 @@ public class ConfigServiceTest {
     Config config = ConfigService.getAppConfig();
 
     assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey, config.getProperty(someKey, null));
-    assertEquals(null, config.getProperty("unknown", null));
+      assertNull(config.getProperty("unknown", null));
   }
 
   @Test
@@ -87,7 +86,7 @@ public class ConfigServiceTest {
     Config config = ConfigService.getConfig(someNamespace);
 
     assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey, config.getProperty(someKey, null));
-    assertEquals(null, config.getProperty("unknown", null));
+      assertNull(config.getProperty("unknown", null));
   }
 
   @Test
@@ -133,9 +132,9 @@ public class ConfigServiceTest {
   }
 
   private static class MockConfigFile implements ConfigFile {
-    private ConfigFileFormat m_configFileFormat;
+    private final ConfigFileFormat m_configFileFormat;
     private String m_appId;
-    private String m_namespace;
+    private final String m_namespace;
 
     public MockConfigFile(String namespace,
                           ConfigFileFormat configFileFormat) {

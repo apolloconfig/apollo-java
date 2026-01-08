@@ -16,21 +16,24 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.exporter.impl.DefaultApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class DefaultApolloClientMetricsExporterFactoryTest {
 
@@ -42,14 +45,14 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
   @Mock
   private ApolloClientMonitorEventListener monitorEventListener;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     MockInjector.setInstance(ConfigUtil.class, configUtil);
     factory = new DefaultApolloClientMetricsExporterFactory();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }
@@ -75,7 +78,7 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
     ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);
 
     assertNotNull(result);
-    assertTrue(result instanceof MockApolloClientMetricsExporter);
+      assertInstanceOf(MockApolloClientMetricsExporter.class, result);
   }
 
   @Test

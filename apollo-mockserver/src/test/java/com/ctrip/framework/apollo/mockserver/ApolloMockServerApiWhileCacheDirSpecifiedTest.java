@@ -16,6 +16,10 @@
  */
 package com.ctrip.framework.apollo.mockserver;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
@@ -24,23 +28,17 @@ import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-
+@ExtendWith(EmbeddedApollo.class)
 public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
 
-  @ClassRule
-  public static EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
   @Test
   public void testLoadDefaultLocalCacheDir() throws Exception {

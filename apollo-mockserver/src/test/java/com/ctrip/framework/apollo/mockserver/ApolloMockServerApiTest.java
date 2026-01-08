@@ -16,28 +16,24 @@
  */
 package com.ctrip.framework.apollo.mockserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.google.common.util.concurrent.SettableFuture;
-
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-
+@ExtendWith(EmbeddedApollo.class)
 public class ApolloMockServerApiTest {
 
   private static final String anotherNamespace = "anotherNamespace";
-
-  @ClassRule
-  public static EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
   @Test
   public void testGetProperty() throws Exception {
@@ -48,7 +44,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testUpdateProperties() throws Exception {
+  public void testUpdateProperties(EmbeddedApollo embeddedApollo) throws Exception {
     String someNewValue = "someNewValue";
 
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
@@ -75,7 +71,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testUpdateSamePropertyTwice() throws Exception {
+  public void testUpdateSamePropertyTwice(EmbeddedApollo embeddedApollo) throws Exception {
     String someNewValue = "someNewValue";
 
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
@@ -100,7 +96,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testDeleteProperties() throws Exception {
+  public void testDeleteProperties(EmbeddedApollo embeddedApollo) throws Exception {
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
 
     final SettableFuture<ConfigChangeEvent> future = SettableFuture.create();
@@ -125,7 +121,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testDeleteSamePropertyTwice() throws Exception {
+  public void testDeleteSamePropertyTwice(EmbeddedApollo embeddedApollo) throws Exception {
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
 
     final Semaphore changes = new Semaphore(0);

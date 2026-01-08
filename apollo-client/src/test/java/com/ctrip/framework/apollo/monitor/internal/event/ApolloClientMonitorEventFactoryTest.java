@@ -16,17 +16,18 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.event;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ApolloClientMonitorEventFactoryTest {
 
   private ApolloClientMonitorEventFactory factory;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     factory = ApolloClientMonitorEventFactory.getInstance();
   }

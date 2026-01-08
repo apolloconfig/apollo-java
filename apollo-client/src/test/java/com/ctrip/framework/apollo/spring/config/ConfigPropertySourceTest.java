@@ -16,9 +16,8 @@
  */
 package com.ctrip.framework.apollo.spring.config;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -32,15 +31,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ConfigPropertySourceTest {
 
   private ConfigPropertySource configPropertySource;
@@ -48,7 +47,7 @@ public class ConfigPropertySourceTest {
   @Mock
   private Config someConfig;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     String someName = "someName";
     configPropertySource = new ConfigPropertySource(someName, someConfig);
@@ -71,7 +70,7 @@ public class ConfigPropertySourceTest {
 
   @Test
   public void testGetEmptyPropertyNames() throws Exception {
-    when(someConfig.getPropertyNames()).thenReturn(Sets.<String>newHashSet());
+    when(someConfig.getPropertyNames()).thenReturn(Sets.newHashSet());
 
     assertEquals(0, configPropertySource.getPropertyNames().length);
   }

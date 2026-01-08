@@ -16,13 +16,14 @@
  */
 package com.ctrip.framework.foundation.internals;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.ctrip.framework.apollo.core.spi.Ordered;
-import org.junit.Test;
-
 import java.util.ServiceConfigurationError;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -31,27 +32,28 @@ public class ServiceBootstrapTest {
   @Test
   public void loadFirstSuccessfully() throws Exception {
     Interface1 service = ServiceBootstrap.loadFirst(Interface1.class);
-    assertTrue(service instanceof Interface1Impl);
+      assertInstanceOf(Interface1Impl.class, service);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void loadFirstWithNoServiceFileDefined() throws Exception {
-    ServiceBootstrap.loadFirst(Interface2.class);
+      assertThrows(IllegalStateException.class,()->
+          ServiceBootstrap.loadFirst(Interface2.class));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void loadFirstWithServiceFileButNoServiceImpl() throws Exception {
-    ServiceBootstrap.loadFirst(Interface3.class);
+      assertThrows(IllegalStateException.class,()-> ServiceBootstrap.loadFirst(Interface3.class));
   }
 
-  @Test(expected = ServiceConfigurationError.class)
+  @Test
   public void loadFirstWithWrongServiceImpl() throws Exception {
-    ServiceBootstrap.loadFirst(Interface4.class);
+      assertThrows(ServiceConfigurationError.class,()-> ServiceBootstrap.loadFirst(Interface4.class));
   }
 
-  @Test(expected = ServiceConfigurationError.class)
+  @Test
   public void loadFirstWithServiceImplNotExists() throws Exception {
-    ServiceBootstrap.loadFirst(Interface5.class);
+      assertThrows(ServiceConfigurationError.class,()-> ServiceBootstrap.loadFirst(Interface5.class));
   }
 
   @Test
@@ -62,12 +64,12 @@ public class ServiceBootstrapTest {
   @Test
   public void loadPrimarySuccessfully() {
     Interface6 service = ServiceBootstrap.loadPrimary(Interface6.class);
-    assertTrue(service instanceof Interface6Impl1);
+      assertInstanceOf(Interface6Impl1.class, service);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void loadPrimaryWithServiceFileButNoServiceImpl() {
-    ServiceBootstrap.loadPrimary(Interface7.class);
+      assertThrows(IllegalStateException.class,()-> ServiceBootstrap.loadPrimary(Interface7.class));
   }
 
   @Test

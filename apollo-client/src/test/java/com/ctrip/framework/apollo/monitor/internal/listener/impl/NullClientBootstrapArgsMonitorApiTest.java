@@ -16,25 +16,28 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class NullClientBootstrapArgsMonitorApiTest {
 
   private NullClientBootstrapArgsMonitorApi bootstrapArgsMonitorApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     bootstrapArgsMonitorApi = new NullClientBootstrapArgsMonitorApi();
   }
 
   @Test
   public void testGetStartupParams() {
-    assertEquals(null, bootstrapArgsMonitorApi.getStartupArg("testKey"));
+      assertNull(bootstrapArgsMonitorApi.getStartupArg("testKey"));
   }
 
   @Test

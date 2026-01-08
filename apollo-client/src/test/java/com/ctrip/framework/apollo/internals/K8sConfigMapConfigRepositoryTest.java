@@ -16,6 +16,15 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.kubernetes.KubernetesManager;
@@ -24,24 +33,18 @@ import com.ctrip.framework.apollo.util.escape.EscapeUtil;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class K8sConfigMapConfigRepositoryTest {
-    private static String someAppId = "someApp";
-    private static String someCluster = "someCluster";
-    private String someNamespace = "default";
+    private static final String someAppId = "someApp";
+    private static final String someCluster = "someCluster";
+    private final String someNamespace = "default";
     private static final String someConfigmapName = "apollo-configcache-someApp";
 
     private static final String defaultKey = "defaultKey";
@@ -50,14 +53,14 @@ public class K8sConfigMapConfigRepositoryTest {
 
     private ConfigRepository upstreamRepo;
     private Properties someProperties;
-    private ConfigSourceType someSourceType = ConfigSourceType.LOCAL;
+    private final ConfigSourceType someSourceType = ConfigSourceType.LOCAL;
     private V1ConfigMap configMap;
     private Map<String, String> data;
     private KubernetesManager kubernetesManager;
     private K8sConfigMapConfigRepository k8sConfigMapConfigRepository;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // mock configUtil
         MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
@@ -82,7 +85,7 @@ public class K8sConfigMapConfigRepositoryTest {
         k8sConfigMapConfigRepository = new K8sConfigMapConfigRepository(someAppId, someNamespace, upstreamRepo);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         MockInjector.reset();
     }

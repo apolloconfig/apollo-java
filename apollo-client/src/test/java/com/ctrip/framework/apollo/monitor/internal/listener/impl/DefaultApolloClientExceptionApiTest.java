@@ -17,23 +17,24 @@
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.THROWABLE;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
-import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
+import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultApolloClientExceptionApiTest {
 
   private DefaultApolloClientExceptionApi exceptionApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     int someQueueSize = 10;
     ConfigUtil configUtil = mock(ConfigUtil.class);

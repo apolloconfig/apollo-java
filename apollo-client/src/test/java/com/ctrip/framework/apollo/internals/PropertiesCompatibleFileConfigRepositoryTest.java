@@ -16,7 +16,9 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -27,13 +29,13 @@ import com.ctrip.framework.apollo.PropertiesCompatibleConfigFile;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.model.ConfigFileChangeEvent;
 import java.util.Properties;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PropertiesCompatibleFileConfigRepositoryTest {
 
   @Mock
@@ -45,13 +47,13 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
   @Mock
   private Properties someProperties;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someNamespaceName = "someNamespaceName";
     someAppId = "someAppId";
-    when(configFile.getNamespace()).thenReturn(someNamespaceName);
-    when(configFile.getAppId()).thenReturn(someAppId);
-    when(configFile.asProperties()).thenReturn(someProperties);
+    lenient().when(configFile.getNamespace()).thenReturn(someNamespaceName);
+      lenient().when(configFile.getAppId()).thenReturn(someAppId);
+      lenient().when(configFile.asProperties()).thenReturn(someProperties);
   }
 
   @Test
@@ -91,14 +93,15 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
     assertSame(someProperties, configFileRepository.getConfig());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGetConfigWithConfigFileReturnNullProperties() throws Exception {
     when(configFile.asProperties()).thenReturn(null);
 
     PropertiesCompatibleFileConfigRepository configFileRepository = new PropertiesCompatibleFileConfigRepository(
         configFile);
 
-    configFileRepository.getConfig();
+      assertThrows(IllegalStateException.class,()->
+    configFileRepository.getConfig());
   }
 
   @Test

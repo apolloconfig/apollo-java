@@ -16,27 +16,10 @@
  */
 package com.ctrip.framework.apollo.kubernetes;
 
-import com.ctrip.framework.apollo.build.MockInjector;
-import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1ConfigMap;
-import io.kubernetes.client.openapi.models.V1ObjectMeta;
-import io.kubernetes.client.openapi.models.V1Pod;
-import io.kubernetes.client.openapi.models.V1PodList;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -47,12 +30,28 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ctrip.framework.apollo.build.MockInjector;
+import io.kubernetes.client.openapi.ApiException;
+import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.models.V1ConfigMap;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.V1PodList;
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 public class KubernetesManagerTest {
 
     private CoreV1Api coreV1Api;
     private KubernetesManager kubernetesManager;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         coreV1Api = mock(CoreV1Api.class);
         kubernetesManager = new KubernetesManager(coreV1Api, "localPodName", 3);
@@ -61,7 +60,7 @@ public class KubernetesManagerTest {
         MockInjector.setInstance(CoreV1Api.class, coreV1Api);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         MockInjector.reset();
     }
@@ -211,7 +210,7 @@ public class KubernetesManagerTest {
         boolean result = kubernetesManager.checkConfigMapExist(namespace, name);
 
         // assert
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     /**

@@ -16,26 +16,24 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-
-import com.ctrip.framework.apollo.enums.ConfigSourceType;
-import java.util.Properties;
-import java.util.Set;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
+import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import java.util.Properties;
+import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -45,7 +43,7 @@ public class DefaultConfigManagerTest {
   private static String someConfigContent;
   private static String someAppId;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MockInjector.setInstance(ConfigFactoryManager.class, new MockConfigFactoryManager());
     MockInjector.setInstance(ConfigUtil.class, new ConfigUtil());
@@ -54,7 +52,7 @@ public class DefaultConfigManagerTest {
     someAppId = "someAppId";
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

@@ -16,12 +16,13 @@
  */
 package com.ctrip.framework.apollo.util.parser;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DurationParserTest {
-  private Parsers.DurationParser durationParser = Parsers.forDuration();
+  private final Parsers.DurationParser durationParser = Parsers.forDuration();
 
   @Test
   public void testParseMilliSeconds() throws Exception {
@@ -95,11 +96,12 @@ public class DurationParserTest {
     checkParseToMillis(expected, text);
   }
 
-  @Test(expected = ParserException.class)
+  @Test
   public void testParseException() throws Exception {
     String text = "someInvalidText";
 
-    durationParser.parseToMillis(text);
+    assertThrows(ParserException.class,()->
+    durationParser.parseToMillis(text));
   }
 
   private void checkParseToMillis(long expected, String text) throws Exception {

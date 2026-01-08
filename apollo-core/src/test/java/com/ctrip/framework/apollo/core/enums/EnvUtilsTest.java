@@ -16,9 +16,10 @@
  */
 package com.ctrip.framework.apollo.core.enums;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EnvUtilsTest {
 
@@ -26,7 +27,7 @@ public class EnvUtilsTest {
   public void testTransformEnv() throws Exception {
     assertEquals(Env.DEV, EnvUtils.transformEnv(Env.DEV.name()));
     assertEquals(Env.FAT, EnvUtils.transformEnv(Env.FAT.name().toLowerCase()));
-    assertEquals(Env.UAT, EnvUtils.transformEnv(" " + Env.UAT.name().toUpperCase() + ""));
+    assertEquals(Env.UAT, EnvUtils.transformEnv(" " + Env.UAT.name().toUpperCase()));
     assertEquals(Env.UNKNOWN, EnvUtils.transformEnv("someInvalidEnv"));
   }
 
@@ -34,12 +35,13 @@ public class EnvUtilsTest {
   public void testFromString() throws Exception {
     assertEquals(Env.DEV, Env.fromString(Env.DEV.name()));
     assertEquals(Env.FAT, Env.fromString(Env.FAT.name().toLowerCase()));
-    assertEquals(Env.UAT, Env.fromString(" " + Env.UAT.name().toUpperCase() + ""));
+    assertEquals(Env.UAT, Env.fromString(" " + Env.UAT.name().toUpperCase()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testFromInvalidString() throws Exception {
-    Env.fromString("someInvalidEnv");
+      assertThrows(IllegalArgumentException.class,()->
+          Env.fromString("someInvalidEnv"));
   }
 
   @Test
@@ -48,19 +50,20 @@ public class EnvUtilsTest {
     assertEquals(prod, Env.PRO);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void fromBlankStringTest() {
-    Env.fromString("");
+      assertThrows(IllegalArgumentException.class,()->
+    Env.fromString(""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void fromSpacesStringTest() {
-    Env.fromString("    ");
+      assertThrows(IllegalArgumentException.class,()-> Env.fromString("    "));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void fromNullStringTest() {
-    Env.fromString(null);
+      assertThrows(IllegalArgumentException.class,()-> Env.fromString(null));
   }
 
 }

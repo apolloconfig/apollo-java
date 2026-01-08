@@ -14,31 +14,30 @@
  */
 package com.ctrip.framework.apollo.spring.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BeanRegistrationUtilTest {
 
   @InjectMocks
   private BeanRegistrationUtil beanRegistrationUtil;
   private BeanDefinitionRegistry someRegistry;
-  private String someBeanName = "someBean";
+  private final String someBeanName = "someBean";
 
-  @Before
+  @BeforeEach
   public void setUp() {
     someRegistry = new SimpleBeanDefinitionRegistry();
   }

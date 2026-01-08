@@ -16,23 +16,23 @@
  */
 package com.ctrip.framework.apollo.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.BaseIntegrationTest;
 import com.ctrip.framework.apollo.core.enums.Env;
 import com.ctrip.framework.apollo.core.internals.LegacyMetaServerProvider;
 import com.ctrip.framework.apollo.core.spi.MetaServerProvider;
 import com.google.common.collect.Maps;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class MetaDomainTest extends BaseIntegrationTest {
 
   @Override
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     super.tearDown();
     MockMetaServerProvider.clear();
@@ -56,8 +56,8 @@ public class MetaDomainTest extends BaseIntegrationTest {
     MockMetaServerProvider.mock(Env.FAT, validServer + "," + invalidServer);
     MockMetaServerProvider.mock(Env.UAT, invalidServer + "," + validServer);
 
-    assertEquals(validServer.trim(), MetaDomainConsts.getDomain(Env.FAT));
-    assertEquals(validServer.trim(), MetaDomainConsts.getDomain(Env.UAT));
+      assertEquals(validServer.trim(), MetaDomainConsts.getDomain(Env.FAT));
+      assertEquals(validServer.trim(), MetaDomainConsts.getDomain(Env.UAT));
   }
 
   @Test
@@ -74,7 +74,7 @@ public class MetaDomainTest extends BaseIntegrationTest {
 
   public static class MockMetaServerProvider implements MetaServerProvider {
 
-    private static Map<Env, String> mockMetaServerAddress = Maps.newHashMap();
+    private static final Map<Env, String> mockMetaServerAddress = Maps.newHashMap();
 
     private static void mock(Env env, String metaServerAddress) {
       mockMetaServerAddress.put(env, metaServerAddress);

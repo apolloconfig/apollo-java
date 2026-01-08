@@ -16,16 +16,16 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.enums.Env;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultMetaServerProviderTest {
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     System.clearProperty(ConfigConsts.APOLLO_META_KEY);
   }

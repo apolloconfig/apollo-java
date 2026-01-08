@@ -22,9 +22,9 @@ import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorContext;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -35,7 +35,7 @@ public class ApolloClientMonitorEventPublisherTest {
   private ApolloClientMonitorEventListener mockListener;
   private ApolloClientMonitorEvent mockEvent;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     mockCollectorManager = mock(ApolloClientMonitorContext.class);
     mockConfigUtil = mock(ConfigUtil.class);
@@ -48,7 +48,7 @@ public class ApolloClientMonitorEventPublisherTest {
     ApolloClientMonitorEventPublisher.reset();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

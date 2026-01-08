@@ -72,7 +72,7 @@ public class ApolloWebClientHttpClient implements HttpClient {
       if (HttpStatus.NOT_MODIFIED.equals(clientResponse.statusCode())) {
         return Mono.just(new HttpResponse<T>(HttpStatus.NOT_MODIFIED.value(), null));
       }
-      return Mono.error(new ApolloConfigStatusCodeException(clientResponse.rawStatusCode(),
+      return Mono.error(new ApolloConfigStatusCodeException(clientResponse.statusCode().value(),
           String.format("Get operation failed for %s", httpRequest.getUrl())));
     }).block();
   }

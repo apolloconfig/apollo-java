@@ -16,24 +16,24 @@
  */
 package com.ctrip.framework.apollo.util.parser;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DateParserTest {
-  private Parsers.DateParser dateParser = Parsers.forDate();
+  private final Parsers.DateParser dateParser = Parsers.forDate();
 
-  private String shortDateText = "2016-09-28";
-  private String mediumDateText = "2016-09-28 15:10:10";
-  private String longDateText = "2016-09-28 15:10:10.123";
+  private final String shortDateText = "2016-09-28";
+  private final String mediumDateText = "2016-09-28 15:10:10";
+  private final String longDateText = "2016-09-28 15:10:10.123";
 
   @Test
   public void testParseShortFormat() throws Exception {
@@ -84,12 +84,13 @@ public class DateParserTest {
     checkWithFormatAndLocale(someDate, dateText, someFormat, someLocale);
   }
 
-  @Test(expected = ParserException.class)
+  @Test
   public void testParseError() throws Exception {
     String someInvalidDate = "someInvalidDate";
     String format = "yyyy-MM-dd";
 
-    dateParser.parse(someInvalidDate, format);
+      assertThrows(ParserException.class,()->
+    dateParser.parse(someInvalidDate, format));
   }
 
   private void check(Date expected, String text) throws Exception {

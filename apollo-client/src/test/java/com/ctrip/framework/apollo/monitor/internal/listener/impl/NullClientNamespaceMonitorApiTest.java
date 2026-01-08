@@ -16,21 +16,21 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi.NamespaceMetrics;
-import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class NullClientNamespaceMonitorApiTest {
 
   private NullClientNamespaceMonitorApi namespaceMonitorApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     namespaceMonitorApi = new NullClientNamespaceMonitorApi();
   }

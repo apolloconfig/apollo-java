@@ -16,25 +16,13 @@
  */
 package com.ctrip.framework.apollo.spring;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import com.google.common.collect.Sets;
-import java.util.Collections;
-import java.util.List;
-
-import java.util.Set;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
@@ -43,6 +31,17 @@ import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfig;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -65,13 +64,14 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
     assertEquals(fxApolloConfig, bean.getYetAnotherConfig());
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigWithWrongFieldType() throws Exception {
     Config applicationConfig = mock(Config.class);
 
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
-    getBean("spring/XmlConfigAnnotationTest2.xml", TestApolloConfigBean2.class);
+      assertThrows(BeanCreationException.class,()->
+    getBean("spring/XmlConfigAnnotationTest2.xml", TestApolloConfigBean2.class));
   }
 
   @Test
@@ -130,22 +130,23 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
     assertEquals(anotherEvent, bean.getChangeEvent3());
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigChangeListenerWithWrongParamType() throws Exception {
     Config applicationConfig = mock(Config.class);
 
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
-    getBean("spring/XmlConfigAnnotationTest4.xml", TestApolloConfigChangeListenerBean2.class);
+      assertThrows(BeanCreationException.class,()->
+    getBean("spring/XmlConfigAnnotationTest4.xml", TestApolloConfigChangeListenerBean2.class));
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigChangeListenerWithWrongParamCount() throws Exception {
     Config applicationConfig = mock(Config.class);
 
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
-
-    getBean("spring/XmlConfigAnnotationTest5.xml", TestApolloConfigChangeListenerBean3.class);
+      assertThrows(BeanCreationException.class,()->
+    getBean("spring/XmlConfigAnnotationTest5.xml", TestApolloConfigChangeListenerBean3.class));
   }
 
   @Test

@@ -16,6 +16,22 @@
  */
 package com.ctrip.framework.apollo.spring;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigFileChangeListener;
@@ -36,13 +52,15 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -52,24 +70,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -88,7 +88,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   }
 
   @Override
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     // clear the system properties
     System.clearProperty(SystemPropertyKeyConstants.SIMPLE_NAMESPACE);
@@ -124,13 +124,14 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     assertEquals(someValue, yamlConfig.getProperty(someKey, null));
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigWithWrongFieldType() throws Exception {
     Config applicationConfig = mock(Config.class);
 
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
-    getBean(TestApolloConfigBean2.class, AppConfig2.class);
+      assertThrows(BeanCreationException.class,()->
+    getBean(TestApolloConfigBean2.class, AppConfig2.class));
   }
 
   @Test
@@ -188,16 +189,18 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     verify(yyyConfig, times(1)).getProperty(eq(someKey), Mockito.nullable(String.class));
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testEnableApolloConfigUnresolvedValueInField() {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, mock(Config.class));
     mockConfig(someAppId, "xxx", mock(Config.class));
-    getSimpleBean(TestEnableApolloConfigResolveExpressionWithDefaultValueConfiguration.class);
+      assertThrows(BeanCreationException.class,()->
+    getSimpleBean(TestEnableApolloConfigResolveExpressionWithDefaultValueConfiguration.class));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testEnableApolloConfigUnresolvable() {
-    getSimpleBean(TestEnableApolloConfigUnresolvableConfiguration.class);
+      assertThrows(IllegalArgumentException.class,()->
+    getSimpleBean(TestEnableApolloConfigUnresolvableConfiguration.class));
   }
 
   @Test
@@ -255,22 +258,23 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     assertEquals(anotherEvent, bean.getChangeEvent3());
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigChangeListenerWithWrongParamType() throws Exception {
     Config applicationConfig = mock(Config.class);
 
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
 
-    getBean(TestApolloConfigChangeListenerBean2.class, AppConfig4.class);
+      assertThrows(BeanCreationException.class,()->
+    getBean(TestApolloConfigChangeListenerBean2.class, AppConfig4.class));
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigChangeListenerWithWrongParamCount() throws Exception {
     Config applicationConfig = mock(Config.class);
 
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
-
-    getBean(TestApolloConfigChangeListenerBean3.class, AppConfig5.class);
+      assertThrows(BeanCreationException.class,()->
+    getBean(TestApolloConfigChangeListenerBean3.class, AppConfig5.class));
   }
 
   @Test
@@ -574,11 +578,12 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     verify(mysqlConfig, times(1)).addChangeListener(any(ConfigChangeListener.class));
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigChangeListenerUnresolvedPlaceholder() {
     Config applicationConfig = mock(Config.class);
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
-    getSimpleBean(TestApolloConfigChangeListenerUnresolvedPlaceholderConfiguration.class);
+      assertThrows(BeanCreationException.class,()->
+    getSimpleBean(TestApolloConfigChangeListenerUnresolvedPlaceholderConfiguration.class));
   }
 
   @Test
@@ -622,10 +627,11 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     assertSame(yamlConfig, configuration.getYamlConfig());
   }
 
-  @Test(expected = BeanCreationException.class)
+  @Test
   public void testApolloConfigUnresolvedExpression() {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, mock(Config.class));
-    getSimpleBean(TestApolloConfigUnresolvedExpressionConfiguration.class);
+      assertThrows(BeanCreationException.class,()->
+    getSimpleBean(TestApolloConfigUnresolvedExpressionConfiguration.class));
   }
 
   @Test
@@ -1074,7 +1080,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
   static class TestApolloConfigChangeListenerWithYamlFile {
 
-    private SettableFuture<ConfigChangeEvent> configChangeEventFuture = SettableFuture.create();
+    private final SettableFuture<ConfigChangeEvent> configChangeEventFuture = SettableFuture.create();
 
     @ApolloConfig(APPLICATION_YAML_NAMESPACE)
     private Config yamlConfig;

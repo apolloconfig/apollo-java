@@ -20,7 +20,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 import com.ctrip.framework.apollo.spring.config.ConfigPropertySourcesProcessor;
 import java.lang.reflect.Field;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.ReflectionUtils;
 
 public class ConfigPropertySourcesProcessorHelperTest {
