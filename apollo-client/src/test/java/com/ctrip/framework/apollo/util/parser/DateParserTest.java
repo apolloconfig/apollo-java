@@ -16,26 +16,24 @@
  */
 package com.ctrip.framework.apollo.util.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.BeanCreationException;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DateParserTest {
-  private Parsers.DateParser dateParser = Parsers.forDate();
+  private final Parsers.DateParser dateParser = Parsers.forDate();
 
-  private String shortDateText = "2016-09-28";
-  private String mediumDateText = "2016-09-28 15:10:10";
-  private String longDateText = "2016-09-28 15:10:10.123";
+  private final String shortDateText = "2016-09-28";
+  private final String mediumDateText = "2016-09-28 15:10:10";
+  private final String longDateText = "2016-09-28 15:10:10.123";
 
   @Test
   public void testParseShortFormat() throws Exception {

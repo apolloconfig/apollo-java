@@ -16,23 +16,15 @@
  */
 package com.ctrip.framework.apollo.spi;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
-import com.ctrip.framework.apollo.internals.PropertiesCompatibleFileConfigRepository;
-import java.util.Properties;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
@@ -42,11 +34,17 @@ import com.ctrip.framework.apollo.core.enums.Env;
 import com.ctrip.framework.apollo.internals.DefaultConfig;
 import com.ctrip.framework.apollo.internals.JsonConfigFile;
 import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
+import com.ctrip.framework.apollo.internals.PropertiesCompatibleFileConfigRepository;
 import com.ctrip.framework.apollo.internals.PropertiesConfigFile;
 import com.ctrip.framework.apollo.internals.XmlConfigFile;
 import com.ctrip.framework.apollo.internals.YamlConfigFile;
 import com.ctrip.framework.apollo.internals.YmlConfigFile;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import java.util.Properties;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Jason Song(song_s@ctrip.com)

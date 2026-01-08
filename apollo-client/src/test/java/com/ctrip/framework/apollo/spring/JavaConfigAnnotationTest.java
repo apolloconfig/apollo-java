@@ -16,6 +16,22 @@
  */
 package com.ctrip.framework.apollo.spring;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.ConfigFileChangeListener;
@@ -31,13 +47,14 @@ import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.ctrip.framework.apollo.spring.annotation.MultipleConfig;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.ctrip.framework.apollo.util.parser.ParserException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -53,25 +70,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -1082,7 +1080,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
   static class TestApolloConfigChangeListenerWithYamlFile {
 
-    private SettableFuture<ConfigChangeEvent> configChangeEventFuture = SettableFuture.create();
+    private final SettableFuture<ConfigChangeEvent> configChangeEventFuture = SettableFuture.create();
 
     @ApolloConfig(APPLICATION_YAML_NAMESPACE)
     private Config yamlConfig;

@@ -16,8 +16,9 @@
  */
 package com.ctrip.framework.apollo.core.utils;
 
-import com.ctrip.framework.test.tools.AloneExtension;
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -27,40 +28,46 @@ import org.slf4j.LoggerFactory;
  * @author kl (http://kailing.pub)
  * @since 2021/5/20
  */
-@ExtendWith(AloneExtension.class)
+@ExtendWith(ResetDeferredLoggerExtension.class)
 public class DeferredLogCacheTest {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final String logMsg = "hello kl";
+
+    @BeforeEach
+    public void setUp() {
+        // 清理缓存，重置状态，保证每个测试独立
+        DeferredLogCache.clear();
+    }
 
     @Test
     public void testDeferredLogCacheMaxLogSize() {
         for (int i = 0; i < 20000; i++) {
             DeferredLogCache.info(logger, "DeferredLogUtilTest");
         }
-        Assert.assertEquals(DeferredLogCache.logSize(), DeferredLogCache.MAX_LOG_SIZE);
+        assertEquals(DeferredLogCache.logSize(), DeferredLogCache.MAX_LOG_SIZE);
     }
 
     @Test
     public void testDisableDeferred() {
-        DeferredLogCache.clear();
         DeferredLogger.disable();
         final Logger defaultLogger = DeferredLoggerFactory.getLogger(DeferredLoggerTest.class);
         defaultLogger.info(logMsg);
         defaultLogger.debug(logMsg);
         defaultLogger.warn(logMsg);
-        Assert.assertEquals(0, DeferredLogCache.logSize());
+        assertEquals(0, DeferredLogCache.logSize());
 
     }
 
     @Test
     public void testEnableDeferred() {
-        final Logger defaultLogger = DeferredLoggerFactory.getLogger(DeferredLoggerTest.class);
-        DeferredLogger.enable();
 
+        DeferredLogger.enable();
+        Logger defaultLogger = DeferredLoggerFactory.getLogger(DeferredLoggerTest.class);
         defaultLogger.info(logMsg);
         defaultLogger.debug(logMsg);
         defaultLogger.warn(logMsg);
-        Assert.assertEquals(3, DeferredLogCache.logSize());
+
+        assertEquals(3, DeferredLogCache.logSize());
     }
 }

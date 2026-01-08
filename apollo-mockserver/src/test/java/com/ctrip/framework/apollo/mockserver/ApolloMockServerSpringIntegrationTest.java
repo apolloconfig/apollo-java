@@ -16,16 +16,20 @@
  */
 package com.ctrip.framework.apollo.mockserver;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.ctrip.framework.apollo.enums.PropertyChangeType;
 import com.ctrip.framework.apollo.mockserver.ApolloMockServerSpringIntegrationTest.TestConfiguration;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.google.common.util.concurrent.SettableFuture;
-import org.junit.ClassRule;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,14 +37,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 
 /**
  * Create by zhangzheng on 8/16/18 Email:zhangzheng@youzan.com
@@ -125,7 +121,7 @@ public class ApolloMockServerSpringIntegrationTest {
     @Value("${key2:default}")
     private String key2;
 
-    private SettableFuture<ConfigChangeEvent> futureData = SettableFuture.create();
+    private final SettableFuture<ConfigChangeEvent> futureData = SettableFuture.create();
 
     @ApolloConfigChangeListener(otherNamespace)
     private void onChange(ConfigChangeEvent changeEvent) {
@@ -134,7 +130,7 @@ public class ApolloMockServerSpringIntegrationTest {
   }
 
   private static class TestInterestedKeyPrefixesBean {
-    private SettableFuture<ConfigChangeEvent> futureData = SettableFuture.create();
+    private final SettableFuture<ConfigChangeEvent> futureData = SettableFuture.create();
 
     @ApolloConfigChangeListener(value = otherNamespace, interestedKeyPrefixes = "server.")
     private void onChange(ConfigChangeEvent changeEvent) {

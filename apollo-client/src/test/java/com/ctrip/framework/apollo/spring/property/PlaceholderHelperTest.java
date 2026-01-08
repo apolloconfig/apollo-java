@@ -16,8 +16,8 @@
  */
 package com.ctrip.framework.apollo.spring.property;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;

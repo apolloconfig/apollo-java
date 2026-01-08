@@ -16,14 +16,13 @@
  */
 package com.ctrip.framework.apollo.core.utils;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.io.IOException;
 import java.util.Properties;
+import org.junit.jupiter.api.Test;
 
 
 public class PropertiesUtilTest {
@@ -45,8 +44,8 @@ public class PropertiesUtilTest {
 
     StringBuffer sb1 = new StringBuffer(System.lineSeparator());
     PropertiesUtil.filterPropertiesComment(sb1);
-    boolean equals = "".equals(sb1.toString());
-    assertEquals(false, equals);
+    boolean equals = "".contentEquals(sb1);
+      assertFalse(equals);
 
     StringBuffer sb2 = new StringBuffer("#aaa" + System.lineSeparator());
     PropertiesUtil.filterPropertiesComment(sb2);

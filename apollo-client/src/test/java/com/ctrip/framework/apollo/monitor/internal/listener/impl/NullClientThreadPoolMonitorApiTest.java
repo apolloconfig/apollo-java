@@ -16,13 +16,14 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi.ApolloThreadPoolInfo;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 public class NullClientThreadPoolMonitorApiTest {
 

@@ -16,21 +16,22 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.monitor.internal.enums.MetricTypeEnums;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.monitor.internal.model.CounterModel;
 import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AbstractApolloClientMetricsExporterTest {
 

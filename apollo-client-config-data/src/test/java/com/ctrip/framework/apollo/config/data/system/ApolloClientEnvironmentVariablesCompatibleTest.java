@@ -18,18 +18,14 @@ package com.ctrip.framework.apollo.config.data.system;
 
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
-import com.github.stefanbirkner.systemlambda.SystemLambda;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author vdisk <vdisk@foxmail.com>
@@ -71,11 +67,11 @@ public class ApolloClientEnvironmentVariablesCompatibleTest {
 //        .and(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES,
 //            "https://test-2-config-service")
 //        .execute(() -> {
-//          Assert.assertEquals("test-2/cacheDir",
+//          assertEquals("test-2/cacheDir",
 //              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR));
-//          Assert.assertEquals("test-2-secret",
+//          assertEquals("test-2-secret",
 //              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET));
-//          Assert.assertEquals("https://test-2-config-service",
+//          assertEquals("https://test-2-config-service",
 //              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE));
 //        });
       Assertions.assertEquals(

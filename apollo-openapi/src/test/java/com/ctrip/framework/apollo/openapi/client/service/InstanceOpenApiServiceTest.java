@@ -16,14 +16,16 @@
  */
 package com.ctrip.framework.apollo.openapi.client.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class InstanceOpenApiServiceTest extends AbstractOpenApiServiceTest {
 

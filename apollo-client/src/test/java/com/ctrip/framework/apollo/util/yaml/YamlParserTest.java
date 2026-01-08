@@ -16,9 +16,10 @@
  */
 package com.ctrip.framework.apollo.util.yaml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +39,6 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.yaml.snakeyaml.composer.ComposerException;
-import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 import org.yaml.snakeyaml.parser.ParserException;
 
@@ -103,7 +103,7 @@ public class YamlParserTest {
 
     Properties orderedProperties = parser.yamlToProperties(yamlContent);
 
-    assertTrue(orderedProperties instanceof OrderedProperties);
+      assertInstanceOf(OrderedProperties.class, orderedProperties);
 
     checkPropertiesEquals(nonOrderedProperties, orderedProperties);
 
@@ -141,7 +141,7 @@ public class YamlParserTest {
 
     Properties actual = parser.yamlToProperties(yamlContent);
 
-    assertTrue("expected: " + expected + " actual: " + actual, checkPropertiesEquals(expected, actual));
+    assertTrue( checkPropertiesEquals(expected, actual),"expected: " + expected + " actual: " + actual);
   }
 
   private boolean checkPropertiesEquals(Properties expected, Properties actual) {

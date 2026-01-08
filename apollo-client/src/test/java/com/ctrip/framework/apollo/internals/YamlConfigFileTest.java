@@ -16,7 +16,14 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -162,7 +169,7 @@ public class YamlConfigFileTest {
       exceptionThrown = ex;
     }
 
-    assertTrue(exceptionThrown instanceof ApolloConfigException);
+      assertInstanceOf(ApolloConfigException.class, exceptionThrown);
     assertNotNull(exceptionThrown.getCause());
   }
 

@@ -16,11 +16,11 @@
  */
 package com.ctrip.framework.foundation.internals;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class UtilsTest {
     private final String actualOsName = System.getProperty("os.name");

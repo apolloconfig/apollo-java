@@ -16,21 +16,24 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.exporter.impl.DefaultApolloClientMetricsExporterFactory;
 import com.ctrip.framework.apollo.monitor.internal.listener.ApolloClientMonitorEventListener;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Collections;
-import java.util.List;
 
 public class DefaultApolloClientMetricsExporterFactoryTest {
 
@@ -75,7 +78,7 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
     ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);
 
     assertNotNull(result);
-    assertTrue(result instanceof MockApolloClientMetricsExporter);
+      assertInstanceOf(MockApolloClientMetricsExporter.class, result);
   }
 
   @Test

@@ -16,26 +16,13 @@
  */
 package com.ctrip.framework.apollo.spring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import com.google.common.collect.Sets;
-import java.util.Collections;
-import java.util.List;
-
-import java.util.Set;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
@@ -44,6 +31,17 @@ import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfig;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Jason Song(song_s@ctrip.com)

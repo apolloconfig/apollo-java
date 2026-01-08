@@ -23,9 +23,10 @@ import static org.mockito.Mockito.when;
 import com.ctrip.framework.apollo.tracer.internals.MockMessageProducerManager;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
@@ -73,17 +74,22 @@ public abstract class BaseIntegrationTest {
     }
   }
 
-  protected ContextHandler mockServerHandler(final int statusCode, final String response) {
+  protected ContextHandler mockServerHandler(final int statusCode, final String responseStr) {
     ContextHandler context = new ContextHandler("/");
     context.setHandler(new Handler.Abstract(){
 
         @Override
         public boolean handle(Request request, Response response, Callback callback)
             throws Exception {
-            ((HttpServletResponse)response).setContentType("text/plain;charset=UTF-8");
-            ((HttpServletResponse)response).setStatus(statusCode);
-            ((HttpServletResponse)response).getWriter().println(response);
-            return true;
+            // 设置响应头
+            response.setStatus(statusCode);
+            response.getHeaders().put("Content-Type", "text/plain;charset=UTF-8");
+
+            // 写入响应体
+            ByteBuffer content = ByteBuffer.wrap(responseStr.getBytes(StandardCharsets.UTF_8));
+            response.write(true, content, callback);
+
+            return true; // 表示请求已处理
         }
     });
     return context;

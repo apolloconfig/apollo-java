@@ -16,7 +16,8 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -31,11 +32,8 @@ import java.util.Properties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.BeanCreationException;
 
 @ExtendWith(MockitoExtension.class)
 public class PropertiesCompatibleFileConfigRepositoryTest {

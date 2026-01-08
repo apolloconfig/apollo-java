@@ -16,17 +16,19 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
-import static com.ctrip.framework.apollo.core.ApolloClientSystemConsts.*;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static com.ctrip.framework.apollo.core.ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.core.enums.Env;
-import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
+import com.ctrip.framework.apollo.util.ConfigUtil;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 public class DefaultApolloClientBootstrapArgsApiTest {
 

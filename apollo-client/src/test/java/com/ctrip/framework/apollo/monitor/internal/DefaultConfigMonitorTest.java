@@ -15,8 +15,10 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.api.ApolloClientBootstrapArgsMonitorApi;

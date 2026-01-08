@@ -15,8 +15,11 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporter;
 import com.ctrip.framework.apollo.monitor.internal.exporter.impl.NullApolloClientMetricsExporter;
@@ -29,13 +32,12 @@ import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientBoots
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientExceptionMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientNamespaceMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientThreadPoolMonitorApi;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.List;
 
 public class ApolloClientMonitorContextTest {
 
@@ -60,11 +62,12 @@ public class ApolloClientMonitorContextTest {
 
   @Test
   public void testInitContext(){
-    assertTrue(monitorContext.getBootstrapArgsApi() instanceof NullClientBootstrapArgsMonitorApi);
-    assertTrue(monitorContext.getNamespaceApi() instanceof NullClientNamespaceMonitorApi);
-    assertTrue(monitorContext.getThreadPoolApi() instanceof NullClientThreadPoolMonitorApi);
-    assertTrue(monitorContext.getExceptionApi() instanceof NullClientExceptionMonitorApi);
-    assertTrue(monitorContext.getMetricsExporter() instanceof NullApolloClientMetricsExporter);
+      assertInstanceOf(NullClientBootstrapArgsMonitorApi.class,
+          monitorContext.getBootstrapArgsApi());
+      assertInstanceOf(NullClientNamespaceMonitorApi.class, monitorContext.getNamespaceApi());
+      assertInstanceOf(NullClientThreadPoolMonitorApi.class, monitorContext.getThreadPoolApi());
+      assertInstanceOf(NullClientExceptionMonitorApi.class, monitorContext.getExceptionApi());
+      assertInstanceOf(NullApolloClientMetricsExporter.class, monitorContext.getMetricsExporter());
   }
 
   @Test

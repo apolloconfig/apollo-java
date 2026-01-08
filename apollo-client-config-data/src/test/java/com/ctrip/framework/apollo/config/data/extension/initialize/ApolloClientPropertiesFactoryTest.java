@@ -21,7 +21,7 @@ import com.ctrip.framework.apollo.config.data.extension.properties.ApolloClientP
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
@@ -31,19 +31,19 @@ import org.springframework.boot.context.properties.source.MapConfigurationProper
  */
 public class ApolloClientPropertiesFactoryTest {
 
-  @Test
-  public void testCreateApolloClientProperties() throws IOException {
-    Map<String, String> map = new LinkedHashMap<>();
-    map.put("apollo.client.extension.enabled", "true");
-    map.put("apollo.client.extension.messaging-type", "long_polling");
-    MapConfigurationPropertySource propertySource = new MapConfigurationPropertySource(map);
-    Binder binder = new Binder(propertySource);
-    ApolloClientPropertiesFactory factory = new ApolloClientPropertiesFactory();
-    ApolloClientProperties apolloClientProperties = factory
-        .createApolloClientProperties(binder, null);
+    @Test
+    public void testCreateApolloClientProperties() throws IOException {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("apollo.client.extension.enabled", "true");
+        map.put("apollo.client.extension.messaging-type", "long_polling");
+        MapConfigurationPropertySource propertySource = new MapConfigurationPropertySource(map);
+        Binder binder = new Binder(propertySource);
+        ApolloClientPropertiesFactory factory = new ApolloClientPropertiesFactory();
+        ApolloClientProperties apolloClientProperties = factory
+            .createApolloClientProperties(binder, null);
 
-    Assert.assertEquals(apolloClientProperties.getExtension().getEnabled(), true);
-    Assert.assertEquals(apolloClientProperties.getExtension().getMessagingType(),
-        ApolloClientMessagingType.LONG_POLLING);
-  }
+        Assertions.assertEquals(apolloClientProperties.getExtension().getEnabled(), true);
+        Assertions.assertEquals(apolloClientProperties.getExtension().getMessagingType(),
+            ApolloClientMessagingType.LONG_POLLING);
+    }
 }

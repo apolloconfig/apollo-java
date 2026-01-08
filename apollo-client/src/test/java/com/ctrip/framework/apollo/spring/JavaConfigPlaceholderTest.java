@@ -16,10 +16,8 @@
  */
 package com.ctrip.framework.apollo.spring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -704,7 +703,7 @@ public class JavaConfigPlaceholderTest extends AbstractSpringIntegrationTest {
       if (b != jsonBean.b) {
         return false;
       }
-      return a != null ? a.equals(jsonBean.a) : jsonBean.a == null;
+      return Objects.equals(a, jsonBean.a);
     }
 
     @Override

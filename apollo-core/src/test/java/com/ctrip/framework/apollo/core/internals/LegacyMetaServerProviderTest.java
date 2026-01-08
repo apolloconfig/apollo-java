@@ -16,7 +16,8 @@
  */
 package com.ctrip.framework.apollo.core.internals;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.ctrip.framework.apollo.core.enums.Env;
 import org.junit.jupiter.api.AfterEach;
@@ -34,7 +35,7 @@ public class LegacyMetaServerProviderTest {
     LegacyMetaServerProvider legacyMetaServerProvider = new LegacyMetaServerProvider();
     assertEquals("http://localhost:8080", legacyMetaServerProvider.getMetaServerAddress(Env.LOCAL));
     assertEquals("http://dev:8080", legacyMetaServerProvider.getMetaServerAddress(Env.DEV));
-    assertEquals(null, legacyMetaServerProvider.getMetaServerAddress(Env.PRO));
+      assertNull(legacyMetaServerProvider.getMetaServerAddress(Env.PRO));
   }
 
   @Test

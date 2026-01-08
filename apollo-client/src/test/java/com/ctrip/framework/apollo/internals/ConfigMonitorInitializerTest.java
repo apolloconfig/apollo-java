@@ -16,6 +16,12 @@
  */
 package com.ctrip.framework.apollo.internals;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorContext;
 import com.ctrip.framework.apollo.monitor.internal.exporter.ApolloClientMetricsExporterFactory;
@@ -25,12 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class ConfigMonitorInitializerTest {
 

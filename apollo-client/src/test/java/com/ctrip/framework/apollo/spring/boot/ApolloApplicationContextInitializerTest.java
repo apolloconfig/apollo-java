@@ -16,7 +16,11 @@
  */
 package com.ctrip.framework.apollo.spring.boot;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -27,6 +31,7 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.spring.config.CachedCompositePropertySource;
 import com.ctrip.framework.apollo.spring.config.PropertySourcesConstants;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import java.util.Properties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,8 +39,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.StandardEnvironment;
-
-import java.util.Properties;
 
 public class ApolloApplicationContextInitializerTest {
 
@@ -145,7 +148,7 @@ public class ApolloApplicationContextInitializerTest {
     apolloApplicationContextInitializer.initialize(environment);
 
     assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME));
-    assertTrue(propertySources.iterator().next() instanceof CachedCompositePropertySource);
+      assertInstanceOf(CachedCompositePropertySource.class, propertySources.iterator().next());
   }
 
   @Test

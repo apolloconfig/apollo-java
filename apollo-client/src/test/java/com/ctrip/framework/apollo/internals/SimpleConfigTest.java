@@ -16,33 +16,30 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ctrip.framework.apollo.Config;
+import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
+import com.ctrip.framework.apollo.enums.PropertyChangeType;
+import com.ctrip.framework.apollo.model.ConfigChange;
+import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import com.ctrip.framework.apollo.Config;
-import com.ctrip.framework.apollo.ConfigChangeListener;
-import com.ctrip.framework.apollo.enums.PropertyChangeType;
-import com.ctrip.framework.apollo.model.ConfigChange;
-import com.ctrip.framework.apollo.model.ConfigChangeEvent;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.SettableFuture;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
@@ -162,11 +159,11 @@ public class SimpleConfigTest {
 
     ConfigChange anotherKeyChange = changeEvent.getChange(anotherKey);
     assertEquals(anotherValue, anotherKeyChange.getOldValue());
-    assertEquals(null, anotherKeyChange.getNewValue());
+      assertNull(anotherKeyChange.getNewValue());
     assertEquals(PropertyChangeType.DELETED, anotherKeyChange.getChangeType());
 
     ConfigChange newKeyChange = changeEvent.getChange(newKey);
-    assertEquals(null, newKeyChange.getOldValue());
+      assertNull(newKeyChange.getOldValue());
     assertEquals(newValue, newKeyChange.getNewValue());
     assertEquals(PropertyChangeType.ADDED, newKeyChange.getChangeType());
 

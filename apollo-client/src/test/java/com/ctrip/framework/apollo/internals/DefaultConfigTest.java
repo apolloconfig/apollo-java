@@ -17,51 +17,50 @@
 package com.ctrip.framework.apollo.internals;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ctrip.framework.apollo.enums.ConfigSourceType;
-import com.ctrip.framework.apollo.util.OrderedProperties;
-import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.google.common.base.Function;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import org.awaitility.core.ThrowingRunnable;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.utils.ClassLoaderUtil;
+import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.enums.PropertyChangeType;
 import com.ctrip.framework.apollo.model.ConfigChange;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
+import com.ctrip.framework.apollo.util.OrderedProperties;
+import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import com.google.common.base.Charsets;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.SettableFuture;
+import java.io.File;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.core.ThrowingRunnable;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -696,11 +695,11 @@ public class DefaultConfigTest {
 
     ConfigChange keyToBeDeletedChange = changeEvent.getChange(keyToBeDeleted);
     assertEquals(keyToBeDeletedValue, keyToBeDeletedChange.getOldValue());
-    assertEquals(null, keyToBeDeletedChange.getNewValue());
+      assertNull(keyToBeDeletedChange.getNewValue());
     assertEquals(PropertyChangeType.DELETED, keyToBeDeletedChange.getChangeType());
 
     ConfigChange newKeyChange = changeEvent.getChange(newKey);
-    assertEquals(null, newKeyChange.getOldValue());
+      assertNull(newKeyChange.getOldValue());
     assertEquals(newValue, newKeyChange.getNewValue());
     assertEquals(PropertyChangeType.ADDED, newKeyChange.getChangeType());
 
@@ -910,7 +909,7 @@ public class DefaultConfigTest {
       public List<String> apply(String s) {
         return Splitter.on(",").trimResults().omitEmptyStrings().splitToList(s);
       }
-    }, Lists.<String>newArrayList()), Lists.newArrayList());
+    }, Lists.newArrayList()), Lists.newArrayList());
   }
 
   @Test

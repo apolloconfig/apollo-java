@@ -16,7 +16,7 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  */
 public class AbstractConfigTest {
 
-  private static String someAppId = "someAppId";
+  private static final String someAppId = "someAppId";
 
   /**
    * @see AbstractConfig#fireConfigChange(ConfigChangeEvent)

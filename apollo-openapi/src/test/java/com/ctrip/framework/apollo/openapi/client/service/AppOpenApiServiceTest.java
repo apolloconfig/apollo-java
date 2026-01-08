@@ -16,8 +16,8 @@
  */
 package com.ctrip.framework.apollo.openapi.client.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
@@ -30,7 +30,6 @@ import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.concurrent.TimeoutException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.StringEntity;
@@ -144,10 +143,7 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
       if (!"POST".equals(request.getMethod())) {
         return false;
       }
-      if (!request.getURI().toString().endsWith("apps")) {
-        return false;
-      }
-      return true;
+        return request.getURI().toString().endsWith("apps");
     }));
 
   }

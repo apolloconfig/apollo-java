@@ -16,8 +16,8 @@
  */
 package com.ctrip.framework.apollo.spring;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
@@ -383,8 +383,8 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
 
     TestXmlBeanWithConstructorArgs bean = context.getBean(TestXmlBeanWithConstructorArgs.class);
 
-    assertEquals(initialTimeout, bean.getTimeout());
-    assertEquals(initialBatch, bean.getBatch());
+    assertEquals(initialTimeout, bean.timeout());
+    assertEquals(initialBatch, bean.batch());
 
     Properties newProperties = assembleProperties(TIMEOUT_PROPERTY, String.valueOf(newTimeout),
         BATCH_PROPERTY, String.valueOf(newBatch));
@@ -394,8 +394,8 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     TimeUnit.MILLISECONDS.sleep(100);
 
     // Does not support this scenario
-    assertEquals(initialTimeout, bean.getTimeout());
-    assertEquals(initialBatch, bean.getBatch());
+    assertEquals(initialTimeout, bean.timeout());
+    assertEquals(initialBatch, bean.batch());
   }
 
   @Test
@@ -512,23 +512,8 @@ public class XmlConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegratio
     assertEquals(someNewDate, bean.getDateProperty());
   }
 
-  public static class TestXmlBeanWithConstructorArgs {
-    private final int timeout;
-    private final int batch;
-
-    public TestXmlBeanWithConstructorArgs(int timeout, int batch) {
-      this.timeout = timeout;
-      this.batch = batch;
+    public record TestXmlBeanWithConstructorArgs(int timeout, int batch) {
     }
-
-    public int getTimeout() {
-      return timeout;
-    }
-
-    public int getBatch() {
-      return batch;
-    }
-  }
 
   public static class TestXmlBeanWithInjectedValue {
     @Value("${timeout}")

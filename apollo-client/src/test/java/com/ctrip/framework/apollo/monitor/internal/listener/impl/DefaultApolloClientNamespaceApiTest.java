@@ -16,22 +16,26 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_NOT_FOUND;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_TIMEOUT;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.NAMESPACE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventFactory;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Collections;
-
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class DefaultApolloClientNamespaceApiTest {
 

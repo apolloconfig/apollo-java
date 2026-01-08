@@ -60,6 +60,10 @@ public class DeferredLogger implements Logger {
     state.compareAndSet(-1, 1);
   }
 
+  public static Integer getState() {
+      return state.get();
+  }
+
   public static void disable() {
     state.set(0);
   }

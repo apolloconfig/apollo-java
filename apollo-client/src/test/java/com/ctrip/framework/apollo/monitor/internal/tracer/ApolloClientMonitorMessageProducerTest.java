@@ -16,8 +16,9 @@
  */
 package com.ctrip.framework.apollo.monitor.internal.tracer;
 
-import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.*;
-import static org.junit.Assert.*;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_CONFIGS;
+import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorConstant.APOLLO_CLIENT_NAMESPACE_USAGE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import org.junit.jupiter.api.BeforeEach;

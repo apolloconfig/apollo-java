@@ -16,12 +16,12 @@
  */
 package com.ctrip.framework.apollo.tracer.internals;
 
-import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -38,7 +38,7 @@ public class NullMessageProducerTest {
   public void testNewTransaction() throws Exception {
     String someType = "someType";
     String someName = "someName";
-    assertTrue(messageProducer.newTransaction(someType, someName) instanceof NullTransaction);
+      assertInstanceOf(NullTransaction.class, messageProducer.newTransaction(someType, someName));
   }
 
 }

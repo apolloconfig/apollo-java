@@ -16,10 +16,10 @@
  */
 package com.ctrip.framework.apollo.spring;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
@@ -832,10 +832,10 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     String someNewString = "someNewString";
     String someJsonProperty = "[{\"a\":\"astring\", \"b\":10},{\"a\":\"astring2\", \"b\":20}]";
     String someNewJsonProperty = "[{\"a\":\"newString\", \"b\":20},{\"a\":\"astring2\", \"b\":20}]";
-    String someJsonDateProperty = "{\"startTime\":\"2024/01/20\",\"endTime\":\"2024/01/20\"}";;
-    String someNewJsonDateProperty = "{\"startTime\":\"2024/02/21\",\"endTime\":\"2024/02/21\"}";;
+    String someJsonDateProperty = "{\"startTime\":\"2024/01/20\",\"endTime\":\"2024/01/20\"}";
+      String someNewJsonDateProperty = "{\"startTime\":\"2024/02/21\",\"endTime\":\"2024/02/21\"}";
 
-    String someDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
+      String someDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
     Date someDate = assembleDate(2018, 2, 23, 20, 1, 2, 123);
     Date someNewDate = assembleDate(2018, 2, 23, 21, 2, 3, 345);
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(someDateFormat, Locale.US);
@@ -934,7 +934,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     TimeUnit.MILLISECONDS.sleep(300);
 
     // should not change anything
-    assertTrue(jsonBean == bean.getJsonBean());
+      assertSame(jsonBean, bean.getJsonBean());
   }
 
   @Test
@@ -961,7 +961,7 @@ public class JavaConfigPlaceholderAutoUpdateTest extends AbstractSpringIntegrati
     TimeUnit.MILLISECONDS.sleep(300);
 
     // should not change anything
-    assertTrue(jsonBean == bean.getJsonBean());
+      assertSame(jsonBean, bean.getJsonBean());
   }
 
   @Test

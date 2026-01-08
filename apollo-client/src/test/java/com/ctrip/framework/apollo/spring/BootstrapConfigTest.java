@@ -16,18 +16,22 @@
  */
 package com.ctrip.framework.apollo.spring;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfig;
-import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
 import com.ctrip.framework.apollo.spring.config.PropertySourcesConstants;
 import com.google.common.collect.Sets;
+import java.util.List;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -42,14 +46,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -107,12 +103,12 @@ public class BootstrapConfigTest {
 
     @Test
     public void test() throws Exception {
-//      Assert.assertNotNull(testBean);
-//      Assert.assertTrue(testBean.execute());
+//      Assertions.assertNotNull(testBean);
+//      Assertions.assertTrue(testBean.execute());
 
-//      Assert.assertEquals(mockedConfig, config);
+//      assertEquals(mockedConfig, config);
 //
-//      Assert.assertEquals(someValue, someInjectedValue);
+//      assertEquals(someValue, someInjectedValue);
     }
   }
 
@@ -154,8 +150,8 @@ public class BootstrapConfigTest {
 
     @Test
     public void test() throws Exception {
-//      Assert.assertNotNull(testBean);
-//      Assert.assertTrue(testBean.execute());
+//      Assertions.assertNotNull(testBean);
+//      Assertions.assertTrue(testBean.execute());
     }
   }
 
@@ -194,8 +190,8 @@ public class BootstrapConfigTest {
 
     @Test
     public void test() throws Exception {
-//      Assert.assertNotNull(testBean);
-//      Assert.assertTrue(testBean.execute());
+//      Assertions.assertNotNull(testBean);
+//      Assertions.assertTrue(testBean.execute());
     }
   }
 
@@ -232,7 +228,7 @@ public class BootstrapConfigTest {
 
     @Test
     public void test() throws Exception {
-      Assert.assertNull(testBean);
+      Assertions.assertNull(testBean);
     }
   }
 
@@ -266,7 +262,7 @@ public class BootstrapConfigTest {
 
     @Test
     public void test() throws Exception {
-      Assert.assertNull(testBean);
+      Assertions.assertNull(testBean);
     }
   }
 
@@ -301,8 +297,8 @@ class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOff extends
 
     @Test
     public void test() throws Exception {
-      Assert.assertNotNull(testBean);
-      Assert.assertTrue(testBean.execute());
+      Assertions.assertNotNull(testBean);
+      Assertions.assertTrue(testBean.execute());
     }
   }
 
@@ -337,8 +333,8 @@ class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOff extends
 
     @Test
     public void test() throws Exception {
-      Assert.assertNotNull(testBean);
-      Assert.assertTrue(testBean.execute());
+      Assertions.assertNotNull(testBean);
+      Assertions.assertTrue(testBean.execute());
     }
   }
 
@@ -372,7 +368,7 @@ class TestWithBootstrapDisabledAndDefaultNamespacesAndConditionalOn extends
 
     @Test
     public void test() throws Exception {
-      Assert.assertNull(testBean);
+      Assertions.assertNull(testBean);
     }
   }
 
@@ -405,8 +401,8 @@ class TestWithBootstrapDisabledAndDefaultNamespacesAndConditionalOn extends
 
     @Test
     public void test() throws Exception {
-      Assert.assertNotNull(testBean);
-      Assert.assertTrue(testBean.execute());
+      Assertions.assertNotNull(testBean);
+      Assertions.assertTrue(testBean.execute());
     }
   }
 
@@ -448,7 +444,7 @@ class TestWithBootstrapEnabledAndEagerLoadEnabled extends
           break;
         }
       }
-      Assert.assertTrue(containsApollo);
+      Assertions.assertTrue(containsApollo);
     }
   }
 

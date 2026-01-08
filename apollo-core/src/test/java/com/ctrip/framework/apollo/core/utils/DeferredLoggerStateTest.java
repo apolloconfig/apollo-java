@@ -16,8 +16,7 @@
  */
 package com.ctrip.framework.apollo.core.utils;
 
-import com.ctrip.framework.test.tools.AloneExtension;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -25,21 +24,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @author kl (http://kailing.pub)
  * @since 2021/5/21
  */
-@ExtendWith(AloneExtension.class)
+@ExtendWith(ResetDeferredLoggerExtension.class)
 public class DeferredLoggerStateTest {
 
   @Test
   public void testDeferredState() {
-    Assert.assertFalse(DeferredLogger.isEnabled());
+    Assertions.assertFalse(DeferredLogger.isEnabled());
 
     DeferredLogger.enable();
-    Assert.assertTrue(DeferredLogger.isEnabled());
+    Assertions.assertTrue(DeferredLogger.isEnabled());
 
     DeferredLogger.replayTo();
-    Assert.assertFalse(DeferredLogger.isEnabled());
+    Assertions.assertFalse(DeferredLogger.isEnabled());
 
     DeferredLogger.enable();
-    Assert.assertFalse(DeferredLogger.isEnabled());
+    Assertions.assertFalse(DeferredLogger.isEnabled());
   }
 
 }

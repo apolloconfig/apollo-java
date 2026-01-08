@@ -16,31 +16,29 @@
  */
 package com.ctrip.framework.apollo.internals;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ctrip.framework.apollo.build.MockInjector;
+import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
+import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import com.ctrip.framework.apollo.build.MockInjector;
-import com.ctrip.framework.apollo.core.ConfigConsts;
-import com.ctrip.framework.apollo.util.ConfigUtil;
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.io.Files;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -52,8 +50,8 @@ public class LocalFileConfigRepositoryTest {
   private String someNamespace;
   private ConfigRepository upstreamRepo;
   private Properties someProperties;
-  private static String someAppId = "someApp";
-  private static String someCluster = "someCluster";
+  private static final String someAppId = "someApp";
+  private static final String someCluster = "someCluster";
   private String defaultKey;
   private String defaultValue;
   private ConfigSourceType someSourceType;
@@ -152,9 +150,8 @@ public class LocalFileConfigRepositoryTest {
 
     Properties result = localFileConfigRepository.getConfig();
 
-    assertEquals(
-        "LocalFileConfigRepository's properties should be the same as fallback repo's when there is no local cache",
-        result, someProperties);
+    assertEquals(result, someProperties,
+        "LocalFileConfigRepository's properties should be the same as fallback repo's when there is no local cache");
     assertEquals(someSourceType, localFileConfigRepository.getSourceType());
   }
 
@@ -173,9 +170,7 @@ public class LocalFileConfigRepositoryTest {
 
     Properties anotherProperties = anotherLocalRepoWithNoFallback.getConfig();
 
-    assertEquals(
-        "LocalFileConfigRepository should persist local cache files and return that afterwards",
-        someProperties, anotherProperties);
+    assertEquals(someProperties, anotherProperties,"LocalFileConfigRepository should persist local cache files and return that afterwards");
     assertEquals(someSourceType, localRepo.getSourceType());
   }
 

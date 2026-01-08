@@ -16,86 +16,86 @@
  */
 package com.ctrip.framework.apollo.core.utils;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class StringUtilsTest {
 
   @Test
   public void testEqualsIgnoreCase() {
-    Assert.assertFalse(StringUtils.equalsIgnoreCase(",", "foo"));
-    Assert.assertFalse(StringUtils.equalsIgnoreCase(null, "??"));
-    Assert.assertTrue(StringUtils.equalsIgnoreCase(null, null));
-    Assert.assertTrue(StringUtils.equalsIgnoreCase("foo", "Foo"));
+    Assertions.assertFalse(StringUtils.equalsIgnoreCase(",", "foo"));
+    Assertions.assertFalse(StringUtils.equalsIgnoreCase(null, "??"));
+    Assertions.assertTrue(StringUtils.equalsIgnoreCase(null, null));
+    Assertions.assertTrue(StringUtils.equalsIgnoreCase("foo", "Foo"));
   }
 
   @Test
   public void testEquals() {
-    Assert.assertFalse(StringUtils.equals(null, ""));
-    Assert.assertTrue(StringUtils.equals(null, null));
-    Assert.assertTrue(StringUtils.equals("3", "3"));
+    Assertions.assertFalse(StringUtils.equals(null, ""));
+    Assertions.assertTrue(StringUtils.equals(null, null));
+    Assertions.assertTrue(StringUtils.equals("3", "3"));
   }
 
   @Test
   public void testIsBlank() {
-    Assert.assertFalse(StringUtils.isBlank("\'"));
-    Assert.assertTrue(StringUtils.isBlank(""));
-    Assert.assertTrue(StringUtils.isBlank(null));
+    Assertions.assertFalse(StringUtils.isBlank("'"));
+    Assertions.assertTrue(StringUtils.isBlank(""));
+    Assertions.assertTrue(StringUtils.isBlank(null));
   }
 
   @Test
   public void testIsContainEmpty() {
-    Assert.assertFalse(StringUtils.isContainEmpty(null));
-    Assert.assertFalse(StringUtils.isContainEmpty(new String[] {}));
-    Assert.assertFalse(StringUtils.isContainEmpty(new String[] {"1"}));
-    Assert.assertTrue(StringUtils.isContainEmpty(new String[] {null}));
+    Assertions.assertFalse(StringUtils.isContainEmpty(null));
+    Assertions.assertFalse(StringUtils.isContainEmpty());
+    Assertions.assertFalse(StringUtils.isContainEmpty("1"));
+    Assertions.assertTrue(StringUtils.isContainEmpty(new String[] {null}));
   }
 
   @Test
   public void testIsEmpty() {
-    Assert.assertFalse(StringUtils.isEmpty("1"));
-    Assert.assertTrue(StringUtils.isEmpty(null));
-    Assert.assertTrue(StringUtils.isEmpty(""));
+    Assertions.assertFalse(StringUtils.isEmpty("1"));
+    Assertions.assertTrue(StringUtils.isEmpty(null));
+    Assertions.assertTrue(StringUtils.isEmpty(""));
   }
 
   @Test
   public void testIsNumeric() {
-    Assert.assertFalse(StringUtils.isNumeric(null));
-    Assert.assertFalse(StringUtils.isNumeric("\'"));
-    Assert.assertTrue(StringUtils.isNumeric("1"));
+    Assertions.assertFalse(StringUtils.isNumeric(null));
+    Assertions.assertFalse(StringUtils.isNumeric("'"));
+    Assertions.assertTrue(StringUtils.isNumeric("1"));
   }
 
   @Test
   public void testStartsWithIgnoreCase() {
-    Assert.assertFalse(StringUtils.startsWithIgnoreCase("A1B2C3", "BAZ"));
-    Assert.assertFalse(StringUtils.startsWithIgnoreCase(",", "BAZ"));
-    Assert.assertTrue(StringUtils.startsWithIgnoreCase("bar", "BAR"));
+    Assertions.assertFalse(StringUtils.startsWithIgnoreCase("A1B2C3", "BAZ"));
+    Assertions.assertFalse(StringUtils.startsWithIgnoreCase(",", "BAZ"));
+    Assertions.assertTrue(StringUtils.startsWithIgnoreCase("bar", "BAR"));
   }
 
   @Test
   public void testStartsWith() {
-    Assert.assertFalse(StringUtils.startsWith("1234", "1a 2b 3c"));
-    Assert.assertTrue(StringUtils.startsWith("1a 2b 3c", "1a 2b 3c"));
-    Assert.assertTrue(StringUtils.startsWith(null, null));
+    Assertions.assertFalse(StringUtils.startsWith("1234", "1a 2b 3c"));
+    Assertions.assertTrue(StringUtils.startsWith("1a 2b 3c", "1a 2b 3c"));
+    Assertions.assertTrue(StringUtils.startsWith(null, null));
   }
 
   @Test
   public void testTrim() {
-    Assert.assertEquals("1234", StringUtils.trim("1234"));
-    Assert.assertNull(StringUtils.trim(null));
+    assertEquals("1234", StringUtils.trim("1234"));
+    Assertions.assertNull(StringUtils.trim(null));
   }
 
   @Test
   public void testTrimToEmpty() {
-    Assert.assertEquals("1234", StringUtils.trimToEmpty("1234"));
-    Assert.assertEquals("", StringUtils.trimToEmpty(null));
+    assertEquals("1234", StringUtils.trimToEmpty("1234"));
+    assertEquals("", StringUtils.trimToEmpty(null));
   }
 
   @Test
   public void trimToNull() {
-    Assert.assertNull(StringUtils.trimToNull(null));
-    Assert.assertEquals("foo", StringUtils.trimToNull("foo"));
+    Assertions.assertNull(StringUtils.trimToNull(null));
+    assertEquals("foo", StringUtils.trimToNull("foo"));
   }
 }
