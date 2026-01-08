@@ -29,7 +29,9 @@ import java.util.List;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,426 +55,443 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @RunWith(Enclosed.class)
 public class BootstrapConfigTest {
 
-  private static final String TEST_BEAN_CONDITIONAL_ON_KEY = "apollo.test.testBean";
-  private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
+    private static final String TEST_BEAN_CONDITIONAL_ON_KEY = "apollo.test.testBean";
+    private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
 
     @Nested
     @ExtendWith(SpringExtension.class)
-  @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
-  @DirtiesContext
-  class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOn extends
-      AbstractSpringIntegrationTest {
+    @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
+    @DirtiesContext
+    class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOn extends
+        AbstractSpringIntegrationTest {
 
-    private static final String someProperty = "someProperty";
-    private static final String someValue = "someValue";
+        private static final String someProperty = "someProperty";
+        private static final String someValue = "someValue";
 
-    @Autowired(required = false)
-    private TestBean testBean;
+        @Autowired(required = false)
+        private TestBean testBean;
 
-    @ApolloConfig
-    private Config config;
+        @ApolloConfig
+        private Config config;
 
-    @Value("${" + someProperty + "}")
-    private String someInjectedValue;
+        @Value("${" + someProperty + "}")
+        private String someInjectedValue;
 
-    private static Config mockedConfig;
+        private static Config mockedConfig;
 
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
+        @BeforeAll
+        public static void beforeClass() throws Exception {
+            doSetUp();
 
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
 
-      mockedConfig = mock(Config.class);
+            mockedConfig = mock(Config.class);
 
-      when(mockedConfig.getPropertyNames()).thenReturn(Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY, someProperty));
+            when(mockedConfig.getPropertyNames()).thenReturn(
+                Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY, someProperty));
 
-      when(mockedConfig.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.TRUE.toString());
-      when(mockedConfig.getProperty(eq(someProperty), Mockito.nullable(String.class))).thenReturn(someValue);
+            when(mockedConfig.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY),
+                Mockito.nullable(String.class))).thenReturn(Boolean.TRUE.toString());
+            when(mockedConfig.getProperty(eq(someProperty),
+                Mockito.nullable(String.class))).thenReturn(someValue);
 
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, mockedConfig);
-    }
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, mockedConfig);
+        }
 
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+        @AfterAll
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
 
-      doTearDown();
-    }
+            doTearDown();
+        }
 
-    @Test
-    public void test() throws Exception {
+        @Test
+        public void test() throws Exception {
 //      Assertions.assertNotNull(testBean);
 //      Assertions.assertTrue(testBean.execute());
 
 //      assertEquals(mockedConfig, config);
 //
 //      assertEquals(someValue, someInjectedValue);
-    }
-  }
-
-    @Nested
-    @ExtendWith(SpringExtension.class)
-  @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
-  @DirtiesContext
-  class TestWithBootstrapEnabledAndNamespacesAndConditionalOn extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
-          String.format("%s, %s", ConfigConsts.NAMESPACE_APPLICATION, FX_APOLLO_NAMESPACE));
-
-      Config config = mock(Config.class);
-      Config anotherConfig = mock(Config.class);
-
-      when(config.getPropertyNames()).thenReturn(Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
-      when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.TRUE.toString());
-
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
-      mockConfig(someAppId, FX_APOLLO_NAMESPACE, config);
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-//      Assertions.assertNotNull(testBean);
-//      Assertions.assertTrue(testBean.execute());
-    }
-  }
-
-    @Nested
-    @ExtendWith(SpringExtension.class)
-  @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
-  @DirtiesContext
-  class TestWithBootstrapEnabledAndNamespacesAndConditionalOnWithYamlFile extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
-          String.format("%s, %s", "application.yml", FX_APOLLO_NAMESPACE));
-
-      prepareYamlConfigFile(someAppId, "application.yml", readYamlContentAsConfigFileProperties("case6.yml"));
-      Config anotherConfig = mock(Config.class);
-
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
-      mockConfig(someAppId, FX_APOLLO_NAMESPACE, anotherConfig);
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-//      Assertions.assertNotNull(testBean);
-//      Assertions.assertTrue(testBean.execute());
-    }
-  }
-
-    @Nested
-    @ExtendWith(SpringExtension.class)
-  @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
-  @DirtiesContext
-  class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOnFailed extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
-
-      Config config = mock(Config.class);
-
-      when(config.getPropertyNames()).thenReturn(Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
-      when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.FALSE.toString());
-
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-      Assertions.assertNull(testBean);
-    }
-  }
-
-    @Nested
-    @ExtendWith(SpringExtension.class)
-  @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
-  @DirtiesContext
-  class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOnFailedWithYamlFile extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, "application.yml");
-
-      prepareYamlConfigFile(someAppId, "application.yml", readYamlContentAsConfigFileProperties("case7.yml"));
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-      Assertions.assertNull(testBean);
-    }
-  }
-
-//  @ExtendWith(SpringExtension.class)
-@Nested
-@SpringBootTest(classes = ConfigurationWithoutConditionalOnProperty.class)
-  @DirtiesContext
-  @ExtendWith(SpringExtension.class)
-class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOff extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
-
-      Config config = mock(Config.class);
-
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-      Assertions.assertNotNull(testBean);
-      Assertions.assertTrue(testBean.execute());
-    }
-  }
-
-    @Nested
-//    @ExtendWith(SpringExtension.class)
-  @SpringBootTest(classes = ConfigurationWithoutConditionalOnProperty.class)
-  @DirtiesContext
-  @ExtendWith(SpringExtension.class)
-  class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOffWithYamlFile extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, "application.yml");
-
-      prepareYamlConfigFile(someAppId, "application.yml", readYamlContentAsConfigFileProperties("case8.yml"));
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-      Assertions.assertNotNull(testBean);
-      Assertions.assertTrue(testBean.execute());
-    }
-  }
-
-//  @ExtendWith(SpringExtension.class)
-@Nested
-@SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
-  @DirtiesContext
-  @ExtendWith(SpringExtension.class)
-class TestWithBootstrapDisabledAndDefaultNamespacesAndConditionalOn extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      Config config = mock(Config.class);
-
-      when(config.getPropertyNames()).thenReturn(Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
-      when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY), Mockito.nullable(String.class))).thenReturn(Boolean.FALSE.toString());
-
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-      Assertions.assertNull(testBean);
-    }
-  }
-
-    @Nested
-//    @ExtendWith(SpringExtension.class)
-  @SpringBootTest(classes = ConfigurationWithoutConditionalOnProperty.class)
-  @DirtiesContext
-  @ExtendWith(SpringExtension.class)
-  class TestWithBootstrapDisabledAndDefaultNamespacesAndConditionalOff extends
-      AbstractSpringIntegrationTest {
-
-    @Autowired(required = false)
-    private TestBean testBean;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      Config config = mock(Config.class);
-
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() throws Exception {
-      Assertions.assertNotNull(testBean);
-      Assertions.assertTrue(testBean.execute());
-    }
-  }
-
-//  @ExtendWith(SpringExtension.class)
-@Nested
-@SpringBootTest(classes = {ConfigurationWithoutConditionalOnProperty.class,TestBean.class})
-  @DirtiesContext
-  @ExtendWith(SpringExtension.class)
-class TestWithBootstrapEnabledAndEagerLoadEnabled extends
-          AbstractSpringIntegrationTest {
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-      doSetUp();
-
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
-      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED, "true");
-
-      Config config = mock(Config.class);
-
-      mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
-    }
-
-    @AfterClass
-    public static void afterClass() {
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
-      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED);
-
-      doTearDown();
-    }
-
-    @Test
-    public void test() {
-      List<EnvironmentPostProcessor> names = SpringFactoriesLoader.loadFactories(EnvironmentPostProcessor.class, getClass().getClassLoader());
-      boolean containsApollo = false;
-      for (EnvironmentPostProcessor name : names) {
-        if (name.getClass().getName().equals("com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer")) {
-          containsApollo = true;
-          break;
         }
-      }
-      Assertions.assertTrue(containsApollo);
     }
-  }
 
-  @EnableAutoConfiguration
-  @Configuration
-  static class ConfigurationWithoutConditionalOnProperty {
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
+    @DirtiesContext
+    class TestWithBootstrapEnabledAndNamespacesAndConditionalOn extends
+        AbstractSpringIntegrationTest {
 
-    @Bean
-    public TestBean testBean() {
-      return new TestBean();
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
+                String.format("%s, %s", ConfigConsts.NAMESPACE_APPLICATION, FX_APOLLO_NAMESPACE));
+
+            Config config = mock(Config.class);
+            Config anotherConfig = mock(Config.class);
+
+            when(config.getPropertyNames()).thenReturn(
+                Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
+            when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY),
+                Mockito.nullable(String.class))).thenReturn(Boolean.TRUE.toString());
+
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
+            mockConfig(someAppId, FX_APOLLO_NAMESPACE, config);
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+//      Assertions.assertNotNull(testBean);
+//      Assertions.assertTrue(testBean.execute());
+        }
     }
-  }
 
-  @ConditionalOnProperty(TEST_BEAN_CONDITIONAL_ON_KEY)
-  @EnableAutoConfiguration
-  @Configuration
-  static class ConfigurationWithConditionalOnProperty {
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
+    @DirtiesContext
+    class TestWithBootstrapEnabledAndNamespacesAndConditionalOnWithYamlFile extends
+        AbstractSpringIntegrationTest {
 
-    @Bean
-    public TestBean testBean() {
-      return new TestBean();
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
+                String.format("%s, %s", "application.yml", FX_APOLLO_NAMESPACE));
+
+            prepareYamlConfigFile(someAppId, "application.yml",
+                readYamlContentAsConfigFileProperties("case6.yml"));
+            Config anotherConfig = mock(Config.class);
+
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, anotherConfig);
+            mockConfig(someAppId, FX_APOLLO_NAMESPACE, anotherConfig);
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+//      Assertions.assertNotNull(testBean);
+//      Assertions.assertTrue(testBean.execute());
+        }
     }
-  }
 
-  static class TestBean {
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
+    @DirtiesContext
+    class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOnFailed extends
+        AbstractSpringIntegrationTest {
 
-    public boolean execute() {
-      return true;
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+
+            Config config = mock(Config.class);
+
+            when(config.getPropertyNames()).thenReturn(
+                Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
+            when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY),
+                Mockito.nullable(String.class))).thenReturn(Boolean.FALSE.toString());
+
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+            Assertions.assertNull(testBean);
+        }
     }
-  }
+
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
+    @DirtiesContext
+    class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOnFailedWithYamlFile extends
+        AbstractSpringIntegrationTest {
+
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
+                "application.yml");
+
+            prepareYamlConfigFile(someAppId, "application.yml",
+                readYamlContentAsConfigFileProperties("case7.yml"));
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+            Assertions.assertNull(testBean);
+        }
+    }
+
+    //  @ExtendWith(SpringExtension.class)
+    @Nested
+    @SpringBootTest(classes = ConfigurationWithoutConditionalOnProperty.class)
+    @DirtiesContext
+    @ExtendWith(SpringExtension.class)
+    class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOff extends
+        AbstractSpringIntegrationTest {
+
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+
+            Config config = mock(Config.class);
+
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+            Assertions.assertNotNull(testBean);
+            Assertions.assertTrue(testBean.execute());
+        }
+    }
+
+    @Nested
+//    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = ConfigurationWithoutConditionalOnProperty.class)
+    @DirtiesContext
+    @ExtendWith(SpringExtension.class)
+    class TestWithBootstrapEnabledAndDefaultNamespacesAndConditionalOffWithYamlFile extends
+        AbstractSpringIntegrationTest {
+
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
+                "application.yml");
+
+            prepareYamlConfigFile(someAppId, "application.yml",
+                readYamlContentAsConfigFileProperties("case8.yml"));
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+            Assertions.assertNotNull(testBean);
+            Assertions.assertTrue(testBean.execute());
+        }
+    }
+
+    //  @ExtendWith(SpringExtension.class)
+    @Nested
+    @SpringBootTest(classes = ConfigurationWithConditionalOnProperty.class)
+    @DirtiesContext
+    @ExtendWith(SpringExtension.class)
+    class TestWithBootstrapDisabledAndDefaultNamespacesAndConditionalOn extends
+        AbstractSpringIntegrationTest {
+
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            Config config = mock(Config.class);
+
+            when(config.getPropertyNames()).thenReturn(
+                Sets.newHashSet(TEST_BEAN_CONDITIONAL_ON_KEY));
+            when(config.getProperty(eq(TEST_BEAN_CONDITIONAL_ON_KEY),
+                Mockito.nullable(String.class))).thenReturn(Boolean.FALSE.toString());
+
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+            Assertions.assertNull(testBean);
+        }
+    }
+
+    @Nested
+//    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = ConfigurationWithoutConditionalOnProperty.class)
+    @DirtiesContext
+    @ExtendWith(SpringExtension.class)
+    class TestWithBootstrapDisabledAndDefaultNamespacesAndConditionalOff extends
+        AbstractSpringIntegrationTest {
+
+        @Autowired(required = false)
+        private TestBean testBean;
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            Config config = mock(Config.class);
+
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
+        }
+
+        @AfterClass
+        public static void afterClass() throws Exception {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() throws Exception {
+            Assertions.assertNotNull(testBean);
+            Assertions.assertTrue(testBean.execute());
+        }
+    }
+
+    //  @ExtendWith(SpringExtension.class)
+    @Nested
+    @SpringBootTest(classes = {ConfigurationWithoutConditionalOnProperty.class, TestBean.class})
+    @DirtiesContext
+    @ExtendWith(SpringExtension.class)
+    class TestWithBootstrapEnabledAndEagerLoadEnabled extends
+        AbstractSpringIntegrationTest {
+
+        @BeforeClass
+        public static void beforeClass() throws Exception {
+            doSetUp();
+
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
+            System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED,
+                "true");
+
+            Config config = mock(Config.class);
+
+            mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
+        }
+
+        @AfterClass
+        public static void afterClass() {
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+            System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED);
+
+            doTearDown();
+        }
+
+        @Test
+        public void test() {
+            List<EnvironmentPostProcessor> names = SpringFactoriesLoader.loadFactories(
+                EnvironmentPostProcessor.class, getClass().getClassLoader());
+            boolean containsApollo = false;
+            for (EnvironmentPostProcessor name : names) {
+                if (name.getClass().getName().equals(
+                    "com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer")) {
+                    containsApollo = true;
+                    break;
+                }
+            }
+            Assertions.assertTrue(containsApollo);
+        }
+    }
+
+    @EnableAutoConfiguration
+    @Configuration
+    static class ConfigurationWithoutConditionalOnProperty {
+
+        @Bean
+        public TestBean testBean() {
+            return new TestBean();
+        }
+    }
+
+    @ConditionalOnProperty(TEST_BEAN_CONDITIONAL_ON_KEY)
+    @EnableAutoConfiguration
+    @Configuration
+    static class ConfigurationWithConditionalOnProperty {
+
+        @Bean
+        public TestBean testBean() {
+            return new TestBean();
+        }
+    }
+
+    static class TestBean {
+
+        public boolean execute() {
+            return true;
+        }
+    }
 }

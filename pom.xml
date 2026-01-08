@@ -61,7 +61,7 @@
 
   <properties>
     <revision>2.5.0-SNAPSHOT</revision>
-    <java.version>21</java.version>
+    <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring-boot.version>4.0.1</spring-boot.version>
     <cat.client.version>3.1.0</cat.client.version>
