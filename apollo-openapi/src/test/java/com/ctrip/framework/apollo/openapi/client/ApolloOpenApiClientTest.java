@@ -17,7 +17,9 @@
 package com.ctrip.framework.apollo.openapi.client;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import static org.junit.Assert.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 public class ApolloOpenApiClientTest {
 
@@ -32,11 +34,12 @@ public class ApolloOpenApiClientTest {
     assertEquals(someToken, client.getToken());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateWithInvalidUrl() {
     String someInvalidUrl = "someInvalidUrl";
     String someToken = "someToken";
 
-    ApolloOpenApiClient.newBuilder().withPortalUrl(someInvalidUrl).withToken(someToken).build();
+    assertThrows(IllegalArgumentException.class,()->
+    ApolloOpenApiClient.newBuilder().withPortalUrl(someInvalidUrl).withToken(someToken).build());
   }
 }

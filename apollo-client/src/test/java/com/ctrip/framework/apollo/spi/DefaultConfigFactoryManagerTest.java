@@ -21,9 +21,9 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
@@ -36,13 +36,13 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 public class DefaultConfigFactoryManagerTest {
   private DefaultConfigFactoryManager defaultConfigFactoryManager;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MockInjector.setInstance(ConfigRegistry.class, new MockConfigRegistry());
     defaultConfigFactoryManager = new DefaultConfigFactoryManager();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

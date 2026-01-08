@@ -23,8 +23,8 @@ import static org.junit.Assert.*;
 import com.ctrip.framework.apollo.core.enums.Env;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class DefaultApolloClientBootstrapArgsApiTest {
   private ConfigUtil configUtil;
   private DefaultApolloClientBootstrapArgsApi api;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     configUtil = mock(ConfigUtil.class);
     when(configUtil.getAccessKeySecret()).thenReturn("secret");

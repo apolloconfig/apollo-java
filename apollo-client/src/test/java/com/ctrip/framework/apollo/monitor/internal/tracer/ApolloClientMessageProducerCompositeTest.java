@@ -21,8 +21,8 @@ import static org.junit.Assert.*;
 
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -39,7 +39,7 @@ public class ApolloClientMessageProducerCompositeTest {
   @Mock
   private MessageProducer producer2;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     List<MessageProducer> producers = Arrays.asList(producer1, producer2);

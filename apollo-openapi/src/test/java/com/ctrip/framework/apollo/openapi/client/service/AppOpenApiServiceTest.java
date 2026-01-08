@@ -17,8 +17,10 @@
 package com.ctrip.framework.apollo.openapi.client.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,11 +30,12 @@ import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.concurrent.TimeoutException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.StringEntity;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
@@ -42,13 +45,13 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private String someAppId;
 
   @Override
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
     someAppId = "someAppId";
 
     StringEntity responseEntity = new StringEntity("[]");
-    when(someHttpResponse.getEntity()).thenReturn(responseEntity);
+    lenient().when(someHttpResponse.getEntity()).thenReturn(responseEntity);
 
     appOpenApiService = new AppOpenApiService(httpClient, someBaseUrl, gson);
   }
@@ -67,37 +70,40 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
         .format("%s/apps/%s/envclusters", someBaseUrl, someAppId), get.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetEnvClusterInfoWithError() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(500);
-
-    appOpenApiService.getEnvClusterInfo(someAppId);
+      assertThrows(RuntimeException.class,()->
+    appOpenApiService.getEnvClusterInfo(someAppId));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateAppNullApp() throws Exception {
     OpenCreateAppDTO req = new OpenCreateAppDTO();
-    appOpenApiService.createApp(req);
+      assertThrows(RuntimeException.class,()->
+    appOpenApiService.createApp(req));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateAppEmptyAppId() throws Exception {
     OpenCreateAppDTO req = new OpenCreateAppDTO();
     req.setApp(new OpenAppDTO());
-    appOpenApiService.createApp(req);
+      assertThrows(RuntimeException.class,()->
+    appOpenApiService.createApp(req));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateAppEmptyAppName() throws Exception {
     OpenAppDTO app = new OpenAppDTO();
     app.setAppId("appId1");
 
     OpenCreateAppDTO req = new OpenCreateAppDTO();
     req.setApp(app);
-    appOpenApiService.createApp(req);
+      assertThrows(RuntimeException.class,()->
+    appOpenApiService.createApp(req));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateAppFail() throws Exception {
     OpenAppDTO app = new OpenAppDTO();
     app.setAppId("appId1");
@@ -108,8 +114,8 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
     req.setAdmins(new HashSet<>(Arrays.asList("user1", "user2")));
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    appOpenApiService.createApp(req);
+      assertThrows(RuntimeException.class,()->
+    appOpenApiService.createApp(req));
   }
 
 

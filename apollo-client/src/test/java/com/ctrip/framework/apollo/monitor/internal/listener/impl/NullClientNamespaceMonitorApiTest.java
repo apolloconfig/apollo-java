@@ -20,8 +20,8 @@ import static org.junit.Assert.*;
 
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi.NamespaceMetrics;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class NullClientNamespaceMonitorApiTest {
 
   private NullClientNamespaceMonitorApi namespaceMonitorApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     namespaceMonitorApi = new NullClientNamespaceMonitorApi();
   }

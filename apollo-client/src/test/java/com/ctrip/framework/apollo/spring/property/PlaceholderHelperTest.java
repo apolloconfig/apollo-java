@@ -20,14 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PlaceholderHelperTest {
 
   private PlaceholderHelper placeholderHelper;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     placeholderHelper = new PlaceholderHelper();
   }

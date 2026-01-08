@@ -22,7 +22,7 @@ import com.ctrip.framework.foundation.Foundation;
 import com.ctrip.framework.foundation.internals.provider.DefaultApplicationProvider;
 import com.ctrip.framework.foundation.internals.provider.DefaultServerProvider;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FoundationTest {
 

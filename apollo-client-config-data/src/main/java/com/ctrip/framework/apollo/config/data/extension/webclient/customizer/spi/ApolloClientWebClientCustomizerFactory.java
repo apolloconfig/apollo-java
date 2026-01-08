@@ -21,7 +21,7 @@ import com.ctrip.framework.apollo.core.spi.Ordered;
 import org.apache.commons.logging.Log;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.web.reactive.function.client.WebClientCustomizer;
+import org.springframework.boot.webclient.WebClientCustomizer;
 import org.springframework.lang.Nullable;
 
 /**

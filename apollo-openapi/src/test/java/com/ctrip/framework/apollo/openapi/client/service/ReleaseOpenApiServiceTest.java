@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.openapi.client.service;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,8 +27,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 public class ReleaseOpenApiServiceTest extends AbstractOpenApiServiceTest {
@@ -40,7 +41,7 @@ public class ReleaseOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private String someNamespace;
 
   @Override
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
 
@@ -50,7 +51,7 @@ public class ReleaseOpenApiServiceTest extends AbstractOpenApiServiceTest {
     someNamespace = "someNamespace";
 
     StringEntity responseEntity = new StringEntity("{}");
-    when(someHttpResponse.getEntity()).thenReturn(responseEntity);
+    lenient().when(someHttpResponse.getEntity()).thenReturn(responseEntity);
 
     releaseOpenApiService = new ReleaseOpenApiService(httpClient, someBaseUrl, gson);
   }
@@ -77,7 +78,7 @@ public class ReleaseOpenApiServiceTest extends AbstractOpenApiServiceTest {
             someNamespace), post.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testPublishNamespaceWithError() throws Exception {
     String someReleaseTitle = "someReleaseTitle";
     String someReleasedBy = "someReleasedBy";
@@ -87,8 +88,8 @@ public class ReleaseOpenApiServiceTest extends AbstractOpenApiServiceTest {
     namespaceReleaseDTO.setReleasedBy(someReleasedBy);
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    releaseOpenApiService.publishNamespace(someAppId, someEnv, someCluster, someNamespace, namespaceReleaseDTO);
+      assertThrows(RuntimeException.class,()->
+    releaseOpenApiService.publishNamespace(someAppId, someEnv, someCluster, someNamespace, namespaceReleaseDTO));
   }
 
   @Test
@@ -106,11 +107,11 @@ public class ReleaseOpenApiServiceTest extends AbstractOpenApiServiceTest {
             someNamespace), get.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetLatestActiveReleaseWithError() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    releaseOpenApiService.getLatestActiveRelease(someAppId, someEnv, someCluster, someNamespace);
+      assertThrows(RuntimeException.class,()->
+    releaseOpenApiService.getLatestActiveRelease(someAppId, someEnv, someCluster, someNamespace));
   }
 
   @Test
@@ -131,13 +132,13 @@ public class ReleaseOpenApiServiceTest extends AbstractOpenApiServiceTest {
         put.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testRollbackReleaseWithError() throws Exception {
     long someReleaseId = 1L;
     String someOperator = "someOperator";
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    releaseOpenApiService.rollbackRelease(someEnv, someReleaseId, someOperator);
+      assertThrows(RuntimeException.class,()->
+    releaseOpenApiService.rollbackRelease(someEnv, someReleaseId, someOperator));
   }
 }

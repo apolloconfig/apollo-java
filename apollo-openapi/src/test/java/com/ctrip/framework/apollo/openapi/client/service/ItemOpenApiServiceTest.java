@@ -18,6 +18,8 @@ package com.ctrip.framework.apollo.openapi.client.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,8 +33,8 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
@@ -45,7 +47,7 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private String someNamespace;
 
   @Override
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
     someAppId = "someAppId";
@@ -54,7 +56,7 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     someNamespace = "someNamespace";
 
     StringEntity responseEntity = new StringEntity("{}");
-    when(someHttpResponse.getEntity()).thenReturn(responseEntity);
+    lenient().when(someHttpResponse.getEntity()).thenReturn(responseEntity);
 
     itemOpenApiService = new ItemOpenApiService(httpClient, someBaseUrl, gson);
   }
@@ -134,7 +136,7 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     assertEquals(gson.toJson(itemDTO), EntityUtils.toString(entity));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateItemWithError() throws Exception {
     String someKey = "someKey";
     String someValue = "someValue";
@@ -146,8 +148,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     itemDTO.setDataChangeCreatedBy(someCreatedBy);
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    itemOpenApiService.createItem(someAppId, someEnv, someCluster, someNamespace, itemDTO);
+      assertThrows(RuntimeException.class,()->
+    itemOpenApiService.createItem(someAppId, someEnv, someCluster, someNamespace, itemDTO));
   }
 
   @Test
@@ -201,7 +203,7 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
         put.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testUpdateItemWithError() throws Exception {
     String someKey = "someKey";
     String someValue = "someValue";
@@ -213,8 +215,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     itemDTO.setDataChangeLastModifiedBy(someModifiedBy);
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    itemOpenApiService.updateItem(someAppId, someEnv, someCluster, someNamespace, itemDTO);
+      assertThrows(RuntimeException.class,()->
+    itemOpenApiService.updateItem(someAppId, someEnv, someCluster, someNamespace, itemDTO));
   }
 
   @Test
@@ -241,7 +243,7 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
             someAppId, someCluster, someNamespace, someKey), put.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateOrUpdateItemWithError() throws Exception {
     String someKey = "someKey";
     String someValue = "someValue";
@@ -253,8 +255,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     itemDTO.setDataChangeCreatedBy(someCreatedBy);
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    itemOpenApiService.createOrUpdateItem(someAppId, someEnv, someCluster, someNamespace, itemDTO);
+      assertThrows(RuntimeException.class,()->
+    itemOpenApiService.createOrUpdateItem(someAppId, someEnv, someCluster, someNamespace, itemDTO));
   }
 
   @Test
@@ -296,14 +298,14 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
             someOperator), delete.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testRemoveItemWithError() throws Exception {
     String someKey = "someKey";
     String someOperator = "someOperator";
 
     when(statusLine.getStatusCode()).thenReturn(404);
-
-    itemOpenApiService.removeItem(someAppId, someEnv, someCluster, someNamespace, someKey, someOperator);
+      assertThrows(RuntimeException.class,()->
+    itemOpenApiService.removeItem(someAppId, someEnv, someCluster, someNamespace, someKey, someOperator));
   }
 
   @Test
@@ -322,38 +324,38 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
             someBaseUrl, someEnv, someAppId, someCluster, someNamespace, page, size), get.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testFindItemsByNamespaceWithError() {
     final int page = 0;
     final int size = 50;
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+      assertThrows(RuntimeException.class,()->
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testFindItemsByNamespaceWithPageNegativeError() {
     final int page = -1;
     final int size = 50;
-
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+      assertThrows(IllegalArgumentException.class,()->
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testFindItemsByNamespaceWithSizeNegativeError() {
     final int page = 0;
     final int size = -50;
-
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+      assertThrows(IllegalArgumentException.class,()->
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testFindItemsByNamespaceWithPageAndSizeAllNegativeError() {
     final int page = -1;
     final int size = -50;
-
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+      assertThrows(IllegalArgumentException.class,()->
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size));
   }
 
 }

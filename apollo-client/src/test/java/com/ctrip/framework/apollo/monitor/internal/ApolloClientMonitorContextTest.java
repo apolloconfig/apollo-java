@@ -29,8 +29,8 @@ import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientBoots
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientExceptionMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientNamespaceMonitorApi;
 import com.ctrip.framework.apollo.monitor.internal.listener.impl.NullClientThreadPoolMonitorApi;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -52,7 +52,7 @@ public class ApolloClientMonitorContextTest {
 
   private ApolloClientMonitorContext monitorContext;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     monitorContext = new ApolloClientMonitorContext();

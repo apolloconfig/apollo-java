@@ -20,8 +20,8 @@ import static com.ctrip.framework.apollo.monitor.internal.ApolloClientMonitorCon
 import static org.junit.Assert.*;
 
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
 
@@ -29,7 +29,7 @@ public class ApolloClientMonitorMessageProducerTest {
 
   private ApolloClientMonitorMessageProducer producer;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
 

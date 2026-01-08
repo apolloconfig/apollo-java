@@ -18,19 +18,21 @@ package com.ctrip.framework.apollo.config.data.system;
 
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author vdisk <vdisk@foxmail.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ApolloClientPropertyCompatibleTestConfiguration.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class ApolloClientSystemPropertiesCompatibleTest {
@@ -58,7 +60,7 @@ public class ApolloClientSystemPropertiesCompatibleTest {
     System.clearProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE);
   }
 
-  @After
+  @AfterEach
   public void clearProperty() {
     for (String propertyName : ApolloApplicationContextInitializer.APOLLO_SYSTEM_PROPERTIES) {
       System.clearProperty(propertyName);

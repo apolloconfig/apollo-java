@@ -17,12 +17,13 @@
 package com.ctrip.framework.foundation.internals;
 
 import com.ctrip.framework.apollo.core.spi.Ordered;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ServiceConfigurationError;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -34,24 +35,25 @@ public class ServiceBootstrapTest {
     assertTrue(service instanceof Interface1Impl);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void loadFirstWithNoServiceFileDefined() throws Exception {
-    ServiceBootstrap.loadFirst(Interface2.class);
+      assertThrows(IllegalStateException.class,()->
+          ServiceBootstrap.loadFirst(Interface2.class));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void loadFirstWithServiceFileButNoServiceImpl() throws Exception {
-    ServiceBootstrap.loadFirst(Interface3.class);
+      assertThrows(IllegalStateException.class,()-> ServiceBootstrap.loadFirst(Interface3.class));
   }
 
-  @Test(expected = ServiceConfigurationError.class)
+  @Test
   public void loadFirstWithWrongServiceImpl() throws Exception {
-    ServiceBootstrap.loadFirst(Interface4.class);
+      assertThrows(ServiceConfigurationError.class,()-> ServiceBootstrap.loadFirst(Interface4.class));
   }
 
-  @Test(expected = ServiceConfigurationError.class)
+  @Test
   public void loadFirstWithServiceImplNotExists() throws Exception {
-    ServiceBootstrap.loadFirst(Interface5.class);
+      assertThrows(ServiceConfigurationError.class,()-> ServiceBootstrap.loadFirst(Interface5.class));
   }
 
   @Test
@@ -65,9 +67,9 @@ public class ServiceBootstrapTest {
     assertTrue(service instanceof Interface6Impl1);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void loadPrimaryWithServiceFileButNoServiceImpl() {
-    ServiceBootstrap.loadPrimary(Interface7.class);
+      assertThrows(IllegalStateException.class,()-> ServiceBootstrap.loadPrimary(Interface7.class));
   }
 
   @Test

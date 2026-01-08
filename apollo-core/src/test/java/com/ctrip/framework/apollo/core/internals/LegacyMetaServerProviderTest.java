@@ -19,12 +19,12 @@ package com.ctrip.framework.apollo.core.internals;
 import static org.junit.Assert.assertEquals;
 
 import com.ctrip.framework.apollo.core.enums.Env;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class LegacyMetaServerProviderTest {
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     System.clearProperty("dev_meta");
   }

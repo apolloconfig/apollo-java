@@ -29,9 +29,9 @@ import static org.mockito.Mockito.when;
 import com.ctrip.framework.apollo.internals.PropertiesCompatibleFileConfigRepository;
 import java.util.Properties;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ctrip.framework.apollo.Config;
@@ -56,7 +56,7 @@ public class DefaultConfigFactoryTest {
   private static String someAppId;
   private static Env someEnv;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "someId";
     someEnv = Env.DEV;
@@ -64,7 +64,7 @@ public class DefaultConfigFactoryTest {
     defaultConfigFactory = spy(new DefaultConfigFactory());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

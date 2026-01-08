@@ -17,8 +17,9 @@
 package com.ctrip.framework.apollo.openapi.client.url;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OpenApiPathBuilderTest {
 
@@ -240,13 +241,15 @@ public class OpenApiPathBuilderTest {
     assertEquals(expected, actual);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testAddParamKeyEmpty() {
-    OpenApiPathBuilder.newBuilder().addParam("", "");
+      assertThrows(IllegalArgumentException.class,()->
+    OpenApiPathBuilder.newBuilder().addParam("", ""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testBuildPathURLEmpty() {
-    OpenApiPathBuilder.newBuilder().buildPath("");
+      assertThrows(IllegalArgumentException.class,()->
+    OpenApiPathBuilder.newBuilder().buildPath(""));
   }
 }

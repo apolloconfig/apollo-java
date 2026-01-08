@@ -26,8 +26,8 @@ import com.ctrip.framework.apollo.monitor.internal.model.GaugeModel;
 import com.ctrip.framework.apollo.monitor.internal.model.SampleModel;
 import java.util.Collections;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class AbstractApolloClientMetricsExporterTest {
   private TestMetricsExporter exporter;
   private ApolloClientMonitorEventListener mockListener;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     exporter = new TestMetricsExporter();
     mockListener = mock(ApolloClientMonitorEventListener.class);

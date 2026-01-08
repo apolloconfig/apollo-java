@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.spring;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -24,8 +25,8 @@ import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.core.ConfigConsts;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
@@ -45,7 +46,7 @@ public class XmlConfigPlaceholderTest extends AbstractSpringIntegrationTest {
   /**
    * forbidden to override the method {@link super#tearDown()}.
    */
-  @After
+  @AfterEach
   public void XmlConfigPlaceholderTestTearDown() {
     // clear the system properties
     System.clearProperty(SystemPropertyKeyConstants.XXX_FROM_SYSTEM_PROPERTY);
@@ -151,9 +152,10 @@ public class XmlConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     check("spring/XmlConfigPlaceholderTest4.xml", anotherTimeout, someBatch);
   }
 
-  @Test(expected = XmlBeanDefinitionStoreException.class)
+  @Test
   public void testWithInvalidWeight() throws Exception {
-    check("spring/XmlConfigPlaceholderTest5.xml", DEFAULT_TIMEOUT, DEFAULT_BATCH);
+      assertThrows(XmlBeanDefinitionStoreException.class, () -> check("spring/XmlConfigPlaceholderTest5.xml", DEFAULT_TIMEOUT, DEFAULT_BATCH))
+    ;
   }
 
 
@@ -179,14 +181,14 @@ public class XmlConfigPlaceholderTest extends AbstractSpringIntegrationTest {
     check("spring/config.namespace.placeholder.xml", anotherTimeout, someBatch);
   }
 
-  @Test(expected = FatalBeanException.class)
+  @Test
   public void testUnresolvedNamespaces() {
     int someTimeout = 1000;
     int anotherTimeout = someTimeout + 1;
     int someBatch = 2000;
     this.prepare(someTimeout, anotherTimeout, someBatch);
 
-    check("spring/config.namespace.placeholder.xml", anotherTimeout, someBatch);
+    assertThrows(FatalBeanException.class, () -> check("spring/config.namespace.placeholder.xml", anotherTimeout, someBatch));
   }
 
   private static void check(String xmlLocation, int expectedTimeout, int expectedBatch) {

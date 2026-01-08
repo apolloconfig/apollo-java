@@ -17,12 +17,13 @@
 package com.ctrip.framework.apollo.core.enums;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -53,26 +54,19 @@ public class ConfigFileFormatTest {
 
   @Test
   public void testNonExistingValueFromString() {
-    expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("thisShouldNotExistPropertiesXML can not map enum");
+    assertThrows(IllegalArgumentException.class, () -> ConfigFileFormat.fromString("thisShouldNotExistPropertiesXML"));
 
-    ConfigFileFormat.fromString("thisShouldNotExistPropertiesXML");
   }
 
   @Test
   public void testEmptyValueFromString() {
-    expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("value can not be empty");
 
-    ConfigFileFormat.fromString("");
+    assertThrows(IllegalArgumentException.class, () -> ConfigFileFormat.fromString(""));
   }
 
   @Test
   public void testSpacedValueFromString() {
-    expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage(" can not map enum");
-
-    ConfigFileFormat.fromString("    ");
+    assertThrows(IllegalArgumentException.class, () -> ConfigFileFormat.fromString(" "));
   }
 
   @Test

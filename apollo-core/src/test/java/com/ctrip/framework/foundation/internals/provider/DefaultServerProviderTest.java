@@ -27,22 +27,22 @@ import com.ctrip.framework.foundation.internals.Utils;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.ctrip.framework.foundation.internals.provider.DefaultServerProvider;
 
 public class DefaultServerProviderTest {
   private DefaultServerProvider defaultServerProvider;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     cleanUp();
     defaultServerProvider = new DefaultServerProvider();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     cleanUp();
   }

@@ -18,8 +18,8 @@ package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class NullClientExceptionMonitorApiTest {
 
   private NullClientExceptionMonitorApi exceptionMonitorApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     exceptionMonitorApi = new NullClientExceptionMonitorApi();
   }

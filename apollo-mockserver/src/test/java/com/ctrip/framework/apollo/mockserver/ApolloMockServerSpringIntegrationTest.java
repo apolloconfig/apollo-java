@@ -23,7 +23,8 @@ import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import com.google.common.util.concurrent.SettableFuture;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.concurrent.ExecutionException;
@@ -38,18 +40,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Create by zhangzheng on 8/16/18 Email:zhangzheng@youzan.com
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(value = {SpringExtension.class,EmbeddedApollo.class})
 @SpringBootTest(classes = TestConfiguration.class)
 public class ApolloMockServerSpringIntegrationTest {
 
   private static final String otherNamespace = "otherNamespace";
-
-  @ClassRule
-  public static EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
   @Autowired
   private TestBean testBean;
@@ -66,7 +66,7 @@ public class ApolloMockServerSpringIntegrationTest {
 
   @Test
   @DirtiesContext
-  public void testListenerTriggeredByAdd() throws InterruptedException, ExecutionException, TimeoutException {
+  public void testListenerTriggeredByAdd(EmbeddedApollo embeddedApollo) throws InterruptedException, ExecutionException, TimeoutException {
     embeddedApollo.addOrModifyProperty(otherNamespace, "someKey", "someValue");
     ConfigChangeEvent changeEvent = testBean.futureData.get(5000, TimeUnit.MILLISECONDS);
     assertEquals(otherNamespace, changeEvent.getNamespace());
@@ -75,7 +75,7 @@ public class ApolloMockServerSpringIntegrationTest {
 
   @Test
   @DirtiesContext
-  public void testListenerTriggeredByDel()
+  public void testListenerTriggeredByDel(EmbeddedApollo embeddedApollo)
       throws InterruptedException, ExecutionException, TimeoutException {
     embeddedApollo.deleteProperty(otherNamespace, "key1");
     ConfigChangeEvent changeEvent = testBean.futureData.get(5000, TimeUnit.MILLISECONDS);
@@ -85,7 +85,7 @@ public class ApolloMockServerSpringIntegrationTest {
 
   @Test
   @DirtiesContext
-  public void shouldNotifyOnInterestedPatterns() throws Exception {
+  public void shouldNotifyOnInterestedPatterns(EmbeddedApollo embeddedApollo) throws Exception {
     embeddedApollo.addOrModifyProperty(otherNamespace, "server.port", "8080");
     embeddedApollo.addOrModifyProperty(otherNamespace, "server.path", "/apollo");
     embeddedApollo.addOrModifyProperty(otherNamespace, "spring.application.name", "whatever");
@@ -95,11 +95,12 @@ public class ApolloMockServerSpringIntegrationTest {
     assertEquals("/apollo", changeEvent.getChange("server.path").getNewValue());
   }
 
-  @Test(expected = TimeoutException.class)
+  @Test
   @DirtiesContext
-  public void shouldNotNotifyOnUninterestedPatterns() throws Exception {
+  public void shouldNotNotifyOnUninterestedPatterns(EmbeddedApollo embeddedApollo) throws Exception {
     embeddedApollo.addOrModifyProperty(otherNamespace, "spring.application.name", "apollo");
-    testInterestedKeyPrefixesBean.futureData.get(5000, TimeUnit.MILLISECONDS);
+      assertThrows(TimeoutException.class,()->
+    testInterestedKeyPrefixesBean.futureData.get(5000, TimeUnit.MILLISECONDS));
   }
 
   @EnableApolloConfig

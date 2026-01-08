@@ -20,8 +20,8 @@ import static org.junit.Assert.*;
 
 import com.ctrip.framework.apollo.monitor.api.ApolloClientThreadPoolMonitorApi.ApolloThreadPoolInfo;
 import lombok.SneakyThrows;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -34,7 +34,7 @@ public class DefaultApolloClientThreadPoolApiTest {
   private ThreadPoolExecutor abstractConfigFileExecutor;
   private ThreadPoolExecutor metricsExporterExecutor;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     remoteConfigExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     abstractConfigExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);

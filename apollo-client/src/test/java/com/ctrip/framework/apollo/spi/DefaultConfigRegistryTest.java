@@ -20,8 +20,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
@@ -33,7 +33,7 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 public class DefaultConfigRegistryTest {
   private DefaultConfigRegistry defaultConfigRegistry;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     defaultConfigRegistry = new DefaultConfigRegistry();
   }

@@ -27,8 +27,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 public class ClusterOpenApiServiceTest extends AbstractOpenApiServiceTest {
@@ -38,7 +38,7 @@ public class ClusterOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private String someAppId;
   private String someEnv;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
     someAppId = "someAppId";
@@ -67,13 +67,13 @@ public class ClusterOpenApiServiceTest extends AbstractOpenApiServiceTest {
         get.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetClusterWithError() throws Exception {
     String someCluster = "someCluster";
 
     when(statusLine.getStatusCode()).thenReturn(404);
-
-    clusterOpenApiService.getCluster(someAppId, someEnv, someCluster);
+      assertThrows(RuntimeException.class,()->
+    clusterOpenApiService.getCluster(someAppId, someEnv, someCluster));
   }
 
   @Test
@@ -103,7 +103,7 @@ public class ClusterOpenApiServiceTest extends AbstractOpenApiServiceTest {
     assertEquals(gson.toJson(clusterDTO), EntityUtils.toString(entity));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateClusterWithError() throws Exception {
     String someCluster = "someCluster";
     String someCreatedBy = "someCreatedBy";
@@ -114,7 +114,7 @@ public class ClusterOpenApiServiceTest extends AbstractOpenApiServiceTest {
     clusterDTO.setDataChangeCreatedBy(someCreatedBy);
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    clusterOpenApiService.createCluster(someEnv, clusterDTO);
+      assertThrows(RuntimeException.class,()->
+    clusterOpenApiService.createCluster(someEnv, clusterDTO));
   }
 }

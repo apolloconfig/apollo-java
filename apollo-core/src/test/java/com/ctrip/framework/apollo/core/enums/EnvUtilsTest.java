@@ -17,8 +17,9 @@
 package com.ctrip.framework.apollo.core.enums;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EnvUtilsTest {
 
@@ -37,9 +38,10 @@ public class EnvUtilsTest {
     assertEquals(Env.UAT, Env.fromString(" " + Env.UAT.name().toUpperCase() + ""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testFromInvalidString() throws Exception {
-    Env.fromString("someInvalidEnv");
+      assertThrows(IllegalArgumentException.class,()->
+          Env.fromString("someInvalidEnv"));
   }
 
   @Test
@@ -48,19 +50,20 @@ public class EnvUtilsTest {
     assertEquals(prod, Env.PRO);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void fromBlankStringTest() {
-    Env.fromString("");
+      assertThrows(IllegalArgumentException.class,()->
+    Env.fromString(""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void fromSpacesStringTest() {
-    Env.fromString("    ");
+      assertThrows(IllegalArgumentException.class,()-> Env.fromString("    "));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void fromNullStringTest() {
-    Env.fromString(null);
+      assertThrows(IllegalArgumentException.class,()-> Env.fromString(null));
   }
 
 }

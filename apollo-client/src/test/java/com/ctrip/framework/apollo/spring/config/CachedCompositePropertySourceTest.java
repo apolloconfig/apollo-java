@@ -33,20 +33,22 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.assertj.core.util.Arrays;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.core.env.PropertySource;
 
 /**
  * @author Shawyeok (shawyeok@outlook.com)
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CachedCompositePropertySourceTest {
 
   private CachedCompositePropertySource compositeSource;
@@ -56,7 +58,7 @@ public class CachedCompositePropertySourceTest {
 
   private List<ConfigChangeListener> listeners;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     compositeSource = new CachedCompositePropertySource("testCompositeSource");
     listeners = new LinkedList<>();

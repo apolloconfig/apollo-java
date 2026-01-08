@@ -23,22 +23,22 @@ import com.ctrip.framework.apollo.config.data.internals.PureApolloConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.DefaultConfigFactory;
 import com.github.stefanbirkner.systemlambda.SystemLambda;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author vdisk <vdisk@foxmail.com>
  */
 public class PureApolloConfigTest {
 
-  @Before
+  @BeforeEach
   public void before() {
     System.setProperty("env", "local");
   }
 
-  @After
+  @AfterEach
   public void after() {
     System.clearProperty("spring.profiles.active");
     System.clearProperty("env");

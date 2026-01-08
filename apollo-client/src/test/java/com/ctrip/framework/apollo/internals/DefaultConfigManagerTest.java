@@ -25,9 +25,9 @@ import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import java.util.Properties;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
@@ -45,7 +45,7 @@ public class DefaultConfigManagerTest {
   private static String someConfigContent;
   private static String someAppId;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MockInjector.setInstance(ConfigFactoryManager.class, new MockConfigFactoryManager());
     MockInjector.setInstance(ConfigUtil.class, new ConfigUtil());
@@ -54,7 +54,7 @@ public class DefaultConfigManagerTest {
     someAppId = "someAppId";
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

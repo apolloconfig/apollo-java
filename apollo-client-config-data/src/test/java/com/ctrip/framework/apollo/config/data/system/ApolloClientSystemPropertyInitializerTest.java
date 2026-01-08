@@ -21,9 +21,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
@@ -57,7 +57,7 @@ public class ApolloClientSystemPropertyInitializerTest {
     }
   }
 
-  @After
+  @AfterEach
   public void clearProperty() {
     for (String propertyName : ApolloApplicationContextInitializer.APOLLO_SYSTEM_PROPERTIES) {
       System.clearProperty(propertyName);

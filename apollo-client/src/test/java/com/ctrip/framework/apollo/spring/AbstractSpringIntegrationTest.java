@@ -41,8 +41,8 @@ import java.util.Map;
 
 import java.util.Objects;
 import java.util.Properties;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.util.ReflectionUtils;
 
 import com.ctrip.framework.apollo.Config;
@@ -75,12 +75,12 @@ public abstract class AbstractSpringIntegrationTest {
     }
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     doSetUp();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     doTearDown();
   }

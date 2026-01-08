@@ -24,9 +24,9 @@ import com.ctrip.framework.apollo.util.escape.EscapeUtil;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class K8sConfigMapConfigRepositoryTest {
     private K8sConfigMapConfigRepository k8sConfigMapConfigRepository;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // mock configUtil
         MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
@@ -82,7 +82,7 @@ public class K8sConfigMapConfigRepositoryTest {
         k8sConfigMapConfigRepository = new K8sConfigMapConfigRepository(someAppId, someNamespace, upstreamRepo);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         MockInjector.reset();
     }

@@ -23,9 +23,9 @@ import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.OffsetDateTime;
@@ -52,7 +52,7 @@ public class KubernetesManagerTest {
     private CoreV1Api coreV1Api;
     private KubernetesManager kubernetesManager;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         coreV1Api = mock(CoreV1Api.class);
         kubernetesManager = new KubernetesManager(coreV1Api, "localPodName", 3);
@@ -61,7 +61,7 @@ public class KubernetesManagerTest {
         MockInjector.setInstance(CoreV1Api.class, coreV1Api);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         MockInjector.reset();
     }

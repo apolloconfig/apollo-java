@@ -30,9 +30,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.ctrip.framework.apollo.build.MockInjector;
@@ -58,7 +58,7 @@ public class LocalFileConfigRepositoryTest {
   private String defaultValue;
   private ConfigSourceType someSourceType;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someBaseDir = new File("src/test/resources/config-cache");
     someBaseDir.mkdir();
@@ -84,7 +84,7 @@ public class LocalFileConfigRepositoryTest {
     MockInjector.setInstance(PropertiesFactory.class, propertiesFactory);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
     recursiveDelete(someBaseDir);

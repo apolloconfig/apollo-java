@@ -29,15 +29,13 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(EmbeddedApollo.class)
 public class ApolloMockServerApiTest {
 
   private static final String anotherNamespace = "anotherNamespace";
-
-  @ClassRule
-  public static EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
   @Test
   public void testGetProperty() throws Exception {
@@ -48,7 +46,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testUpdateProperties() throws Exception {
+  public void testUpdateProperties(EmbeddedApollo embeddedApollo) throws Exception {
     String someNewValue = "someNewValue";
 
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
@@ -75,7 +73,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testUpdateSamePropertyTwice() throws Exception {
+  public void testUpdateSamePropertyTwice(EmbeddedApollo embeddedApollo) throws Exception {
     String someNewValue = "someNewValue";
 
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
@@ -100,7 +98,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testDeleteProperties() throws Exception {
+  public void testDeleteProperties(EmbeddedApollo embeddedApollo) throws Exception {
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
 
     final SettableFuture<ConfigChangeEvent> future = SettableFuture.create();
@@ -125,7 +123,7 @@ public class ApolloMockServerApiTest {
   }
 
   @Test
-  public void testDeleteSamePropertyTwice() throws Exception {
+  public void testDeleteSamePropertyTwice(EmbeddedApollo embeddedApollo) throws Exception {
     Config otherConfig = ConfigService.getConfig(anotherNamespace);
 
     final Semaphore changes = new Semaphore(0);

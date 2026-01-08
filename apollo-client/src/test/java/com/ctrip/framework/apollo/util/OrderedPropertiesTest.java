@@ -21,14 +21,15 @@ import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Properties;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.BeanCreationException;
 
 public class OrderedPropertiesTest {
 
   private OrderedProperties orderedProperties;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     orderedProperties = new OrderedProperties();
     orderedProperties.setProperty("key1", "value1");
@@ -92,9 +93,10 @@ public class OrderedPropertiesTest {
   }
 
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testPutNull() {
-    orderedProperties.put("key3", null);
+      assertThrows(NullPointerException.class,()->
+    orderedProperties.put("key3", null));
   }
 
   @Test

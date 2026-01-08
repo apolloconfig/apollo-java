@@ -27,9 +27,9 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.spring.config.CachedCompositePropertySource;
 import com.ctrip.framework.apollo.spring.config.PropertySourcesConstants;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -41,12 +41,12 @@ public class ApolloApplicationContextInitializerTest {
 
   private ApolloApplicationContextInitializer apolloApplicationContextInitializer;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     apolloApplicationContextInitializer = new ApolloApplicationContextInitializer();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     System.clearProperty(ApolloClientSystemConsts.APP_ID);
     System.clearProperty(ConfigConsts.APOLLO_CLUSTER_KEY);

@@ -24,8 +24,8 @@ import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class DefaultApolloClientExceptionApiTest {
 
   private DefaultApolloClientExceptionApi exceptionApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     int someQueueSize = 10;
     ConfigUtil configUtil = mock(ConfigUtil.class);

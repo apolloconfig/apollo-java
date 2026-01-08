@@ -23,18 +23,18 @@ import static org.mockito.Mockito.when;
 import com.ctrip.framework.apollo.tracer.internals.MockMessageProducerManager;
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.ServerSocket;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.junit.After;
-import org.junit.Before;
+import org.eclipse.jetty.util.Callback;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class BaseIntegrationTest {
   protected static final int PORT = findFreePort();
@@ -56,7 +56,7 @@ public abstract class BaseIntegrationTest {
   }
 
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MessageProducer someProducer = mock(MessageProducer.class);
     MockMessageProducerManager.setProducer(someProducer);
@@ -66,26 +66,25 @@ public abstract class BaseIntegrationTest {
     when(someProducer.newTransaction(anyString(), anyString())).thenReturn(someTransaction);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
-    if (server != null && server.isStarted()) {
+    if (server != null) {
       server.stop();
     }
   }
 
   protected ContextHandler mockServerHandler(final int statusCode, final String response) {
     ContextHandler context = new ContextHandler("/");
-    context.setHandler(new AbstractHandler() {
+    context.setHandler(new Handler.Abstract(){
 
-      @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request,
-          HttpServletResponse response) throws IOException, ServletException {
-
-        response.setContentType("text/plain;charset=UTF-8");
-        response.setStatus(statusCode);
-        response.getWriter().println(response);
-        baseRequest.setHandled(true);
-      }
+        @Override
+        public boolean handle(Request request, Response response, Callback callback)
+            throws Exception {
+            ((HttpServletResponse)response).setContentType("text/plain;charset=UTF-8");
+            ((HttpServletResponse)response).setStatus(statusCode);
+            ((HttpServletResponse)response).getWriter().println(response);
+            return true;
+        }
     });
     return context;
   }

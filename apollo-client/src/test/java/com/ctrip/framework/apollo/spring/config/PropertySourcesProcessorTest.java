@@ -35,9 +35,9 @@ import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Lists;
 import java.util.Properties;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -56,7 +56,7 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
     propertySources = mock(MutablePropertySources.class);
@@ -70,7 +70,7 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
   }
 
   @Override
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     super.tearDown();
     PropertySourcesProcessor.reset();

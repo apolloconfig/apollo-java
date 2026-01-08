@@ -61,14 +61,14 @@
 
   <properties>
     <revision>2.5.0-SNAPSHOT</revision>
-    <java.version>1.8</java.version>
+    <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring-boot.version>2.7.18</spring-boot.version>
+    <spring-boot.version>4.0.1</spring-boot.version>
     <cat.client.version>3.1.0</cat.client.version>
-    <junitperf>1.36.0</junitperf>
+    <junitperf>1.37.0</junitperf>
     <!-- Plugins Version -->
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-    <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+    <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
     <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
@@ -102,7 +102,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.21</version>
+        <version>2.0.17</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -134,7 +134,7 @@
       <dependency>
         <groupId>org.junit.vintage</groupId>
         <artifactId>junit-vintage-engine</artifactId>
-        <version>5.7.0</version>
+        <version>6.0.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -170,6 +170,11 @@
         <version>18.0.0</version>
         <optional>true</optional>
       </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -353,6 +358,9 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <trimStackTrace>false</trimStackTrace>
+            <argLine>
+                --add-opens java.base/java.util=ALL-UNNAMED
+            </argLine>
         </configuration>
       </plugin>
       <plugin>

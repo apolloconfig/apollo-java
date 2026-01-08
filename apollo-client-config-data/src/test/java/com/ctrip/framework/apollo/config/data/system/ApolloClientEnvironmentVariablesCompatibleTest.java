@@ -19,19 +19,22 @@ package com.ctrip.framework.apollo.config.data.system;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
 import com.github.stefanbirkner.systemlambda.SystemLambda;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author vdisk <vdisk@foxmail.com>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+//@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ApolloClientPropertyCompatibleTestConfiguration.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class ApolloClientEnvironmentVariablesCompatibleTest {
@@ -39,26 +42,57 @@ public class ApolloClientEnvironmentVariablesCompatibleTest {
   @Autowired
   private ConfigurableEnvironment environment;
 
+    /**
+     * ⚠️ 在 Spring Context 初始化前执行
+     */
+    @DynamicPropertySource
+    static void registerApolloEnv(DynamicPropertyRegistry registry) {
+        registry.add(
+            ApolloClientSystemConsts.APOLLO_CACHE_DIR,
+            () -> "test-2/cacheDir"
+        );
+        registry.add(
+            ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET,
+            () -> "test-2-secret"
+        );
+        registry.add(
+            ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE,
+            () -> "https://test-2-config-service"
+        );
+    }
+
   @Test
   public void testEnvironmentVariablesCompatible() throws Exception {
-    SystemLambda.withEnvironmentVariable(
-        ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES,
-        "test-2/cacheDir")
-        .and(ApolloClientSystemConsts.DEPRECATED_APOLLO_ACCESS_KEY_SECRET_ENVIRONMENT_VARIABLES,
-            "test-2-secret")
-        .and(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES,
-            "https://test-2-config-service")
-        .execute(() -> {
-          Assert.assertEquals("test-2/cacheDir",
-              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR));
-          Assert.assertEquals("test-2-secret",
-              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET));
-          Assert.assertEquals("https://test-2-config-service",
-              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE));
-        });
+//    SystemLambda.withEnvironmentVariable(
+//        ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES,
+//        "test-2/cacheDir")
+//        .and(ApolloClientSystemConsts.DEPRECATED_APOLLO_ACCESS_KEY_SECRET_ENVIRONMENT_VARIABLES,
+//            "test-2-secret")
+//        .and(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES,
+//            "https://test-2-config-service")
+//        .execute(() -> {
+//          Assert.assertEquals("test-2/cacheDir",
+//              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR));
+//          Assert.assertEquals("test-2-secret",
+//              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET));
+//          Assert.assertEquals("https://test-2-config-service",
+//              this.environment.getProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE));
+//        });
+      Assertions.assertEquals(
+          "test-2/cacheDir",
+          environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR)
+      );
+      Assertions.assertEquals(
+          "test-2-secret",
+          environment.getProperty(ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET)
+      );
+      Assertions.assertEquals(
+          "https://test-2-config-service",
+          environment.getProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE)
+      );
   }
 
-  @After
+  @AfterEach
   public void clearProperty() {
     for (String propertyName : ApolloApplicationContextInitializer.APOLLO_SYSTEM_PROPERTIES) {
       System.clearProperty(propertyName);

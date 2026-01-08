@@ -16,7 +16,10 @@
  */
 package com.ctrip.framework.test.tools;
 
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author kl (http://kailing.pub)
@@ -27,10 +30,29 @@ public class AloneClassLoader extends URLClassLoader {
   private final ClassLoader appClassLoader;
 
   public AloneClassLoader() {
-    super(((URLClassLoader) getSystemClassLoader()).getURLs(),
+    super(getClasspathUrls(),
         Thread.currentThread().getContextClassLoader().getParent());
     appClassLoader = Thread.currentThread().getContextClassLoader();
   }
+
+    private static URL[] getClasspathUrls() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (cl instanceof URLClassLoader) {
+            return ((URLClassLoader) cl).getURLs();
+        }
+
+        // Java 9+ fallback（安全）
+        List<URL> urls = new ArrayList<>();
+        try {
+            var resources = cl.getResources("");
+            while (resources.hasMoreElements()) {
+                urls.add(resources.nextElement());
+            }
+        } catch (Exception ignored) {
+        }
+        return urls.toArray(new URL[0]);
+    }
 
   @Override
   public Class<?> loadClass(String name) throws ClassNotFoundException {

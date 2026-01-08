@@ -18,12 +18,15 @@ package com.ctrip.framework.apollo.internals;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -61,20 +64,23 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 /**
  * Created by Jason on 4/9/16.
  */
-@RunWith(MockitoJUnitRunner.class)
+//@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class RemoteConfigRepositoryTest {
 
   @Mock
@@ -95,11 +101,11 @@ public class RemoteConfigRepositoryTest {
   private static String someCluster;
   private static String someSecret;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someNamespace = "someName";
 
-    when(pollResponse.getStatusCode()).thenReturn(HttpServletResponse.SC_NOT_MODIFIED);
+      lenient().when(pollResponse.getStatusCode()).thenReturn(HttpServletResponse.SC_NOT_MODIFIED);
 
     configUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, configUtil);
@@ -108,8 +114,8 @@ public class RemoteConfigRepositoryTest {
 
     ServiceDTO serviceDTO = mock(ServiceDTO.class);
 
-    when(serviceDTO.getHomepageUrl()).thenReturn(someServerUrl);
-    when(configServiceLocator.getConfigServices()).thenReturn(Lists.newArrayList(serviceDTO));
+      lenient().when(serviceDTO.getHomepageUrl()).thenReturn(someServerUrl);
+      lenient().when(configServiceLocator.getConfigServices()).thenReturn(Lists.newArrayList(serviceDTO));
     MockInjector.setInstance(ConfigServiceLocator.class, configServiceLocator);
 
     httpClient = spy(new MockHttpClient());
@@ -119,7 +125,7 @@ public class RemoteConfigRepositoryTest {
 
     MockInjector.setInstance(RemoteConfigLongPollService.class, remoteConfigLongPollService);
 
-    when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
+      lenient().when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
       @Override
       public Properties answer(InvocationOnMock invocation) {
         return new Properties();
@@ -132,7 +138,7 @@ public class RemoteConfigRepositoryTest {
 
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
     remoteConfigLongPollService.stopLongPollingRefresh();
@@ -274,7 +280,7 @@ public class RemoteConfigRepositoryTest {
     assertEquals(value2, result.get(key2));
   }
 
-  @Test(expected = ApolloConfigException.class)
+  @Test
   public void testGetRemoteConfigWithUnknownSync() throws Exception {
 
     ApolloConfig someApolloConfigWithUnknownSync = assembleApolloConfigWithUnknownSync(
@@ -288,8 +294,8 @@ public class RemoteConfigRepositoryTest {
 
     //must stop the long polling before exception occurred
     remoteConfigLongPollService.stopLongPollingRefresh();
-
-    remoteConfigRepository.getConfig();
+      assertThrows(ApolloConfigException.class, () ->
+    remoteConfigRepository.getConfig());
   }
 
   @Test
@@ -355,7 +361,7 @@ public class RemoteConfigRepositoryTest {
     assertEquals(ConfigSourceType.REMOTE, remoteConfigRepository.getSourceType());
   }
 
-  @Test(expected = ApolloConfigException.class)
+  @Test
   public void testGetRemoteConfigWithServerError() throws Exception {
 
     when(someResponse.getStatusCode()).thenReturn(500);
@@ -363,12 +369,13 @@ public class RemoteConfigRepositoryTest {
     RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     //must stop the long polling before exception occurred
-    remoteConfigLongPollService.stopLongPollingRefresh();
 
-    remoteConfigRepository.getConfig();
+    remoteConfigLongPollService.stopLongPollingRefresh();
+      assertThrows(ApolloConfigException.class, () ->
+    remoteConfigRepository.getConfig());
   }
 
-  @Test(expected = ApolloConfigException.class)
+  @Test
   public void testGetRemoteConfigWithNotFount() throws Exception {
 
     when(someResponse.getStatusCode()).thenReturn(404);
@@ -376,9 +383,8 @@ public class RemoteConfigRepositoryTest {
     RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someAppId, someNamespace);
 
     //must stop the long polling before exception occurred
-    remoteConfigLongPollService.stopLongPollingRefresh();
-
-    remoteConfigRepository.getConfig();
+      remoteConfigLongPollService.stopLongPollingRefresh();
+      assertThrows(ApolloConfigException.class, () ->remoteConfigRepository.getConfig());
   }
 
   @Test

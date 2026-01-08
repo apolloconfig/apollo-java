@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.net.HttpHeaders;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author nisiyong

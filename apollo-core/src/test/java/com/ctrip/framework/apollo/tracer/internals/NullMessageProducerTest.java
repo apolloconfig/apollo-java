@@ -18,8 +18,8 @@ package com.ctrip.framework.apollo.tracer.internals;
 
 import com.ctrip.framework.apollo.tracer.spi.MessageProducer;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 public class NullMessageProducerTest {
   private MessageProducer messageProducer;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     messageProducer = new NullMessageProducer();
   }

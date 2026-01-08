@@ -45,9 +45,9 @@ import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.awaitility.core.ThrowingRunnable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigChangeListener;
@@ -77,7 +77,7 @@ public class DefaultConfigTest {
   private ConfigSourceType someSourceType;
   private PropertiesFactory propertiesFactory;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
 
@@ -97,7 +97,7 @@ public class DefaultConfigTest {
     configRepository = mock(ConfigRepository.class);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
     recursiveDelete(someResourceDir);

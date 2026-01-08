@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.openapi.client.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.openapi.client.constant.ApolloOpenApiConstants;
@@ -26,12 +27,14 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 abstract class AbstractOpenApiServiceTest {
   @Mock
   protected CloseableHttpClient httpClient;
@@ -44,15 +47,15 @@ abstract class AbstractOpenApiServiceTest {
 
   protected String someBaseUrl;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     gson = new GsonBuilder().setDateFormat(ApolloOpenApiConstants.JSON_DATE_FORMAT).create();
     someBaseUrl = "http://someBaseUrl";
 
-    when(someHttpResponse.getStatusLine()).thenReturn(statusLine);
-    when(statusLine.getStatusCode()).thenReturn(200);
+    lenient().when(someHttpResponse.getStatusLine()).thenReturn(statusLine);
+    lenient().when(statusLine.getStatusCode()).thenReturn(200);
 
-    when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(someHttpResponse);
+    lenient().when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(someHttpResponse);
   }
 
 }

@@ -16,8 +16,8 @@
  */
 package com.ctrip.framework.foundation.internals;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 public class UtilsTest {
     private final String actualOsName = System.getProperty("os.name");
 
-    @After
+    @AfterEach
     public void tearDown() {
         System.setProperty("os.name", actualOsName);
     }

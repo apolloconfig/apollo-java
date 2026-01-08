@@ -32,15 +32,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ConfigPropertySourceTest {
 
   private ConfigPropertySource configPropertySource;
@@ -48,7 +50,7 @@ public class ConfigPropertySourceTest {
   @Mock
   private Config someConfig;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     String someName = "someName";
     configPropertySource = new ConfigPropertySource(someName, someConfig);

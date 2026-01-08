@@ -17,13 +17,15 @@
 package com.ctrip.framework.apollo.util.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.BeanCreationException;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
@@ -84,12 +86,13 @@ public class DateParserTest {
     checkWithFormatAndLocale(someDate, dateText, someFormat, someLocale);
   }
 
-  @Test(expected = ParserException.class)
+  @Test
   public void testParseError() throws Exception {
     String someInvalidDate = "someInvalidDate";
     String format = "yyyy-MM-dd";
 
-    dateParser.parse(someInvalidDate, format);
+      assertThrows(ParserException.class,()->
+    dateParser.parse(someInvalidDate, format));
   }
 
   private void check(Date expected, String text) throws Exception {

@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.internals;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.build.MockInjector;
@@ -27,16 +28,17 @@ import com.ctrip.framework.apollo.util.OrderedProperties;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import com.ctrip.framework.apollo.util.yaml.YamlParser;
 import java.util.Properties;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-@RunWith(MockitoJUnitRunner.class)
+
+@ExtendWith(MockitoExtension.class)
 public class YamlConfigFileTest {
 
   private String someAppId;
@@ -50,14 +52,14 @@ public class YamlConfigFileTest {
 
   private ConfigSourceType someSourceType;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "someAppId";
     someNamespace = "someName";
 
     MockInjector.setInstance(YamlParser.class, yamlParser);
 
-    when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
+      lenient().when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
       @Override
       public Properties answer(InvocationOnMock invocation) {
         return new Properties();
@@ -66,7 +68,7 @@ public class YamlConfigFileTest {
     MockInjector.setInstance(PropertiesFactory.class, propertiesFactory);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

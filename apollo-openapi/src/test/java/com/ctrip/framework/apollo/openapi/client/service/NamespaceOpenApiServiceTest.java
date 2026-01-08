@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.openapi.client.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,8 +26,8 @@ import com.ctrip.framework.apollo.openapi.dto.OpenAppNamespaceDTO;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
@@ -40,7 +41,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private boolean fillItemDetail;
 
   @Override
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
 
@@ -82,18 +83,18 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
                  get.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetNamespaceWithError() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(404);
-
-    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, true);
+      assertThrows(RuntimeException.class,()->
+    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, true));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetNamespaceWithErrorAndFillItemDetailFalse() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(404);
-
-    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, false);
+      assertThrows(RuntimeException.class,()->
+    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, false));
   }
 
   @Test
@@ -126,18 +127,18 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
                  get.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetNamespacesWithError() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(404);
-
-    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, true);
+      assertThrows(RuntimeException.class,()->
+    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, true));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetNamespacesWithErrorAndFillItemDetailFalse() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(404);
-
-    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, false);
+      assertThrows(RuntimeException.class,()->
+    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, false));
   }
 
   @Test
@@ -161,7 +162,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
     assertEquals(String.format("%s/apps/%s/appnamespaces", someBaseUrl, someAppId), post.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testCreateAppNamespaceWithError() throws Exception {
     String someName = "someName";
     String someCreatedBy = "someCreatedBy";
@@ -172,8 +173,8 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
     appNamespaceDTO.setDataChangeCreatedBy(someCreatedBy);
 
     when(statusLine.getStatusCode()).thenReturn(400);
-
-    namespaceOpenApiService.createAppNamespace(appNamespaceDTO);
+      assertThrows(RuntimeException.class,()->
+    namespaceOpenApiService.createAppNamespace(appNamespaceDTO));
   }
 
   @Test
@@ -191,10 +192,10 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
             someNamespace), post.getURI().toString());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testGetNamespaceLockWithError() throws Exception {
     when(statusLine.getStatusCode()).thenReturn(404);
-
-    namespaceOpenApiService.getNamespaceLock(someAppId, someEnv, someCluster, someNamespace);
+      assertThrows(RuntimeException.class,()->
+    namespaceOpenApiService.getNamespaceLock(someAppId, someEnv, someCluster, someNamespace));
   }
 }

@@ -18,7 +18,7 @@ package com.ctrip.framework.apollo.util;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jason Song(song_s@ctrip.com)

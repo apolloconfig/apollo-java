@@ -18,8 +18,8 @@ package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public class NullClientBootstrapArgsMonitorApiTest {
 
   private NullClientBootstrapArgsMonitorApi bootstrapArgsMonitorApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     bootstrapArgsMonitorApi = new NullClientBootstrapArgsMonitorApi();
   }

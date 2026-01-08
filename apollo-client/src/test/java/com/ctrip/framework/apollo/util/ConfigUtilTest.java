@@ -21,8 +21,8 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import java.io.File;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.spy;
  */
 public class ConfigUtilTest {
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     System.clearProperty(ConfigConsts.APOLLO_CLUSTER_KEY);
     System.clearProperty("apollo.connectTimeout");

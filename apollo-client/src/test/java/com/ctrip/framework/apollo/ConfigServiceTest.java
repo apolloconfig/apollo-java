@@ -22,9 +22,9 @@ import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.ctrip.framework.apollo.build.MockInjector;
 import com.ctrip.framework.apollo.core.ConfigConsts;
@@ -40,14 +40,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 public class ConfigServiceTest {
   private static String someAppId;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "someAppId";
 
     MockInjector.setInstance(ConfigUtil.class, new MockConfigUtil());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     //as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();

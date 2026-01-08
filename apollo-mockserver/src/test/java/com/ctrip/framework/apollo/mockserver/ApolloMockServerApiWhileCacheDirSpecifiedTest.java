@@ -25,7 +25,8 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.BufferedWriter;
@@ -37,10 +38,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
+@ExtendWith(EmbeddedApollo.class)
 public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
 
-  @ClassRule
-  public static EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
   @Test
   public void testLoadDefaultLocalCacheDir() throws Exception {

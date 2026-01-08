@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.util.yaml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,13 +30,14 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.ByteArrayResource;
+import org.yaml.snakeyaml.composer.ComposerException;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 import org.yaml.snakeyaml.parser.ParserException;
@@ -44,12 +46,12 @@ public class YamlParserTest {
 
   private YamlParser parser;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     parser = new YamlParser();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }
@@ -64,19 +66,22 @@ public class YamlParserTest {
     test("case7.yaml");
   }
 
-  @Test(expected = DuplicateKeyException.class)
+  @Test
   public void testcase2() throws Exception {
-    testInvalid("case2.yaml");
+      assertThrows(DuplicateKeyException.class, () ->
+    testInvalid("case2.yaml"));
   }
 
-  @Test(expected = ParserException.class)
+  @Test
   public void testcase8() throws Exception {
-    testInvalid("case8.yaml");
+      assertThrows(ParserException.class, () ->
+    testInvalid("case8.yaml"));
   }
 
-  @Test(expected = ConstructorException.class)
+  @Test
   public void testcase9() throws Exception {
-    testInvalid("case9.yaml");
+      assertThrows(ComposerException.class, () ->
+    testInvalid("case9.yaml"));
   }
 
   @Test

@@ -23,14 +23,14 @@ import static org.junit.Assert.assertTrue;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import java.io.File;
 import java.io.FileInputStream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultApplicationProviderTest {
   private DefaultApplicationProvider defaultApplicationProvider;
   String PREDEFINED_APP_ID = "110402";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     defaultApplicationProvider = new DefaultApplicationProvider();
   }

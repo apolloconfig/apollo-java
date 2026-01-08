@@ -20,8 +20,8 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.internals.ConfigManager;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEvent;
 import com.ctrip.framework.apollo.monitor.internal.event.ApolloClientMonitorEventFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -44,7 +44,7 @@ public class DefaultApolloClientNamespaceApiTest {
   @InjectMocks
   private DefaultApolloClientNamespaceApi namespaceApi;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     when(configManager.getConfig(anyString())).thenReturn(config);

@@ -18,8 +18,8 @@ package com.ctrip.framework.apollo.openapi.client.service;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +34,7 @@ public class InstanceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private String someCluster;
   private String someNamespace;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     super.setUp();
     someAppId = "someAppId";

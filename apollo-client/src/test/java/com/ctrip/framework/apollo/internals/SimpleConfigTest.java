@@ -17,6 +17,7 @@
 package com.ctrip.framework.apollo.internals;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,9 +27,10 @@ import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -41,12 +43,13 @@ import com.ctrip.framework.apollo.model.ConfigChange;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.SettableFuture;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 /**
  * @author Jason Song(song_s@ctrip.com)
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SimpleConfigTest {
 
   private String someAppId;
@@ -57,12 +60,12 @@ public class SimpleConfigTest {
   private PropertiesFactory propertiesFactory;
   private ConfigSourceType someSourceType;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "someAppId";
     someNamespace = "someName";
 
-    when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
+      lenient().when(propertiesFactory.getPropertiesInstance()).thenAnswer(new Answer<Properties>() {
       @Override
       public Properties answer(InvocationOnMock invocation) {
         return new Properties();
@@ -71,7 +74,7 @@ public class SimpleConfigTest {
     MockInjector.setInstance(PropertiesFactory.class, propertiesFactory);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }

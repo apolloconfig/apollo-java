@@ -30,9 +30,9 @@ import com.ctrip.framework.apollo.internals.ConfigRepository;
 import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
 import com.ctrip.framework.apollo.internals.RemoteConfigRepository;
 import com.ctrip.framework.apollo.util.ConfigUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultConfigFactoryFileCachePropertyTest {
 
@@ -41,7 +41,7 @@ public class DefaultConfigFactoryFileCachePropertyTest {
   private String someAppId;
   private String someNamespace;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     someAppId = "someAppId";
     someNamespace = "someNamespace";
@@ -74,7 +74,7 @@ public class DefaultConfigFactoryFileCachePropertyTest {
     verify(configFactory, times(1)).createRemoteConfigRepository(someAppId, someNamespace);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     MockInjector.reset();
   }
