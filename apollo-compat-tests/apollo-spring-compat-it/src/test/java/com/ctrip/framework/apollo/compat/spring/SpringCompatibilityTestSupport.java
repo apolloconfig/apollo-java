@@ -47,6 +47,8 @@ final class SpringCompatibilityTestSupport {
   }
 
   static void beforeClass(EmbeddedApollo embeddedApollo) throws Exception {
+    System.setProperty("app.id", "someAppId");
+    System.setProperty("env", "local");
     embeddedApollo.resetOverriddenProperties();
     resetApolloState();
   }
@@ -71,7 +73,7 @@ final class SpringCompatibilityTestSupport {
   static Properties copyConfigProperties(Config config) {
     Properties properties = new Properties();
     for (String key : config.getPropertyNames()) {
-      properties.setProperty(key, config.getProperty(key, null));
+      properties.setProperty(key, config.getProperty(key, ""));
     }
     return properties;
   }
@@ -126,7 +128,7 @@ final class SpringCompatibilityTestSupport {
       ((Table<?, ?, ?>) container).clear();
       return;
     }
-    Method clearMethod = container.getClass().getDeclaredMethod("clear");
+    Method clearMethod = container.getClass().getMethod("clear");
     clearMethod.setAccessible(true);
     clearMethod.invoke(container);
   }

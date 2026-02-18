@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author wxq
  */
-public class MockedConfigService {
+public class MockedConfigService implements AutoCloseable {
 
   private static final String META_SERVER_PATH = "/services/config?.*";
 
@@ -255,6 +255,7 @@ public class MockedConfigService {
         );
   }
 
+  @Override
   public void close() {
     if (this.server.isRunning()) {
       this.server.stop();

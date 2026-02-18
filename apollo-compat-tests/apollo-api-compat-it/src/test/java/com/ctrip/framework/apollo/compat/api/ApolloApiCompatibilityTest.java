@@ -207,7 +207,7 @@ public class ApolloApiCompatibilityTest {
       ((Table<?, ?, ?>) container).clear();
       return;
     }
-    Method clearMethod = container.getClass().getDeclaredMethod("clear");
+    Method clearMethod = container.getClass().getMethod("clear");
     clearMethod.setAccessible(true);
     clearMethod.invoke(container);
   }

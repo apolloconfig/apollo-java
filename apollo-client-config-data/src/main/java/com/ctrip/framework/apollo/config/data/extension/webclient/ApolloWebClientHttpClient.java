@@ -26,6 +26,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -36,6 +38,10 @@ import reactor.core.publisher.Mono;
  * @author vdisk <vdisk@foxmail.com>
  */
 public class ApolloWebClientHttpClient implements HttpClient {
+
+  private static final Method CLIENT_RESPONSE_STATUS_CODE_METHOD = resolveClientResponseStatusCodeMethod();
+  private static final ConcurrentMap<Class<?>, Method> STATUS_CODE_VALUE_METHOD_CACHE =
+      new ConcurrentHashMap<Class<?>, Method>();
 
   private final WebClient webClient;
 
@@ -96,17 +102,32 @@ public class ApolloWebClientHttpClient implements HttpClient {
    */
   private int resolveStatusCode(Object clientResponse) {
     try {
-      Method statusCodeMethod = ClientResponse.class.getMethod("statusCode");
-      Object statusCode = statusCodeMethod.invoke(clientResponse);
+      Object statusCode = CLIENT_RESPONSE_STATUS_CODE_METHOD.invoke(clientResponse);
       if (statusCode == null) {
         throw new ApolloConfigException("Failed to resolve response status code: statusCode is null");
       }
-      // Both HttpStatus and HttpStatusCode expose value(), so resolve it reflectively.
-      Method valueMethod = statusCode.getClass().getMethod("value");
+      Method valueMethod = STATUS_CODE_VALUE_METHOD_CACHE.computeIfAbsent(statusCode.getClass(),
+          ApolloWebClientHttpClient::resolveStatusCodeValueMethod);
       Object value = valueMethod.invoke(statusCode);
       return ((Number) value).intValue();
     } catch (Exception ex) {
       throw new ApolloConfigException("Failed to resolve response status code", ex);
+    }
+  }
+
+  private static Method resolveClientResponseStatusCodeMethod() {
+    try {
+      return ClientResponse.class.getMethod("statusCode");
+    } catch (NoSuchMethodException ex) {
+      throw new ExceptionInInitializerError(ex);
+    }
+  }
+
+  private static Method resolveStatusCodeValueMethod(Class<?> statusCodeType) {
+    try {
+      return statusCodeType.getMethod("value");
+    } catch (NoSuchMethodException ex) {
+      throw new IllegalStateException("Failed to resolve value() method from " + statusCodeType, ex);
     }
   }
 }

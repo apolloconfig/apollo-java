@@ -35,10 +35,11 @@ import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import com.google.common.collect.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.Map;
+import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Before;
 import org.junit.Test;
@@ -112,6 +113,11 @@ public class ConfigDataIntegrationTest {
   @Before
   public void beforeEach() {
     embeddedApollo.resetOverriddenProperties();
+  }
+
+  @After
+  public void afterEach() throws Exception {
+    resetApolloStaticState();
   }
 
   @Autowired
