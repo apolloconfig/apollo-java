@@ -22,6 +22,7 @@ import com.ctrip.framework.apollo.core.dto.ServiceDTO;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
 import org.mockserver.integration.ClientAndServer;
@@ -157,8 +158,41 @@ public class MockedConfigService implements AutoCloseable {
       int mockedStatusCode,
       ApolloConfig apolloConfig
   ) {
+    mockConfigs(failedAtFirstTime, mockedStatusCode, apolloConfig, "/configs/.*");
+  }
+
+  public void mockConfigs(
+      String appId,
+      String cluster,
+      String namespace,
+      int mockedStatusCode,
+      ApolloConfig apolloConfig
+  ) {
+    mockConfigs(false, appId, cluster, namespace, mockedStatusCode, apolloConfig);
+  }
+
+  public void mockConfigs(
+      boolean failedAtFirstTime,
+      String appId,
+      String cluster,
+      String namespace,
+      int mockedStatusCode,
+      ApolloConfig apolloConfig
+  ) {
+    String path = String.format("/configs/%s/%s/%s.*",
+        Pattern.quote(appId),
+        Pattern.quote(cluster),
+        Pattern.quote(namespace));
+    mockConfigs(failedAtFirstTime, mockedStatusCode, apolloConfig, path);
+  }
+
+  private void mockConfigs(
+      boolean failedAtFirstTime,
+      int mockedStatusCode,
+      ApolloConfig apolloConfig,
+      String path
+  ) {
     // cannot use /configs/* as the path, because mock server will treat * as a wildcard
-    final String path = "/configs/.*";
     RequestDefinition requestDefinition = HttpRequest.request("GET").withPath(path);
 
     // need clear
@@ -222,7 +256,7 @@ public class MockedConfigService implements AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     if (this.server.isRunning()) {
       this.server.stop();
     }

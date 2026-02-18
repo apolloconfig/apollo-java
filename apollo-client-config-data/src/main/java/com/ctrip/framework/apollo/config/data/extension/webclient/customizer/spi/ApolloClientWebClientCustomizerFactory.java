@@ -18,11 +18,12 @@ package com.ctrip.framework.apollo.config.data.extension.webclient.customizer.sp
 
 import com.ctrip.framework.apollo.config.data.extension.properties.ApolloClientProperties;
 import com.ctrip.framework.apollo.core.spi.Ordered;
+import java.util.function.Consumer;
 import org.apache.commons.logging.Log;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.web.reactive.function.client.WebClientCustomizer;
 import org.springframework.lang.Nullable;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author vdisk <vdisk@foxmail.com>
@@ -30,7 +31,7 @@ import org.springframework.lang.Nullable;
 public interface ApolloClientWebClientCustomizerFactory extends Ordered {
 
   /**
-   * create a WebClientCustomizer instance
+   * create a webclient builder customizer
    *
    * @param apolloClientProperties apollo client binded properties
    * @param binder                 properties binder
@@ -41,10 +42,10 @@ public interface ApolloClientWebClientCustomizerFactory extends Ordered {
    *                               Spring Boot 3.x or
    *                               org.springframework.boot.bootstrap.ConfigurableBootstrapContext
    *                               for Spring Boot 4.x)
-   * @return WebClientCustomizer instance or null
+   * @return customizer instance or null
    */
   @Nullable
-  WebClientCustomizer createWebClientCustomizer(ApolloClientProperties apolloClientProperties,
+  Consumer<WebClient.Builder> createWebClientCustomizer(ApolloClientProperties apolloClientProperties,
       Binder binder, BindHandler bindHandler, Log log,
       Object bootstrapContext);
 }
