@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:apollo="http://www.ctrip.com/schema/apollo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.ctrip.com/schema/apollo http://www.ctrip.com/schema/apollo.xsd">
+
+  <apollo:config order="10"/>
+  <apollo:config namespaces="TEST1.apollo,application.yaml" order="11"/>
+
+  <bean id="xmlBean" class="com.ctrip.framework.apollo.compat.spring.SpringXmlBean">
+    <property name="timeout" value="${compat.xml.timeout:0}"/>
+    <property name="batch" value="${compat.xml.batch:0}"/>
+    <property name="publicKey" value="${public.key:missing}"/>
+    <property name="yamlMarker" value="${yaml.marker:missing}"/>
+  </bean>
+
+</beans>

@@ -58,6 +58,8 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -77,6 +79,7 @@ import static org.mockito.Mockito.when;
 public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   private static final String FX_APOLLO_NAMESPACE = "FX.apollo";
   private static final String APPLICATION_YAML_NAMESPACE = "application.yaml";
+  private static final String ANOTHER_APP_ID = "someAppId2";
 
   private static <T> T getBean(Class<T> beanClass, Class<?>... annotatedClasses) {
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(annotatedClasses);
@@ -98,6 +101,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     System.clearProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY);
     System.clearProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY_YAML);
     System.clearProperty(SystemPropertyKeyConstants.DELIMITED_NAMESPACES);
+    System.clearProperty(SystemPropertyKeyConstants.LISTENER_APP_ID);
+    System.clearProperty(SystemPropertyKeyConstants.LISTENER_NAMESPACE);
     System.clearProperty(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE);
     super.tearDown();
   }
@@ -676,6 +681,87 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
   }
 
+  @Test
+  public void testApolloConfigChangeListenerWithAppId() {
+    Config applicationConfig = mock(Config.class);
+    Config anotherAppConfig = mock(Config.class);
+
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig("someAppId2", "namespace2", anotherAppConfig);
+
+    getBean(TestApolloConfigChangeListenerWithAppIdBean.class, AppConfig12.class);
+
+    verify(anotherAppConfig, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
+  @Test
+  public void testApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppId() {
+    Config applicationConfig = mock(Config.class);
+    Config anotherAppConfig = mock(Config.class);
+
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+    mockConfig("someAppId2", "namespace2", anotherAppConfig);
+
+    getBean(TestApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppIdBean.class, AppConfig13.class);
+
+    final ArgumentCaptor<Set> interestedKeyPrefixesArgumentCaptor = ArgumentCaptor.forClass(Set.class);
+
+    verify(anotherAppConfig, times(1))
+        .addChangeListener(any(ConfigChangeListener.class), Mockito.nullable(Set.class),
+            interestedKeyPrefixesArgumentCaptor.capture());
+
+    assertEquals(1, interestedKeyPrefixesArgumentCaptor.getAllValues().size());
+    assertEquals(Sets.newHashSet("redis.cache.", "logging."),
+        interestedKeyPrefixesArgumentCaptor.getValue());
+  }
+
+  @Test
+  public void testApolloConfigChangeListenerWithAppIdRuntimeRefresh() throws Exception {
+    SimpleConfig defaultAppConfig = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION,
+        assembleProperties("runtime.default.timeout", "30"));
+    SimpleConfig anotherAppConfig = prepareConfig(ANOTHER_APP_ID, ConfigConsts.NAMESPACE_APPLICATION,
+        assembleProperties("runtime.another.timeout", "66"));
+
+    TestApolloRuntimeListenerRoutingBean bean = getBean(
+        TestApolloRuntimeListenerRoutingBean.class, TestApolloRuntimeListenerRoutingConfiguration.class);
+
+    assertEquals(30, bean.getTimeout());
+
+    defaultAppConfig.onRepositoryChange(someAppId, ConfigConsts.NAMESPACE_APPLICATION,
+        assembleProperties("runtime.default.timeout", "45"));
+
+    ConfigChangeEvent defaultEvent = bean.pollDefaultEvent(5, TimeUnit.SECONDS);
+    assertNotNull(defaultEvent);
+    assertEquals("45", defaultEvent.getChange("runtime.default.timeout").getNewValue());
+    assertNull(bean.pollAnotherAppEvent(200, TimeUnit.MILLISECONDS));
+    TimeUnit.MILLISECONDS.sleep(100);
+    assertEquals(45, bean.getTimeout());
+
+    anotherAppConfig.onRepositoryChange(ANOTHER_APP_ID, ConfigConsts.NAMESPACE_APPLICATION,
+        assembleProperties("runtime.another.timeout", "77"));
+
+    ConfigChangeEvent anotherEvent = bean.pollAnotherAppEvent(5, TimeUnit.SECONDS);
+    assertNotNull(anotherEvent);
+    assertEquals("77", anotherEvent.getChange("runtime.another.timeout").getNewValue());
+    assertNull(bean.pollDefaultEvent(200, TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  public void testApolloConfigChangeListenerResolveAppIdFromSystemProperty() {
+    Config applicationConfig = mock(Config.class);
+    mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
+
+    System.setProperty(SystemPropertyKeyConstants.LISTENER_APP_ID, "someAppId2");
+    System.setProperty(SystemPropertyKeyConstants.LISTENER_NAMESPACE, "namespace2");
+
+    Config anotherAppConfig = mock(Config.class);
+    mockConfig("someAppId2", "namespace2", anotherAppConfig);
+
+    getSimpleBean(TestApolloConfigChangeListenerResolveAppIdFromSystemPropertyConfiguration.class);
+
+    verify(anotherAppConfig, times(1)).addChangeListener(any(ConfigChangeListener.class));
+  }
+
   private static class SystemPropertyKeyConstants {
 
     static final String SIMPLE_NAMESPACE = "simple.namespace";
@@ -685,6 +771,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     static final String FROM_NAMESPACE_APPLICATION_KEY = "from.namespace.application.key";
     static final String FROM_NAMESPACE_APPLICATION_KEY_YAML = "from.namespace.application.key.yaml";
     static final String DELIMITED_NAMESPACES = "delimited.namespaces";
+    static final String LISTENER_APP_ID = "listener.appid";
+    static final String LISTENER_NAMESPACE = "listener.namespace";
   }
 
   @EnableApolloConfig
@@ -933,6 +1021,24 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     }
   }
 
+  @Configuration
+  @EnableApolloConfig
+  static class AppConfig12 {
+    @Bean
+    public TestApolloConfigChangeListenerWithAppIdBean bean() {
+      return new TestApolloConfigChangeListenerWithAppIdBean();
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class AppConfig13 {
+    @Bean
+    public TestApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppIdBean bean() {
+      return new TestApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppIdBean();
+    }
+  }
+
   static class TestApolloConfigBean1 {
     @ApolloConfig
     private Config config;
@@ -1090,6 +1196,75 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     public Config getYamlConfig() {
       return yamlConfig;
+    }
+  }
+
+  static class TestApolloConfigChangeListenerWithAppIdBean {
+
+    @ApolloConfigChangeListener(appId = "someAppId2", value = "namespace2")
+    private void onChange(ConfigChangeEvent changeEvent) {
+    }
+  }
+
+  static class TestApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppIdBean {
+
+    @ApolloConfigChangeListener(appId = "someAppId2", value = "namespace2",
+        interestedKeyPrefixes = {"redis.cache.", "logging."})
+    private void onChange(ConfigChangeEvent changeEvent) {
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig(multipleConfigs = {
+      @MultipleConfig(appId = ANOTHER_APP_ID, namespaces = {ConfigConsts.NAMESPACE_APPLICATION}, order = 9)})
+  static class TestApolloRuntimeListenerRoutingConfiguration {
+
+    @Bean
+    public TestApolloRuntimeListenerRoutingBean bean() {
+      return new TestApolloRuntimeListenerRoutingBean();
+    }
+  }
+
+  static class TestApolloRuntimeListenerRoutingBean {
+
+    private final BlockingQueue<ConfigChangeEvent> defaultEvents = new ArrayBlockingQueue<>(4);
+    private final BlockingQueue<ConfigChangeEvent> anotherAppEvents = new ArrayBlockingQueue<>(4);
+    private volatile int timeout;
+
+    @Value("${runtime.default.timeout:0}")
+    public void setTimeout(int timeout) {
+      this.timeout = timeout;
+    }
+
+    @ApolloConfigChangeListener(interestedKeyPrefixes = {"runtime.default."})
+    private void onDefaultAppChange(ConfigChangeEvent event) {
+      defaultEvents.offer(event);
+    }
+
+    @ApolloConfigChangeListener(appId = ANOTHER_APP_ID, interestedKeyPrefixes = {"runtime.another."})
+    private void onAnotherAppChange(ConfigChangeEvent event) {
+      anotherAppEvents.offer(event);
+    }
+
+    int getTimeout() {
+      return timeout;
+    }
+
+    ConfigChangeEvent pollDefaultEvent(long timeout, TimeUnit unit) throws InterruptedException {
+      return defaultEvents.poll(timeout, unit);
+    }
+
+    ConfigChangeEvent pollAnotherAppEvent(long timeout, TimeUnit unit) throws InterruptedException {
+      return anotherAppEvents.poll(timeout, unit);
+    }
+  }
+
+  @Configuration
+  @EnableApolloConfig
+  static class TestApolloConfigChangeListenerResolveAppIdFromSystemPropertyConfiguration {
+
+    @ApolloConfigChangeListener(appId = "${listener.appid}", value = "${listener.namespace}")
+    private void onChange(ConfigChangeEvent changeEvent) {
     }
   }
 

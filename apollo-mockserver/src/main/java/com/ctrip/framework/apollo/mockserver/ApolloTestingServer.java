@@ -17,15 +17,18 @@
 package com.ctrip.framework.apollo.mockserver;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.utils.ResourceUtils;
 import com.ctrip.framework.apollo.internals.ConfigServiceLocator;
 import com.ctrip.framework.apollo.internals.LocalFileConfigRepository;
+import com.ctrip.framework.apollo.internals.RemoteConfigLongPollService;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.mockwebserver.Dispatcher;
@@ -45,6 +48,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ApolloTestingServer implements AutoCloseable {
 
@@ -52,8 +56,10 @@ public class ApolloTestingServer implements AutoCloseable {
     private static final Type notificationType = new TypeToken<List<ApolloConfigNotification>>() {
     }.getType();
 
-    private static String someAppId = "someAppId";
+    private static final String DEFAULT_APP_ID = "someAppId";
     private static Method CONFIG_SERVICE_LOCATOR_CLEAR;
+    private static Method CONFIG_SERVICE_RESET;
+    private static Method REMOTE_CONFIG_LONG_POLL_STOP;
     private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
     private static ConfigUtil CONFIG_UTIL;
@@ -62,8 +68,10 @@ public class ApolloTestingServer implements AutoCloseable {
     private static ResourceUtils RESOURCES_UTILS;
 
     private static final Gson GSON = new Gson();
-    private final Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace = Maps.newConcurrentMap();
-    private final Map<String, Set<String>> deletedKeysOfNamespace = Maps.newConcurrentMap();
+    private final Map<String, Map<String, Map<String, String>>> addedOrModifiedPropertiesOfAppAndNamespace =
+        Maps.newConcurrentMap();
+    private final Map<String, Map<String, Set<String>>> deletedKeysOfAppAndNamespace =
+        Maps.newConcurrentMap();
 
     private MockWebServer server;
 
@@ -77,6 +85,11 @@ public class ApolloTestingServer implements AutoCloseable {
             CONFIG_SERVICE_LOCATOR = ApolloInjector.getInstance(ConfigServiceLocator.class);
             CONFIG_SERVICE_LOCATOR_CLEAR = ConfigServiceLocator.class.getDeclaredMethod("initConfigServices");
             CONFIG_SERVICE_LOCATOR_CLEAR.setAccessible(true);
+            CONFIG_SERVICE_RESET = ConfigService.class.getDeclaredMethod("reset");
+            CONFIG_SERVICE_RESET.setAccessible(true);
+            REMOTE_CONFIG_LONG_POLL_STOP =
+                RemoteConfigLongPollService.class.getDeclaredMethod("stopLongPollingRefresh");
+            REMOTE_CONFIG_LONG_POLL_STOP.setAccessible(true);
 
             CONFIG_UTIL = ApolloInjector.getInstance(ConfigUtil.class);
 
@@ -90,7 +103,7 @@ public class ApolloTestingServer implements AutoCloseable {
     }
 
     public void start() throws IOException {
-        clear();
+        clearForStart();
         server = new MockWebServer();
         final Dispatcher dispatcher = new Dispatcher() {
             @Override
@@ -105,7 +118,7 @@ public class ApolloTestingServer implements AutoCloseable {
                     String appId = pathSegments.get(1);
                     String cluster = pathSegments.get(2);
                     String namespace = pathSegments.get(3);
-                    return new MockResponse().setResponseCode(200).setBody(loadConfigFor(namespace));
+                    return new MockResponse().setResponseCode(200).setBody(loadConfigFor(appId, namespace));
                 }
                 return new MockResponse().setResponseCode(404);
             }
@@ -120,7 +133,7 @@ public class ApolloTestingServer implements AutoCloseable {
 
     public void close() {
         try {
-            clear();
+            clearForClose();
             server.close();
         } catch (Exception e) {
             logger.error("stop apollo server error", e);
@@ -137,7 +150,13 @@ public class ApolloTestingServer implements AutoCloseable {
         return started;
     }
 
-    private void clear() {
+    private void clearForStart() {
+        resetApolloClientState(false);
+        resetOverriddenProperties();
+    }
+
+    private void clearForClose() {
+        resetApolloClientState(true);
         resetOverriddenProperties();
     }
 
@@ -151,32 +170,46 @@ public class ApolloTestingServer implements AutoCloseable {
         }
     }
 
-    private String loadConfigFor(String namespace) {
-        final Properties prop = loadPropertiesOfNamespace(namespace);
+    private String loadConfigFor(String appId, String namespace) {
+        final Properties prop = loadPropertiesOfNamespace(appId, namespace);
         Map<String, String> configurations = Maps.newHashMap();
         for (String propertyName : prop.stringPropertyNames()) {
             configurations.put(propertyName, prop.getProperty(propertyName));
         }
-        ApolloConfig apolloConfig = new ApolloConfig("someAppId", "someCluster", namespace, "someReleaseKey");
+        ApolloConfig apolloConfig = new ApolloConfig(appId, "someCluster", namespace, "someReleaseKey");
 
-        Map<String, String> mergedConfigurations = mergeOverriddenProperties(namespace, configurations);
+        Map<String, String> mergedConfigurations = mergeOverriddenProperties(appId, namespace, configurations);
         apolloConfig.setConfigurations(mergedConfigurations);
         return GSON.toJson(apolloConfig);
     }
 
-    private Properties loadPropertiesOfNamespace(String namespace) {
+    private Properties loadPropertiesOfNamespace(String appId, String namespace) {
+        String appSpecificFilename = String.format("mockdata-%s-%s.properties", appId, namespace);
+        Properties appSpecific = loadPropertiesFromResource(appSpecificFilename, appId, namespace);
+        if (appSpecific != null) {
+            return appSpecific;
+        }
+
         String filename = String.format("mockdata-%s.properties", namespace);
-        Object mockdataPropertiesExits = null;
+        Properties genericProperties = loadPropertiesFromResource(filename, appId, namespace);
+        if (genericProperties != null) {
+            return genericProperties;
+        }
+        return new LocalFileConfigRepository(appId, namespace).getConfig();
+    }
+
+    private Properties loadPropertiesFromResource(String filename, String appId, String namespace) {
+        Object mockdataPropertiesExists = null;
         try {
-            mockdataPropertiesExits = RESOURCES_UTILS_CLEAR.invoke(RESOURCES_UTILS, filename);
+            mockdataPropertiesExists = RESOURCES_UTILS_CLEAR.invoke(RESOURCES_UTILS, filename);
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("invoke resources util locator clear failed.", e);
         }
-        if (!Objects.isNull(mockdataPropertiesExits)) {
-            logger.debug("load {} from {}", namespace, filename);
+        if (!Objects.isNull(mockdataPropertiesExists)) {
+            logger.debug("load appId [{}] namespace [{}] from {}", appId, namespace, filename);
             return ResourceUtils.readConfigFile(filename, new Properties());
         }
-        return new LocalFileConfigRepository(someAppId, namespace).getConfig();
+        return null;
     }
 
     private String mockLongPollBody(String notificationsStr) {
@@ -192,11 +225,16 @@ public class ApolloTestingServer implements AutoCloseable {
     /**
      * 合并用户对namespace的修改
      */
-    private Map<String, String> mergeOverriddenProperties(String namespace, Map<String, String> configurations) {
-        if (addedOrModifiedPropertiesOfNamespace.containsKey(namespace)) {
+    private Map<String, String> mergeOverriddenProperties(String appId, String namespace,
+        Map<String, String> configurations) {
+        Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace =
+            addedOrModifiedPropertiesOfAppAndNamespace.get(appId);
+        if (addedOrModifiedPropertiesOfNamespace != null
+            && addedOrModifiedPropertiesOfNamespace.containsKey(namespace)) {
             configurations.putAll(addedOrModifiedPropertiesOfNamespace.get(namespace));
         }
-        if (deletedKeysOfNamespace.containsKey(namespace)) {
+        Map<String, Set<String>> deletedKeysOfNamespace = deletedKeysOfAppAndNamespace.get(appId);
+        if (deletedKeysOfNamespace != null && deletedKeysOfNamespace.containsKey(namespace)) {
             for (String k : deletedKeysOfNamespace.get(namespace)) {
                 configurations.remove(k);
             }
@@ -208,33 +246,89 @@ public class ApolloTestingServer implements AutoCloseable {
      * Add new property or update existed property
      */
     public void addOrModifyProperty(String namespace, String someKey, String someValue) {
+        addOrModifyProperty(DEFAULT_APP_ID, namespace, someKey, someValue);
+    }
+
+    /**
+     * Add new property or update existed property for the specified appId and namespace.
+     */
+    public void addOrModifyProperty(String appId, String namespace, String someKey, String someValue) {
+        Map<String, Map<String, String>> addedOrModifiedPropertiesOfNamespace =
+            addedOrModifiedPropertiesOfAppAndNamespace.computeIfAbsent(appId, key -> Maps.newConcurrentMap());
         if (addedOrModifiedPropertiesOfNamespace.containsKey(namespace)) {
             addedOrModifiedPropertiesOfNamespace.get(namespace).put(someKey, someValue);
-        } else {
-            Map<String, String> m = Maps.newConcurrentMap();
-            m.put(someKey, someValue);
-            addedOrModifiedPropertiesOfNamespace.put(namespace, m);
+            return;
         }
+        Map<String, String> properties = Maps.newConcurrentMap();
+        properties.put(someKey, someValue);
+        addedOrModifiedPropertiesOfNamespace.put(namespace, properties);
     }
 
     /**
      * Delete existed property
      */
     public void deleteProperty(String namespace, String someKey) {
+        deleteProperty(DEFAULT_APP_ID, namespace, someKey);
+    }
+
+    /**
+     * Delete existed property for the specified appId and namespace.
+     */
+    public void deleteProperty(String appId, String namespace, String someKey) {
+        Map<String, Set<String>> deletedKeysOfNamespace =
+            deletedKeysOfAppAndNamespace.computeIfAbsent(appId, key -> Maps.newConcurrentMap());
         if (deletedKeysOfNamespace.containsKey(namespace)) {
             deletedKeysOfNamespace.get(namespace).add(someKey);
-        } else {
-            Set<String> m = Sets.newConcurrentHashSet();
-            m.add(someKey);
-            deletedKeysOfNamespace.put(namespace, m);
+            return;
         }
+        Set<String> keys = Sets.newConcurrentHashSet();
+        keys.add(someKey);
+        deletedKeysOfNamespace.put(namespace, keys);
     }
 
     /**
      * reset overridden properties
      */
     public void resetOverriddenProperties() {
-        addedOrModifiedPropertiesOfNamespace.clear();
-        deletedKeysOfNamespace.clear();
+        addedOrModifiedPropertiesOfAppAndNamespace.clear();
+        deletedKeysOfAppAndNamespace.clear();
+    }
+
+    private void resetApolloClientState(boolean stopLongPolling) {
+        try {
+            RemoteConfigLongPollService longPollService =
+                ApolloInjector.getInstance(RemoteConfigLongPollService.class);
+            if (stopLongPolling) {
+                REMOTE_CONFIG_LONG_POLL_STOP.invoke(longPollService);
+            } else {
+                prepareLongPollingService();
+            }
+            clearLongPollingState(longPollService);
+            CONFIG_SERVICE_RESET.invoke(null);
+        } catch (Throwable ex) {
+            logger.warn("reset apollo client state failed.", ex);
+        }
+    }
+
+    private static void prepareLongPollingService() throws Exception {
+        RemoteConfigLongPollService longPollService =
+            ApolloInjector.getInstance(RemoteConfigLongPollService.class);
+        AtomicBoolean stopped = (AtomicBoolean) getLongPollField(longPollService, "m_longPollingStopped");
+        stopped.set(false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void clearLongPollingState(RemoteConfigLongPollService longPollService) throws Exception {
+        ((Map<String, Boolean>) getLongPollField(longPollService, "m_longPollStarted")).clear();
+        ((Map<String, ?>) getLongPollField(longPollService, "m_longPollNamespaces")).clear();
+        ((Table<String, String, Long>) getLongPollField(longPollService, "m_notifications")).clear();
+        ((Map<String, ?>) getLongPollField(longPollService, "m_remoteNotificationMessages")).clear();
+    }
+
+    private static Object getLongPollField(RemoteConfigLongPollService longPollService, String fieldName)
+        throws Exception {
+        java.lang.reflect.Field field = RemoteConfigLongPollService.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(longPollService);
     }
 }

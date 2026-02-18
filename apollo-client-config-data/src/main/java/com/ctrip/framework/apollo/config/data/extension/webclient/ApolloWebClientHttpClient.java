@@ -22,11 +22,13 @@ import com.ctrip.framework.apollo.util.http.HttpClient;
 import com.ctrip.framework.apollo.util.http.HttpRequest;
 import com.ctrip.framework.apollo.util.http.HttpResponse;
 import com.google.gson.Gson;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -64,15 +66,16 @@ public class ApolloWebClientHttpClient implements HttpClient {
       }
     }
     return requestHeadersSpec.exchangeToMono(clientResponse -> {
-      if (HttpStatus.OK.equals(clientResponse.statusCode())) {
+      int statusCode = this.resolveStatusCode(clientResponse);
+      if (HttpStatus.OK.value() == statusCode) {
         return clientResponse.bodyToMono(String.class)
             .map(body -> new HttpResponse<T>(HttpStatus.OK.value(),
                 gson.fromJson(body, responseType)));
       }
-      if (HttpStatus.NOT_MODIFIED.equals(clientResponse.statusCode())) {
+      if (HttpStatus.NOT_MODIFIED.value() == statusCode) {
         return Mono.just(new HttpResponse<T>(HttpStatus.NOT_MODIFIED.value(), null));
       }
-      return Mono.error(new ApolloConfigStatusCodeException(clientResponse.rawStatusCode(),
+      return Mono.error(new ApolloConfigStatusCodeException(statusCode,
           String.format("Get operation failed for %s", httpRequest.getUrl())));
     }).block();
   }
@@ -81,5 +84,29 @@ public class ApolloWebClientHttpClient implements HttpClient {
   public <T> HttpResponse<T> doGet(HttpRequest httpRequest, Type responseType)
       throws ApolloConfigException {
     return this.doGetInternal(httpRequest, responseType);
+  }
+
+  /**
+   * Resolve HTTP status code across Spring WebFlux 5/6/7.
+   *
+   * <p>ClientResponse#statusCode has different return types across major versions
+   * (HttpStatus in Spring 5, HttpStatusCode in Spring 6/7). Calling it directly would bind
+   * to one method descriptor at compile time and could fail on another runtime version.
+   * Reflection keeps this bridge binary-compatible for Boot 2/3/4 compatibility tests.
+   */
+  private int resolveStatusCode(Object clientResponse) {
+    try {
+      Method statusCodeMethod = ClientResponse.class.getMethod("statusCode");
+      Object statusCode = statusCodeMethod.invoke(clientResponse);
+      if (statusCode == null) {
+        throw new ApolloConfigException("Failed to resolve response status code: statusCode is null");
+      }
+      // Both HttpStatus and HttpStatusCode expose value(), so resolve it reflectively.
+      Method valueMethod = statusCode.getClass().getMethod("value");
+      Object value = valueMethod.invoke(statusCode);
+      return ((Number) value).intValue();
+    } catch (Exception ex) {
+      throw new ApolloConfigException("Failed to resolve response status code", ex);
+    }
   }
 }
