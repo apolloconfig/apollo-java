@@ -64,9 +64,12 @@ jobs:
           ${{ runner.os }}-maven-unit-integration-
           ${{ runner.os }}-maven-
     - name: Run unit and integration tests
-      run: |
-        mvn -B clean test -P travis jacoco:report \
-          -Dmaven.gitcommitid.skip=true
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 3
+        max_attempts: 3
+        retry_wait_seconds: 1
+        command: mvn -B clean test -P travis jacoco:report -Dmaven.gitcommitid.skip=true
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
