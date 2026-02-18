@@ -19,7 +19,7 @@ package com.ctrip.framework.apollo.openapi.client;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.fail;
 
 import com.ctrip.framework.apollo.openapi.dto.OpenAppDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenCreateAppDTO;
@@ -41,6 +41,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Mock integration tests that verify OpenAPI client request/response chain.
@@ -50,7 +53,7 @@ public class ApolloOpenApiMockIntegrationTest {
   private HttpServer server;
   private MockPortalHandler handler;
 
-  @org.junit.jupiter.api.BeforeEach
+  @Before
   public void setUp() throws Exception {
     handler = new MockPortalHandler();
     server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
@@ -58,14 +61,14 @@ public class ApolloOpenApiMockIntegrationTest {
     server.start();
   }
 
-  @org.junit.jupiter.api.AfterEach
+  @After
   public void tearDown() {
     if (server != null) {
       server.stop(0);
     }
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   public void shouldCallFindAppsWithAuthorizationHeaderAndQuery() throws Exception {
     handler.mock("GET", "/openapi/v1/apps", 200,
         "[{\"appId\":\"SampleApp\",\"name\":\"SampleApp\",\"ownerName\":\"apollo\"}]");
@@ -84,7 +87,7 @@ public class ApolloOpenApiMockIntegrationTest {
     assertEquals(token, request.authorization);
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   public void shouldSerializeCreateAppRequestBody() throws Exception {
     handler.mock("POST", "/openapi/v1/apps", 200, "");
     ApolloOpenApiClient client = newClient("create-token");
@@ -109,7 +112,7 @@ public class ApolloOpenApiMockIntegrationTest {
     assertTrue(capturedRequest.body.contains("\"admins\":[\"apollo\"]"));
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   public void shouldUseDefaultClusterAndNamespace() throws Exception {
     handler.mock("GET", "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces/application",
         200,
@@ -130,7 +133,7 @@ public class ApolloOpenApiMockIntegrationTest {
     assertEquals("namespace-token", request.authorization);
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   public void shouldParseOrganizations() throws Exception {
     handler.mock("GET", "/openapi/v1/organizations", 200,
         "[{\"orgId\":\"100001\",\"orgName\":\"Apollo Team\"}]");
@@ -148,14 +151,18 @@ public class ApolloOpenApiMockIntegrationTest {
     assertEquals("org-token", request.authorization);
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   public void shouldWrapServerErrorsAsRuntimeException() {
     handler.mock("GET", "/openapi/v1/apps", 500, "internal error");
     ApolloOpenApiClient client = newClient("error-token");
 
-    RuntimeException exception = assertThrows(RuntimeException.class, client::getAllApps);
-    assertTrue(exception.getMessage().contains("Load app information"));
-    assertNotNull(exception.getCause());
+    try {
+      client.getAllApps();
+      fail("Expected RuntimeException to be thrown");
+    } catch (RuntimeException ex) {
+      assertTrue(ex.getMessage().contains("Load app information"));
+      assertNotNull(ex.getCause());
+    }
   }
 
   private ApolloOpenApiClient newClient(String token) {

@@ -17,15 +17,15 @@
 package com.ctrip.framework.apollo.compat.spring;
 
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
 public class SpringApolloEventListenerProbe implements ApplicationListener {
 
-  private final BlockingQueue<String> namespaces = new ArrayBlockingQueue<String>(8);
+  private final BlockingQueue<String> namespaces = new LinkedBlockingQueue<String>();
 
   @Override
   public void onApplicationEvent(ApplicationEvent event) {

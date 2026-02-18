@@ -192,11 +192,13 @@ public class ApolloApiCompatibilityTest {
     clearField(ApolloInjector.getInstance(ConfigRegistry.class), "m_instances");
   }
 
-  @SuppressWarnings("unchecked")
   private static void clearField(Object target, String fieldName) throws Exception {
     Field field = target.getClass().getDeclaredField(fieldName);
     field.setAccessible(true);
     Object container = field.get(target);
+    if (container == null) {
+      return;
+    }
     if (container instanceof Map) {
       ((Map<?, ?>) container).clear();
       return;

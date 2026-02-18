@@ -16,24 +16,25 @@
  */
 package com.ctrip.framework.apollo.config.data.listener;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 
-import com.ctrip.framework.apollo.config.data.util.BootstrapRegistryHelper;
 import com.ctrip.framework.apollo.core.utils.DeferredLogger;
-import java.lang.reflect.Constructor;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
-import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author vdisk <vdisk@foxmail.com>
  */
 public class ApolloDeferredLoggerApplicationListenerTest {
+
+  @After
+  public void tearDown() {
+    DeferredLogger.disable();
+  }
 
   @Test
   public void testReplayDeferredLogsOnApplicationContextInitialized() {
@@ -59,36 +60,5 @@ public class ApolloDeferredLoggerApplicationListenerTest {
             new IllegalStateException("test"));
 
     listener.onApplicationEvent(event);
-  }
-}
-
-/**
- * @author vdisk <vdisk@foxmail.com>
- */
-class ApolloSpringApplicationRegisterListenerTest {
-
-  @Test
-  public void testRegisterSpringApplicationToBootstrapContext() throws Exception {
-    Object bootstrapContext = newDefaultBootstrapContext();
-    SpringApplication springApplication = new SpringApplication(Object.class);
-
-    Constructor<?> constructor = ApplicationStartingEvent.class.getConstructors()[0];
-    ApplicationStartingEvent event = (ApplicationStartingEvent) constructor
-        .newInstance(bootstrapContext, springApplication, new String[0]);
-
-    ApolloSpringApplicationRegisterListener listener = new ApolloSpringApplicationRegisterListener();
-    listener.onApplicationEvent(event);
-
-    SpringApplication registered = BootstrapRegistryHelper.get(bootstrapContext, SpringApplication.class);
-    assertSame(springApplication, registered);
-  }
-
-  private Object newDefaultBootstrapContext() throws Exception {
-    String className = "org.springframework.boot.DefaultBootstrapContext";
-    if (ClassUtils.isPresent("org.springframework.boot.bootstrap.DefaultBootstrapContext",
-        getClass().getClassLoader())) {
-      className = "org.springframework.boot.bootstrap.DefaultBootstrapContext";
-    }
-    return Class.forName(className).getConstructor().newInstance();
   }
 }

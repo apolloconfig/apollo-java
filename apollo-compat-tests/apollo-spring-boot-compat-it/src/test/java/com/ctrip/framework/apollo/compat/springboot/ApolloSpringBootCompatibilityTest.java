@@ -82,6 +82,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @DirtiesContext
 public class ApolloSpringBootCompatibilityTest {
 
+  private static final String SOME_APP_ID = "someAppId";
   private static final String ANOTHER_APP_ID = "100004459";
 
   @ClassRule
@@ -138,17 +139,17 @@ public class ApolloSpringBootCompatibilityTest {
     applicationProperties.setProperty("compat.timeout", "801");
     applicationProperties.setProperty("jsonBeanProperty",
         "[{\"someString\":\"gamma-boot\",\"someInt\":303}]");
-    applyConfigChange(applicationConfig, "application", applicationProperties);
+    applyConfigChange(applicationConfig, SOME_APP_ID, "application", applicationProperties);
 
     Config publicConfig = ConfigService.getConfig("TEST1.apollo");
     Properties publicProperties = copyConfigProperties(publicConfig);
     publicProperties.setProperty("public.only", "from-public-boot-updated");
-    applyConfigChange(publicConfig, "TEST1.apollo", publicProperties);
+    applyConfigChange(publicConfig, SOME_APP_ID, "TEST1.apollo", publicProperties);
 
     Config yamlConfig = ConfigService.getConfig("application.yaml");
     Properties yamlProperties = copyConfigProperties(yamlConfig);
     yamlProperties.setProperty("yaml.marker", "boot-compat-updated");
-    applyConfigChange(yamlConfig, "application.yaml", yamlProperties);
+    applyConfigChange(yamlConfig, SOME_APP_ID, "application.yaml", yamlProperties);
 
     Properties anotherAppProperties = copyConfigProperties(compatAnnotatedBean.getAnotherAppConfig());
     anotherAppProperties.setProperty("compat.origin", "changed-origin-boot");
@@ -431,11 +432,13 @@ public class ApolloSpringBootCompatibilityTest {
     clearField(ApolloInjector.getInstance(ConfigRegistry.class), "m_instances");
   }
 
-  @SuppressWarnings("unchecked")
   private static void clearField(Object target, String fieldName) throws Exception {
     Field field = target.getClass().getDeclaredField(fieldName);
     field.setAccessible(true);
     Object container = field.get(target);
+    if (container == null) {
+      return;
+    }
     if (container instanceof Map) {
       ((Map<?, ?>) container).clear();
       return;
@@ -452,14 +455,9 @@ public class ApolloSpringBootCompatibilityTest {
   private static Properties copyConfigProperties(Config config) {
     Properties properties = new Properties();
     for (String key : config.getPropertyNames()) {
-      properties.setProperty(key, config.getProperty(key, null));
+      properties.setProperty(key, config.getProperty(key, ""));
     }
     return properties;
-  }
-
-  private static void applyConfigChange(Config config, String namespace, Properties properties) {
-    Assert.assertTrue(config instanceof DefaultConfig);
-    ((DefaultConfig) config).onRepositoryChange(namespace, properties);
   }
 
   private static void applyConfigChange(Config config, String appId, String namespace,

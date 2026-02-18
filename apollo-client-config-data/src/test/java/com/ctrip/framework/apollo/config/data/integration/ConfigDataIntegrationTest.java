@@ -156,7 +156,7 @@ public class ConfigDataIntegrationTest {
     assertEquals("55", environment.getProperty("redis.cache.commandTimeout"));
 
     addOrModifyForAllAppIds("application", "apollo.unrelated.key", "value");
-    ConfigChangeEvent unrelatedEvent = listenerProbe.pollEvent(1500, TimeUnit.MILLISECONDS);
+    ConfigChangeEvent unrelatedEvent = listenerProbe.pollEvent(3000, TimeUnit.MILLISECONDS);
     assertNull(unrelatedEvent);
   }
 

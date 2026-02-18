@@ -164,7 +164,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
 
     assertEquals("default-v1", defaultAppConfig.getProperty(MULTI_APP_KEY, null));
     assertEquals("another-v2", anotherAppConfig.getProperty(MULTI_APP_KEY, null));
-    assertNull(pollFuture(defaultAppFuture, 300));
+    assertNull(pollFuture(defaultAppFuture, 1000));
   }
 
   @Test

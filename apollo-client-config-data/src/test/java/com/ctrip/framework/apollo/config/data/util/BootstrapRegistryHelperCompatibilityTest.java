@@ -18,7 +18,6 @@ package com.ctrip.framework.apollo.config.data.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
@@ -49,9 +48,8 @@ public class BootstrapRegistryHelperCompatibilityTest {
   @Test
   public void testGetBootstrapContextFromEventAndLoaderContext() throws Exception {
     Object bootstrapContext = newDefaultBootstrapContext();
-    Constructor<?> constructor = ApplicationStartingEvent.class.getConstructors()[0];
-    ApplicationStartingEvent event = (ApplicationStartingEvent) constructor
-        .newInstance(bootstrapContext, new SpringApplication(Object.class), new String[0]);
+    ApplicationStartingEvent event =
+        newApplicationStartingEvent(bootstrapContext, new SpringApplication(Object.class));
 
     Object eventBootstrapContext = BootstrapRegistryHelper.getBootstrapContext(event);
     assertSame(bootstrapContext, eventBootstrapContext);
@@ -75,7 +73,18 @@ public class BootstrapRegistryHelperCompatibilityTest {
         .isPresent("org.springframework.boot.bootstrap.ConfigurableBootstrapContext",
             BootstrapRegistryHelperCompatibilityTest.class.getClassLoader());
     assertEquals(expected, BootstrapRegistryHelper.isSpringBoot4Present());
-    assertTrue(BootstrapRegistryHelper.class.getName().contains("BootstrapRegistryHelper"));
+  }
+
+  private ApplicationStartingEvent newApplicationStartingEvent(
+      Object bootstrapContext, SpringApplication springApplication) throws Exception {
+    for (Constructor<?> constructor : ApplicationStartingEvent.class.getConstructors()) {
+      Class<?>[] parameterTypes = constructor.getParameterTypes();
+      if (parameterTypes.length == 3 && SpringApplication.class.isAssignableFrom(parameterTypes[1])) {
+        return (ApplicationStartingEvent) constructor
+            .newInstance(bootstrapContext, springApplication, new String[0]);
+      }
+    }
+    throw new IllegalStateException("Unsupported ApplicationStartingEvent constructor signature");
   }
 
   private Object newDefaultBootstrapContext() throws Exception {
@@ -87,4 +96,3 @@ public class BootstrapRegistryHelperCompatibilityTest {
     return Class.forName(className).getConstructor().newInstance();
   }
 }
-

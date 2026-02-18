@@ -65,7 +65,7 @@ public class ApolloClientConfigDataAutoConfigurationTest {
     }
 
     @Bean
-    public PropertySourcesProcessor customPropertySourcesProcessor() {
+    public static PropertySourcesProcessor customPropertySourcesProcessor() {
       return new ConfigPropertySourcesProcessor();
     }
   }
