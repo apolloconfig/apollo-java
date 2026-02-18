@@ -18,7 +18,6 @@ package com.ctrip.framework.apollo.config.data.extension.webclient.customizer.sp
 
 import com.ctrip.framework.apollo.config.data.extension.properties.ApolloClientProperties;
 import com.ctrip.framework.apollo.core.spi.Ordered;
-import java.lang.reflect.Method;
 import java.util.function.Consumer;
 import org.apache.commons.logging.Log;
 import org.springframework.boot.context.properties.bind.BindHandler;
@@ -46,68 +45,7 @@ public interface ApolloClientWebClientCustomizerFactory extends Ordered {
    * @return customizer instance or null
    */
   @Nullable
-  default Consumer<WebClient.Builder> createWebClientCustomizer(
-      ApolloClientProperties apolloClientProperties,
-      Binder binder,
-      BindHandler bindHandler,
-      Log log,
-      Object bootstrapContext) {
-    // Keep compatibility for third-party extensions compiled with the old
-    // createWebClientCustomizer(...):WebClientCustomizer signature.
-    Method legacyMethod = findLegacyCustomizerMethod(this.getClass());
-    if (legacyMethod == null) {
-      return null;
-    }
-    try {
-      Object customizer = legacyMethod
-          .invoke(this, apolloClientProperties, binder, bindHandler, log, bootstrapContext);
-      return asBuilderConsumer(customizer);
-    } catch (Exception ex) {
-      throw new IllegalStateException("Failed to invoke legacy createWebClientCustomizer method", ex);
-    }
-  }
-
-  static Method findLegacyCustomizerMethod(Class<?> implementationType) {
-    for (Method method : implementationType.getMethods()) {
-      if (!"createWebClientCustomizer".equals(method.getName())
-          || method.getDeclaringClass() == ApolloClientWebClientCustomizerFactory.class) {
-        continue;
-      }
-      Class<?>[] parameterTypes = method.getParameterTypes();
-      if (parameterTypes.length == 5
-          && ApolloClientProperties.class == parameterTypes[0]
-          && Binder.class == parameterTypes[1]
-          && BindHandler.class == parameterTypes[2]
-          && Log.class == parameterTypes[3]
-          && Object.class == parameterTypes[4]) {
-        method.setAccessible(true);
-        return method;
-      }
-    }
-    return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  static Consumer<WebClient.Builder> asBuilderConsumer(Object customizer) {
-    if (customizer == null) {
-      return null;
-    }
-    if (customizer instanceof Consumer) {
-      return (Consumer<WebClient.Builder>) customizer;
-    }
-    try {
-      Method customizeMethod = customizer.getClass().getMethod("customize", WebClient.Builder.class);
-      customizeMethod.setAccessible(true);
-      return builder -> {
-        try {
-          customizeMethod.invoke(customizer, builder);
-        } catch (Exception ex) {
-          throw new IllegalStateException("Failed to invoke legacy WebClient customizer", ex);
-        }
-      };
-    } catch (NoSuchMethodException ex) {
-      throw new IllegalStateException(
-          "Unsupported customizer type from createWebClientCustomizer: " + customizer.getClass(), ex);
-    }
-  }
+  Consumer<WebClient.Builder> createWebClientCustomizer(ApolloClientProperties apolloClientProperties,
+      Binder binder, BindHandler bindHandler, Log log,
+      Object bootstrapContext);
 }

@@ -38,11 +38,6 @@ final class SpringCompatibilityTestSupport {
   private static final String ORIGINAL_APP_ID = System.getProperty("app.id");
   private static final String ORIGINAL_ENV = System.getProperty("env");
 
-  static {
-    System.setProperty("app.id", "someAppId");
-    System.setProperty("env", "local");
-  }
-
   private SpringCompatibilityTestSupport() {
   }
 
