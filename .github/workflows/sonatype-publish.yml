@@ -1,0 +1,85 @@
+#
+# Copyright 2026 Apollo Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: sonatype publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: 'Sonatype namespace (e.g. com.ctrip.framework.apollo)'
+        required: true
+        default: 'com.ctrip.framework.apollo'
+      repository_key:
+        description: 'Optional staging repository key; leave blank to auto-detect'
+        required: false
+        default: ''
+      timeout_minutes:
+        description: 'Max minutes to wait for deployment status polling'
+        required: true
+        default: '60'
+      mode:
+        description: 'manual upload mode: portal_api|automatic|user_managed'
+        required: true
+        default: 'portal_api'
+        type: choice
+        options:
+          - portal_api
+          - automatic
+          - user_managed
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish via Sonatype API
+        id: publish
+        env:
+          INPUT_NAMESPACE: ${{ github.event.inputs.namespace }}
+          INPUT_REPOSITORY_KEY: ${{ github.event.inputs.repository_key }}
+          INPUT_TIMEOUT_MINUTES: ${{ github.event.inputs.timeout_minutes }}
+          INPUT_MODE: ${{ github.event.inputs.mode }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+        run: |
+          python3 .github/scripts/sonatype_publish.py
+
+      - name: Sonatype publish summary
+        if: always()
+        env:
+          PUBLISH_RESULT: ${{ steps.publish.outputs.result }}
+          PUBLISH_REPOSITORY_KEY: ${{ steps.publish.outputs.repository_key }}
+          PUBLISH_DEPLOYMENT_ID: ${{ steps.publish.outputs.deployment_id }}
+          PUBLISH_FINAL_STATE: ${{ steps.publish.outputs.final_state }}
+          PUBLISH_DEPLOYMENT_URL: ${{ steps.publish.outputs.deployment_url }}
+          PUBLISH_REASON: ${{ steps.publish.outputs.reason }}
+        run: |
+          {
+            echo "## Sonatype Publish Result"
+            echo ""
+            echo "- result: ${PUBLISH_RESULT}"
+            echo "- repository_key: ${PUBLISH_REPOSITORY_KEY}"
+            echo "- deployment_id: ${PUBLISH_DEPLOYMENT_ID}"
+            echo "- final_state: ${PUBLISH_FINAL_STATE}"
+            echo "- deployment_url: ${PUBLISH_DEPLOYMENT_URL}"
+            if [ -n "${PUBLISH_REASON}" ]; then
+              echo "- reason: ${PUBLISH_REASON}"
+              echo ""
+              echo "Manual fallback: open https://central.sonatype.com/publishing/deployments and complete publish by deployment id."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# This workflow publishes Apollo Java artifacts.
 
 name: publish sdks
 
@@ -25,24 +24,81 @@ on:
         description: 'Maven Repository(snapshots or releases)'
         required: true
         default: 'snapshots'
+      namespace:
+        description: 'Sonatype namespace used to search staging repositories'
+        required: true
+        default: 'com.ctrip.framework.apollo'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      repository_key: ${{ steps.repository_context.outputs.repository_key }}
+      portal_deployment_id: ${{ steps.repository_context.outputs.portal_deployment_id }}
+      uploaded_urls_count: ${{ steps.upload_context.outputs.uploaded_urls_count }}
+      jar_urls_count: ${{ steps.upload_context.outputs.jar_urls_count }}
+      pom_urls_count: ${{ steps.upload_context.outputs.pom_urls_count }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Maven Central Repository
-      uses: actions/setup-java@v1
-      with:
-        java-version: 8
-        server-id: ${{ github.event.inputs.repository }}
-        server-username: MAVEN_USERNAME
-        server-password: MAVEN_CENTRAL_TOKEN
-        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE
-    - name: Publish to Apache Maven Central
-      run: mvn clean deploy -DskipTests=true -Prelease "-Dreleases.repo=https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/" "-Dsnapshots.repo=https://central.sonatype.com/repository/maven-snapshots/"
-      env:
-        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-        MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      - uses: actions/checkout@v4
+
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 8
+          server-id: ${{ github.event.inputs.repository }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Publish to Apache Maven Central
+        run: |
+          set -eo pipefail
+          mvn clean deploy -DskipTests=true -Prelease \
+            "-Dreleases.repo=https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/" \
+            "-Dsnapshots.repo=https://central.sonatype.com/repository/maven-snapshots/" \
+            2>&1 | tee maven-deploy.log
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+      - name: Extract uploaded artifact URLs
+        id: upload_context
+        env:
+          TARGET_REPOSITORY: ${{ github.event.inputs.repository }}
+          DEPLOY_LOG: maven-deploy.log
+          DEPLOY_ARTIFACTS_FILE: deploy-artifacts.json
+        run: |
+          python3 .github/scripts/release_extract_upload_context.py
+
+      - name: Resolve staging repository key
+        id: repository_context
+        env:
+          TARGET_REPOSITORY: ${{ github.event.inputs.repository }}
+          TARGET_NAMESPACE: ${{ github.event.inputs.namespace }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          REPOSITORY_CONTEXT_FILE: repository-context.json
+        run: |
+          python3 .github/scripts/release_resolve_repository_context.py
+
+      - name: Upload release publish context
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-deploy-context
+          if-no-files-found: warn
+          path: |
+            maven-deploy.log
+            deploy-artifacts.json
+            repository-context.json
+
+      - name: Publish summary
+        if: always()
+        env:
+          DEPLOY_ARTIFACTS_FILE: deploy-artifacts.json
+          REPOSITORY_CONTEXT_FILE: repository-context.json
+        run: |
+          python3 .github/scripts/release_write_summary.py
