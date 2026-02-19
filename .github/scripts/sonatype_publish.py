@@ -159,78 +159,88 @@ def main() -> int:
                     f"{OSSRH_BASE}/manual/search/repositories?"
                     f"ip=any&profile_id={urllib.parse.quote(namespace)}"
                 )
-                _, list_payload = request_json("GET", list_url, headers)
-                repositories = (
-                    list_payload.get("repositories", [])
-                    if isinstance(list_payload, dict)
-                    else []
-                )
-                for item in repositories:
-                    if item.get("key") == repository_key and item.get("portal_deployment_id"):
-                        deployment_id = item.get("portal_deployment_id")
-                        break
-
-                if deployment_id:
-                    deployment_url = f"{PORTAL_BASE}/publishing/deployments/{deployment_id}"
-                    publish_triggered = False
-                    deadline = time.time() + timeout_minutes * 60
-
-                    while time.time() <= deadline:
-                        status_url = (
-                            f"{PORTAL_BASE}/api/v1/publisher/status?"
-                            f"id={urllib.parse.quote(deployment_id)}"
+                list_status, list_payload = request_json("GET", list_url, headers)
+                if list_status is None or list_status < 200 or list_status >= 300:
+                    list_error = list_payload.get("error") if isinstance(list_payload, dict) else ""
+                    if not list_error:
+                        list_error = (
+                            f"HTTP {list_status}"
+                            if list_status is not None
+                            else "HTTP unknown"
                         )
-                        _, status_payload = request_json("POST", status_url, headers)
-                        final_state = extract_deployment_state(status_payload)
-
-                        if final_state == "PUBLISHED":
-                            result = "published"
-                            reason = ""
-                            break
-
-                        if final_state in {"FAILED", "BROKEN", "ERROR"}:
-                            reason = f"Deployment entered terminal state: {final_state}"
-                            break
-
-                        if (
-                            mode == "portal_api"
-                            and final_state == "VALIDATED"
-                            and not publish_triggered
-                        ):
-                            publish_url = (
-                                f"{PORTAL_BASE}/api/v1/publisher/deployment/"
-                                f"{urllib.parse.quote(deployment_id)}"
-                            )
-                            publish_status, publish_payload = request_json(
-                                "POST",
-                                publish_url,
-                                headers,
-                            )
-                            if publish_status is None or publish_status >= 400:
-                                publish_error = publish_payload.get("error")
-                                if not publish_error:
-                                    publish_error = (
-                                        f"HTTP {publish_status}"
-                                        if publish_status is not None
-                                        else "HTTP unknown"
-                                    )
-                                reason = f"Publish API failed: {publish_error}"
-                                break
-                            publish_triggered = True
-
-                        if mode == "user_managed" and final_state == "VALIDATED":
-                            reason = "Mode user_managed requires manual publish in portal"
-                            break
-
-                        time.sleep(10)
-
-                    if result != "published" and not reason and final_state != "unknown":
-                        reason = (
-                            "Timed out waiting for deployment status. "
-                            f"Latest state={final_state}"
-                        )
+                    reason = f"Repository list API failed after upload: {list_error}"
                 else:
-                    reason = "No portal deployment id found for repository"
+                    repositories = (
+                        list_payload.get("repositories", [])
+                        if isinstance(list_payload, dict)
+                        else []
+                    )
+                    for item in repositories:
+                        if item.get("key") == repository_key and item.get("portal_deployment_id"):
+                            deployment_id = item.get("portal_deployment_id")
+                            break
+
+                    if deployment_id:
+                        deployment_url = f"{PORTAL_BASE}/publishing/deployments/{deployment_id}"
+                        publish_triggered = False
+                        deadline = time.time() + timeout_minutes * 60
+
+                        while time.time() <= deadline:
+                            status_url = (
+                                f"{PORTAL_BASE}/api/v1/publisher/status?"
+                                f"id={urllib.parse.quote(deployment_id)}"
+                            )
+                            _, status_payload = request_json("POST", status_url, headers)
+                            final_state = extract_deployment_state(status_payload)
+
+                            if final_state == "PUBLISHED":
+                                result = "published"
+                                reason = ""
+                                break
+
+                            if final_state in {"FAILED", "BROKEN", "ERROR"}:
+                                reason = f"Deployment entered terminal state: {final_state}"
+                                break
+
+                            if (
+                                mode == "portal_api"
+                                and final_state == "VALIDATED"
+                                and not publish_triggered
+                            ):
+                                publish_url = (
+                                    f"{PORTAL_BASE}/api/v1/publisher/deployment/"
+                                    f"{urllib.parse.quote(deployment_id)}"
+                                )
+                                publish_status, publish_payload = request_json(
+                                    "POST",
+                                    publish_url,
+                                    headers,
+                                )
+                                if publish_status is None or publish_status >= 400:
+                                    publish_error = publish_payload.get("error")
+                                    if not publish_error:
+                                        publish_error = (
+                                            f"HTTP {publish_status}"
+                                            if publish_status is not None
+                                            else "HTTP unknown"
+                                        )
+                                    reason = f"Publish API failed: {publish_error}"
+                                    break
+                                publish_triggered = True
+
+                            if mode == "user_managed" and final_state == "VALIDATED":
+                                reason = "Mode user_managed requires manual publish in portal"
+                                break
+
+                            time.sleep(10)
+
+                        if result != "published" and not reason and final_state != "unknown":
+                            reason = (
+                                "Timed out waiting for deployment status. "
+                                f"Latest state={final_state}"
+                            )
+                    else:
+                        reason = "No portal deployment id found for repository"
 
     if result != "published" and not reason:
         reason = "Automatic publish did not complete"
