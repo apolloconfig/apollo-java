@@ -60,6 +60,7 @@ jobs:
           python3 .github/scripts/sonatype_publish.py
 
       - name: Sonatype publish summary
+        if: always()
         env:
           PUBLISH_RESULT: ${{ steps.publish.outputs.result }}
           PUBLISH_REPOSITORY_KEY: ${{ steps.publish.outputs.repository_key }}

@@ -105,20 +105,39 @@ def main() -> int:
 
         if not repository_key:
             searches = ("open", "closed")
+            search_errors: list[str] = []
+            successful_search = False
             for state in searches:
                 search_url = (
                     f"{OSSRH_BASE}/manual/search/repositories?"
                     f"ip=any&profile_id={urllib.parse.quote(namespace)}"
                     f"&state={urllib.parse.quote(state)}"
                 )
-                _, payload = request_json("GET", search_url, headers)
+                search_status, payload = request_json("GET", search_url, headers)
+                if search_status is None or search_status < 200 or search_status >= 300:
+                    search_error = payload.get("error") if isinstance(payload, dict) else ""
+                    if not search_error:
+                        search_error = (
+                            f"HTTP {search_status}"
+                            if search_status is not None
+                            else "HTTP unknown"
+                        )
+                    search_errors.append(
+                        f"Repository search failed ({state}): {search_error}"
+                    )
+                    continue
+
+                successful_search = True
                 repositories = payload.get("repositories", []) if isinstance(payload, dict) else []
                 if repositories:
                     repository_key = repositories[0].get("key", "") or ""
                     break
 
         if not repository_key:
-            reason = "No staging repository key found"
+            if search_errors and not successful_search:
+                reason = "; ".join(search_errors)
+            else:
+                reason = "No staging repository key found"
         else:
             upload_url = (
                 f"{OSSRH_BASE}/manual/upload/repository/{urllib.parse.quote(repository_key)}"

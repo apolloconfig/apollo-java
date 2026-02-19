@@ -118,11 +118,25 @@ def main() -> int:
                     )
                     continue
 
+                if status < 200 or status >= 300:
+                    http_error = payload.get("error", f"HTTP {status}")
+                    last_error = http_error
+                    context["search_candidates"].append(
+                        {
+                            "state": state,
+                            "ip": ip,
+                            "status": status,
+                            "count": 0,
+                            "error": http_error,
+                        }
+                    )
+                    continue
+
                 repositories = (
                     payload.get("repositories", []) if isinstance(payload, dict) else []
                 )
                 context["search_candidates"].append(
-                    {"state": state, "ip": ip, "count": len(repositories)}
+                    {"state": state, "ip": ip, "status": status, "count": len(repositories)}
                 )
                 if repositories:
                     selected = repositories[0]
