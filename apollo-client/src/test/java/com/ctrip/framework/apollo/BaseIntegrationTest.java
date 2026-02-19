@@ -103,6 +103,16 @@ public abstract class BaseIntegrationTest {
     );
   }
 
+  public void mockConfigs(
+      String appId,
+      String cluster,
+      String namespace,
+      int mockedStatusCode,
+      ApolloConfig apolloConfig
+  ) {
+    this.mockedConfigService.mockConfigs(appId, cluster, namespace, mockedStatusCode, apolloConfig);
+  }
+
   @BeforeEach
   public void setUp() throws Exception {
     someAppId = "1003171";

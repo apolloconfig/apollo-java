@@ -11,6 +11,7 @@ Apollo Java 2.5.0
 * [Feature Support retry in open api client.](https://github.com/apolloconfig/apollo-java/pull/105)
 * [Support Spring Boot 4.0 bootstrap context package relocation for apollo-client-config-data](https://github.com/apolloconfig/apollo-java/pull/115)
 * [Fix change listener de-duplication by identity to avoid stale property names cache in Spring Cloud bootstrap dual-context initialization](https://github.com/apolloconfig/apollo-java/pull/121)
+* [Test Overhaul automated compatibility coverage across API/Spring/Spring Boot scenarios](https://github.com/apolloconfig/apollo-java/pull/123)
 
 ------------------
 All issues and pull requests are [here](https://github.com/apolloconfig/apollo-java/milestone/5?closed=1)

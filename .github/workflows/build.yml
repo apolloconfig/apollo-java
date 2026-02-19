@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
 name: build
 
@@ -25,40 +23,173 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  compile-matrix:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         jdk: [8, 11, 17]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v4
       with:
+        distribution: temurin
         java-version: ${{ matrix.jdk }}
     - name: Cache Maven packages
       uses: actions/cache@v4
       with:
         path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-maven-compile-${{ matrix.jdk }}-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
+          ${{ runner.os }}-maven-compile-${{ matrix.jdk }}-
           ${{ runner.os }}-maven-
-    - name: JDK 8
-      if: matrix.jdk == '8'
+    - name: Compile
+      run: mvn -B clean compile -Dmaven.gitcommitid.skip=true
+
+  unit-integration-pr:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 8
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-unit-integration-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-unit-integration-
+          ${{ runner.os }}-maven-
+    - name: Run unit and integration tests
       uses: nick-fields/retry@v3
       with:
-        timeout_minutes: 3
+        timeout_minutes: 4
         max_attempts: 3
         retry_wait_seconds: 1
-        command: mvn -B clean package -P travis jacoco:report -Dmaven.gitcommitid.skip=true
-    - name: JDK 11
-      if: matrix.jdk == '11'
-      run: mvn -B clean compile -Dmaven.gitcommitid.skip=true
-    - name: JDK 17
-      if: matrix.jdk == '17'
-      run: mvn -B clean compile -Dmaven.gitcommitid.skip=true
+        command: mvn -B clean test -P travis jacoco:report -Dmaven.gitcommitid.skip=true
     - name: Upload coverage to Codecov
-      if: matrix.jdk == '8'
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
       with:
-        file: ${{ github.workspace }}/apollo-*/target/site/jacoco/jacoco.xml
+        files: ${{ github.workspace }}/apollo-*/target/site/jacoco/jacoco.xml
+
+  compat-api:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 8
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-compat-api-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-compat-api-
+          ${{ runner.os }}-maven-
+    - name: Build local artifacts for api compatibility
+      run: |
+        mvn -B -pl apollo-core,apollo-client,apollo-mockserver -am \
+          -DskipTests install -Dmaven.gitcommitid.skip=true
+    - name: Run api compatibility tests
+      run: |
+        mvn -B -f apollo-compat-tests/pom.xml -pl apollo-api-compat-it \
+          test -Dmaven.gitcommitid.skip=true
+
+  compat-spring:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: spring-3.1.1-jdk8
+            java: 8
+            spring_framework: 3.1.1.RELEASE
+            java_version_prop: 1.8
+          - name: spring-6.1-jdk17
+            java: 17
+            spring_framework: 6.1.18
+            java_version_prop: 17
+    name: compat-spring-${{ matrix.name }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: ${{ matrix.java }}
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-compat-spring-${{ matrix.name }}-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-compat-spring-${{ matrix.name }}-
+          ${{ runner.os }}-maven-
+    - name: Build local artifacts for compat tests
+      run: |
+        mvn -B -pl apollo-core,apollo-client,apollo-mockserver -am \
+          -DskipTests install -Dmaven.gitcommitid.skip=true
+    - name: Run spring compatibility tests
+      run: |
+        mvn -B -f apollo-compat-tests/pom.xml -pl apollo-spring-compat-it \
+          -Dspring.framework.version=${{ matrix.spring_framework }} \
+          -Djava.version=${{ matrix.java_version_prop }} \
+          test -Dmaven.gitcommitid.skip=true
+
+  compat-spring-boot:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: spring-boot-2.7-jdk8
+            java: 8
+            spring_boot: 2.7.18
+            java_version_prop: 1.8
+            compat_slf4j: 1.7.36
+            compat_vintage: 5.7.0
+          - name: spring-boot-3.3-jdk17
+            java: 17
+            spring_boot: 3.3.10
+            java_version_prop: 17
+            compat_slf4j: 2.0.17
+            compat_vintage: 5.10.5
+          - name: spring-boot-4.0-jdk17
+            java: 17
+            spring_boot: 4.0.0
+            java_version_prop: 17
+            compat_slf4j: 2.0.17
+            compat_vintage: 6.0.1
+    name: compat-spring-boot-${{ matrix.name }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: ${{ matrix.java }}
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-compat-spring-boot-${{ matrix.name }}-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-compat-spring-boot-${{ matrix.name }}-
+          ${{ runner.os }}-maven-
+    - name: Build local artifacts for spring boot compatibility
+      run: |
+        mvn -B -pl apollo-core,apollo-client,apollo-mockserver,apollo-client-config-data -am \
+          -DskipTests \
+          install -Dmaven.gitcommitid.skip=true
+    - name: Run spring boot compatibility tests
+      run: |
+        mvn -B -f apollo-compat-tests/pom.xml -pl apollo-spring-boot-compat-it \
+          -Dspring-boot.version=${{ matrix.spring_boot }} \
+          -Djava.version=${{ matrix.java_version_prop }} \
+          -Dcompat.slf4j.version=${{ matrix.compat_slf4j }} \
+          -Dcompat.junit.vintage.version=${{ matrix.compat_vintage }} \
+          test -Dmaven.gitcommitid.skip=true

@@ -98,6 +98,11 @@
         <artifactId>apollo-client</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.ctrip.framework.apollo</groupId>
+        <artifactId>apollo-mockserver</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!--third party -->
       <dependency>
         <groupId>org.slf4j</groupId>
