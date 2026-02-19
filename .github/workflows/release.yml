@@ -38,9 +38,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Publish to Sonatype Central
-        run: |
-          set -eo pipefail
-          mvn clean deploy -DskipTests=true -Prelease
+        run: mvn clean deploy -DskipTests=true -Prelease
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
