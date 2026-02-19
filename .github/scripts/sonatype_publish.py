@@ -25,6 +25,8 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
+from github_actions_utils import write_output
+
 OSSRH_BASE = "https://ossrh-staging-api.central.sonatype.com"
 PORTAL_BASE = "https://central.sonatype.com"
 
@@ -62,14 +64,6 @@ def extract_deployment_state(payload: dict[str, Any]) -> str:
         if isinstance(value, str):
             return value
     return "unknown"
-
-
-def write_output(key: str, value: str) -> None:
-    output_path = os.environ.get("GITHUB_OUTPUT", "").strip()
-    if not output_path:
-        return
-    with open(output_path, "a", encoding="utf-8") as stream:
-        stream.write(f"{key}={value}\n")
 
 
 def to_int(value: str, default: int) -> int:
@@ -190,7 +184,26 @@ def main() -> int:
                                 f"{PORTAL_BASE}/api/v1/publisher/status?"
                                 f"id={urllib.parse.quote(deployment_id)}"
                             )
-                            _, status_payload = request_json("POST", status_url, headers)
+                            poll_status, status_payload = request_json(
+                                "POST",
+                                status_url,
+                                headers,
+                            )
+                            if poll_status is None or poll_status < 200 or poll_status >= 300:
+                                poll_error = (
+                                    status_payload.get("error")
+                                    if isinstance(status_payload, dict)
+                                    else ""
+                                )
+                                if not poll_error:
+                                    poll_error = (
+                                        f"HTTP {poll_status}"
+                                        if poll_status is not None
+                                        else "HTTP unknown"
+                                    )
+                                reason = f"Status polling API failed: {poll_error}"
+                                break
+
                             final_state = extract_deployment_state(status_payload)
 
                             if final_state == "PUBLISHED":
@@ -234,7 +247,7 @@ def main() -> int:
 
                             time.sleep(10)
 
-                        if result != "published" and not reason and final_state != "unknown":
+                        if result != "published" and not reason:
                             reason = (
                                 "Timed out waiting for deployment status. "
                                 f"Latest state={final_state}"

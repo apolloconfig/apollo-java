@@ -21,13 +21,7 @@ import os
 import re
 from pathlib import Path
 
-
-def write_output(key: str, value: str) -> None:
-    output_path = os.environ.get("GITHUB_OUTPUT", "").strip()
-    if not output_path:
-        return
-    with open(output_path, "a", encoding="utf-8") as out:
-        out.write(f"{key}={value}\n")
+from github_actions_utils import write_output
 
 
 def main() -> int:
@@ -40,8 +34,7 @@ def main() -> int:
 
     uploaded_urls: list[str] = []
     for target_repo, url in pattern.findall(log_text):
-        normalized = target_repo.rstrip(":")
-        if normalized == repository_name:
+        if target_repo == repository_name:
             uploaded_urls.append(url)
 
     deduped_urls = sorted(set(uploaded_urls))

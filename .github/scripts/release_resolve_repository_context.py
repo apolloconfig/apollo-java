@@ -25,6 +25,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+from github_actions_utils import write_output
+
 OSSRH_BASE = "https://ossrh-staging-api.central.sonatype.com"
 
 
@@ -40,22 +42,15 @@ def request_json(url: str, headers: dict[str, str]) -> tuple[int | None, dict[st
             except json.JSONDecodeError:
                 return response.status, {"raw": body}
     except urllib.error.HTTPError as error:
+        body = error.read().decode("utf-8")
         try:
-            payload = json.loads(error.read().decode("utf-8"))
-        except Exception:  # noqa: BLE001
-            payload = {"error": f"HTTP {error.code}"}
+            payload = json.loads(body) if body else {}
+        except json.JSONDecodeError:
+            payload = {"raw": body}
         payload.setdefault("error", f"HTTP {error.code}")
         return error.code, payload
     except Exception as error:  # noqa: BLE001
         return None, {"error": str(error)}
-
-
-def write_output(key: str, value: str) -> None:
-    output_path = os.environ.get("GITHUB_OUTPUT", "").strip()
-    if not output_path:
-        return
-    with open(output_path, "a", encoding="utf-8") as stream:
-        stream.write(f"{key}={value}\n")
 
 
 def main() -> int:
