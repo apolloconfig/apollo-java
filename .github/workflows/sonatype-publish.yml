@@ -35,6 +35,11 @@ on:
         description: 'manual upload mode: portal_api|automatic|user_managed'
         required: true
         default: 'portal_api'
+        type: choice
+        options:
+          - portal_api
+          - automatic
+          - user_managed
 
 jobs:
   publish:
@@ -55,17 +60,24 @@ jobs:
           python3 .github/scripts/sonatype_publish.py
 
       - name: Sonatype publish summary
+        env:
+          PUBLISH_RESULT: ${{ steps.publish.outputs.result }}
+          PUBLISH_REPOSITORY_KEY: ${{ steps.publish.outputs.repository_key }}
+          PUBLISH_DEPLOYMENT_ID: ${{ steps.publish.outputs.deployment_id }}
+          PUBLISH_FINAL_STATE: ${{ steps.publish.outputs.final_state }}
+          PUBLISH_DEPLOYMENT_URL: ${{ steps.publish.outputs.deployment_url }}
+          PUBLISH_REASON: ${{ steps.publish.outputs.reason }}
         run: |
           {
             echo "## Sonatype Publish Result"
             echo ""
-            echo "- result: ${{ steps.publish.outputs.result }}"
-            echo "- repository_key: ${{ steps.publish.outputs.repository_key }}"
-            echo "- deployment_id: ${{ steps.publish.outputs.deployment_id }}"
-            echo "- final_state: ${{ steps.publish.outputs.final_state }}"
-            echo "- deployment_url: ${{ steps.publish.outputs.deployment_url }}"
-            if [ -n "${{ steps.publish.outputs.reason }}" ]; then
-              echo "- reason: ${{ steps.publish.outputs.reason }}"
+            echo "- result: ${PUBLISH_RESULT}"
+            echo "- repository_key: ${PUBLISH_REPOSITORY_KEY}"
+            echo "- deployment_id: ${PUBLISH_DEPLOYMENT_ID}"
+            echo "- final_state: ${PUBLISH_FINAL_STATE}"
+            echo "- deployment_url: ${PUBLISH_DEPLOYMENT_URL}"
+            if [ -n "${PUBLISH_REASON}" ]; then
+              echo "- reason: ${PUBLISH_REASON}"
               echo ""
               echo "Manual fallback: open https://central.sonatype.com/publishing/deployments and complete publish by deployment id."
             fi

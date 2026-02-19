@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+# Copyright 2026 Apollo Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """Resolve Sonatype repository context for release deployments."""
 
 from __future__ import annotations
@@ -22,7 +35,10 @@ def request_json(url: str, headers: dict[str, str]) -> tuple[int | None, dict[st
             body = response.read().decode("utf-8")
             if not body:
                 return response.status, {}
-            return response.status, json.loads(body)
+            try:
+                return response.status, json.loads(body)
+            except json.JSONDecodeError:
+                return response.status, {"raw": body}
     except urllib.error.HTTPError as error:
         try:
             payload = json.loads(error.read().decode("utf-8"))
@@ -91,6 +107,15 @@ def main() -> int:
                 status, payload = request_json(url, headers)
                 if status is None:
                     last_error = payload.get("error", "unknown error")
+                    context["search_candidates"].append(
+                        {
+                            "state": state,
+                            "ip": ip,
+                            "status": None,
+                            "count": 0,
+                            "error": last_error,
+                        }
+                    )
                     continue
 
                 repositories = (
