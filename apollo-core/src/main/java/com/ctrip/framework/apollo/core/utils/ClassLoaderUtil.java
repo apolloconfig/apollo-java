@@ -17,10 +17,8 @@
 package com.ctrip.framework.apollo.core.utils;
 
 import com.google.common.base.Strings;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -40,19 +38,12 @@ public class ClassLoaderUtil {
     }
 
     try {
-      URL url = loader.getResource("");
-      // get class path
-      if (url != null) {
-        classPath = url.getPath();
-        classPath = URLDecoder.decode(classPath, "utf-8");
-      }
-
-      // 如果是jar包内的，则返回当前路径
-      if (Strings.isNullOrEmpty(classPath) || classPath.contains(".jar!")) {
-        classPath = System.getProperty("user.dir");
+      classPath = resolveClassPath(loader, null);
+      if (Strings.isNullOrEmpty(classPath)) {
+        classPath = getDefaultClassPath();
       }
     } catch (Throwable ex) {
-      classPath = System.getProperty("user.dir");
+      classPath = getDefaultClassPath();
       logger.warn("Failed to locate class path, fallback to user.dir: {}", classPath, ex);
     }
   }
@@ -63,6 +54,23 @@ public class ClassLoaderUtil {
 
   public static String getClassPath() {
     return classPath;
+  }
+
+  static String resolveClassPath(ClassLoader classLoader, String defaultClassPath) throws Exception {
+    URL url = classLoader.getResource("");
+    if (url == null || !"file".equalsIgnoreCase(url.getProtocol())) {
+      return defaultClassPath;
+    }
+
+    String resolvedClassPath = URLDecoder.decode(url.getPath(), "utf-8");
+    if (Strings.isNullOrEmpty(resolvedClassPath)) {
+      return defaultClassPath;
+    }
+    return resolvedClassPath;
+  }
+
+  private static String getDefaultClassPath() {
+    return System.getProperty("user.dir");
   }
 
   public static boolean isClassPresent(String className) {
