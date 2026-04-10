@@ -32,9 +32,11 @@ import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
 import com.ctrip.framework.apollo.spi.ConfigRegistry;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
+import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
 import com.google.common.collect.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -80,13 +82,14 @@ public class ConfigDataIntegrationTest {
   private static final EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
   private static final ExternalResource apolloStateResource = new ExternalResource() {
-    private String originalAppId;
     private String originalEnv;
+    private Map<String, String> originalApolloSystemProperties = new HashMap<>();
 
     @Override
     protected void before() throws Throwable {
-      originalAppId = System.getProperty("app.id");
+      originalApolloSystemProperties = snapshotApolloSystemProperties();
       originalEnv = System.getProperty("env");
+      clearApolloSystemProperties();
       System.setProperty("app.id", TEST_APP_ID);
       System.setProperty("env", TEST_ENV);
       resetApolloStaticState();
@@ -99,7 +102,7 @@ public class ConfigDataIntegrationTest {
       } catch (Exception ex) {
         throw new RuntimeException(ex);
       } finally {
-        restoreOrClear("app.id", originalAppId);
+        restoreApolloSystemProperties(originalApolloSystemProperties);
         restoreOrClear("env", originalEnv);
       }
     }
@@ -118,6 +121,9 @@ public class ConfigDataIntegrationTest {
   @After
   public void afterEach() throws Exception {
     resetApolloStaticState();
+    clearApolloSystemProperties();
+    System.setProperty("app.id", TEST_APP_ID);
+    System.setProperty("env", TEST_ENV);
   }
 
   @Autowired
@@ -281,6 +287,27 @@ public class ConfigDataIntegrationTest {
       return;
     }
     System.setProperty(key, originalValue);
+  }
+
+  private static Map<String, String> snapshotApolloSystemProperties() {
+    Map<String, String> originalProperties = new HashMap<>();
+    for (String propertyName : ApolloApplicationContextInitializer.APOLLO_SYSTEM_PROPERTIES) {
+      originalProperties.put(propertyName, System.getProperty(propertyName));
+    }
+    return originalProperties;
+  }
+
+  private static void clearApolloSystemProperties() {
+    for (String propertyName : ApolloApplicationContextInitializer.APOLLO_SYSTEM_PROPERTIES) {
+      System.clearProperty(propertyName);
+    }
+  }
+
+  private static void restoreApolloSystemProperties(Map<String, String> originalProperties) {
+    clearApolloSystemProperties();
+    for (Map.Entry<String, String> entry : originalProperties.entrySet()) {
+      restoreOrClear(entry.getKey(), entry.getValue());
+    }
   }
 
   private static void addOrModifyForAllAppIds(String namespace, String key, String value) {
