@@ -103,6 +103,34 @@ public class ConfigServiceTest {
     assertEquals(someNamespaceFileName + ":" + someConfigFileFormat.getValue(), configFile.getContent());
   }
 
+  @Test
+  public void testGetConfigWithCustomAppId() throws Exception {
+    String customAppId = "customAppId";
+    String someNamespace = "mock";
+    String someKey = "someKey";
+    MockInjector.setInstance(ConfigFactory.class, someNamespace, new MockConfigFactory());
+
+    Config config = ConfigService.getConfig(customAppId, someNamespace);
+
+    assertEquals(customAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey,
+        config.getProperty(someKey, null));
+  }
+
+  @Test
+  public void testGetConfigFileWithCustomAppId() throws Exception {
+    String customAppId = "customAppId";
+    String someNamespace = "mock";
+    ConfigFileFormat someConfigFileFormat = ConfigFileFormat.YML;
+    String someNamespaceFileName =
+        String.format("%s.%s", someNamespace, someConfigFileFormat.getValue());
+    MockInjector.setInstance(ConfigFactory.class, someNamespaceFileName, new MockConfigFactory());
+
+    ConfigFile configFile = ConfigService.getConfigFile(customAppId, someNamespace, someConfigFileFormat);
+
+    assertEquals(customAppId, configFile.getAppId());
+    assertEquals(someNamespaceFileName, configFile.getNamespace());
+  }
+
   private static class MockConfig extends AbstractConfig {
     private final String m_appId;
     private final String m_namespace;
