@@ -122,8 +122,13 @@ public class SpringAnnotationCompatibilityTest {
     assertNotNull(anotherAppChange);
     assertNotNull(anotherAppChange.getChange("compat.origin"));
 
-    String namespace = apolloEventListenerProbe.pollNamespace(10, TimeUnit.SECONDS);
-    assertEquals("application", namespace);
+    // config change listeners are notified asynchronously, so events from different
+    // namespaces may arrive in any order
+    SpringCompatibilityTestSupport.waitForCondition(
+        "ApplicationListener should receive namespace updates",
+        () -> apolloEventListenerProbe.hasNamespace("application")
+            && apolloEventListenerProbe.hasNamespace("TEST1.apollo")
+            && apolloEventListenerProbe.hasNamespace("application.yaml"));
 
     SpringCompatibilityTestSupport.waitForCondition("public value should be updated",
         () -> "from-public-updated".equals(
