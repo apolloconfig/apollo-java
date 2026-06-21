@@ -17,24 +17,24 @@
 package com.ctrip.framework.apollo.compat.spring;
 
 import com.ctrip.framework.apollo.spring.events.ApolloConfigChangeEvent;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
 public class SpringApolloEventListenerProbe implements ApplicationListener {
 
-  private final BlockingQueue<String> namespaces = new LinkedBlockingQueue<String>();
+  private final Set<String> namespaces = Collections.synchronizedSet(new HashSet<String>());
 
   @Override
   public void onApplicationEvent(ApplicationEvent event) {
     if (event instanceof ApolloConfigChangeEvent) {
-      namespaces.offer(((ApolloConfigChangeEvent) event).getConfigChangeEvent().getNamespace());
+      namespaces.add(((ApolloConfigChangeEvent) event).getConfigChangeEvent().getNamespace());
     }
   }
 
-  public String pollNamespace(long timeout, TimeUnit unit) throws InterruptedException {
-    return namespaces.poll(timeout, unit);
+  public boolean hasNamespace(String namespace) {
+    return namespaces.contains(namespace);
   }
 }
