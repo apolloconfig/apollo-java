@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 
 import com.ctrip.framework.apollo.core.MetaDomainConsts;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
+import com.ctrip.framework.apollo.spi.DefaultConfigFactory;
+import java.util.Properties;
 import java.util.Set;
 
 import org.junit.After;
@@ -101,6 +103,60 @@ public class ConfigServiceTest {
 
     assertEquals(someNamespaceFileName, configFile.getNamespace());
     assertEquals(someNamespaceFileName + ":" + someConfigFileFormat.getValue(), configFile.getContent());
+  }
+
+  @Test
+  public void testGetConfigWithCustomAppId() throws Exception {
+    String customAppId = "customAppId";
+    String someNamespace = "mock";
+    String someKey = "someKey";
+    MockInjector.setInstance(ConfigFactory.class, someNamespace, new MockConfigFactory());
+
+    Config config = ConfigService.getConfig(customAppId, someNamespace);
+
+    assertEquals(customAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey,
+        config.getProperty(someKey, null));
+  }
+
+  @Test
+  public void testGetConfigFileWithCustomAppId() throws Exception {
+    String customAppId = "customAppId";
+    String someNamespace = "mock";
+    ConfigFileFormat someConfigFileFormat = ConfigFileFormat.YML;
+    String someNamespaceFileName =
+        String.format("%s.%s", someNamespace, someConfigFileFormat.getValue());
+    MockInjector.setInstance(ConfigFactory.class, someNamespaceFileName, new MockConfigFactory());
+
+    ConfigFile configFile = ConfigService.getConfigFile(customAppId, someNamespace, someConfigFileFormat);
+
+    assertEquals(customAppId, configFile.getAppId());
+    assertEquals(someNamespaceFileName, configFile.getNamespace());
+  }
+
+  @Test
+  public void testGetConfigWithCustomAppIdForPropertiesCompatibleNamespace() throws Exception {
+    String customAppId = "customAppId";
+    String someNamespace = "mock";
+    ConfigFileFormat someConfigFileFormat = ConfigFileFormat.YML;
+    String someNamespaceFileName =
+        String.format("%s.%s", someNamespace, someConfigFileFormat.getValue());
+
+    // Exercise the real DefaultConfigFactory path for a non-properties namespace, i.e.
+    // create(appId, "mock.yml") -> createPropertiesCompatibleFileConfigRepository(...) ->
+    // ConfigService.getConfigFile(appId, "mock", YML). Only createConfigFile is stubbed (to avoid
+    // hitting a remote repository); it echoes the appId it receives into the resulting properties so
+    // the assertion below fails if DefaultConfigFactory ever drops the custom appId again.
+    MockInjector.setInstance(ConfigFactory.class, someNamespaceFileName, new DefaultConfigFactory() {
+      @Override
+      public ConfigFile createConfigFile(String appId, String namespace,
+          ConfigFileFormat configFileFormat) {
+        return new MockPropertiesCompatibleConfigFile(appId, namespace, configFileFormat);
+      }
+    });
+
+    Config config = ConfigService.getConfig(customAppId, someNamespaceFileName);
+
+    assertEquals(customAppId, config.getProperty("appId", null));
   }
 
   private static class MockConfig extends AbstractConfig {
@@ -210,6 +266,67 @@ public class ConfigServiceTest {
     @Override
     public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
       return new MockConfigFile(appId, namespace, configFileFormat);
+    }
+  }
+
+  private static class MockPropertiesCompatibleConfigFile implements PropertiesCompatibleConfigFile {
+    private final String m_appId;
+    private final String m_namespace;
+    private final ConfigFileFormat m_configFileFormat;
+
+    public MockPropertiesCompatibleConfigFile(String appId, String namespace,
+        ConfigFileFormat configFileFormat) {
+      m_appId = appId;
+      m_namespace = namespace;
+      m_configFileFormat = configFileFormat;
+    }
+
+    @Override
+    public Properties asProperties() {
+      Properties properties = new Properties();
+      // echo the appId so it is observable through the resulting Config
+      properties.setProperty("appId", m_appId);
+      return properties;
+    }
+
+    @Override
+    public String getContent() {
+      return null;
+    }
+
+    @Override
+    public boolean hasContent() {
+      return true;
+    }
+
+    @Override
+    public String getAppId() {
+      return m_appId;
+    }
+
+    @Override
+    public String getNamespace() {
+      return m_namespace;
+    }
+
+    @Override
+    public ConfigFileFormat getConfigFileFormat() {
+      return m_configFileFormat;
+    }
+
+    @Override
+    public void addChangeListener(ConfigFileChangeListener listener) {
+
+    }
+
+    @Override
+    public boolean removeChangeListener(ConfigFileChangeListener listener) {
+      return false;
+    }
+
+    @Override
+    public ConfigSourceType getSourceType() {
+      return ConfigSourceType.REMOTE;
     }
   }
 
