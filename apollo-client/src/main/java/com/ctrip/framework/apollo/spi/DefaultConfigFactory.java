@@ -163,7 +163,7 @@ public class DefaultConfigFactory implements ConfigFactory {
       String appId, String namespace, ConfigFileFormat format) {
     String actualNamespaceName = trimNamespaceFormat(namespace, format);
     PropertiesCompatibleConfigFile configFile = (PropertiesCompatibleConfigFile) ConfigService
-        .getConfigFile(actualNamespaceName, format);
+        .getConfigFile(appId, actualNamespaceName, format);
 
     return new PropertiesCompatibleFileConfigRepository(configFile);
   }
