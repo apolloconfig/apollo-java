@@ -19,7 +19,6 @@ package com.ctrip.framework.apollo.config.data.extension.websocket;
 import com.ctrip.framework.apollo.config.data.extension.initialize.ApolloClientExtensionInitializer;
 import com.ctrip.framework.apollo.config.data.extension.properties.ApolloClientProperties;
 import org.apache.commons.logging.Log;
-import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.logging.DeferredLogFactory;
@@ -31,10 +30,10 @@ public class ApolloClientWebsocketExtensionInitializer implements ApolloClientEx
 
   private final Log log;
 
-  private final ConfigurableBootstrapContext bootstrapContext;
+  private final Object bootstrapContext;
 
   public ApolloClientWebsocketExtensionInitializer(DeferredLogFactory logFactory,
-      ConfigurableBootstrapContext bootstrapContext) {
+      Object bootstrapContext) {
     this.log = logFactory.getLog(ApolloClientWebsocketExtensionInitializer.class);
     this.bootstrapContext = bootstrapContext;
   }

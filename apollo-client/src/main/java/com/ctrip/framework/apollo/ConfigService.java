@@ -101,6 +101,19 @@ public class ConfigService {
     return s_instance.getManager().getConfigFile(namespace, configFileFormat);
   }
 
+  /**
+   * Get the config file instance for the appId and namespace.
+   *
+   * @param appId            the appId of the config
+   * @param namespace        the namespace of the config without file extension, e.g. "application"
+   * @param configFileFormat the config file format
+   * @return config file instance
+   */
+  public static ConfigFile getConfigFile(String appId, String namespace,
+      ConfigFileFormat configFileFormat) {
+    return s_instance.getManager().getConfigFile(appId, namespace, configFileFormat);
+  }
+
   public static ConfigMonitor getConfigMonitor(){
       return s_instance.getMonitor();
   }

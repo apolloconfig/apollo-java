@@ -72,7 +72,7 @@ public class DefaultConfigFactory implements ConfigFactory {
   public Config create(String appId, String namespace) {
     ConfigFileFormat format = determineFileFormat(namespace);
 
-    ConfigRepository configRepository = null;
+    ConfigRepository configRepository;
 
     // although ConfigFileFormat.Properties are compatible with themselves we
     // should not create a PropertiesCompatibleFileConfigRepository for them
@@ -163,7 +163,7 @@ public class DefaultConfigFactory implements ConfigFactory {
       String appId, String namespace, ConfigFileFormat format) {
     String actualNamespaceName = trimNamespaceFormat(namespace, format);
     PropertiesCompatibleConfigFile configFile = (PropertiesCompatibleConfigFile) ConfigService
-        .getConfigFile(actualNamespaceName, format);
+        .getConfigFile(appId, actualNamespaceName, format);
 
     return new PropertiesCompatibleFileConfigRepository(configFile);
   }

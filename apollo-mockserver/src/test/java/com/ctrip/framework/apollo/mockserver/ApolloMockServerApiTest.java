@@ -146,4 +146,39 @@ public class ApolloMockServerApiTest {
     assertNull(otherConfig.getProperty("key6", null));
     assertEquals(0, changes.availablePermits());
   }
+
+  @Test
+  public void testUpdatePropertiesWithDifferentAppIds() throws Exception {
+    String appIdA = "appIdA";
+    String appIdB = "appIdB";
+    String updatedValue = "value-only-for-app-b";
+
+    Config configA = ConfigService.getConfig(appIdA, anotherNamespace);
+    Config configB = ConfigService.getConfig(appIdB, anotherNamespace);
+
+    assertEquals("otherValue1", configA.getProperty("key1", null));
+    assertEquals("otherValue1", configB.getProperty("key1", null));
+
+    embeddedApollo.addOrModifyProperty(appIdB, anotherNamespace, "key1", updatedValue);
+
+    long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
+    while (System.currentTimeMillis() < deadline
+        && !updatedValue.equals(configB.getProperty("key1", null))) {
+      Thread.sleep(100);
+    }
+
+    assertEquals("otherValue1", configA.getProperty("key1", null));
+    assertEquals(updatedValue, configB.getProperty("key1", null));
+
+    embeddedApollo.deleteProperty(appIdB, anotherNamespace, "key1");
+
+    deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
+    while (System.currentTimeMillis() < deadline
+        && configB.getProperty("key1", null) != null) {
+      Thread.sleep(100);
+    }
+
+    assertNull(configB.getProperty("key1", null));
+    assertEquals("otherValue1", configA.getProperty("key1", null));
+  }
 }

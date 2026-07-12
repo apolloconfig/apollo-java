@@ -23,12 +23,11 @@ import com.ctrip.framework.apollo.config.data.injector.ApolloConfigDataInjectorC
 import com.ctrip.framework.apollo.util.http.HttpClient;
 import com.ctrip.framework.foundation.internals.ServiceBootstrap;
 import java.util.List;
+import java.util.function.Consumer;
 import org.apache.commons.logging.Log;
-import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.logging.DeferredLogFactory;
-import org.springframework.boot.web.reactive.function.client.WebClientCustomizer;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -40,10 +39,10 @@ public class ApolloClientLongPollingExtensionInitializer implements
 
   private final Log log;
 
-  private final ConfigurableBootstrapContext bootstrapContext;
+  private final Object bootstrapContext;
 
   public ApolloClientLongPollingExtensionInitializer(DeferredLogFactory logFactory,
-      ConfigurableBootstrapContext bootstrapContext) {
+      Object bootstrapContext) {
     this.log = logFactory.getLog(ApolloClientLongPollingExtensionInitializer.class);
     this.bootstrapContext = bootstrapContext;
   }
@@ -56,11 +55,11 @@ public class ApolloClientLongPollingExtensionInitializer implements
         .loadAllOrdered(ApolloClientWebClientCustomizerFactory.class);
     if (!CollectionUtils.isEmpty(factories)) {
       for (ApolloClientWebClientCustomizerFactory factory : factories) {
-        WebClientCustomizer webClientCustomizer = factory
+        Consumer<WebClient.Builder> webClientCustomizer = factory
             .createWebClientCustomizer(apolloClientProperties, binder, bindHandler, this.log,
                 this.bootstrapContext);
         if (webClientCustomizer != null) {
-          webClientCustomizer.customize(webClientBuilder);
+          webClientCustomizer.accept(webClientBuilder);
         }
       }
     }

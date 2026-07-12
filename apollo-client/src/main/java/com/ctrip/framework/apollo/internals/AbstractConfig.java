@@ -56,8 +56,10 @@ public abstract class AbstractConfig implements Config {
   protected static final ExecutorService m_executorService;
 
   private final List<ConfigChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
-  private final Map<ConfigChangeListener, Set<String>> m_interestedKeys = Maps.newConcurrentMap();
-  private final Map<ConfigChangeListener, Set<String>> m_interestedKeyPrefixes = Maps.newConcurrentMap();
+  private final Map<ConfigChangeListener, Set<String>> m_interestedKeys =
+      Collections.synchronizedMap(new IdentityHashMap<>());
+  private final Map<ConfigChangeListener, Set<String>> m_interestedKeyPrefixes =
+      Collections.synchronizedMap(new IdentityHashMap<>());
   private final ConfigUtil m_configUtil;
   private volatile Cache<String, Integer> m_integerCache;
   private volatile Cache<String, Long> m_longCache;
@@ -99,7 +101,7 @@ public abstract class AbstractConfig implements Config {
 
   @Override
   public void addChangeListener(ConfigChangeListener listener, Set<String> interestedKeys, Set<String> interestedKeyPrefixes) {
-    if (!m_listeners.contains(listener)) {
+    if (!containsListenerInstance(listener)) {
       m_listeners.add(listener);
       if (interestedKeys != null && !interestedKeys.isEmpty()) {
         m_interestedKeys.put(listener, Sets.newHashSet(interestedKeys));
@@ -114,7 +116,7 @@ public abstract class AbstractConfig implements Config {
   public boolean removeChangeListener(ConfigChangeListener listener) {
     m_interestedKeys.remove(listener);
     m_interestedKeyPrefixes.remove(listener);
-    return m_listeners.remove(listener);
+    return m_listeners.removeIf(addedListener -> addedListener == listener);
   }
 
   @Override
@@ -607,5 +609,14 @@ public abstract class AbstractConfig implements Config {
     }
 
     return changes;
+  }
+
+  private boolean containsListenerInstance(ConfigChangeListener listener) {
+    for (ConfigChangeListener configChangeListener : m_listeners) {
+      if (configChangeListener == listener) {
+        return true;
+      }
+    }
+    return false;
   }
 }

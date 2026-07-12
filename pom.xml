@@ -60,7 +60,7 @@
   </developers>
 
   <properties>
-    <revision>2.5.0-SNAPSHOT</revision>
+    <revision>2.6.0-SNAPSHOT</revision>
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring-boot.version>2.7.18</spring-boot.version>
@@ -73,6 +73,7 @@
     <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
     <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
     <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+    <central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
     <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
     <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
   </properties>
@@ -96,6 +97,11 @@
       <dependency>
         <groupId>com.ctrip.framework.apollo</groupId>
         <artifactId>apollo-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ctrip.framework.apollo</groupId>
+        <artifactId>apollo-mockserver</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--third party -->
@@ -452,19 +458,18 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
           </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>${central-publishing-maven-plugin.version}</version>
+            <extensions>true</extensions>
+            <configuration>
+              <autoPublish>true</autoPublish>
+              <waitUntil>PUBLISHED</waitUntil>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
-
-  <distributionManagement>
-    <repository>
-      <id>releases</id>
-      <url>${releases.repo}</url>
-    </repository>
-    <snapshotRepository>
-      <id>snapshots</id>
-      <url>${snapshots.repo}</url>
-    </snapshotRepository>
-  </distributionManagement>
 </project>
