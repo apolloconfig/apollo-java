@@ -80,20 +80,25 @@ public class OpenTelemetryApolloClientMetricsExporterTest {
         tags.put("cluster", "default");
 
         // Mock counter builder
-        io.opentelemetry.api.metrics.LongCounterBuilder counterBuilder = mock(io.opentelemetry.api.metrics.LongCounterBuilder.class);
-        io.opentelemetry.api.metrics.LongCounter counter = mock(io.opentelemetry.api.metrics.LongCounter.class);
+        io.opentelemetry.api.metrics.LongCounterBuilder longCounterBuilder = mock(io.opentelemetry.api.metrics.LongCounterBuilder.class);
+        io.opentelemetry.api.metrics.DoubleCounterBuilder counterBuilder = mock(io.opentelemetry.api.metrics.DoubleCounterBuilder.class);
+        io.opentelemetry.api.metrics.DoubleCounter counter = mock(io.opentelemetry.api.metrics.DoubleCounter.class);
         
-        when(meter.counterBuilder(name)).thenReturn(counterBuilder);
+        when(meter.counterBuilder(name)).thenReturn(longCounterBuilder);
+        when(longCounterBuilder.setDescription("Apollo counter metrics")).thenReturn(longCounterBuilder);
+        when(longCounterBuilder.setUnit("1")).thenReturn(longCounterBuilder);
+        when(longCounterBuilder.ofDoubles()).thenReturn(counterBuilder);
         when(counterBuilder.setDescription("Apollo counter metrics")).thenReturn(counterBuilder);
         when(counterBuilder.setUnit("1")).thenReturn(counterBuilder);
         when(counterBuilder.build()).thenReturn(counter);
 
         // This will create the counter on first call
-        exporter.registerOrUpdateCounterSample(name, tags, 1.0);
+        exporter.registerOrUpdateCounterSample(name, tags, 1.25);
         
         // Verify counter was created
         verify(meter).counterBuilder(name);
         verify(counterBuilder).build();
+        verify(counter).add(eq(1.25), any());
     }
 
     @Test
@@ -105,7 +110,9 @@ public class OpenTelemetryApolloClientMetricsExporterTest {
 
         // Mock gauge builder
         io.opentelemetry.api.metrics.DoubleGaugeBuilder gaugeBuilder = mock(io.opentelemetry.api.metrics.DoubleGaugeBuilder.class);
-        io.opentelemetry.api.metrics.ObservableDoubleGauge gauge = mock(io.opentelemetry.api.metrics.ObservableDoubleGauge.class);
+        io.opentelemetry.api.metrics.ObservableDoubleGauge gauge =
+            new io.opentelemetry.api.metrics.ObservableDoubleGauge() {
+            };
         
         when(meter.gaugeBuilder(name)).thenReturn(gaugeBuilder);
         when(gaugeBuilder.setDescription("Apollo gauge metrics")).thenReturn(gaugeBuilder);
@@ -137,16 +144,22 @@ public class OpenTelemetryApolloClientMetricsExporterTest {
         tags.put("test", "value");
         
         // Mock counter creation
-        io.opentelemetry.api.metrics.LongCounterBuilder counterBuilder = mock(io.opentelemetry.api.metrics.LongCounterBuilder.class);
-        io.opentelemetry.api.metrics.LongCounter counter = mock(io.opentelemetry.api.metrics.LongCounter.class);
-        when(meter.counterBuilder("test_counter")).thenReturn(counterBuilder);
+        io.opentelemetry.api.metrics.LongCounterBuilder longCounterBuilder = mock(io.opentelemetry.api.metrics.LongCounterBuilder.class);
+        io.opentelemetry.api.metrics.DoubleCounterBuilder counterBuilder = mock(io.opentelemetry.api.metrics.DoubleCounterBuilder.class);
+        io.opentelemetry.api.metrics.DoubleCounter counter = mock(io.opentelemetry.api.metrics.DoubleCounter.class);
+        when(meter.counterBuilder("test_counter")).thenReturn(longCounterBuilder);
+        when(longCounterBuilder.setDescription(anyString())).thenReturn(longCounterBuilder);
+        when(longCounterBuilder.setUnit(anyString())).thenReturn(longCounterBuilder);
+        when(longCounterBuilder.ofDoubles()).thenReturn(counterBuilder);
         when(counterBuilder.setDescription(anyString())).thenReturn(counterBuilder);
         when(counterBuilder.setUnit(anyString())).thenReturn(counterBuilder);
         when(counterBuilder.build()).thenReturn(counter);
         
         // Mock gauge creation
         io.opentelemetry.api.metrics.DoubleGaugeBuilder gaugeBuilder = mock(io.opentelemetry.api.metrics.DoubleGaugeBuilder.class);
-        io.opentelemetry.api.metrics.ObservableDoubleGauge gauge = mock(io.opentelemetry.api.metrics.ObservableDoubleGauge.class);
+        io.opentelemetry.api.metrics.ObservableDoubleGauge gauge =
+            new io.opentelemetry.api.metrics.ObservableDoubleGauge() {
+            };
         when(meter.gaugeBuilder("test_gauge")).thenReturn(gaugeBuilder);
         when(gaugeBuilder.setDescription(anyString())).thenReturn(gaugeBuilder);
         when(gaugeBuilder.setUnit(anyString())).thenReturn(gaugeBuilder);
