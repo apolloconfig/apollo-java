@@ -129,6 +129,15 @@ public class ApolloOpenApiClient {
     return namespaceService.getNamespaces(appId, env, clusterName, fillItemDetail);
   }
 
+
+  /**
+   * Get the namespaces with extendInfo
+   * @since 2.6.0
+   */
+  public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail,  boolean extendInfo) {
+    return namespaceService.getNamespaces(appId, env, clusterName, fillItemDetail, extendInfo);
+  }
+
   /**
    * Get the cluster
    *
@@ -157,6 +166,14 @@ public class ApolloOpenApiClient {
    */
   public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail) {
     return namespaceService.getNamespace(appId, env, clusterName, namespaceName, fillItemDetail);
+  }
+
+  /**
+   * Get the namespace with extendInfo
+   * @since 2.6.0
+   */
+  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail,  boolean extendInfo) {
+    return namespaceService.getNamespace(appId, env, clusterName, namespaceName, fillItemDetail, extendInfo);
   }
 
   /**

@@ -34,6 +34,8 @@ public class OpenNamespaceDTO extends BaseDTO {
 
   private List<OpenItemDTO> items;
 
+  private OpenNamespaceExtendDTO extendInfo;
+
   public String getAppId() {
     return appId;
   }
@@ -90,6 +92,14 @@ public class OpenNamespaceDTO extends BaseDTO {
     this.items = items;
   }
 
+  public OpenNamespaceExtendDTO getExtendInfo() {
+    return extendInfo;
+  }
+
+  public void setExtendInfo(OpenNamespaceExtendDTO extendInfo) {
+    this.extendInfo = extendInfo;
+  }
+
   @Override
   public String toString() {
     return "OpenNamespaceDTO{" +
@@ -100,6 +110,7 @@ public class OpenNamespaceDTO extends BaseDTO {
         ", format='" + format + '\'' +
         ", isPublic=" + isPublic +
         ", items=" + items +
+        ", extendInfo=" + extendInfo +
         ", dataChangeCreatedBy='" + dataChangeCreatedBy + '\'' +
         ", dataChangeLastModifiedBy='" + dataChangeLastModifiedBy + '\'' +
         ", dataChangeCreatedTime=" + dataChangeCreatedTime +
