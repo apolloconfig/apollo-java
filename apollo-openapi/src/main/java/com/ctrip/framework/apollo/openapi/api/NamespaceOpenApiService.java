@@ -36,6 +36,20 @@ public interface NamespaceOpenApiService {
    */
   OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail);
 
+  /**
+   * Retrieves a single namespace, optionally including extra info such as {@code parentAppId}
+   * of an associated public namespace.
+   * <p>
+   * Default implementation falls back to {@link #getNamespace(String, String, String, String, boolean)}
+   * and ignores {@code extendInfo}, for backward compatibility with implementations written
+   * before this method was introduced. Implementations that support extendInfo should override
+   * this method directly.
+   * @since 2.6.0
+   */
+  default OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail, boolean extendInfo) {
+    return getNamespace(appId, env, clusterName, namespaceName, fillItemDetail);
+  }
+
   default List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName) {
     return getNamespaces(appId, env, clusterName, true);
   }
@@ -45,6 +59,20 @@ public interface NamespaceOpenApiService {
    * @since 2.4.0
    */
   List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail);
+
+  /**
+   * Retrieves a list namespaces, optionally including extra info such as {@code parentAppId}
+   * of an associated public namespace.
+   * <p>
+   * Default implementation falls back to {@link #getNamespaces(String, String, String, boolean)}
+   * and ignores {@code extendInfo}, for backward compatibility with implementations written
+   * before this method was introduced. Implementations that support extendInfo should override
+   * this method directly.
+   * @since 2.6.0
+   */
+  default List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail, boolean extendInfo) {
+    return getNamespaces(appId, env, clusterName, fillItemDetail);
+  }
 
   OpenAppNamespaceDTO createAppNamespace(OpenAppNamespaceDTO appNamespaceDTO);
 

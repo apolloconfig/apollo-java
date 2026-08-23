@@ -129,8 +129,47 @@ public class ApolloOpenApiMockIntegrationTest {
     assertEquals("GET", request.method);
     assertEquals("/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces/application",
         request.path);
-    assertEquals("fillItemDetail=true", request.query);
+    assertEquals("fillItemDetail=true&extendInfo=false", request.query);
     assertEquals("namespace-token", request.authorization);
+  }
+
+  @Test
+  public void shouldPassExtendInfoFlagAndParseItForGetNamespace() throws Exception {
+    handler.mock("GET", "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces/application",
+        200,
+        "{\"appId\":\"SampleApp\",\"clusterName\":\"default\",\"namespaceName\":\"application\","
+            + "\"extendInfo\":{\"parentAppId\":\"public-app\",\"isConfigHidden\":true,\"itemModifiedCnt\":3}}");
+    ApolloOpenApiClient client = newClient("namespace-extend-token");
+
+    OpenNamespaceDTO namespaceDTO = client
+        .getNamespace("SampleApp", "DEV", null, null, true, true);
+    CapturedRequest request = handler.awaitRequest(5, TimeUnit.SECONDS);
+
+    assertEquals("fillItemDetail=true&extendInfo=true", request.query);
+    assertNotNull(namespaceDTO.getExtendInfo());
+    assertEquals("public-app", namespaceDTO.getExtendInfo().getParentAppId());
+    assertEquals(Boolean.TRUE, namespaceDTO.getExtendInfo().getIsConfigHidden());
+    assertEquals(3, namespaceDTO.getExtendInfo().getItemModifiedCnt().intValue());
+  }
+
+  @Test
+  public void shouldPassExtendInfoFlagAndParseItForGetNamespaces() throws Exception {
+    handler.mock("GET", "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces",
+        200,
+        "[{\"appId\":\"SampleApp\",\"clusterName\":\"default\",\"namespaceName\":\"application\","
+            + "\"extendInfo\":{\"parentAppId\":\"public-app\",\"isConfigHidden\":false,\"itemModifiedCnt\":1}}]");
+    ApolloOpenApiClient client = newClient("namespaces-extend-token");
+
+    List<OpenNamespaceDTO> namespaceDTOs = client
+        .getNamespaces("SampleApp", "DEV", "default", true, true);
+    CapturedRequest request = handler.awaitRequest(5, TimeUnit.SECONDS);
+
+    assertEquals("fillItemDetail=true&extendInfo=true", request.query);
+    assertEquals(1, namespaceDTOs.size());
+    assertNotNull(namespaceDTOs.get(0).getExtendInfo());
+    assertEquals("public-app", namespaceDTOs.get(0).getExtendInfo().getParentAppId());
+    assertEquals(Boolean.FALSE, namespaceDTOs.get(0).getExtendInfo().getIsConfigHidden());
+    assertEquals(1, namespaceDTOs.get(0).getExtendInfo().getItemModifiedCnt().intValue());
   }
 
   @Test

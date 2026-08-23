@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ctrip.framework.apollo.openapi.dto.OpenAppNamespaceDTO;
+import com.ctrip.framework.apollo.openapi.dto.OpenNamespaceDTO;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -38,6 +39,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
   private String someCluster;
   private String someNamespace;
   private boolean fillItemDetail;
+  private boolean extendInfo;
 
   @Override
   @Before
@@ -77,9 +79,49 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpGet get = request.getValue();
 
-    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s?fillItemDetail=%s",
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s?fillItemDetail=%s&extendInfo=false",
                                someBaseUrl, someEnv, someAppId, someCluster, someNamespace, fillItemDetail),
                  get.getURI().toString());
+  }
+
+  @Test
+  public void testGetNamespaceWithExtendInfoTrue() throws Exception {
+    verifyGetNamespaceWithExtendInfo(true);
+  }
+
+  @Test
+  public void testGetNamespaceWithExtendInfoFalse() throws Exception {
+    verifyGetNamespaceWithExtendInfo(false);
+  }
+
+  private void verifyGetNamespaceWithExtendInfo(boolean extendInfoValue) throws Exception {
+    extendInfo = extendInfoValue;
+
+    final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
+
+    namespaceOpenApiService.getNamespace(someAppId, someEnv, someCluster, someNamespace, fillItemDetail, extendInfo);
+
+    verify(httpClient, times(1)).execute(request.capture());
+
+    HttpGet get = request.getValue();
+
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s?fillItemDetail=%s&extendInfo=%s",
+                               someBaseUrl, someEnv, someAppId, someCluster, someNamespace, fillItemDetail, extendInfo),
+                 get.getURI().toString());
+  }
+
+  @Test
+  public void testGetNamespaceDeserializesExtendInfo() throws Exception {
+    StringEntity responseEntity = new StringEntity(
+        "{\"appId\":\"someAppId\",\"extendInfo\":{\"parentAppId\":\"public-app\",\"isConfigHidden\":false,\"itemModifiedCnt\":2}}");
+    when(someHttpResponse.getEntity()).thenReturn(responseEntity);
+
+    OpenNamespaceDTO result = namespaceOpenApiService
+        .getNamespace(someAppId, someEnv, someCluster, someNamespace, true, true);
+
+    assertEquals("public-app", result.getExtendInfo().getParentAppId());
+    assertEquals(false, result.getExtendInfo().getIsConfigHidden());
+    assertEquals(2, result.getExtendInfo().getItemModifiedCnt().intValue());
   }
 
   @Test(expected = RuntimeException.class)
@@ -98,12 +140,12 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
   @Test
   public void testGetNamespaces() throws Exception {
-    verifyGetNamespace(true);
+    verifyGetNamespaces(true);
   }
 
   @Test
   public void testGetNamespacesWithFillItemDetailFalse() throws Exception {
-    verifyGetNamespace(false);
+    verifyGetNamespaces(false);
   }
 
 
@@ -122,7 +164,7 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
     HttpGet get = request.getValue();
 
     assertEquals(String
-                     .format("%s/envs/%s/apps/%s/clusters/%s/namespaces?fillItemDetail=%s", someBaseUrl, someEnv, someAppId, someCluster, fillItemDetail),
+                     .format("%s/envs/%s/apps/%s/clusters/%s/namespaces?fillItemDetail=%s&extendInfo=false", someBaseUrl, someEnv, someAppId, someCluster, fillItemDetail),
                  get.getURI().toString());
   }
 
@@ -131,6 +173,35 @@ public class NamespaceOpenApiServiceTest extends AbstractOpenApiServiceTest {
     when(statusLine.getStatusCode()).thenReturn(404);
 
     namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, true);
+  }
+
+  @Test
+  public void testGetNamespacesWithExtendInfoTrue() throws Exception {
+    verifyGetNamespacesWithExtendInfo(true);
+  }
+
+  @Test
+  public void testGetNamespacesWithExtendInfoFalse() throws Exception {
+    verifyGetNamespacesWithExtendInfo(false);
+  }
+
+  private void verifyGetNamespacesWithExtendInfo(boolean extendInfoValue) throws Exception {
+    extendInfo = extendInfoValue;
+
+    StringEntity responseEntity = new StringEntity("[]");
+    when(someHttpResponse.getEntity()).thenReturn(responseEntity);
+
+    final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
+
+    namespaceOpenApiService.getNamespaces(someAppId, someEnv, someCluster, fillItemDetail, extendInfo);
+
+    verify(httpClient, times(1)).execute(request.capture());
+
+    HttpGet get = request.getValue();
+
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces?fillItemDetail=%s&extendInfo=%s",
+                               someBaseUrl, someEnv, someAppId, someCluster, fillItemDetail, extendInfo),
+                 get.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)
