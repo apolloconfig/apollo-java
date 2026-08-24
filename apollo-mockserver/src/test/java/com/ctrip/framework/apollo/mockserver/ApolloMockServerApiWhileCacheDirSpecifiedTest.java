@@ -53,19 +53,21 @@ public class ApolloMockServerApiWhileCacheDirSpecifiedTest {
 
     ConfigUtil configUtil = spy(new ConfigUtil());
     doReturn(someAppId).when(configUtil).getAppId();
-    String defaultLocalCacheDir = ReflectionTestUtils.invokeMethod(configUtil, "getDefaultLocalCacheDir", new Object[]{});
+    String defaultLocalCacheDir =
+        ReflectionTestUtils.invokeMethod(configUtil, "getDefaultLocalCacheDir", new Object[] {});
     assertEquals(someCacheDir + "/" + someAppId, defaultLocalCacheDir);
 
     // LocalFileConfigRepository.CONFIG_DIR
-    LocalFileConfigRepository localFileConfigRepository = new LocalFileConfigRepository(someAppId, someNamespace);
+    LocalFileConfigRepository localFileConfigRepository =
+        new LocalFileConfigRepository(someAppId, someNamespace);
     Field FIELD_CONFIG_DIR = localFileConfigRepository.getClass().getDeclaredField("CONFIG_DIR");
     FIELD_CONFIG_DIR.setAccessible(true);
     String configDir = (String) FIELD_CONFIG_DIR.get(localFileConfigRepository);
 
     File someBaseDir = new File(defaultLocalCacheDir, configDir);
     someBaseDir.mkdirs();
-    File file = new File(someBaseDir, String.format("%s.properties", Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(
-            someAppId, "default", someNamespace)));
+    File file = new File(someBaseDir, String.format("%s.properties", Joiner
+        .on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).join(someAppId, "default", someNamespace)));
     try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), Charsets.UTF_8)) {
       writer.write(someKey + "=" + someValue);
     }

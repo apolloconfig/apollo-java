@@ -28,10 +28,9 @@ public class ApolloClientPropertiesFactory {
 
   public static final String PROPERTIES_PREFIX = "apollo.client";
 
-  public ApolloClientProperties createApolloClientProperties(
-      Binder binder,
+  public ApolloClientProperties createApolloClientProperties(Binder binder,
       BindHandler bindHandler) {
-    return binder.bind(PROPERTIES_PREFIX,
-        Bindable.of(ApolloClientProperties.class), bindHandler).orElse(null);
+    return binder.bind(PROPERTIES_PREFIX, Bindable.of(ApolloClientProperties.class), bindHandler)
+        .orElse(null);
   }
 }

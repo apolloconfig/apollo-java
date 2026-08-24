@@ -66,7 +66,8 @@ public class ApolloMockServerSpringIntegrationTest {
 
   @Test
   @DirtiesContext
-  public void testListenerTriggeredByAdd() throws InterruptedException, ExecutionException, TimeoutException {
+  public void testListenerTriggeredByAdd()
+      throws InterruptedException, ExecutionException, TimeoutException {
     embeddedApollo.addOrModifyProperty(otherNamespace, "someKey", "someValue");
     ConfigChangeEvent changeEvent = testBean.futureData.get(5000, TimeUnit.MILLISECONDS);
     assertEquals(otherNamespace, changeEvent.getNamespace());
@@ -89,7 +90,8 @@ public class ApolloMockServerSpringIntegrationTest {
     embeddedApollo.addOrModifyProperty(otherNamespace, "server.port", "8080");
     embeddedApollo.addOrModifyProperty(otherNamespace, "server.path", "/apollo");
     embeddedApollo.addOrModifyProperty(otherNamespace, "spring.application.name", "whatever");
-    ConfigChangeEvent changeEvent = testInterestedKeyPrefixesBean.futureData.get(5000, TimeUnit.MILLISECONDS);
+    ConfigChangeEvent changeEvent =
+        testInterestedKeyPrefixesBean.futureData.get(5000, TimeUnit.MILLISECONDS);
     assertEquals(otherNamespace, changeEvent.getNamespace());
     assertEquals("8080", changeEvent.getChange("server.port").getNewValue());
     assertEquals("/apollo", changeEvent.getChange("server.path").getNewValue());

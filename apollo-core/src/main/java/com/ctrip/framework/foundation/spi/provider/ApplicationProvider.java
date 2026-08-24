@@ -52,7 +52,7 @@ public interface ApplicationProvider extends Provider {
    *
    * @since 2.4.0
    */
-  default String getAccessKeySecret(String appId){
+  default String getAccessKeySecret(String appId) {
     return null;
   }
 }

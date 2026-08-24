@@ -56,8 +56,8 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
 
   @Test
   public void testGetConfig() throws Exception {
-    PropertiesCompatibleFileConfigRepository configFileRepository = new PropertiesCompatibleFileConfigRepository(
-        configFile);
+    PropertiesCompatibleFileConfigRepository configFileRepository =
+        new PropertiesCompatibleFileConfigRepository(configFile);
 
     assertSame(someProperties, configFileRepository.getConfig());
     verify(configFile, times(1)).addChangeListener(configFileRepository);
@@ -69,8 +69,8 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
 
     when(configFile.asProperties()).thenThrow(someException);
 
-    PropertiesCompatibleFileConfigRepository configFileRepository = new PropertiesCompatibleFileConfigRepository(
-        configFile);
+    PropertiesCompatibleFileConfigRepository configFileRepository =
+        new PropertiesCompatibleFileConfigRepository(configFile);
 
     Throwable exceptionThrown = null;
     try {
@@ -95,8 +95,8 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
   public void testGetConfigWithConfigFileReturnNullProperties() throws Exception {
     when(configFile.asProperties()).thenReturn(null);
 
-    PropertiesCompatibleFileConfigRepository configFileRepository = new PropertiesCompatibleFileConfigRepository(
-        configFile);
+    PropertiesCompatibleFileConfigRepository configFileRepository =
+        new PropertiesCompatibleFileConfigRepository(configFile);
 
     configFileRepository.getConfig();
   }
@@ -107,8 +107,8 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
 
     when(configFile.getSourceType()).thenReturn(someType);
 
-    PropertiesCompatibleFileConfigRepository configFileRepository = new PropertiesCompatibleFileConfigRepository(
-        configFile);
+    PropertiesCompatibleFileConfigRepository configFileRepository =
+        new PropertiesCompatibleFileConfigRepository(configFile);
 
     assertSame(someType, configFileRepository.getSourceType());
   }
@@ -120,8 +120,8 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
 
     RepositoryChangeListener someListener = mock(RepositoryChangeListener.class);
 
-    PropertiesCompatibleFileConfigRepository configFileRepository = new PropertiesCompatibleFileConfigRepository(
-        configFile);
+    PropertiesCompatibleFileConfigRepository configFileRepository =
+        new PropertiesCompatibleFileConfigRepository(configFile);
 
     configFileRepository.addChangeListener(someListener);
 
@@ -132,6 +132,7 @@ public class PropertiesCompatibleFileConfigRepositoryTest {
     configFileRepository.onChange(someChangeEvent);
 
     assertSame(anotherProperties, configFileRepository.getConfig());
-    verify(someListener, times(1)).onRepositoryChange(someAppId, someNamespaceName, anotherProperties);
+    verify(someListener, times(1)).onRepositoryChange(someAppId, someNamespaceName,
+        anotherProperties);
   }
 }

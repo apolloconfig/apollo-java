@@ -51,8 +51,8 @@ public class NamespaceOpenApiServiceTest {
   public void testGetNamespacesDefaultBridgeDelegatesToLegacyMethod() {
     LegacyNamespaceOpenApiService legacyService = new LegacyNamespaceOpenApiService();
 
-    List<OpenNamespaceDTO> result = legacyService.getNamespaces("someAppId", "someEnv",
-        "someCluster", false, true);
+    List<OpenNamespaceDTO> result =
+        legacyService.getNamespaces("someAppId", "someEnv", "someCluster", false, true);
 
     assertSame(legacyService.lastNamespacesResult, result);
     assertEquals(false, legacyService.lastFillItemDetail);

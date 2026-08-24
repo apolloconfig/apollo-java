@@ -116,4 +116,3 @@ public class ApolloWebClientHttpClientTest {
     private String value;
   }
 }
-

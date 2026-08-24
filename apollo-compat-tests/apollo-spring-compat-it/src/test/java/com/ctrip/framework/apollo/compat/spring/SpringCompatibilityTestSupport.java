@@ -38,8 +38,7 @@ final class SpringCompatibilityTestSupport {
   private static final String ORIGINAL_APP_ID = System.getProperty("app.id");
   private static final String ORIGINAL_ENV = System.getProperty("env");
 
-  private SpringCompatibilityTestSupport() {
-  }
+  private SpringCompatibilityTestSupport() {}
 
   static void beforeClass(EmbeddedApollo embeddedApollo) throws Exception {
     System.setProperty("app.id", "someAppId");
@@ -54,7 +53,8 @@ final class SpringCompatibilityTestSupport {
     resetApolloState();
   }
 
-  static void waitForCondition(String failureMessage, Callable<Boolean> condition) throws Exception {
+  static void waitForCondition(String failureMessage, Callable<Boolean> condition)
+      throws Exception {
     long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(15);
     while (System.currentTimeMillis() < deadline) {
       if (Boolean.TRUE.equals(condition.call())) {

@@ -24,36 +24,36 @@ import java.util.List;
  */
 public class OpenPageDTO<T> {
 
-    private final int page;
-    private final int size;
-    private final long total;
-    private final List<T> content;
+  private final int page;
+  private final int size;
+  private final long total;
+  private final List<T> content;
 
-    public OpenPageDTO(int page, int size, long total, List<T> content) {
-        this.page = page;
-        this.size = size;
-        this.total = total;
-        this.content = Collections.unmodifiableList(content);
-    }
+  public OpenPageDTO(int page, int size, long total, List<T> content) {
+    this.page = page;
+    this.size = size;
+    this.total = total;
+    this.content = Collections.unmodifiableList(content);
+  }
 
-    public int getPage() {
-        return page;
-    }
+  public int getPage() {
+    return page;
+  }
 
-    public int getSize() {
-        return size;
-    }
+  public int getSize() {
+    return size;
+  }
 
-    public long getTotal() {
-        return total;
-    }
+  public long getTotal() {
+    return total;
+  }
 
-    public List<T> getContent() {
-        return content;
-    }
+  public List<T> getContent() {
+    return content;
+  }
 
-    public boolean hasContent() {
-        return content != null && !content.isEmpty();
-    }
+  public boolean hasContent() {
+    return content != null && !content.isEmpty();
+  }
 
 }

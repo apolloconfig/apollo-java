@@ -34,8 +34,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 /**
  * @author vdisk <vdisk@foxmail.com>
  */
-public class ApolloClientLongPollingExtensionInitializer implements
-    ApolloClientExtensionInitializer {
+public class ApolloClientLongPollingExtensionInitializer
+    implements ApolloClientExtensionInitializer {
 
   private final Log log;
 
@@ -51,13 +51,12 @@ public class ApolloClientLongPollingExtensionInitializer implements
   public void initialize(ApolloClientProperties apolloClientProperties, Binder binder,
       BindHandler bindHandler) {
     WebClient.Builder webClientBuilder = WebClient.builder();
-    List<ApolloClientWebClientCustomizerFactory> factories = ServiceBootstrap
-        .loadAllOrdered(ApolloClientWebClientCustomizerFactory.class);
+    List<ApolloClientWebClientCustomizerFactory> factories =
+        ServiceBootstrap.loadAllOrdered(ApolloClientWebClientCustomizerFactory.class);
     if (!CollectionUtils.isEmpty(factories)) {
       for (ApolloClientWebClientCustomizerFactory factory : factories) {
-        Consumer<WebClient.Builder> webClientCustomizer = factory
-            .createWebClientCustomizer(apolloClientProperties, binder, bindHandler, this.log,
-                this.bootstrapContext);
+        Consumer<WebClient.Builder> webClientCustomizer = factory.createWebClientCustomizer(
+            apolloClientProperties, binder, bindHandler, this.log, this.bootstrapContext);
         if (webClientCustomizer != null) {
           webClientCustomizer.accept(webClientBuilder);
         }

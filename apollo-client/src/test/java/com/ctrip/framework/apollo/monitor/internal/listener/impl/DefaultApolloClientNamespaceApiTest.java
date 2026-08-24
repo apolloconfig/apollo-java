@@ -52,9 +52,8 @@ public class DefaultApolloClientNamespaceApiTest {
 
   @Test
   public void testCollectNamespaceNotFound() {
-    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
-        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND)
-        .putAttachment(NAMESPACE, "testNamespace");
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND).putAttachment(NAMESPACE, "testNamespace");
 
     namespaceApi.collect0(event);
 
@@ -63,9 +62,8 @@ public class DefaultApolloClientNamespaceApiTest {
 
   @Test
   public void testCollectNamespaceTimeout() {
-    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
-        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT)
-        .putAttachment(NAMESPACE, "testNamespace");
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT).putAttachment(NAMESPACE, "testNamespace");
 
     namespaceApi.collect0(event);
 
@@ -74,9 +72,8 @@ public class DefaultApolloClientNamespaceApiTest {
 
   @Test
   public void testCollectNormalNamespace() {
-    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
-        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
-        .putAttachment(NAMESPACE, "testNamespace");
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE).putAttachment(NAMESPACE, "testNamespace");
 
     namespaceApi.collect0(event);
 
@@ -96,9 +93,8 @@ public class DefaultApolloClientNamespaceApiTest {
   @Test
   public void testExportMetrics() {
     // Set up some initial state
-    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory
-        .getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
-        .putAttachment(NAMESPACE, "testNamespace");
+    ApolloClientMonitorEvent event = ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE).putAttachment(NAMESPACE, "testNamespace");
     namespaceApi.collect0(event);
 
     // Call the export method

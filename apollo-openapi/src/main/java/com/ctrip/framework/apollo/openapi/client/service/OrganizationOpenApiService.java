@@ -26,26 +26,25 @@ import org.apache.http.util.EntityUtils;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class OrganizationOpenApiService extends AbstractOpenApiService implements
-        com.ctrip.framework.apollo.openapi.api.OrganizationOpenApiService{
-    private static final Type ORGANIZATIONS_DTO_LIST_TYPE = new TypeToken<List<OpenOrganizationDto>>() {
-    }.getType();
+public class OrganizationOpenApiService extends AbstractOpenApiService
+    implements com.ctrip.framework.apollo.openapi.api.OrganizationOpenApiService {
+  private static final Type ORGANIZATIONS_DTO_LIST_TYPE =
+      new TypeToken<List<OpenOrganizationDto>>() {}.getType();
 
-    public OrganizationOpenApiService(CloseableHttpClient client, String baseUrl, Gson gson) {
-        super(client, baseUrl, gson);
+  public OrganizationOpenApiService(CloseableHttpClient client, String baseUrl, Gson gson) {
+    super(client, baseUrl, gson);
+  }
+
+  @Override
+  public List<OpenOrganizationDto> getOrganizations() {
+    OpenApiPathBuilder pathBuilder =
+        OpenApiPathBuilder.newBuilder().customResource("/organizations");
+
+    try (CloseableHttpResponse response = get(pathBuilder)) {
+      return gson.fromJson(EntityUtils.toString(response.getEntity()), ORGANIZATIONS_DTO_LIST_TYPE);
+    } catch (Throwable ex) {
+      throw new RuntimeException("get organizations information failed", ex);
     }
 
-    @Override
-    public List<OpenOrganizationDto> getOrganizations() {
-        OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder()
-                .customResource("/organizations");
-
-        try (CloseableHttpResponse response = get(pathBuilder)) {
-            return gson.fromJson(EntityUtils.toString(response.getEntity()), ORGANIZATIONS_DTO_LIST_TYPE);
-        } catch (Throwable ex) {
-            throw new RuntimeException("get organizations information failed", ex);
-        }
-
-    }
+  }
 }
-

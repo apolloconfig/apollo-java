@@ -42,7 +42,8 @@ public class ExceptionUtilTest {
     Throwable cause1 = new Throwable(causeMsg1, cause2);
     Throwable ex = new Throwable(someMessage, cause1);
 
-    String expected = someMessage + " [Cause: Throwable("+ causeMsg1 +") [Cause: Exception(" + causeMsg2 + ")]]";
+    String expected = someMessage + " [Cause: Throwable(" + causeMsg1 + ") [Cause: Exception("
+        + causeMsg2 + ")]]";
     assertEquals(expected, ExceptionUtil.getDetailMessage(ex));
   }
 

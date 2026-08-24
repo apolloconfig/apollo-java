@@ -49,7 +49,8 @@ public class ApolloClientMonitorConstant {
   public static final String APOLLO_CLIENT_NAMESPACE_NOT_FOUND = "Apollo.Client.NamespaceNotFound";
   public static final String APOLLO_CLIENT_NAMESPACE_TIMEOUT = "Apollo.Client.NamespaceTimeout";
   public static final String APOLLO_CLIENT_NAMESPACE_USAGE = "Apollo.Client.NamespaceUsage";
-  public static final String APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND = "Apollo.Client.NamespaceFirstLoadSpendTime";
+  public static final String APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND =
+      "Apollo.Client.NamespaceFirstLoadSpendTime";
 
   /**
    * listener tag
@@ -62,21 +63,31 @@ public class ApolloClientMonitorConstant {
   /**
    * metrics
    */
-  public static final String METRICS_NAMESPACE_LATEST_UPDATE_TIME = "apollo_client_namespace_latest_update_time";
+  public static final String METRICS_NAMESPACE_LATEST_UPDATE_TIME =
+      "apollo_client_namespace_latest_update_time";
   public static final String METRICS_NAMESPACE_ITEM_NUM = "apollo_client_namespace_item_num";
   public static final String METRICS_EXCEPTION_NUM = "apollo_client_exception_num";
-  public static final String METRICS_NAMESPACE_FIRST_LOAD_SPEND = "apollo_client_namespace_first_load_time_spend_in_ms";
+  public static final String METRICS_NAMESPACE_FIRST_LOAD_SPEND =
+      "apollo_client_namespace_first_load_time_spend_in_ms";
   public static final String METRICS_NAMESPACE_USAGE = "apollo_client_namespace_usage";
   public static final String METRICS_NAMESPACE_NOT_FOUND = "apollo_client_namespace_not_found";
   public static final String METRICS_NAMESPACE_TIMEOUT = "apollo_client_namespace_timeout";
   public static final String METRICS_THREAD_POOL_NAME = "thread_pool_name";
-  public static final String METRICS_THREAD_POOL_ACTIVE_TASK_COUNT = "apollo_client_thread_pool_active_task_count";
-  public static final String METRICS_THREAD_POOL_QUEUE_SIZE = "apollo_client_thread_pool_queue_size";
-  public static final String METRICS_THREAD_POOL_COMPLETED_TASK_COUNT = "apollo_client_thread_pool_completed_task_count";
+  public static final String METRICS_THREAD_POOL_ACTIVE_TASK_COUNT =
+      "apollo_client_thread_pool_active_task_count";
+  public static final String METRICS_THREAD_POOL_QUEUE_SIZE =
+      "apollo_client_thread_pool_queue_size";
+  public static final String METRICS_THREAD_POOL_COMPLETED_TASK_COUNT =
+      "apollo_client_thread_pool_completed_task_count";
   public static final String METRICS_THREAD_POOL_POOL_SIZE = "apollo_client_thread_pool_pool_size";
-  public static final String METRICS_THREAD_POOL_TOTAL_TASK_COUNT = "apollo_client_thread_pool_total_task_count";
-  public static final String METRICS_THREAD_POOL_CORE_POOL_SIZE = "apollo_client_thread_pool_core_pool_size";
-  public static final String METRICS_THREAD_POOL_MAXIMUM_POOL_SIZE = "apollo_client_thread_pool_maximum_pool_size";
-  public static final String METRICS_THREAD_POOL_LARGEST_POOL_SIZE = "apollo_client_thread_pool_largest_pool_size";
-  public static final String METRICS_THREAD_POOL_QUEUE_REMAINING_CAPACITY = "apollo_client_thread_pool_queue_remaining_capacity";
+  public static final String METRICS_THREAD_POOL_TOTAL_TASK_COUNT =
+      "apollo_client_thread_pool_total_task_count";
+  public static final String METRICS_THREAD_POOL_CORE_POOL_SIZE =
+      "apollo_client_thread_pool_core_pool_size";
+  public static final String METRICS_THREAD_POOL_MAXIMUM_POOL_SIZE =
+      "apollo_client_thread_pool_maximum_pool_size";
+  public static final String METRICS_THREAD_POOL_LARGEST_POOL_SIZE =
+      "apollo_client_thread_pool_largest_pool_size";
+  public static final String METRICS_THREAD_POOL_QUEUE_REMAINING_CAPACITY =
+      "apollo_client_thread_pool_queue_remaining_capacity";
 }

@@ -82,7 +82,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   private static final String ANOTHER_APP_ID = "someAppId2";
 
   private static <T> T getBean(Class<T> beanClass, Class<?>... annotatedClasses) {
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(annotatedClasses);
+    AnnotationConfigApplicationContext context =
+        new AnnotationConfigApplicationContext(annotatedClasses);
     return context.getBean(beanClass);
   }
 
@@ -117,7 +118,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
     mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
-    prepareYamlConfigFile(someAppId, APPLICATION_YAML_NAMESPACE, readYamlContentAsConfigFileProperties("case9.yml"));
+    prepareYamlConfigFile(someAppId, APPLICATION_YAML_NAMESPACE,
+        readYamlContentAsConfigFileProperties("case9.yml"));
 
     TestApolloConfigBean1 bean = getBean(TestApolloConfigBean1.class, AppConfig1.class);
 
@@ -145,7 +147,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
     mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
-    prepareYamlConfigFile(someAppId, APPLICATION_YAML_NAMESPACE, readYamlContentAsConfigFileProperties("case9.yml"));
+    prepareYamlConfigFile(someAppId, APPLICATION_YAML_NAMESPACE,
+        readYamlContentAsConfigFileProperties("case9.yml"));
 
     TestApolloChildConfigBean bean = getBean(TestApolloChildConfigBean.class, AppConfig6.class);
 
@@ -237,9 +240,10 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     ConfigChangeEvent someEvent = mock(ConfigChangeEvent.class);
     ConfigChangeEvent anotherEvent = mock(ConfigChangeEvent.class);
 
-    TestApolloConfigChangeListenerBean1 bean = getBean(TestApolloConfigChangeListenerBean1.class, AppConfig3.class);
+    TestApolloConfigChangeListenerBean1 bean =
+        getBean(TestApolloConfigChangeListenerBean1.class, AppConfig3.class);
 
-    //PropertySourcesProcessor add listeners to listen config changed of all namespace
+    // PropertySourcesProcessor add listeners to listen config changed of all namespace
     assertEquals(4, applicationListeners.size());
     assertEquals(1, fxApolloListeners.size());
 
@@ -310,9 +314,10 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     ConfigChangeEvent someEvent = mock(ConfigChangeEvent.class);
     ConfigChangeEvent anotherEvent = mock(ConfigChangeEvent.class);
 
-    TestApolloChildConfigChangeListener bean = getBean(TestApolloChildConfigChangeListener.class, AppConfig7.class);
+    TestApolloChildConfigChangeListener bean =
+        getBean(TestApolloChildConfigChangeListener.class, AppConfig7.class);
 
-    //PropertySourcesProcessor add listeners to listen config changed of all namespace
+    // PropertySourcesProcessor add listeners to listen config changed of all namespace
     assertEquals(5, applicationListeners.size());
     assertEquals(1, fxApolloListeners.size());
 
@@ -343,17 +348,17 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
     mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
-    TestApolloConfigChangeListenerWithInterestedKeysBean bean = getBean(
-        TestApolloConfigChangeListenerWithInterestedKeysBean.class, AppConfig8.class);
+    TestApolloConfigChangeListenerWithInterestedKeysBean bean =
+        getBean(TestApolloConfigChangeListenerWithInterestedKeysBean.class, AppConfig8.class);
 
     final ArgumentCaptor<Set> applicationConfigInterestedKeys = ArgumentCaptor.forClass(Set.class);
     final ArgumentCaptor<Set> fxApolloConfigInterestedKeys = ArgumentCaptor.forClass(Set.class);
 
-    verify(applicationConfig, times(2))
-        .addChangeListener(any(ConfigChangeListener.class), applicationConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
+    verify(applicationConfig, times(2)).addChangeListener(any(ConfigChangeListener.class),
+        applicationConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
 
-    verify(fxApolloConfig, times(1))
-        .addChangeListener(any(ConfigChangeListener.class), fxApolloConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
+    verify(fxApolloConfig, times(1)).addChangeListener(any(ConfigChangeListener.class),
+        fxApolloConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
 
     assertEquals(2, applicationConfigInterestedKeys.getAllValues().size());
 
@@ -365,7 +370,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     assertEquals(1, fxApolloConfigInterestedKeys.getAllValues().size());
 
-    assertEquals(Collections.singletonList(Sets.newHashSet("anotherKey")), fxApolloConfigInterestedKeys.getAllValues());
+    assertEquals(Collections.singletonList(Sets.newHashSet("anotherKey")),
+        fxApolloConfigInterestedKeys.getAllValues());
   }
 
   @Test
@@ -377,12 +383,11 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean bean = getBean(
         TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean.class, AppConfig10.class);
 
-    final ArgumentCaptor<Set> interestedKeyPrefixesArgumentCaptor = ArgumentCaptor
-        .forClass(Set.class);
+    final ArgumentCaptor<Set> interestedKeyPrefixesArgumentCaptor =
+        ArgumentCaptor.forClass(Set.class);
 
-    verify(applicationConfig, times(1))
-        .addChangeListener(any(ConfigChangeListener.class), Mockito.nullable(Set.class),
-            interestedKeyPrefixesArgumentCaptor.capture());
+    verify(applicationConfig, times(1)).addChangeListener(any(ConfigChangeListener.class),
+        Mockito.nullable(Set.class), interestedKeyPrefixesArgumentCaptor.capture());
 
     assertEquals(1, interestedKeyPrefixesArgumentCaptor.getAllValues().size());
 
@@ -400,20 +405,19 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     // just for speed up test without waiting
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, mock(Config.class));
 
-    SimpleConfig simpleConfig = spy(
-        this.prepareConfig(someAppId,
-                TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean1.SPECIAL_NAMESPACE,
-            new Properties()));
+    SimpleConfig simpleConfig = spy(this.prepareConfig(someAppId,
+        TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean1.SPECIAL_NAMESPACE,
+        new Properties()));
 
-    mockConfig(someAppId, TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean1.SPECIAL_NAMESPACE,
+    mockConfig(someAppId,
+        TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean1.SPECIAL_NAMESPACE,
         simpleConfig);
 
     TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean1 bean = getBean(
         TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean1.class, AppConfig11.class);
 
-    verify(simpleConfig, atLeastOnce())
-        .addChangeListener(any(ConfigChangeListener.class), Mockito.nullable(Set.class),
-            anySet());
+    verify(simpleConfig, atLeastOnce()).addChangeListener(any(ConfigChangeListener.class),
+        Mockito.nullable(Set.class), anySet());
 
     Properties properties = new Properties();
     properties.put("logging.level.com", "debug");
@@ -440,7 +444,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     YamlConfigFile configFile = prepareYamlConfigFile(someAppId, APPLICATION_YAML_NAMESPACE,
         readYamlContentAsConfigFileProperties("case9.yml"));
 
-    TestApolloConfigChangeListenerWithYamlFile bean = getBean(TestApolloConfigChangeListenerWithYamlFile.class, AppConfig9.class);
+    TestApolloConfigChangeListenerWithYamlFile bean =
+        getBean(TestApolloConfigChangeListenerWithYamlFile.class, AppConfig9.class);
 
     Config yamlConfig = bean.getYamlConfig();
     SettableFuture<ConfigChangeEvent> future = bean.getConfigChangeEventFuture();
@@ -448,7 +453,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     assertEquals(someValue, yamlConfig.getProperty(someKey, null));
     assertFalse(future.isDone());
 
-    configFile.onRepositoryChange(someAppId, APPLICATION_YAML_NAMESPACE, readYamlContentAsConfigFileProperties("case9-new.yml"));
+    configFile.onRepositoryChange(someAppId, APPLICATION_YAML_NAMESPACE,
+        readYamlContentAsConfigFileProperties("case9-new.yml"));
 
     ConfigChangeEvent configChangeEvent = future.get(100, TimeUnit.MILLISECONDS);
     ConfigChange change = configChangeEvent.getChange(someKey);
@@ -471,7 +477,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     // Because Configutil has been initialized a long time ago,
     // setting this system variable does not cause configutil to reload,
     // thereby getting the value of this system variable.
-    // Therefore, we need to re -initialize the Configutil here to get the value of the system variable loaded to the configutil.
+    // Therefore, we need to re -initialize the Configutil here to get the value of the system
+    // variable loaded to the configutil.
     MockConfigUtil configUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, configUtil);
 
@@ -530,7 +537,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     Config appConfig = mock(Config.class);
     mockConfig(someAppId, "app", appConfig);
 
-    getSimpleBean(TestApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue.class);
+    getSimpleBean(
+        TestApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue.class);
 
     verify(app1Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
     verify(app2Config, times(1)).addChangeListener(any(ConfigChangeListener.class));
@@ -591,7 +599,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, mock(Config.class));
 
     final String resolvedValue = "resolve.from.self.yml";
-    YamlConfigFile yamlConfigFile = prepareYamlConfigFile(someAppId, resolvedValue, readYamlContentAsConfigFileProperties(resolvedValue));
+    YamlConfigFile yamlConfigFile = prepareYamlConfigFile(someAppId, resolvedValue,
+        readYamlContentAsConfigFileProperties(resolvedValue));
     getSimpleBean(TestApolloConfigChangeListenerResolveExpressionFromSelfYamlConfiguration.class);
     verify(yamlConfigFile, times(1)).addChangeListener(any(ConfigFileChangeListener.class));
   }
@@ -603,8 +612,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     Config yamlConfig = mock(Config.class);
     mockConfig(someAppId, "default-2020-11-14-1733", defaultConfig);
     mockConfig(someAppId, APPLICATION_YAML_NAMESPACE, yamlConfig);
-    TestApolloConfigResolveExpressionDefaultConfiguration configuration = getSimpleBean(
-        TestApolloConfigResolveExpressionDefaultConfiguration.class);
+    TestApolloConfigResolveExpressionDefaultConfiguration configuration =
+        getSimpleBean(TestApolloConfigResolveExpressionDefaultConfiguration.class);
     assertSame(defaultConfig, configuration.getDefaultConfig());
     assertSame(yamlConfig, configuration.getYamlConfig());
   }
@@ -621,8 +630,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     Config yamlConfig = mock(Config.class);
     mockConfig(someAppId, namespaceName, config);
     mockConfig(someAppId, yamlNamespaceName, yamlConfig);
-    TestApolloConfigResolveExpressionFromSystemPropertyConfiguration configuration = getSimpleBean(
-        TestApolloConfigResolveExpressionFromSystemPropertyConfiguration.class);
+    TestApolloConfigResolveExpressionFromSystemPropertyConfiguration configuration =
+        getSimpleBean(TestApolloConfigResolveExpressionFromSystemPropertyConfiguration.class);
     assertSame(config, configuration.getConfig());
     assertSame(yamlConfig, configuration.getYamlConfig());
   }
@@ -641,16 +650,18 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     {
       // hide variable scope
       Properties properties = new Properties();
-      properties.setProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY, namespaceName);
-      properties.setProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY_YAML, yamlNamespaceName);
+      properties.setProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY,
+          namespaceName);
+      properties.setProperty(SystemPropertyKeyConstants.FROM_NAMESPACE_APPLICATION_KEY_YAML,
+          yamlNamespaceName);
       this.prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, properties);
     }
     final Config config = mock(Config.class);
     final Config yamlConfig = mock(Config.class);
     mockConfig(someAppId, namespaceName, config);
     mockConfig(someAppId, yamlNamespaceName, yamlConfig);
-    TestApolloConfigResolveExpressionFromApolloConfigNamespaceApplication configuration = getSimpleBean(
-        TestApolloConfigResolveExpressionFromApolloConfigNamespaceApplication.class);
+    TestApolloConfigResolveExpressionFromApolloConfigNamespaceApplication configuration =
+        getSimpleBean(TestApolloConfigResolveExpressionFromApolloConfigNamespaceApplication.class);
     assertSame(config, configuration.getConfig());
     assertSame(yamlConfig, configuration.getYamlConfig());
   }
@@ -667,9 +678,11 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig("someAppId2", "namespace2", multipleConfig);
     mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
-    prepareYamlConfigFile(someAppId, APPLICATION_YAML_NAMESPACE, readYamlContentAsConfigFileProperties("case9.yml"));
+    prepareYamlConfigFile(someAppId, APPLICATION_YAML_NAMESPACE,
+        readYamlContentAsConfigFileProperties("case9.yml"));
 
-    TestApolloConfigBean5 bean = getBean(TestApolloConfigBean5.class, TestApolloMultipleConfig.class);
+    TestApolloConfigBean5 bean =
+        getBean(TestApolloConfigBean5.class, TestApolloMultipleConfig.class);
 
     assertEquals(applicationConfig, bean.getConfig());
     assertEquals(multipleConfig, bean.getMultipleConfig());
@@ -702,13 +715,14 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
     mockConfig("someAppId2", "namespace2", anotherAppConfig);
 
-    getBean(TestApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppIdBean.class, AppConfig13.class);
+    getBean(TestApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppIdBean.class,
+        AppConfig13.class);
 
-    final ArgumentCaptor<Set> interestedKeyPrefixesArgumentCaptor = ArgumentCaptor.forClass(Set.class);
+    final ArgumentCaptor<Set> interestedKeyPrefixesArgumentCaptor =
+        ArgumentCaptor.forClass(Set.class);
 
-    verify(anotherAppConfig, times(1))
-        .addChangeListener(any(ConfigChangeListener.class), Mockito.nullable(Set.class),
-            interestedKeyPrefixesArgumentCaptor.capture());
+    verify(anotherAppConfig, times(1)).addChangeListener(any(ConfigChangeListener.class),
+        Mockito.nullable(Set.class), interestedKeyPrefixesArgumentCaptor.capture());
 
     assertEquals(1, interestedKeyPrefixesArgumentCaptor.getAllValues().size());
     assertEquals(Sets.newHashSet("redis.cache.", "logging."),
@@ -719,11 +733,11 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   public void testApolloConfigChangeListenerWithAppIdRuntimeRefresh() throws Exception {
     SimpleConfig defaultAppConfig = prepareConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION,
         assembleProperties("runtime.default.timeout", "30"));
-    SimpleConfig anotherAppConfig = prepareConfig(ANOTHER_APP_ID, ConfigConsts.NAMESPACE_APPLICATION,
-        assembleProperties("runtime.another.timeout", "66"));
+    SimpleConfig anotherAppConfig = prepareConfig(ANOTHER_APP_ID,
+        ConfigConsts.NAMESPACE_APPLICATION, assembleProperties("runtime.another.timeout", "66"));
 
-    TestApolloRuntimeListenerRoutingBean bean = getBean(
-        TestApolloRuntimeListenerRoutingBean.class, TestApolloRuntimeListenerRoutingConfiguration.class);
+    TestApolloRuntimeListenerRoutingBean bean = getBean(TestApolloRuntimeListenerRoutingBean.class,
+        TestApolloRuntimeListenerRoutingConfiguration.class);
 
     assertEquals(30, bean.getTimeout());
 
@@ -842,8 +856,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   static class TestApolloConfigChangeListenerResolveExpressionSimpleConfiguration {
 
     @ApolloConfigChangeListener("${simple.application:application}")
-    private void onChange(ConfigChangeEvent event) {
-    }
+    private void onChange(ConfigChangeEvent event) {}
   }
 
   @Configuration
@@ -851,17 +864,16 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   static class TestApolloConfigChangeListenerWithCommaSeparatedNameSpaces {
 
     @ApolloConfigChangeListener("${" + SystemPropertyKeyConstants.DELIMITED_NAMESPACES + "}")
-    private void onChange(ConfigChangeEvent changeEvent) {
-    }
+    private void onChange(ConfigChangeEvent changeEvent) {}
   }
 
   @Configuration
   @EnableApolloConfig
   static class TestApolloConfigChangeListenerWithCommaSeparatedNameSpacesMergedWithOnesInValue {
 
-    @ApolloConfigChangeListener(value = {"app", "${" + SystemPropertyKeyConstants.DELIMITED_NAMESPACES + "}"})
-    private void onChange(ConfigChangeEvent changeEvent) {
-    }
+    @ApolloConfigChangeListener(
+        value = {"app", "${" + SystemPropertyKeyConstants.DELIMITED_NAMESPACES + "}"})
+    private void onChange(ConfigChangeEvent changeEvent) {}
   }
 
   @Configuration
@@ -869,27 +881,23 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   static class TestApolloConfigChangeListenerResolveExpressionFromSystemPropertyConfiguration {
 
     @ApolloConfigChangeListener("${redis.namespace}")
-    private void onChange(ConfigChangeEvent event) {
-    }
+    private void onChange(ConfigChangeEvent event) {}
   }
 
   @Configuration
   @EnableApolloConfig
   static class TestApolloConfigChangeListenerResolveExpressionFromApplicationNamespaceConfiguration {
 
-    @ApolloConfigChangeListener(value = {ConfigConsts.NAMESPACE_APPLICATION,
-        "${mysql.namespace}"})
-    private void onChange(ConfigChangeEvent event) {
-    }
+    @ApolloConfigChangeListener(value = {ConfigConsts.NAMESPACE_APPLICATION, "${mysql.namespace}"})
+    private void onChange(ConfigChangeEvent event) {}
   }
 
   @Configuration
   @EnableApolloConfig
   static class TestApolloConfigChangeListenerUnresolvedPlaceholderConfiguration {
-    @ApolloConfigChangeListener(value = {ConfigConsts.NAMESPACE_APPLICATION,
-        "${i.can.not.be.resolved}"})
-    private void onChange(ConfigChangeEvent event) {
-    }
+    @ApolloConfigChangeListener(
+        value = {ConfigConsts.NAMESPACE_APPLICATION, "${i.can.not.be.resolved}"})
+    private void onChange(ConfigChangeEvent event) {}
   }
 
   @Configuration
@@ -900,8 +908,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
      * value in file src/test/resources/spring/yaml/resolve.from.self.yml
      */
     @ApolloConfigChangeListener("${i.can.resolve.from.self}")
-    private void onChange(ConfigChangeEvent event) {
-    }
+    private void onChange(ConfigChangeEvent event) {}
   }
 
   @Configuration
@@ -1157,18 +1164,18 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   private static class TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean {
 
     @ApolloConfigChangeListener(interestedKeyPrefixes = {"number", "logging.level"})
-    private void onChange(ConfigChangeEvent changeEvent) {
-    }
+    private void onChange(ConfigChangeEvent changeEvent) {}
   }
 
   private static class TestApolloConfigChangeListenerWithInterestedKeyPrefixesBean1 {
 
     static final String SPECIAL_NAMESPACE = "special-namespace-2021";
 
-    private final BlockingQueue<ConfigChangeEvent> configChangeEventQueue = new ArrayBlockingQueue<>(100);
+    private final BlockingQueue<ConfigChangeEvent> configChangeEventQueue =
+        new ArrayBlockingQueue<>(100);
 
-    @ApolloConfigChangeListener(value = SPECIAL_NAMESPACE, interestedKeyPrefixes = {"number",
-        "logging.level"})
+    @ApolloConfigChangeListener(value = SPECIAL_NAMESPACE,
+        interestedKeyPrefixes = {"number", "logging.level"})
     private void onChange(ConfigChangeEvent changeEvent) {
       this.configChangeEventQueue.add(changeEvent);
     }
@@ -1202,21 +1209,19 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   static class TestApolloConfigChangeListenerWithAppIdBean {
 
     @ApolloConfigChangeListener(appId = "someAppId2", value = "namespace2")
-    private void onChange(ConfigChangeEvent changeEvent) {
-    }
+    private void onChange(ConfigChangeEvent changeEvent) {}
   }
 
   static class TestApolloConfigChangeListenerWithInterestedKeyPrefixesAndAppIdBean {
 
     @ApolloConfigChangeListener(appId = "someAppId2", value = "namespace2",
         interestedKeyPrefixes = {"redis.cache.", "logging."})
-    private void onChange(ConfigChangeEvent changeEvent) {
-    }
+    private void onChange(ConfigChangeEvent changeEvent) {}
   }
 
   @Configuration
-  @EnableApolloConfig(multipleConfigs = {
-      @MultipleConfig(appId = ANOTHER_APP_ID, namespaces = {ConfigConsts.NAMESPACE_APPLICATION}, order = 9)})
+  @EnableApolloConfig(multipleConfigs = {@MultipleConfig(appId = ANOTHER_APP_ID,
+      namespaces = {ConfigConsts.NAMESPACE_APPLICATION}, order = 9)})
   static class TestApolloRuntimeListenerRoutingConfiguration {
 
     @Bean
@@ -1241,7 +1246,8 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
       defaultEvents.offer(event);
     }
 
-    @ApolloConfigChangeListener(appId = ANOTHER_APP_ID, interestedKeyPrefixes = {"runtime.another."})
+    @ApolloConfigChangeListener(appId = ANOTHER_APP_ID,
+        interestedKeyPrefixes = {"runtime.another."})
     private void onAnotherAppChange(ConfigChangeEvent event) {
       anotherAppEvents.offer(event);
     }
@@ -1264,17 +1270,16 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   static class TestApolloConfigChangeListenerResolveAppIdFromSystemPropertyConfiguration {
 
     @ApolloConfigChangeListener(appId = "${listener.appid}", value = "${listener.namespace}")
-    private void onChange(ConfigChangeEvent changeEvent) {
-    }
+    private void onChange(ConfigChangeEvent changeEvent) {}
   }
 
   @Configuration
   @EnableApolloConfig(value = {"FX_APOLLO_NAMESPACE", "APPLICATION_YAML_NAMESPACE"},
       multipleConfigs = {@MultipleConfig(appId = "someAppId2", namespaces = {"namespace2"})})
-  static class TestApolloMultipleConfig{
+  static class TestApolloMultipleConfig {
 
     @Bean
-    public TestApolloConfigBean5 bean(){
+    public TestApolloConfigBean5 bean() {
       return new TestApolloConfigBean5();
     }
 
@@ -1283,7 +1288,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   static class TestApolloConfigBean5 {
     @ApolloConfig
     private Config config;
-    @ApolloConfig(appId = "someAppId2",value = "namespace2")
+    @ApolloConfig(appId = "someAppId2", value = "namespace2")
     private Config multipleConfig;
     @ApolloConfig(FX_APOLLO_NAMESPACE)
     private Config yetAnotherConfig;

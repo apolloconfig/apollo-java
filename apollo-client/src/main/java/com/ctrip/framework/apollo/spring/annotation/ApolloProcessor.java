@@ -63,7 +63,7 @@ public abstract class ApolloProcessor implements BeanPostProcessor, PriorityOrde
 
   @Override
   public int getOrder() {
-    //make it as late as possible
+    // make it as late as possible
     return Ordered.LOWEST_PRECEDENCE;
   }
 

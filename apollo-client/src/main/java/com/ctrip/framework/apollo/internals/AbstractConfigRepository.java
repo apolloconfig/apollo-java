@@ -35,7 +35,8 @@ import com.google.common.collect.Lists;
 public abstract class AbstractConfigRepository implements ConfigRepository {
   private static final Logger logger = LoggerFactory.getLogger(AbstractConfigRepository.class);
   private List<RepositoryChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
-  protected PropertiesFactory propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
+  protected PropertiesFactory propertiesFactory =
+      ApolloInjector.getInstance(PropertiesFactory.class);
 
   protected boolean trySync() {
     try {
@@ -43,9 +44,8 @@ public abstract class AbstractConfigRepository implements ConfigRepository {
       return true;
     } catch (Throwable ex) {
       Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
-      logger
-          .warn("Sync config failed, will retry. Repository {}, reason: {}", this.getClass(), ExceptionUtil
-              .getDetailMessage(ex));
+      logger.warn("Sync config failed, will retry. Repository {}, reason: {}", this.getClass(),
+          ExceptionUtil.getDetailMessage(ex));
     }
     return false;
   }

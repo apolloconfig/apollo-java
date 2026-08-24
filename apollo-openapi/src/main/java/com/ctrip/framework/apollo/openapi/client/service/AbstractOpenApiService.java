@@ -67,7 +67,8 @@ abstract class AbstractOpenApiService {
     return execute(delete);
   }
 
-  private CloseableHttpResponse execute(HttpEntityEnclosingRequestBase requestBase, Object entity) throws IOException {
+  private CloseableHttpResponse execute(HttpEntityEnclosingRequestBase requestBase, Object entity)
+      throws IOException {
     requestBase.setEntity(new StringEntity(gson.toJson(entity), ContentType.APPLICATION_JSON));
 
     return execute(requestBase);
@@ -91,7 +92,7 @@ abstract class AbstractOpenApiService {
     try {
       message = EntityUtils.toString(response.getEntity());
     } catch (IOException e) {
-      //ignore
+      // ignore
     }
 
     throw new ApolloOpenApiException(status.getStatusCode(), status.getReasonPhrase(), message);
@@ -102,7 +103,8 @@ abstract class AbstractOpenApiService {
   }
 
   protected void checkNotEmpty(String value, String name) {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(value), name + " should not be null or empty");
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(value),
+        name + " should not be null or empty");
   }
 
   protected void checkPage(int page) {

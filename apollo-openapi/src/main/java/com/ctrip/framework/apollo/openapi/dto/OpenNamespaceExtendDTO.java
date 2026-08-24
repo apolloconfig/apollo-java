@@ -55,10 +55,7 @@ public class OpenNamespaceExtendDTO {
 
   @Override
   public String toString() {
-    return "OpenNamespaceExtendDTO{" +
-        "isConfigHidden=" + isConfigHidden +
-        ", parentAppId='" + parentAppId + '\'' +
-        ", itemModifiedCnt=" + itemModifiedCnt +
-        '}';
+    return "OpenNamespaceExtendDTO{" + "isConfigHidden=" + isConfigHidden + ", parentAppId='"
+        + parentAppId + '\'' + ", itemModifiedCnt=" + itemModifiedCnt + '}';
   }
 }

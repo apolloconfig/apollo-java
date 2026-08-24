@@ -39,7 +39,8 @@ import reactor.core.publisher.Mono;
  */
 public class ApolloWebClientHttpClient implements HttpClient {
 
-  private static final Method CLIENT_RESPONSE_STATUS_CODE_METHOD = resolveClientResponseStatusCodeMethod();
+  private static final Method CLIENT_RESPONSE_STATUS_CODE_METHOD =
+      resolveClientResponseStatusCodeMethod();
   private static final ConcurrentMap<Class<?>, Method> STATUS_CODE_VALUE_METHOD_CACHE =
       new ConcurrentHashMap<Class<?>, Method>();
 
@@ -64,8 +65,8 @@ public class ApolloWebClientHttpClient implements HttpClient {
 
   private <T> HttpResponse<T> doGetInternal(HttpRequest httpRequest, Type responseType)
       throws ApolloConfigException {
-    WebClient.RequestHeadersSpec<?> requestHeadersSpec = this.webClient.get()
-        .uri(URI.create(httpRequest.getUrl()));
+    WebClient.RequestHeadersSpec<?> requestHeadersSpec =
+        this.webClient.get().uri(URI.create(httpRequest.getUrl()));
     if (!CollectionUtils.isEmpty(httpRequest.getHeaders())) {
       for (Map.Entry<String, String> entry : httpRequest.getHeaders().entrySet()) {
         requestHeadersSpec.header(entry.getKey(), entry.getValue());
@@ -74,9 +75,8 @@ public class ApolloWebClientHttpClient implements HttpClient {
     return requestHeadersSpec.exchangeToMono(clientResponse -> {
       int statusCode = this.resolveStatusCode(clientResponse);
       if (HttpStatus.OK.value() == statusCode) {
-        return clientResponse.bodyToMono(String.class)
-            .map(body -> new HttpResponse<T>(HttpStatus.OK.value(),
-                gson.fromJson(body, responseType)));
+        return clientResponse.bodyToMono(String.class).map(
+            body -> new HttpResponse<T>(HttpStatus.OK.value(), gson.fromJson(body, responseType)));
       }
       if (HttpStatus.NOT_MODIFIED.value() == statusCode) {
         return Mono.just(new HttpResponse<T>(HttpStatus.NOT_MODIFIED.value(), null));
@@ -104,7 +104,8 @@ public class ApolloWebClientHttpClient implements HttpClient {
     try {
       Object statusCode = CLIENT_RESPONSE_STATUS_CODE_METHOD.invoke(clientResponse);
       if (statusCode == null) {
-        throw new ApolloConfigException("Failed to resolve response status code: statusCode is null");
+        throw new ApolloConfigException(
+            "Failed to resolve response status code: statusCode is null");
       }
       Method valueMethod = STATUS_CODE_VALUE_METHOD_CACHE.computeIfAbsent(statusCode.getClass(),
           ApolloWebClientHttpClient::resolveStatusCodeValueMethod);
@@ -127,7 +128,8 @@ public class ApolloWebClientHttpClient implements HttpClient {
     try {
       return statusCodeType.getMethod("value");
     } catch (NoSuchMethodException ex) {
-      throw new IllegalStateException("Failed to resolve value() method from " + statusCodeType, ex);
+      throw new IllegalStateException("Failed to resolve value() method from " + statusCodeType,
+          ex);
     }
   }
 }

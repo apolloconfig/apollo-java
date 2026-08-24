@@ -82,16 +82,15 @@ public class AbstractApolloClientMetricsExporterTest {
 
   @Test
   public void testRegisterSampleCounter() {
-    CounterModel counterModel = (CounterModel) CounterModel.create("testCounter", 5.0)
-        .putTag("key", "value");
+    CounterModel counterModel =
+        (CounterModel) CounterModel.create("testCounter", 5.0).putTag("key", "value");
     exporter.registerSample(counterModel);
   }
 
   private class TestMetricsExporter extends AbstractApolloClientMetricsExporter {
 
     @Override
-    protected void doInit() {
-    }
+    protected void doInit() {}
 
     public List<ApolloClientMonitorEventListener> getCollectors() {
       return listeners;

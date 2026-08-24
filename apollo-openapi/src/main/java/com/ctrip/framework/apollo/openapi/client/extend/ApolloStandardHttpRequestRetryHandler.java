@@ -37,11 +37,8 @@ public class ApolloStandardHttpRequestRetryHandler extends DefaultHttpRequestRet
   private final Set<String> idempotentMethods;
 
   public ApolloStandardHttpRequestRetryHandler(int retryCount, IdempotentHttpMethod[] httpMethods) {
-    super(retryCount, false, Arrays.asList(
-        UnknownHostException.class,
-        ConnectException.class,
-        NoRouteToHostException.class,
-        SSLException.class));
+    super(retryCount, false, Arrays.asList(UnknownHostException.class, ConnectException.class,
+        NoRouteToHostException.class, SSLException.class));
     this.idempotentMethods = new HashSet<>();
     if (httpMethods == null || httpMethods.length == 0) {
       // default set safe idempotent http method

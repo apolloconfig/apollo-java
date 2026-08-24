@@ -41,7 +41,7 @@ public interface ConfigFile {
    *
    * @since 2.4.0
    */
-  default String getAppId(){
+  default String getAppId() {
     return null;
   }
 

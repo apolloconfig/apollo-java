@@ -74,7 +74,8 @@ public class DefaultConfigRegistryTest {
     }
 
     @Override
-    public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+    public ConfigFile createConfigFile(String appId, String namespace,
+        ConfigFileFormat configFileFormat) {
       return null;
     }
   }

@@ -45,7 +45,8 @@ public class SpringValueRegistry {
     if (!registry.containsKey(beanFactory)) {
       synchronized (LOCK) {
         if (!registry.containsKey(beanFactory)) {
-          registry.put(beanFactory, Multimaps.synchronizedListMultimap(LinkedListMultimap.create()));
+          registry.put(beanFactory,
+              Multimaps.synchronizedListMultimap(LinkedListMultimap.create()));
         }
       }
     }
@@ -67,8 +68,9 @@ public class SpringValueRegistry {
   }
 
   private void initialize() {
-    Executors.newSingleThreadScheduledExecutor(ApolloThreadFactory.create("SpringValueRegistry", true)).scheduleAtFixedRate(
-        new Runnable() {
+    Executors
+        .newSingleThreadScheduledExecutor(ApolloThreadFactory.create("SpringValueRegistry", true))
+        .scheduleAtFixedRate(new Runnable() {
           @Override
           public void run() {
             try {
@@ -85,8 +87,8 @@ public class SpringValueRegistry {
     while (!Thread.currentThread().isInterrupted() && iterator.hasNext()) {
       Multimap<String, SpringValue> springValues = iterator.next();
       synchronized (springValues) {
-        Iterator<Entry<String, SpringValue>> springValueIterator = springValues.entries()
-            .iterator();
+        Iterator<Entry<String, SpringValue>> springValueIterator =
+            springValues.entries().iterator();
         while (springValueIterator.hasNext()) {
           Entry<String, SpringValue> springValue = springValueIterator.next();
           if (!springValue.getValue().isTargetBeanValid()) {

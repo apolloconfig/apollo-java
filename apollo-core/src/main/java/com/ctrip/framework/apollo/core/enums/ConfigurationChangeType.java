@@ -28,8 +28,8 @@ public enum ConfigurationChangeType {
   ADDED, MODIFIED, DELETED, UNKNOWN;
 
   public static ConfigurationChangeType fromString(String changeType) {
-    ConfigurationChangeType configurationChangeType = ConfigurationChangeTypeUtils.transformChangeType(
-        changeType);
+    ConfigurationChangeType configurationChangeType =
+        ConfigurationChangeTypeUtils.transformChangeType(changeType);
     Preconditions.checkArgument(configurationChangeType != UNKNOWN,
         String.format("ConfigurationChangeType %s is invalid", changeType));
     return configurationChangeType;

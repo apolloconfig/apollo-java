@@ -45,7 +45,7 @@ public interface ApolloClientWebClientCustomizerFactory extends Ordered {
    * @return customizer instance or null
    */
   @Nullable
-  Consumer<WebClient.Builder> createWebClientCustomizer(ApolloClientProperties apolloClientProperties,
-      Binder binder, BindHandler bindHandler, Log log,
-      Object bootstrapContext);
+  Consumer<WebClient.Builder> createWebClientCustomizer(
+      ApolloClientProperties apolloClientProperties, Binder binder, BindHandler bindHandler,
+      Log log, Object bootstrapContext);
 }

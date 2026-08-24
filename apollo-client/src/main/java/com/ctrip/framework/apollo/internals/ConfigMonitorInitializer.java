@@ -46,8 +46,8 @@ import java.util.List;
  */
 public class ConfigMonitorInitializer {
 
-  private static final ApolloClientMonitorContext MONITOR_CONTEXT = ApolloInjector.getInstance(
-      ApolloClientMonitorContext.class);
+  private static final ApolloClientMonitorContext MONITOR_CONTEXT =
+      ApolloInjector.getInstance(ApolloClientMonitorContext.class);
   protected static volatile boolean hasInitialized = false;
   private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
@@ -71,45 +71,42 @@ public class ConfigMonitorInitializer {
 
   private static void initializeJmxMonitoring() {
     if (m_configUtil.isClientMonitorJmxEnabled()) {
-      MONITOR_CONTEXT.getApolloClientMonitorEventListeners().forEach(metricsListener ->
-          ApolloClientJmxMBeanRegister.register(
-              MBEAN_NAME + metricsListener.getName(), metricsListener)
-      );
+      MONITOR_CONTEXT.getApolloClientMonitorEventListeners()
+          .forEach(metricsListener -> ApolloClientJmxMBeanRegister
+              .register(MBEAN_NAME + metricsListener.getName(), metricsListener));
     }
   }
 
   private static void initializeMetricsEventListener() {
-    ConfigManager configManager = ApolloInjector.getInstance(
-        ConfigManager.class);
-    DefaultApolloClientBootstrapArgsApi defaultApolloClientBootstrapArgsApi = new DefaultApolloClientBootstrapArgsApi(
-        m_configUtil);
-    DefaultApolloClientExceptionApi defaultApolloClientExceptionApi = new DefaultApolloClientExceptionApi(m_configUtil);
-    DefaultApolloClientNamespaceApi defaultApolloClientNamespaceApi = new DefaultApolloClientNamespaceApi(
-        configManager);
-    DefaultApolloClientThreadPoolApi defaultApolloClientThreadPoolApi = new DefaultApolloClientThreadPoolApi(
-        RemoteConfigRepository.m_executorService,
-        AbstractConfig.m_executorService, AbstractConfigFile.m_executorService,
-        AbstractApolloClientMetricsExporter.m_executorService);
+    ConfigManager configManager = ApolloInjector.getInstance(ConfigManager.class);
+    DefaultApolloClientBootstrapArgsApi defaultApolloClientBootstrapArgsApi =
+        new DefaultApolloClientBootstrapArgsApi(m_configUtil);
+    DefaultApolloClientExceptionApi defaultApolloClientExceptionApi =
+        new DefaultApolloClientExceptionApi(m_configUtil);
+    DefaultApolloClientNamespaceApi defaultApolloClientNamespaceApi =
+        new DefaultApolloClientNamespaceApi(configManager);
+    DefaultApolloClientThreadPoolApi defaultApolloClientThreadPoolApi =
+        new DefaultApolloClientThreadPoolApi(RemoteConfigRepository.m_executorService,
+            AbstractConfig.m_executorService, AbstractConfigFile.m_executorService,
+            AbstractApolloClientMetricsExporter.m_executorService);
 
     MONITOR_CONTEXT.setApolloClientBootstrapArgsMonitorApi(defaultApolloClientBootstrapArgsApi);
     MONITOR_CONTEXT.setApolloClientExceptionMonitorApi(defaultApolloClientExceptionApi);
     MONITOR_CONTEXT.setApolloClientNamespaceMonitorApi(defaultApolloClientNamespaceApi);
     MONITOR_CONTEXT.setApolloClientThreadPoolMonitorApi(defaultApolloClientThreadPoolApi);
     MONITOR_CONTEXT.setApolloClientMonitorEventListeners(
-        Lists.newArrayList(defaultApolloClientBootstrapArgsApi,
-            defaultApolloClientNamespaceApi, defaultApolloClientThreadPoolApi,
-            defaultApolloClientExceptionApi));
+        Lists.newArrayList(defaultApolloClientBootstrapArgsApi, defaultApolloClientNamespaceApi,
+            defaultApolloClientThreadPoolApi, defaultApolloClientExceptionApi));
   }
 
-  private static void initializeMetricsExporter(
-  ) {
+  private static void initializeMetricsExporter() {
     if (StringUtils.isBlank(m_configUtil.getMonitorExternalType())) {
       return;
     }
-    ApolloClientMetricsExporterFactory exporterFactory = ApolloInjector.getInstance(
-            ApolloClientMetricsExporterFactory.class);
-    ApolloClientMetricsExporter metricsReporter = exporterFactory.getMetricsReporter(
-            MONITOR_CONTEXT.getApolloClientMonitorEventListeners());
+    ApolloClientMetricsExporterFactory exporterFactory =
+        ApolloInjector.getInstance(ApolloClientMetricsExporterFactory.class);
+    ApolloClientMetricsExporter metricsReporter =
+        exporterFactory.getMetricsReporter(MONITOR_CONTEXT.getApolloClientMonitorEventListeners());
     if (metricsReporter != null) {
       MONITOR_CONTEXT.setApolloClientMetricsExporter(metricsReporter);
     }

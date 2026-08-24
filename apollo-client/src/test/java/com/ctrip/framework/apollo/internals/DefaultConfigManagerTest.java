@@ -87,8 +87,7 @@ public class DefaultConfigManagerTest {
     String someNamespace = "someName";
     ConfigFileFormat someConfigFileFormat = ConfigFileFormat.Properties;
 
-    ConfigFile configFile =
-        defaultConfigManager.getConfigFile(someNamespace, someConfigFileFormat);
+    ConfigFile configFile = defaultConfigManager.getConfigFile(someNamespace, someConfigFileFormat);
 
     assertEquals(someConfigFileFormat, configFile.getConfigFileFormat());
     assertEquals(someConfigContent, configFile.getContent());
@@ -141,7 +140,8 @@ public class DefaultConfigManagerTest {
         }
 
         @Override
-        public ConfigFile createConfigFile(String appId, String namespace, final ConfigFileFormat configFileFormat) {
+        public ConfigFile createConfigFile(String appId, String namespace,
+            final ConfigFileFormat configFileFormat) {
           ConfigRepository someConfigRepository = mock(ConfigRepository.class);
           return new AbstractConfigFile(appId, namespace, someConfigRepository) {
 

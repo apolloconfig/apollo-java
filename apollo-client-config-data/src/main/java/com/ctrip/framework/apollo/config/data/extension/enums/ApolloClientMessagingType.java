@@ -29,6 +29,5 @@ public enum ApolloClientMessagingType {
   /**
    * websocket
    */
-  WEBSOCKET,
-  ;
+  WEBSOCKET,;
 }

@@ -14,18 +14,6 @@
  * limitations under the License.
  *
  */
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
- * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
- * to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
 package com.ctrip.framework.foundation.internals.io;
 
 import static com.ctrip.framework.foundation.internals.io.IOUtils.EOF;
@@ -60,7 +48,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>read()</code> method.
-   * 
+   *
    * @return the byte read or -1 if the end of stream
    * @throws IOException if an I/O error occurs
    */
@@ -79,7 +67,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>read(byte[])</code> method.
-   * 
+   *
    * @param bts the buffer to read the bytes into
    * @return the number of bytes read or EOF if the end of stream
    * @throws IOException if an I/O error occurs
@@ -99,7 +87,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>read(byte[], int, int)</code> method.
-   * 
+   *
    * @param bts the buffer to read the bytes into
    * @param off The start offset
    * @param len The number of bytes to read
@@ -121,7 +109,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>skip(long)</code> method.
-   * 
+   *
    * @param ln the number of bytes to skip
    * @return the actual number of bytes skipped
    * @throws IOException if an I/O error occurs
@@ -138,7 +126,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>available()</code> method.
-   * 
+   *
    * @return the number of available bytes
    * @throws IOException if an I/O error occurs
    */
@@ -154,7 +142,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>close()</code> method.
-   * 
+   *
    * @throws IOException if an I/O error occurs
    */
   @Override
@@ -168,7 +156,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>mark(int)</code> method.
-   * 
+   *
    * @param readlimit read ahead limit
    */
   @Override
@@ -178,7 +166,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>reset()</code> method.
-   * 
+   *
    * @throws IOException if an I/O error occurs
    */
   @Override
@@ -192,7 +180,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
 
   /**
    * Invokes the delegate's <code>markSupported()</code> method.
-   * 
+   *
    * @return true if mark is supported, otherwise false
    */
   @Override
@@ -241,7 +229,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
    * <p>
    * This method provides a point to implement custom exception handling. The default behaviour is to re-throw the
    * exception.
-   * 
+   *
    * @param e The IOException thrown
    * @throws IOException if an I/O error occurs
    * @since 2.0

@@ -31,7 +31,7 @@ public class CatTransaction implements Transaction {
 
   @Override
   public void setStatus(String status) {
-      catTransaction.setStatus(status);
+    catTransaction.setStatus(status);
   }
 
   @Override

@@ -109,7 +109,8 @@ public class DefaultConfigFactoryManagerTest {
       }
 
       @Override
-      public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+      public ConfigFile createConfigFile(String appId, String namespace,
+          ConfigFileFormat configFileFormat) {
         return null;
       }
 
@@ -117,7 +118,7 @@ public class DefaultConfigFactoryManagerTest {
 
     @Override
     public void register(String namespace, ConfigFactory factory) {
-      //do nothing
+      // do nothing
     }
 
     @Override
@@ -159,7 +160,8 @@ public class DefaultConfigFactoryManagerTest {
     }
 
     @Override
-    public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+    public ConfigFile createConfigFile(String appId, String namespace,
+        ConfigFileFormat configFileFormat) {
       return null;
     }
   }
@@ -181,7 +183,8 @@ public class DefaultConfigFactoryManagerTest {
     }
 
     @Override
-    public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+    public ConfigFile createConfigFile(String appId, String namespace,
+        ConfigFileFormat configFileFormat) {
       return null;
     }
   }

@@ -25,30 +25,31 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 
 import java.io.IOException;
 
-public class MockApolloExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
+public class MockApolloExtension
+    implements BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
 
-    private ApolloTestingServer apollo = new ApolloTestingServer();
+  private ApolloTestingServer apollo = new ApolloTestingServer();
 
-    @Override
-    public void afterTestExecution(ExtensionContext context) {
-        apollo.close();
-    }
+  @Override
+  public void afterTestExecution(ExtensionContext context) {
+    apollo.close();
+  }
 
-    @Override
-    public void beforeTestExecution(ExtensionContext context) throws IOException {
-        apollo.start();
-    }
+  @Override
+  public void beforeTestExecution(ExtensionContext context) throws IOException {
+    apollo.start();
+  }
 
-    @Override
-    public boolean supportsParameter(
-        ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType() == ApolloTestingServer.class
-            && extensionContext.getTestMethod().isPresent();
-    }
+  @Override
+  public boolean supportsParameter(ParameterContext parameterContext,
+      ExtensionContext extensionContext) throws ParameterResolutionException {
+    return parameterContext.getParameter().getType() == ApolloTestingServer.class
+        && extensionContext.getTestMethod().isPresent();
+  }
 
-    @Override
-    public Object resolveParameter(
-        ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return apollo;
-    }
+  @Override
+  public Object resolveParameter(ParameterContext parameterContext,
+      ExtensionContext extensionContext) throws ParameterResolutionException {
+    return apollo;
+  }
 }

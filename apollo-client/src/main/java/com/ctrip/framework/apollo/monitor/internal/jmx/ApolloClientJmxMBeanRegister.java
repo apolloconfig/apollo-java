@@ -31,8 +31,8 @@ import org.slf4j.Logger;
  */
 public final class ApolloClientJmxMBeanRegister {
 
-  private static final Logger logger = DeferredLoggerFactory.getLogger(
-      ApolloClientJmxMBeanRegister.class);
+  private static final Logger logger =
+      DeferredLoggerFactory.getLogger(ApolloClientJmxMBeanRegister.class);
   private static MBeanServer mbeanServer;
   private static ObjectName ERROR_OBJECT_NAME;
 

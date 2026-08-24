@@ -129,8 +129,8 @@ public class MetaDomainConsts {
   }
 
   private static List<MetaServerProvider> initMetaServerProviders() {
-    Iterator<MetaServerProvider> metaServerProviderIterator = ServiceBootstrap
-        .loadAll(MetaServerProvider.class);
+    Iterator<MetaServerProvider> metaServerProviderIterator =
+        ServiceBootstrap.loadAll(MetaServerProvider.class);
 
     List<MetaServerProvider> metaServerProviders = Lists.newArrayList(metaServerProviderIterator);
 
@@ -167,8 +167,8 @@ public class MetaDomainConsts {
   private static void updateMetaServerAddresses(String metaServerAddresses) {
     logger.debug("Selecting meta server address for: {}", metaServerAddresses);
 
-    Transaction transaction = Tracer
-        .newTransaction("Apollo.MetaService", "refreshMetaServerAddress");
+    Transaction transaction =
+        Tracer.newTransaction("Apollo.MetaService", "refreshMetaServerAddress");
     transaction.addData("Url", metaServerAddresses);
 
     try {
@@ -180,7 +180,7 @@ public class MetaDomainConsts {
 
       for (String address : metaServers) {
         address = address.trim();
-        //check whether /services/config is accessible
+        // check whether /services/config is accessible
         if (NetUtil.pingUrl(address + "/services/config")) {
           // select the first available meta server
           selectedMetaServerAddressCache.put(metaServerAddresses, address);
@@ -222,7 +222,8 @@ public class MetaDomainConsts {
             updateMetaServerAddresses(metaServerAddresses);
           }
         } catch (Throwable ex) {
-          logger.warn("Refreshing meta server address failed, will retry in {} seconds", REFRESH_INTERVAL_IN_SECOND, ex);
+          logger.warn("Refreshing meta server address failed, will retry in {} seconds",
+              REFRESH_INTERVAL_IN_SECOND, ex);
         }
       }
     }, REFRESH_INTERVAL_IN_SECOND, REFRESH_INTERVAL_IN_SECOND, TimeUnit.SECONDS);

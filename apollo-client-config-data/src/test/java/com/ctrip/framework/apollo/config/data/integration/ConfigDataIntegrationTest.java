@@ -67,12 +67,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ConfigDataIntegrationTest.TestConfiguration.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE,
-    properties = {
-        "app.id=someAppId",
-        "env=local",
+    properties = {"app.id=someAppId", "env=local",
         "spring.config.import=apollo://application,apollo://TEST1.apollo,apollo://application.yaml",
-        "listeners=application,TEST1.apollo,application.yaml"
-    })
+        "listeners=application,TEST1.apollo,application.yaml"})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class ConfigDataIntegrationTest {
 
@@ -109,9 +106,8 @@ public class ConfigDataIntegrationTest {
   };
 
   @ClassRule
-  public static final RuleChain apolloRuleChain = RuleChain
-      .outerRule(apolloStateResource)
-      .around(embeddedApollo);
+  public static final RuleChain apolloRuleChain =
+      RuleChain.outerRule(apolloStateResource).around(embeddedApollo);
 
   @Before
   public void beforeEach() {
@@ -219,8 +215,7 @@ public class ConfigDataIntegrationTest {
 
     private final BlockingQueue<ConfigChangeEvent> queue = new ArrayBlockingQueue<>(10);
 
-    @ApolloConfigChangeListener(value = "${listeners}",
-        interestedKeyPrefixes = {"redis.cache."})
+    @ApolloConfigChangeListener(value = "${listeners}", interestedKeyPrefixes = {"redis.cache."})
     private void onChange(ConfigChangeEvent changeEvent) {
       queue.offer(changeEvent);
     }
@@ -312,8 +307,7 @@ public class ConfigDataIntegrationTest {
 
   private static void addOrModifyForAllAppIds(String namespace, String key, String value) {
     embeddedApollo.addOrModifyProperty(TEST_APP_ID, namespace, key, value);
-    embeddedApollo.addOrModifyProperty(
-        ConfigConsts.NO_APPID_PLACEHOLDER, namespace, key, value);
+    embeddedApollo.addOrModifyProperty(ConfigConsts.NO_APPID_PLACEHOLDER, namespace, key, value);
   }
 
 }

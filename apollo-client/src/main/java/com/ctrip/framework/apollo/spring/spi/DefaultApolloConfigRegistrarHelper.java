@@ -40,29 +40,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrarHelper {
-  private static final Logger logger = LoggerFactory.getLogger(
-      DefaultApolloConfigRegistrarHelper.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(DefaultApolloConfigRegistrarHelper.class);
 
   private final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   private Environment environment;
 
   @Override
-  public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-    AnnotationAttributes attributes = AnnotationAttributes
-        .fromMap(importingClassMetadata.getAnnotationAttributes(EnableApolloConfig.class.getName()));
+  public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
+      BeanDefinitionRegistry registry) {
+    AnnotationAttributes attributes = AnnotationAttributes.fromMap(
+        importingClassMetadata.getAnnotationAttributes(EnableApolloConfig.class.getName()));
     final String[] namespaces = attributes.getStringArray("value");
     final int order = attributes.getNumber("order");
 
     // put main appId
-    PropertySourcesProcessor.addNamespaces(configUtil.getAppId(), Lists.newArrayList(this.resolveNamespaces(namespaces)), order);
+    PropertySourcesProcessor.addNamespaces(configUtil.getAppId(),
+        Lists.newArrayList(this.resolveNamespaces(namespaces)), order);
 
     // put multiple appId into
     AnnotationAttributes[] multipleConfigs = attributes.getAnnotationArray("multipleConfigs");
     if (multipleConfigs != null) {
       for (AnnotationAttributes multipleConfig : multipleConfigs) {
         String appId = multipleConfig.getString("appId");
-        String[] multipleNamespaces = this.resolveNamespaces(multipleConfig.getStringArray("namespaces"));
+        String[] multipleNamespaces =
+            this.resolveNamespaces(multipleConfig.getStringArray("namespaces"));
         String secret = resolveSecret(multipleConfig.getString("secret"));
         int multipleOrder = multipleConfig.getNumber("order");
 
@@ -70,41 +73,50 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
         if (!StringUtils.isBlank(secret)) {
           System.setProperty("apollo.accesskey." + appId + ".secret", secret);
         }
-        PropertySourcesProcessor.addNamespaces(appId, Lists.newArrayList(multipleNamespaces), multipleOrder);
+        PropertySourcesProcessor.addNamespaces(appId, Lists.newArrayList(multipleNamespaces),
+            multipleOrder);
       }
     }
 
     Map<String, Object> propertySourcesPlaceholderPropertyValues = new HashMap<>();
-    // to make sure the default PropertySourcesPlaceholderConfigurer's priority is higher than PropertyPlaceholderConfigurer
+    // to make sure the default PropertySourcesPlaceholderConfigurer's priority is higher than
+    // PropertyPlaceholderConfigurer
     propertySourcesPlaceholderPropertyValues.put("order", 0);
 
-    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, PropertySourcesPlaceholderConfigurer.class,
-            propertySourcesPlaceholderPropertyValues);
-    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, AutoUpdateConfigChangeListener.class);
-    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, PropertySourcesProcessor.class);
-    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, ApolloAnnotationProcessor.class);
+    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry,
+        PropertySourcesPlaceholderConfigurer.class, propertySourcesPlaceholderPropertyValues);
+    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry,
+        AutoUpdateConfigChangeListener.class);
+    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry,
+        PropertySourcesProcessor.class);
+    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry,
+        ApolloAnnotationProcessor.class);
     BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, SpringValueProcessor.class);
-    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, SpringValueDefinitionProcessor.class);
+    BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry,
+        SpringValueDefinitionProcessor.class);
   }
 
   private String[] resolveNamespaces(String[] namespaces) {
-    // no support for Spring version prior to 3.2.x, see https://github.com/apolloconfig/apollo/issues/4178
+    // no support for Spring version prior to 3.2.x, see
+    // https://github.com/apolloconfig/apollo/issues/4178
     if (this.environment == null) {
       logNamespacePlaceholderNotSupportedMessage(namespaces);
       return namespaces;
     }
     String[] resolvedNamespaces = new String[namespaces.length];
     for (int i = 0; i < namespaces.length; i++) {
-      // throw IllegalArgumentException if given text is null or if any placeholders are unresolvable
+      // throw IllegalArgumentException if given text is null or if any placeholders are
+      // unresolvable
       resolvedNamespaces[i] = this.environment.resolveRequiredPlaceholders(namespaces[i]);
     }
     return resolvedNamespaces;
   }
 
-  private String resolveSecret(String secret){
+  private String resolveSecret(String secret) {
     if (this.environment == null) {
       if (secret != null && secret.contains("${")) {
-        logger.warn("secret placeholder {} is not supported for Spring version prior to 3.2.x", secret);
+        logger.warn("secret placeholder {} is not supported for Spring version prior to 3.2.x",
+            secret);
       }
       return secret;
     }
@@ -114,7 +126,8 @@ public class DefaultApolloConfigRegistrarHelper implements ApolloConfigRegistrar
   private void logNamespacePlaceholderNotSupportedMessage(String[] namespaces) {
     for (String namespace : namespaces) {
       if (namespace.contains("${")) {
-        logger.warn("Namespace placeholder {} is not supported for Spring version prior to 3.2.x,"
+        logger.warn(
+            "Namespace placeholder {} is not supported for Spring version prior to 3.2.x,"
                 + " see https://github.com/apolloconfig/apollo/issues/4178 for more details.",
             namespace);
         break;

@@ -114,8 +114,8 @@ public class ApolloOpenApiMockIntegrationTest {
 
   @Test
   public void shouldUseDefaultClusterAndNamespace() throws Exception {
-    handler.mock("GET", "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces/application",
-        200,
+    handler.mock("GET",
+        "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces/application", 200,
         "{\"appId\":\"SampleApp\",\"clusterName\":\"default\",\"namespaceName\":\"application\"}");
     ApolloOpenApiClient client = newClient("namespace-token");
 
@@ -135,14 +135,13 @@ public class ApolloOpenApiMockIntegrationTest {
 
   @Test
   public void shouldPassExtendInfoFlagAndParseItForGetNamespace() throws Exception {
-    handler.mock("GET", "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces/application",
-        200,
+    handler.mock("GET",
+        "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces/application", 200,
         "{\"appId\":\"SampleApp\",\"clusterName\":\"default\",\"namespaceName\":\"application\","
             + "\"extendInfo\":{\"parentAppId\":\"public-app\",\"isConfigHidden\":true,\"itemModifiedCnt\":3}}");
     ApolloOpenApiClient client = newClient("namespace-extend-token");
 
-    OpenNamespaceDTO namespaceDTO = client
-        .getNamespace("SampleApp", "DEV", null, null, true, true);
+    OpenNamespaceDTO namespaceDTO = client.getNamespace("SampleApp", "DEV", null, null, true, true);
     CapturedRequest request = handler.awaitRequest(5, TimeUnit.SECONDS);
 
     assertEquals("fillItemDetail=true&extendInfo=true", request.query);
@@ -154,14 +153,13 @@ public class ApolloOpenApiMockIntegrationTest {
 
   @Test
   public void shouldPassExtendInfoFlagAndParseItForGetNamespaces() throws Exception {
-    handler.mock("GET", "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces",
-        200,
+    handler.mock("GET", "/openapi/v1/envs/DEV/apps/SampleApp/clusters/default/namespaces", 200,
         "[{\"appId\":\"SampleApp\",\"clusterName\":\"default\",\"namespaceName\":\"application\","
             + "\"extendInfo\":{\"parentAppId\":\"public-app\",\"isConfigHidden\":false,\"itemModifiedCnt\":1}}]");
     ApolloOpenApiClient client = newClient("namespaces-extend-token");
 
-    List<OpenNamespaceDTO> namespaceDTOs = client
-        .getNamespaces("SampleApp", "DEV", "default", true, true);
+    List<OpenNamespaceDTO> namespaceDTOs =
+        client.getNamespaces("SampleApp", "DEV", "default", true, true);
     CapturedRequest request = handler.awaitRequest(5, TimeUnit.SECONDS);
 
     assertEquals("fillItemDetail=true&extendInfo=true", request.query);
@@ -207,8 +205,7 @@ public class ApolloOpenApiMockIntegrationTest {
   private ApolloOpenApiClient newClient(String token) {
     return ApolloOpenApiClient.newBuilder()
         .withPortalUrl(String.format("http://127.0.0.1:%d", server.getAddress().getPort()))
-        .withToken(token)
-        .build();
+        .withToken(token).build();
   }
 
   private static class MockPortalHandler implements HttpHandler {
@@ -280,11 +277,7 @@ public class ApolloOpenApiMockIntegrationTest {
     private final String authorization;
     private final String body;
 
-    private CapturedRequest(
-        String method,
-        String path,
-        String query,
-        String authorization,
+    private CapturedRequest(String method, String path, String query, String authorization,
         String body) {
       this.method = method;
       this.path = path;

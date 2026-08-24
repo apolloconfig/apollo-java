@@ -76,12 +76,14 @@ public class ApolloClientSystemConsts {
   /**
    * kubernetes configmap cache namespace
    */
-  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE = "apollo.cache.kubernetes.namespace";
+  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE =
+      "apollo.cache.kubernetes.namespace";
 
   /**
    * kubernetes configmap cache namespace environment variables
    */
-  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_KUBERNETES_NAMESPACE";
+  public static final String APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES =
+      "APOLLO_CACHE_KUBERNETES_NAMESPACE";
 
   /**
    * apollo client access key
@@ -97,13 +99,15 @@ public class ApolloClientSystemConsts {
   /**
    * apollo client access key environment variables
    */
-  public static final String APOLLO_ACCESS_KEY_SECRET_ENVIRONMENT_VARIABLES = "APOLLO_ACCESS_KEY_SECRET";
+  public static final String APOLLO_ACCESS_KEY_SECRET_ENVIRONMENT_VARIABLES =
+      "APOLLO_ACCESS_KEY_SECRET";
 
   /**
    * apollo client access key environment variables
    */
   @Deprecated
-  public static final String DEPRECATED_APOLLO_ACCESS_KEY_SECRET_ENVIRONMENT_VARIABLES = "APOLLO_ACCESSKEY_SECRET";
+  public static final String DEPRECATED_APOLLO_ACCESS_KEY_SECRET_ENVIRONMENT_VARIABLES =
+      "APOLLO_ACCESSKEY_SECRET";
 
   /**
    * apollo meta server address
@@ -135,7 +139,8 @@ public class ApolloClientSystemConsts {
    * apollo config service address environment variables
    */
   @Deprecated
-  public static final String DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES = "APOLLO_CONFIGSERVICE";
+  public static final String DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES =
+      "APOLLO_CONFIGSERVICE";
 
   /**
    * enable property order
@@ -145,17 +150,20 @@ public class ApolloClientSystemConsts {
   /**
    * enable property order environment variables
    */
-  public static final String APOLLO_PROPERTY_ORDER_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_PROPERTY_ORDER_ENABLE";
+  public static final String APOLLO_PROPERTY_ORDER_ENABLE_ENVIRONMENT_VARIABLES =
+      "APOLLO_PROPERTY_ORDER_ENABLE";
 
   /**
    * enable property names cache
    */
-  public static final String APOLLO_PROPERTY_NAMES_CACHE_ENABLE = "apollo.property.names.cache.enable";
+  public static final String APOLLO_PROPERTY_NAMES_CACHE_ENABLE =
+      "apollo.property.names.cache.enable";
 
   /**
    * enable property names cache environment variables
    */
-  public static final String APOLLO_PROPERTY_NAMES_CACHE_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_PROPERTY_NAMES_CACHE_ENABLE";
+  public static final String APOLLO_PROPERTY_NAMES_CACHE_ENABLE_ENVIRONMENT_VARIABLES =
+      "APOLLO_PROPERTY_NAMES_CACHE_ENABLE";
 
   /**
    * enable property names cache
@@ -165,7 +173,8 @@ public class ApolloClientSystemConsts {
   /**
    * enable property names cache environment variables
    */
-  public static final String APOLLO_CACHE_FILE_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_CACHE_FILE_ENABLE";
+  public static final String APOLLO_CACHE_FILE_ENABLE_ENVIRONMENT_VARIABLES =
+      "APOLLO_CACHE_FILE_ENABLE";
 
   /**
    * enable property names cache
@@ -175,34 +184,40 @@ public class ApolloClientSystemConsts {
   /**
    * enable property names cache environment variables
    */
-  public static final String APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES = "APOLLO_KUBERNETES_CACHE_ENABLE";
+  public static final String APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES =
+      "APOLLO_KUBERNETES_CACHE_ENABLE";
 
   /**
    * enable apollo overrideSystemProperties
    */
-  public static final String APOLLO_OVERRIDE_SYSTEM_PROPERTIES = "apollo.override-system-properties";
+  public static final String APOLLO_OVERRIDE_SYSTEM_PROPERTIES =
+      "apollo.override-system-properties";
 
   /**
    * apollo client monitor enabled
    */
   public static final String APOLLO_CLIENT_MONITOR_ENABLED = "apollo.client.monitor.enabled";
-  
+
   /**
    * apollo client monitor exception save size
    */
-  public static final String APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE = "apollo.client.monitor.exception-queue-size";
+  public static final String APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE =
+      "apollo.client.monitor.exception-queue-size";
   /**
    * apollo client monitor jmx enabled
    */
-  public static final String APOLLO_CLIENT_MONITOR_JMX_ENABLED = "apollo.client.monitor.jmx.enabled";
+  public static final String APOLLO_CLIENT_MONITOR_JMX_ENABLED =
+      "apollo.client.monitor.jmx.enabled";
 
   /**
    * apollo client monitor form {such as jmx,prometheus}
    */
-  public static final String APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE = "apollo.client.monitor.external.type";
+  public static final String APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE =
+      "apollo.client.monitor.external.type";
 
   /**
    * apollo client monitor collect period
    */
-  public static final String APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD = "apollo.client.monitor.external.export-period";
+  public static final String APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD =
+      "apollo.client.monitor.external.export-period";
 }

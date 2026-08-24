@@ -52,19 +52,19 @@ public class ConfigUtil {
 
   private int refreshInterval = 5;
   private TimeUnit refreshIntervalTimeUnit = TimeUnit.MINUTES;
-  private int connectTimeout = 1000; //1 second
-  private int readTimeout = 5000; //5 seconds
+  private int connectTimeout = 1000; // 1 second
+  private int readTimeout = 5000; // 5 seconds
   private String cluster;
-  private int loadConfigQPS = 2; //2 times per second
-  private int longPollQPS = 2; //2 times per second
-  //for on error retry
-  private long onErrorRetryInterval = 1;//1 second
-  private TimeUnit onErrorRetryIntervalTimeUnit = TimeUnit.SECONDS;//1 second
-  //for typed config cache of parser result, e.g. integer, double, long, etc.
-  private long maxConfigCacheSize = 500;//500 cache key
-  private long configCacheExpireTime = 1;//1 minute
-  private TimeUnit configCacheExpireTimeUnit = TimeUnit.MINUTES;//1 minute
-  private long longPollingInitialDelayInMills = 2000;//2 seconds
+  private int loadConfigQPS = 2; // 2 times per second
+  private int longPollQPS = 2; // 2 times per second
+  // for on error retry
+  private long onErrorRetryInterval = 1;// 1 second
+  private TimeUnit onErrorRetryIntervalTimeUnit = TimeUnit.SECONDS;// 1 second
+  // for typed config cache of parser result, e.g. integer, double, long, etc.
+  private long maxConfigCacheSize = 500;// 500 cache key
+  private long configCacheExpireTime = 1;// 1 minute
+  private TimeUnit configCacheExpireTimeUnit = TimeUnit.MINUTES;// 1 minute
+  private long longPollingInitialDelayInMills = 2000;// 2 seconds
   private boolean autoUpdateInjectedSpringProperties = true;
   private final RateLimiter warnLogRateLimiter;
   private boolean propertiesOrdered = false;
@@ -145,15 +145,15 @@ public class ConfigUtil {
   }
 
   private void initCluster() {
-    //Load data center from system property
+    // Load data center from system property
     cluster = System.getProperty(ConfigConsts.APOLLO_CLUSTER_KEY);
 
-    //Use data center as cluster
+    // Use data center as cluster
     if (Strings.isNullOrEmpty(cluster)) {
       cluster = getDataCenter();
     }
 
-    //Use default cluster
+    // Use default cluster
     if (Strings.isNullOrEmpty(cluster)) {
       cluster = ConfigConsts.CLUSTER_NAME_DEFAULT;
     }
@@ -363,16 +363,18 @@ public class ConfigUtil {
     }
     if (Strings.isNullOrEmpty(cacheRoot)) {
       // 2. Get from OS environment variable
-      cacheRoot = System.getenv(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES);
+      cacheRoot =
+          System.getenv(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES);
       if (!Strings.isNullOrEmpty(cacheRoot)) {
-        DeprecatedPropertyNotifyUtil
-            .warn(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES,
-                ApolloClientSystemConsts.APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES);
+        DeprecatedPropertyNotifyUtil.warn(
+            ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES,
+            ApolloClientSystemConsts.APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES);
       }
     }
     if (Strings.isNullOrEmpty(cacheRoot)) {
       // 3. Get from server.properties
-      cacheRoot = Foundation.server().getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR, null);
+      cacheRoot = Foundation.server()
+          .getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR, null);
       if (!Strings.isNullOrEmpty(cacheRoot)) {
         DeprecatedPropertyNotifyUtil.warn(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR,
             ApolloClientSystemConsts.APOLLO_CACHE_DIR);
@@ -380,7 +382,8 @@ public class ConfigUtil {
     }
     if (Strings.isNullOrEmpty(cacheRoot)) {
       // 4. Get from app.properties
-      cacheRoot = Foundation.app().getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR, null);
+      cacheRoot =
+          Foundation.app().getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR, null);
       if (!Strings.isNullOrEmpty(cacheRoot)) {
         DeprecatedPropertyNotifyUtil.warn(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR,
             ApolloClientSystemConsts.APOLLO_CACHE_DIR);
@@ -401,18 +404,22 @@ public class ConfigUtil {
 
   private String getCacheKubernetesNamespace() {
     // 1. Get from System Property
-    String k8sNamespace = System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
+    String k8sNamespace =
+        System.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE);
     if (Strings.isNullOrEmpty(k8sNamespace)) {
       // 2. Get from OS environment variable
-      k8sNamespace = System.getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES);
+      k8sNamespace = System
+          .getenv(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE_ENVIRONMENT_VARIABLES);
     }
     if (Strings.isNullOrEmpty(k8sNamespace)) {
       // 3. Get from server.properties
-      k8sNamespace = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+      k8sNamespace = Foundation.server()
+          .getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
     }
     if (Strings.isNullOrEmpty(k8sNamespace)) {
       // 4. Get from app.properties
-      k8sNamespace = Foundation.app().getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
+      k8sNamespace = Foundation.app()
+          .getProperty(ApolloClientSystemConsts.APOLLO_CACHE_KUBERNETES_NAMESPACE, null);
     }
     return k8sNamespace;
   }
@@ -421,7 +428,7 @@ public class ConfigUtil {
     try {
       return Env.LOCAL == getApolloEnv();
     } catch (Throwable ex) {
-      //ignore
+      // ignore
     }
     return false;
   }
@@ -458,8 +465,8 @@ public class ConfigUtil {
   }
 
   private void initLongPollingInitialDelayInMills() {
-    String customizedLongPollingInitialDelay = System
-        .getProperty("apollo.longPollingInitialDelayInMills");
+    String customizedLongPollingInitialDelay =
+        System.getProperty("apollo.longPollingInitialDelayInMills");
     if (!Strings.isNullOrEmpty(customizedLongPollingInitialDelay)) {
       try {
         longPollingInitialDelayInMills = Long.parseLong(customizedLongPollingInitialDelay);
@@ -479,8 +486,8 @@ public class ConfigUtil {
     String enableAutoUpdate = System.getProperty("apollo.autoUpdateInjectedSpringProperties");
     if (Strings.isNullOrEmpty(enableAutoUpdate)) {
       // 2. Get from app.properties
-      enableAutoUpdate = Foundation.app()
-          .getProperty("apollo.autoUpdateInjectedSpringProperties", null);
+      enableAutoUpdate =
+          Foundation.app().getProperty("apollo.autoUpdateInjectedSpringProperties", null);
     }
     if (!Strings.isNullOrEmpty(enableAutoUpdate)) {
       autoUpdateInjectedSpringProperties = Boolean.parseBoolean(enableAutoUpdate.trim());
@@ -529,34 +536,37 @@ public class ConfigUtil {
   }
 
   private void initPropertyNamesCacheEnabled() {
-    propertyNamesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE,
+    propertyNamesCacheEnabled =
+        getPropertyBoolean(ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE,
             ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE_ENVIRONMENT_VARIABLES,
             propertyNamesCacheEnabled);
   }
 
   private void initPropertyFileCacheEnabled() {
     propertyFileCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CACHE_FILE_ENABLE,
-            ApolloClientSystemConsts.APOLLO_CACHE_FILE_ENABLE_ENVIRONMENT_VARIABLES,
-            propertyFileCacheEnabled);
+        ApolloClientSystemConsts.APOLLO_CACHE_FILE_ENABLE_ENVIRONMENT_VARIABLES,
+        propertyFileCacheEnabled);
   }
 
   private void initOverrideSystemProperties() {
-    overrideSystemProperties = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
-            ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
-            overrideSystemProperties);
+    overrideSystemProperties =
+        getPropertyBoolean(ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
+            ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES, overrideSystemProperties);
   }
 
   private void initPropertyKubernetesCacheEnabled() {
-    propertyKubernetesCacheEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
+    propertyKubernetesCacheEnabled =
+        getPropertyBoolean(ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE,
             ApolloClientSystemConsts.APOLLO_KUBERNETES_CACHE_ENABLE_ENVIRONMENT_VARIABLES,
             propertyKubernetesCacheEnabled);
   }
 
   private void initClientMonitorExternalType() {
-    monitorExternalType = System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
+    monitorExternalType =
+        System.getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE);
     if (Strings.isNullOrEmpty(monitorExternalType)) {
       monitorExternalType = Foundation.app()
-              .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "");
+          .getProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, "");
     }
   }
 
@@ -565,12 +575,13 @@ public class ConfigUtil {
   }
 
   private void initClientMonitorExternalExportPeriod() {
-    Integer value = getCustomizedIntegerValue(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD);
+    Integer value = getCustomizedIntegerValue(
+        ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD);
 
     if (value != null) {
       if (value <= 0) {
         logger.warn("Config for {} is invalid: {}, remain default value: 10",
-                ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, value);
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD, value);
       } else {
         monitorExternalExportPeriod = value;
       }
@@ -582,9 +593,9 @@ public class ConfigUtil {
   }
 
   private void initClientMonitorEnabled() {
-    clientMonitorEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
-            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
-            clientMonitorEnabled);
+    clientMonitorEnabled =
+        getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED,
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_ENABLED, clientMonitorEnabled);
   }
 
   public boolean isClientMonitorEnabled() {
@@ -592,9 +603,9 @@ public class ConfigUtil {
   }
 
   private void initClientMonitorJmxEnabled() {
-    clientMonitorJmxEnabled = getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
-            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
-            clientMonitorJmxEnabled);
+    clientMonitorJmxEnabled =
+        getPropertyBoolean(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED, clientMonitorJmxEnabled);
   }
 
   public boolean isClientMonitorJmxEnabled() {
@@ -602,12 +613,13 @@ public class ConfigUtil {
   }
 
   private void initClientMonitorExceptionQueueSize() {
-    Integer value = getCustomizedIntegerValue(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE);
+    Integer value = getCustomizedIntegerValue(
+        ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE);
 
     if (value != null) {
       if (value <= 0) {
         logger.warn("Config for {} is invalid: {}, remain default value: 25",
-                ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, value);
+            ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, value);
       } else {
         monitorExceptionQueueSize = value;
       }
@@ -630,14 +642,14 @@ public class ConfigUtil {
       try {
         return Boolean.parseBoolean(enablePropertyNamesCache);
       } catch (Throwable ex) {
-        logger.warn("Config for {} is invalid: {}, set default value: {}",
-                propertyName, enablePropertyNamesCache, defaultVal);
+        logger.warn("Config for {} is invalid: {}, set default value: {}", propertyName,
+            enablePropertyNamesCache, defaultVal);
       }
     }
     return defaultVal;
   }
 
-  public String getAccessKeySecret(String appId){
+  public String getAccessKeySecret(String appId) {
     return Foundation.app().getAccessKeySecret(appId);
   }
 }

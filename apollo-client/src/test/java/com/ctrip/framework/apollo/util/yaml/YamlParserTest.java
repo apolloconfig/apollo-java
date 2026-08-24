@@ -136,7 +136,8 @@ public class YamlParserTest {
 
     Properties actual = parser.yamlToProperties(yamlContent);
 
-    assertTrue("expected: " + expected + " actual: " + actual, checkPropertiesEquals(expected, actual));
+    assertTrue("expected: " + expected + " actual: " + actual,
+        checkPropertiesEquals(expected, actual));
   }
 
   private boolean checkPropertiesEquals(Properties expected, Properties actual) {

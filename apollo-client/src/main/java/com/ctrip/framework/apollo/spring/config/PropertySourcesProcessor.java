@@ -61,17 +61,20 @@ import org.springframework.core.env.StandardEnvironment;
  */
 public class PropertySourcesProcessor implements BeanFactoryPostProcessor, EnvironmentAware,
     ApplicationEventPublisherAware, PriorityOrdered {
-  private static final Map<Integer, Multimap<String, String>> APP_NAMESPACE_NAMES = Maps.newHashMap();
-  private static final Set<BeanFactory> AUTO_UPDATE_INITIALIZED_BEAN_FACTORIES = Sets.newConcurrentHashSet();
+  private static final Map<Integer, Multimap<String, String>> APP_NAMESPACE_NAMES =
+      Maps.newHashMap();
+  private static final Set<BeanFactory> AUTO_UPDATE_INITIALIZED_BEAN_FACTORIES =
+      Sets.newConcurrentHashSet();
 
-  private final ConfigPropertySourceFactory configPropertySourceFactory = SpringInjector
-      .getInstance(ConfigPropertySourceFactory.class);
+  private final ConfigPropertySourceFactory configPropertySourceFactory =
+      SpringInjector.getInstance(ConfigPropertySourceFactory.class);
   private ConfigUtil configUtil;
   private ConfigurableEnvironment environment;
   private ApplicationEventPublisher applicationEventPublisher;
 
   public static boolean addNamespaces(Collection<String> namespaces, int order) {
-    return addNamespaces(ApolloInjector.getInstance(ConfigUtil.class).getAppId(), namespaces, order);
+    return addNamespaces(ApolloInjector.getInstance(ConfigUtil.class).getAppId(), namespaces,
+        order);
   }
 
   public static boolean addNamespaces(String appId, Collection<String> namespaces, int order) {
@@ -84,25 +87,28 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
   }
 
   @Override
-  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+      throws BeansException {
     this.configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     initializePropertySources();
     initializeAutoUpdatePropertiesFeature(beanFactory);
   }
 
   private void initializePropertySources() {
-    if (environment.getPropertySources().contains(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME)) {
-      //already initialized
+    if (environment.getPropertySources()
+        .contains(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME)) {
+      // already initialized
       return;
     }
     CompositePropertySource composite;
     if (configUtil.isPropertyNamesCacheEnabled()) {
-      composite = new CachedCompositePropertySource(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME);
+      composite =
+          new CachedCompositePropertySource(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME);
     } else {
       composite = new CompositePropertySource(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME);
     }
 
-    //sort by order asc
+    // sort by order asc
     ImmutableSortedSet<Integer> orders = ImmutableSortedSet.copyOf(APP_NAMESPACE_NAMES.keySet());
     Iterator<Integer> iterator = orders.iterator();
 
@@ -138,8 +144,10 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
           .addAfter(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME, composite);
     } else {
       if (!configUtil.isOverrideSystemProperties()) {
-        if (environment.getPropertySources().contains(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME)) {
-          environment.getPropertySources().addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, composite);
+        if (environment.getPropertySources()
+            .contains(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME)) {
+          environment.getPropertySources()
+              .addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, composite);
           return;
         }
       }
@@ -152,10 +160,11 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
       return;
     }
 
-    ConfigChangeListener configChangeEventPublisher = changeEvent ->
-        applicationEventPublisher.publishEvent(new ApolloConfigChangeEvent(changeEvent));
+    ConfigChangeListener configChangeEventPublisher = changeEvent -> applicationEventPublisher
+        .publishEvent(new ApolloConfigChangeEvent(changeEvent));
 
-    List<ConfigPropertySource> configPropertySources = configPropertySourceFactory.getAllConfigPropertySources();
+    List<ConfigPropertySource> configPropertySources =
+        configPropertySourceFactory.getAllConfigPropertySources();
     for (ConfigPropertySource configPropertySource : configPropertySources) {
       configPropertySource.addChangeListener(configChangeEventPublisher);
     }
@@ -163,13 +172,13 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
 
   @Override
   public void setEnvironment(Environment environment) {
-    //it is safe enough to cast as all known environment is derived from ConfigurableEnvironment
+    // it is safe enough to cast as all known environment is derived from ConfigurableEnvironment
     this.environment = (ConfigurableEnvironment) environment;
   }
 
   @Override
   public int getOrder() {
-    //make it as early as possible
+    // make it as early as possible
     return Ordered.HIGHEST_PRECEDENCE;
   }
 

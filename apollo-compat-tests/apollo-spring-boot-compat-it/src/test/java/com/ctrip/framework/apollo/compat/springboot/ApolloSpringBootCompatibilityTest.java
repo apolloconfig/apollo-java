@@ -72,13 +72,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ApolloSpringBootCompatibilityTest.TestConfiguration.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE,
-    properties = {
-        "app.id=someAppId",
-        "env=local",
+    properties = {"app.id=someAppId", "env=local",
         "spring.config.import=apollo://application,apollo://TEST1.apollo,apollo://application.yaml",
         "listeners=application,TEST1.apollo,application.yaml",
-        "org.springframework.boot.logging.LoggingSystem=none"
-    })
+        "org.springframework.boot.logging.LoggingSystem=none"})
 @DirtiesContext
 public class ApolloSpringBootCompatibilityTest {
 
@@ -151,7 +148,8 @@ public class ApolloSpringBootCompatibilityTest {
     yamlProperties.setProperty("yaml.marker", "boot-compat-updated");
     applyConfigChange(yamlConfig, SOME_APP_ID, "application.yaml", yamlProperties);
 
-    Properties anotherAppProperties = copyConfigProperties(compatAnnotatedBean.getAnotherAppConfig());
+    Properties anotherAppProperties =
+        copyConfigProperties(compatAnnotatedBean.getAnotherAppConfig());
     anotherAppProperties.setProperty("compat.origin", "changed-origin-boot");
     applyConfigChange(compatAnnotatedBean.getAnotherAppConfig(), ANOTHER_APP_ID, "application",
         anotherAppProperties);
@@ -160,7 +158,8 @@ public class ApolloSpringBootCompatibilityTest {
     assertNotNull(defaultChange);
     assertNotNull(defaultChange.getChange("compat.timeout"));
 
-    ConfigChangeEvent publicChange = compatAnnotatedBean.pollPublicNamespaceEvent(5, TimeUnit.SECONDS);
+    ConfigChangeEvent publicChange =
+        compatAnnotatedBean.pollPublicNamespaceEvent(5, TimeUnit.SECONDS);
     assertNotNull(publicChange);
     assertNotNull(publicChange.getChange("public.only"));
 
@@ -168,22 +167,19 @@ public class ApolloSpringBootCompatibilityTest {
     assertNotNull(yamlChange);
     assertNotNull(yamlChange.getChange("yaml.marker"));
 
-    ConfigChangeEvent anotherAppChange = compatAnnotatedBean.pollAnotherAppEvent(5, TimeUnit.SECONDS);
+    ConfigChangeEvent anotherAppChange =
+        compatAnnotatedBean.pollAnotherAppEvent(5, TimeUnit.SECONDS);
     assertNotNull(anotherAppChange);
     assertNotNull(anotherAppChange.getChange("compat.origin"));
 
-    waitForCondition("another app config should be updated",
-        () -> "changed-origin-boot".equals(
-            compatAnnotatedBean.getAnotherAppConfig().getProperty("compat.origin", null)));
-    waitForCondition("public namespace config should be updated",
-        () -> "from-public-boot-updated".equals(
-            compatAnnotatedBean.getPublicNamespaceConfig().getProperty("public.only", null)));
-    waitForCondition("yaml namespace config should be updated",
-        () -> "boot-compat-updated".equals(
-            compatAnnotatedBean.getYamlNamespaceConfig().getProperty("yaml.marker", null)));
-    waitForCondition("application namespace config should be updated",
-        () -> "801".equals(
-            compatAnnotatedBean.getApplicationConfig().getProperty("compat.timeout", null)));
+    waitForCondition("another app config should be updated", () -> "changed-origin-boot"
+        .equals(compatAnnotatedBean.getAnotherAppConfig().getProperty("compat.origin", null)));
+    waitForCondition("public namespace config should be updated", () -> "from-public-boot-updated"
+        .equals(compatAnnotatedBean.getPublicNamespaceConfig().getProperty("public.only", null)));
+    waitForCondition("yaml namespace config should be updated", () -> "boot-compat-updated"
+        .equals(compatAnnotatedBean.getYamlNamespaceConfig().getProperty("yaml.marker", null)));
+    waitForCondition("application namespace config should be updated", () -> "801"
+        .equals(compatAnnotatedBean.getApplicationConfig().getProperty("compat.timeout", null)));
     waitForCondition("json value should be updated",
         () -> compatAnnotatedBean.getJsonBeans().size() == 1
             && "gamma-boot".equals(compatAnnotatedBean.getJsonBeans().get(0).getSomeString()));
@@ -197,8 +193,7 @@ public class ApolloSpringBootCompatibilityTest {
   @EnableAutoConfiguration
   @EnableApolloConfig(value = {"application", "TEST1.apollo", "application.yaml"},
       multipleConfigs = {
-          @MultipleConfig(appId = ANOTHER_APP_ID, namespaces = {"application"}, order = 9)
-      })
+          @MultipleConfig(appId = ANOTHER_APP_ID, namespaces = {"application"}, order = 9)})
   @EnableConfigurationProperties(RedisCacheProperties.class)
   @Configuration
   static class TestConfiguration {
@@ -322,8 +317,7 @@ public class ApolloSpringBootCompatibilityTest {
       yamlNamespaceEvents.offer(event);
     }
 
-    @ApolloConfigChangeListener(appId = ANOTHER_APP_ID,
-        interestedKeyPrefixes = {"compat.origin"})
+    @ApolloConfigChangeListener(appId = ANOTHER_APP_ID, interestedKeyPrefixes = {"compat.origin"})
     private void onAnotherAppChange(ConfigChangeEvent event) {
       anotherAppEvents.offer(event);
     }
@@ -360,11 +354,13 @@ public class ApolloSpringBootCompatibilityTest {
       return defaultEvents.poll(timeout, unit);
     }
 
-    ConfigChangeEvent pollPublicNamespaceEvent(long timeout, TimeUnit unit) throws InterruptedException {
+    ConfigChangeEvent pollPublicNamespaceEvent(long timeout, TimeUnit unit)
+        throws InterruptedException {
       return publicNamespaceEvents.poll(timeout, unit);
     }
 
-    ConfigChangeEvent pollYamlNamespaceEvent(long timeout, TimeUnit unit) throws InterruptedException {
+    ConfigChangeEvent pollYamlNamespaceEvent(long timeout, TimeUnit unit)
+        throws InterruptedException {
       return yamlNamespaceEvents.poll(timeout, unit);
     }
 
@@ -381,7 +377,8 @@ public class ApolloSpringBootCompatibilityTest {
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
       if (event instanceof ApolloConfigChangeEvent) {
-        ConfigChangeEvent configChangeEvent = ((ApolloConfigChangeEvent) event).getConfigChangeEvent();
+        ConfigChangeEvent configChangeEvent =
+            ((ApolloConfigChangeEvent) event).getConfigChangeEvent();
         changes.add(configChangeEvent.getAppId() + "#" + configChangeEvent.getNamespace());
         namespaces.add(configChangeEvent.getNamespace());
       }
@@ -466,7 +463,8 @@ public class ApolloSpringBootCompatibilityTest {
     ((DefaultConfig) config).onRepositoryChange(appId, namespace, properties);
   }
 
-  private static void waitForCondition(String message, Callable<Boolean> condition) throws Exception {
+  private static void waitForCondition(String message, Callable<Boolean> condition)
+      throws Exception {
     long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10);
     while (System.currentTimeMillis() < deadline) {
       if (Boolean.TRUE.equals(condition.call())) {

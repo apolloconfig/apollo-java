@@ -96,7 +96,8 @@ public class ApolloConfigDataLoaderTest {
     assertEquals(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME,
         firstConfigData.getPropertySources().get(2).getName());
 
-    ConfigData secondConfigData = loader.load(context, new ApolloConfigDataResource("TEST1.apollo"));
+    ConfigData secondConfigData =
+        loader.load(context, new ApolloConfigDataResource("TEST1.apollo"));
     assertEquals(1, secondConfigData.getPropertySources().size());
     PropertySource<?> secondPropertySource = secondConfigData.getPropertySources().get(0);
     assertEquals("TEST1.apollo", secondPropertySource.getName());
@@ -153,8 +154,7 @@ public class ApolloConfigDataLoaderTest {
 
   private ConfigDataLoaderContext newContextWithBootstrapContext(Object bootstrapContext) {
     return (ConfigDataLoaderContext) Proxy.newProxyInstance(
-        ConfigDataLoaderContext.class.getClassLoader(),
-        new Class[]{ConfigDataLoaderContext.class},
+        ConfigDataLoaderContext.class.getClassLoader(), new Class[] {ConfigDataLoaderContext.class},
         (proxy, method, args) -> {
           if ("getBootstrapContext".equals(method.getName())) {
             return bootstrapContext;
@@ -164,7 +164,8 @@ public class ApolloConfigDataLoaderTest {
   }
 
   private void resetInitializer() throws Exception {
-    Field initializedField = ApolloConfigDataLoaderInitializer.class.getDeclaredField("INITIALIZED");
+    Field initializedField =
+        ApolloConfigDataLoaderInitializer.class.getDeclaredField("INITIALIZED");
     initializedField.setAccessible(true);
     initializedField.setBoolean(null, false);
   }

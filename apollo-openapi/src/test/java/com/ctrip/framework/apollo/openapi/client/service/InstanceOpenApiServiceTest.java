@@ -51,13 +51,14 @@ public class InstanceOpenApiServiceTest extends AbstractOpenApiServiceTest {
     StringEntity responseEntity = new StringEntity("1");
     when(someHttpResponse.getEntity()).thenReturn(responseEntity);
 
-    instanceOpenApiService.getInstanceCountByNamespace(someAppId, someEnv, someCluster, someNamespace);
+    instanceOpenApiService.getInstanceCountByNamespace(someAppId, someEnv, someCluster,
+        someNamespace);
 
     verify(httpClient, times(1)).execute(request.capture());
 
     HttpGet get = request.getValue();
 
     assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/instances",
-            someBaseUrl, someEnv, someAppId, someCluster, someNamespace), get.getURI().toString());
+        someBaseUrl, someEnv, someAppId, someCluster, someNamespace), get.getURI().toString());
   }
 }

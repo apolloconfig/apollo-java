@@ -26,7 +26,7 @@ import org.junit.Test;
  * @author huanghousheng
  * @since 9/7/22
  */
-public class  UrlUtilsTest {
+public class UrlUtilsTest {
 
   @Test
   public void testSlash() {

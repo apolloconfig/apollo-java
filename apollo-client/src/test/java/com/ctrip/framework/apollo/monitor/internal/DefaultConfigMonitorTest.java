@@ -15,6 +15,7 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -48,7 +49,7 @@ public class DefaultConfigMonitorTest {
   private DefaultConfigMonitor configMonitor;
 
   @Before
-  public void setUp(){
+  public void setUp() {
     MockitoAnnotations.initMocks(this);
     when(monitorContext.getExceptionApi()).thenReturn(exceptionMonitorApi);
     when(monitorContext.getNamespaceApi()).thenReturn(namespaceMonitorApi);
@@ -56,7 +57,7 @@ public class DefaultConfigMonitorTest {
     when(monitorContext.getThreadPoolApi()).thenReturn(threadPoolMonitorApi);
     when(monitorContext.getMetricsExporter()).thenReturn(metricsExporter);
     MockInjector.setInstance(ApolloClientMonitorContext.class, monitorContext);
-    
+
     configMonitor = new DefaultConfigMonitor();
   }
 
@@ -66,7 +67,7 @@ public class DefaultConfigMonitorTest {
   }
 
   @Test
-  public void testApis(){
+  public void testApis() {
     assertSame(exceptionMonitorApi, configMonitor.getExceptionMonitorApi());
     assertSame(namespaceMonitorApi, configMonitor.getNamespaceMonitorApi());
     assertSame(bootstrapArgsMonitorApi, configMonitor.getBootstrapArgsMonitorApi());
@@ -74,7 +75,7 @@ public class DefaultConfigMonitorTest {
   }
 
   @Test
-  public void testExporterData(){
+  public void testExporterData() {
     String data = "data";
     when(metricsExporter.response()).thenReturn(data);
 

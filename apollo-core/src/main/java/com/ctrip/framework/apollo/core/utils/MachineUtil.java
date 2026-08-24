@@ -48,7 +48,7 @@ public class MachineUtil {
       StringBuilder sb = new StringBuilder();
       Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 
-      if (e != null){
+      if (e != null) {
         while (e.hasMoreElements()) {
           NetworkInterface ni = e.nextElement();
           sb.append(ni.toString());
@@ -59,7 +59,7 @@ public class MachineUtil {
               sb.append(bb.getChar());
               sb.append(bb.getChar());
               sb.append(bb.getChar());
-            } catch (BufferUnderflowException shortHardwareAddressException) { //NOPMD
+            } catch (BufferUnderflowException shortHardwareAddressException) { // NOPMD
               // mac with less than 6 bytes. continue
             }
           }

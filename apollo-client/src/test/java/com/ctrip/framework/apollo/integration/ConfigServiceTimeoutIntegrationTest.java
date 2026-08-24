@@ -48,8 +48,9 @@ import org.junit.jupiter.api.Test;
 class ConfigServiceTimeoutIntegrationTest extends BaseIntegrationTest {
 
   @Test
-  void timeoutWhenGet10Namespace() throws ExecutionException, InterruptedException, TimeoutException {
-    MockedConfigService  mockedConfigService = newMockedConfigService();
+  void timeoutWhenGet10Namespace()
+      throws ExecutionException, InterruptedException, TimeoutException {
+    MockedConfigService mockedConfigService = newMockedConfigService();
     mockedConfigService.mockMetaSeverWithDelay(30_000);
 
     final SettableFuture<Boolean> loadFinished = SettableFuture.create();
@@ -81,7 +82,7 @@ class ConfigServiceTimeoutIntegrationTest extends BaseIntegrationTest {
     properties.put("k3", "v3");
     createLocalCachePropertyFile(properties);
 
-    MockedConfigService  mockedConfigService = newMockedConfigService();
+    MockedConfigService mockedConfigService = newMockedConfigService();
     mockedConfigService.mockMetaSeverWithDelay(30_000);
 
     final SettableFuture<Config> configSettableFuture = SettableFuture.create();
@@ -125,7 +126,7 @@ class ConfigServiceTimeoutIntegrationTest extends BaseIntegrationTest {
       createLocalCachePropertyFile(ns, properties);
     }
 
-    MockedConfigService  mockedConfigService = newMockedConfigService();
+    MockedConfigService mockedConfigService = newMockedConfigService();
     mockedConfigService.mockMetaSeverWithDelay(30_000);
 
     // concurrent execute
@@ -133,8 +134,8 @@ class ConfigServiceTimeoutIntegrationTest extends BaseIntegrationTest {
       final String ns = nsList.get(i);
       final int index = i;
       Runnable runnable = () -> {
-          Config config = ConfigService.getConfig(ns);
-          futureList.get(index).set(config);
+        Config config = ConfigService.getConfig(ns);
+        futureList.get(index).set(config);
       };
       Thread thread = new Thread(runnable);
       thread.start();
@@ -180,7 +181,7 @@ class ConfigServiceTimeoutIntegrationTest extends BaseIntegrationTest {
       createLocalCachePropertyFile(ns, properties);
     }
 
-    MockedConfigService  mockedConfigService = newMockedConfigService();
+    MockedConfigService mockedConfigService = newMockedConfigService();
 
     // simulate timeout, so will read local backup
     mockedConfigService.mockMetaSeverWithDelay(30_000);
@@ -223,11 +224,9 @@ class ConfigServiceTimeoutIntegrationTest extends BaseIntegrationTest {
       // change the config
       mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
       // notify
-      mockedConfigService.mockLongPollNotifications(
-          pollTimeoutInMS, HttpServletResponse.SC_OK,
-          Lists.newArrayList(
-              new ApolloConfigNotification(apolloConfig.getNamespaceName(), recoverNotificationId))
-      );
+      mockedConfigService.mockLongPollNotifications(pollTimeoutInMS, HttpServletResponse.SC_OK,
+          Lists.newArrayList(new ApolloConfigNotification(apolloConfig.getNamespaceName(),
+              recoverNotificationId)));
     }
 
     // recover meta service
@@ -255,11 +254,9 @@ class ConfigServiceTimeoutIntegrationTest extends BaseIntegrationTest {
       // change the config
       mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
       // notify
-      mockedConfigService.mockLongPollNotifications(
-          pollTimeoutInMS, HttpServletResponse.SC_OK,
-          Lists.newArrayList(
-              new ApolloConfigNotification(apolloConfig.getNamespaceName(), anotherRecoverNotificationId))
-      );
+      mockedConfigService.mockLongPollNotifications(pollTimeoutInMS, HttpServletResponse.SC_OK,
+          Lists.newArrayList(new ApolloConfigNotification(apolloConfig.getNamespaceName(),
+              anotherRecoverNotificationId)));
     }
 
     // wait

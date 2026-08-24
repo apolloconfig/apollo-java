@@ -71,9 +71,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpGet get = request.getValue();
 
-    assertEquals(String
-        .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s", someBaseUrl, someEnv,
-            someAppId, someCluster, someNamespace, someKey), get.getURI().toString());
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s", someBaseUrl,
+        someEnv, someAppId, someCluster, someNamespace, someKey), get.getURI().toString());
   }
 
   @Test
@@ -88,11 +87,10 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpGet get = request.getValue();
 
-    assertEquals(String
-            .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/encodedItems/%s", someBaseUrl,
-                someEnv,
-                someAppId, someCluster, someNamespace,
-                new String(Base64.getEncoder().encode(someKey.getBytes(StandardCharsets.UTF_8)))),
+    assertEquals(
+        String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/encodedItems/%s", someBaseUrl,
+            someEnv, someAppId, someCluster, someNamespace,
+            new String(Base64.getEncoder().encode(someKey.getBytes(StandardCharsets.UTF_8)))),
         get.getURI().toString());
   }
 
@@ -124,9 +122,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpPost post = request.getValue();
 
-    assertEquals(String
-        .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items", someBaseUrl, someEnv, someAppId, someCluster,
-            someNamespace), post.getURI().toString());
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items", someBaseUrl,
+        someEnv, someAppId, someCluster, someNamespace), post.getURI().toString());
 
     StringEntity entity = (StringEntity) post.getEntity();
 
@@ -169,9 +166,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpPut put = request.getValue();
 
-    assertEquals(String
-        .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s", someBaseUrl, someEnv, someAppId, someCluster,
-            someNamespace, someKey), put.getURI().toString());
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s", someBaseUrl,
+        someEnv, someAppId, someCluster, someNamespace, someKey), put.getURI().toString());
   }
 
   @Test
@@ -193,11 +189,10 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpPut put = request.getValue();
 
-    assertEquals(String
-            .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/encodedItems/%s", someBaseUrl,
-                someEnv, someAppId, someCluster,
-                someNamespace,
-                new String(Base64.getEncoder().encode(someKey.getBytes(StandardCharsets.UTF_8)))),
+    assertEquals(
+        String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/encodedItems/%s", someBaseUrl,
+            someEnv, someAppId, someCluster, someNamespace,
+            new String(Base64.getEncoder().encode(someKey.getBytes(StandardCharsets.UTF_8)))),
         put.getURI().toString());
   }
 
@@ -236,9 +231,11 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpPut put = request.getValue();
 
-    assertEquals(String
-        .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s?createIfNotExists=true", someBaseUrl, someEnv,
-            someAppId, someCluster, someNamespace, someKey), put.getURI().toString());
+    assertEquals(
+        String.format(
+            "%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s?createIfNotExists=true",
+            someBaseUrl, someEnv, someAppId, someCluster, someNamespace, someKey),
+        put.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)
@@ -264,15 +261,17 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     final ArgumentCaptor<HttpDelete> request = ArgumentCaptor.forClass(HttpDelete.class);
 
-    itemOpenApiService.removeItem(someAppId, someEnv, someCluster, someNamespace, someKey, someOperator);
+    itemOpenApiService.removeItem(someAppId, someEnv, someCluster, someNamespace, someKey,
+        someOperator);
 
     verify(httpClient, times(1)).execute(request.capture());
 
     HttpDelete delete = request.getValue();
 
-    assertEquals(String
-        .format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s?operator=%s", someBaseUrl, someEnv,
-            someAppId, someCluster, someNamespace, someKey, someOperator), delete.getURI().toString());
+    assertEquals(
+        String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items/%s?operator=%s",
+            someBaseUrl, someEnv, someAppId, someCluster, someNamespace, someKey, someOperator),
+        delete.getURI().toString());
   }
 
   @Test
@@ -293,7 +292,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
         String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/encodedItems/%s?operator=%s",
             someBaseUrl, someEnv, someAppId, someCluster, someNamespace,
             new String(Base64.getEncoder().encode(someKey.getBytes(StandardCharsets.UTF_8))),
-            someOperator), delete.getURI().toString());
+            someOperator),
+        delete.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)
@@ -303,7 +303,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     when(statusLine.getStatusCode()).thenReturn(404);
 
-    itemOpenApiService.removeItem(someAppId, someEnv, someCluster, someNamespace, someKey, someOperator);
+    itemOpenApiService.removeItem(someAppId, someEnv, someCluster, someNamespace, someKey,
+        someOperator);
   }
 
   @Test
@@ -312,14 +313,17 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     final int size = 50;
     final ArgumentCaptor<HttpGet> request = ArgumentCaptor.forClass(HttpGet.class);
 
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page,
+        size);
 
     verify(httpClient, times(1)).execute(request.capture());
 
     HttpGet get = request.getValue();
 
-    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items?page=%s&size=%s",
-            someBaseUrl, someEnv, someAppId, someCluster, someNamespace, page, size), get.getURI().toString());
+    assertEquals(
+        String.format("%s/envs/%s/apps/%s/clusters/%s/namespaces/%s/items?page=%s&size=%s",
+            someBaseUrl, someEnv, someAppId, someCluster, someNamespace, page, size),
+        get.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)
@@ -329,7 +333,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     when(statusLine.getStatusCode()).thenReturn(400);
 
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page,
+        size);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -337,7 +342,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     final int page = -1;
     final int size = 50;
 
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page,
+        size);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -345,7 +351,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     final int page = 0;
     final int size = -50;
 
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page,
+        size);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -353,7 +360,8 @@ public class ItemOpenApiServiceTest extends AbstractOpenApiServiceTest {
     final int page = -1;
     final int size = -50;
 
-    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page, size);
+    itemOpenApiService.findItemsByNamespace(someAppId, someEnv, someCluster, someNamespace, page,
+        size);
   }
 
 }

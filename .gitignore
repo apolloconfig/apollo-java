@@ -26,4 +26,4 @@ target
 # git
 *.orig
 .flattened-pom.xml
-
+config-cache/

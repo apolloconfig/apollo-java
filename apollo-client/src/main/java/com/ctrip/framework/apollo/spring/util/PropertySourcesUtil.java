@@ -34,11 +34,12 @@ public class PropertySourcesUtil {
   public static void ensureBootstrapPropertyPrecedence(ConfigurableEnvironment environment) {
     MutablePropertySources propertySources = environment.getPropertySources();
 
-    PropertySource<?> bootstrapPropertySource = propertySources
-        .get(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
+    PropertySource<?> bootstrapPropertySource =
+        propertySources.get(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
 
     // not exists or already in the first place
-    if (bootstrapPropertySource == null || propertySources.precedenceOf(bootstrapPropertySource) == 0) {
+    if (bootstrapPropertySource == null
+        || propertySources.precedenceOf(bootstrapPropertySource) == 0) {
       return;
     }
 

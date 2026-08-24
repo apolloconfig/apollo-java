@@ -26,7 +26,8 @@ import java.util.List;
  */
 public interface NamespaceOpenApiService {
 
-  default OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName) {
+  default OpenNamespaceDTO getNamespace(String appId, String env, String clusterName,
+      String namespaceName) {
     return getNamespace(appId, env, clusterName, namespaceName, true);
   }
 
@@ -34,7 +35,8 @@ public interface NamespaceOpenApiService {
    * Retrieves a single namespace
    * @since 2.4.0
    */
-  OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail);
+  OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName,
+      boolean fillItemDetail);
 
   /**
    * Retrieves a single namespace, optionally including extra info such as {@code parentAppId}
@@ -46,7 +48,8 @@ public interface NamespaceOpenApiService {
    * this method directly.
    * @since 2.6.0
    */
-  default OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail, boolean extendInfo) {
+  default OpenNamespaceDTO getNamespace(String appId, String env, String clusterName,
+      String namespaceName, boolean fillItemDetail, boolean extendInfo) {
     return getNamespace(appId, env, clusterName, namespaceName, fillItemDetail);
   }
 
@@ -58,7 +61,8 @@ public interface NamespaceOpenApiService {
    * Retrieves a list namespaces
    * @since 2.4.0
    */
-  List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail);
+  List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName,
+      boolean fillItemDetail);
 
   /**
    * Retrieves a list namespaces, optionally including extra info such as {@code parentAppId}
@@ -70,7 +74,8 @@ public interface NamespaceOpenApiService {
    * this method directly.
    * @since 2.6.0
    */
-  default List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail, boolean extendInfo) {
+  default List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName,
+      boolean fillItemDetail, boolean extendInfo) {
     return getNamespaces(appId, env, clusterName, fillItemDetail);
   }
 

@@ -58,8 +58,7 @@ public interface ApolloClientThreadPoolMonitorApi {
       this.executor = executor;
     }
 
-    public ApolloThreadPoolInfo() {
-    }
+    public ApolloThreadPoolInfo() {}
 
 
     public int getActiveTaskCount() {

@@ -24,8 +24,8 @@ import java.util.Map;
 /**
  * @author Rawven
  */
-public class NullClientBootstrapArgsMonitorApi implements ApolloClientBootstrapArgsMonitorApi,
-    ApolloClientJmxBootstrapArgsMBean {
+public class NullClientBootstrapArgsMonitorApi
+    implements ApolloClientBootstrapArgsMonitorApi, ApolloClientJmxBootstrapArgsMBean {
 
   @Override
   public Map<String, String> getBootstrapArgsString() {

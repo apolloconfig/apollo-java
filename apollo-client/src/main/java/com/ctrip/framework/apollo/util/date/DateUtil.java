@@ -25,16 +25,16 @@ import java.util.Optional;
  * @date 2024/10/19
  */
 public class DateUtil {
-	 public static final DateTimeFormatter MEDIUM_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  public static final DateTimeFormatter MEDIUM_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-	/**
-	 * Formats a LocalDateTime object to a string using the MEDIUM_FORMATTER.
-	 *
-	 * @param localDateTime the LocalDateTime to format, can be null
-	 * @return the formatted date-time string, or null if the input is null
-	 */
-	public static Optional<String> formatLocalDateTime(LocalDateTime localDateTime) {
-		return Optional.ofNullable(localDateTime)
-				.map(dt -> dt.format(MEDIUM_FORMATTER));
-	}
+  /**
+   * Formats a LocalDateTime object to a string using the MEDIUM_FORMATTER.
+   *
+   * @param localDateTime the LocalDateTime to format, can be null
+   * @return the formatted date-time string, or null if the input is null
+   */
+  public static Optional<String> formatLocalDateTime(LocalDateTime localDateTime) {
+    return Optional.ofNullable(localDateTime).map(dt -> dt.format(MEDIUM_FORMATTER));
+  }
 }

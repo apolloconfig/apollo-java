@@ -31,8 +31,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author Rawven
  */
-public abstract class AbstractApolloClientMonitorEventListener implements
-    ApolloClientMonitorEventListener {
+public abstract class AbstractApolloClientMonitorEventListener
+    implements ApolloClientMonitorEventListener {
 
   private final Map<String, CounterModel> counterSamples = Maps.newConcurrentMap();
   private final Map<String, GaugeModel> gaugeSamples = Maps.newConcurrentMap();
@@ -75,14 +75,12 @@ public abstract class AbstractApolloClientMonitorEventListener implements
   /**
    * Specific collection logic
    */
-  protected void collect0(ApolloClientMonitorEvent event) {
-  }
+  protected void collect0(ApolloClientMonitorEvent event) {}
 
   /**
    * Convenient for indicators that can only be obtained from the status object
    */
-  protected void export0() {
-  }
+  protected void export0() {}
 
 
   /**
@@ -111,14 +109,13 @@ public abstract class AbstractApolloClientMonitorEventListener implements
     String mapKey = metricsName + (tagValues != null ? Arrays.toString(tagValues) : "");
 
     if (isCounter) {
-      CounterModel counter = counterSamples.computeIfAbsent(mapKey,
-          key -> (CounterModel) CounterModel.create(metricsName, 0)
-              .putTags(getTags(tagKeys, tagValues)));
+      CounterModel counter =
+          counterSamples.computeIfAbsent(mapKey, key -> (CounterModel) CounterModel
+              .create(metricsName, 0).putTags(getTags(tagKeys, tagValues)));
       counter.increase(value);
     } else {
-      GaugeModel gauge = gaugeSamples.computeIfAbsent(mapKey,
-          key -> (GaugeModel) GaugeModel.create(metricsName, 0)
-              .putTags(getTags(tagKeys, tagValues)));
+      GaugeModel gauge = gaugeSamples.computeIfAbsent(mapKey, key -> (GaugeModel) GaugeModel
+          .create(metricsName, 0).putTags(getTags(tagKeys, tagValues)));
       gauge.setValue(value);
     }
   }

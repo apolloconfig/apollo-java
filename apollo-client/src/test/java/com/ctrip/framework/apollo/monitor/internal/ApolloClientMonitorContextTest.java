@@ -15,6 +15,7 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -59,7 +60,7 @@ public class ApolloClientMonitorContextTest {
   }
 
   @Test
-  public void testInitContext(){
+  public void testInitContext() {
     assertTrue(monitorContext.getBootstrapArgsApi() instanceof NullClientBootstrapArgsMonitorApi);
     assertTrue(monitorContext.getNamespaceApi() instanceof NullClientNamespaceMonitorApi);
     assertTrue(monitorContext.getThreadPoolApi() instanceof NullClientThreadPoolMonitorApi);
@@ -84,12 +85,15 @@ public class ApolloClientMonitorContextTest {
 
   @Test
   public void testGetCollectors() {
-    ApolloClientMonitorEventListener listener = Mockito.mock(ApolloClientMonitorEventListener.class);
-    ApolloClientMonitorEventListener listener2 = Mockito.mock(ApolloClientMonitorEventListener.class);
+    ApolloClientMonitorEventListener listener =
+        Mockito.mock(ApolloClientMonitorEventListener.class);
+    ApolloClientMonitorEventListener listener2 =
+        Mockito.mock(ApolloClientMonitorEventListener.class);
     monitorContext.addApolloClientMonitorEventListener(listener);
     monitorContext.addApolloClientMonitorEventListener(listener2);
 
-    List<ApolloClientMonitorEventListener> listeners = monitorContext.getApolloClientMonitorEventListeners();
+    List<ApolloClientMonitorEventListener> listeners =
+        monitorContext.getApolloClientMonitorEventListeners();
     assertEquals(2, listeners.size());
   }
 }

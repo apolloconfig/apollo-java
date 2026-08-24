@@ -100,13 +100,15 @@ public class DateParserTest {
     assertEquals(expected, dateParser.parse(text, format));
   }
 
-  private void checkWithFormatAndLocale(Date expected, String text, String format, Locale locale) throws Exception {
+  private void checkWithFormatAndLocale(Date expected, String text, String format, Locale locale)
+      throws Exception {
     assertEquals(expected, dateParser.parse(text, format, locale));
   }
 
-  private Date assembleDate(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+  private Date assembleDate(int year, int month, int day, int hour, int minute, int second,
+      int millisecond) {
     Calendar date = Calendar.getInstance();
-    date.set(year, month - 1, day, hour, minute, second); //Month in Calendar is 0 based
+    date.set(year, month - 1, day, hour, minute, second); // Month in Calendar is 0 based
     date.set(Calendar.MILLISECOND, millisecond);
 
     return date.getTime();

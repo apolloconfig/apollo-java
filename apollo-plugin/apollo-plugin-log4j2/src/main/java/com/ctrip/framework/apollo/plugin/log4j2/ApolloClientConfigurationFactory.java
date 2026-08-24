@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 package com.ctrip.framework.apollo.plugin.log4j2;
 
 import com.ctrip.framework.apollo.ConfigFile;
@@ -57,16 +56,18 @@ public class ApolloClientConfigurationFactory extends ConfigurationFactory {
 
   @Override
   protected String[] getSupportedTypes() {
-    return new String[]{"*"};
+    return new String[] {"*"};
   }
 
   @Override
-  public Configuration getConfiguration(LoggerContext loggerContext, String name, URI configLocation) {
+  public Configuration getConfiguration(LoggerContext loggerContext, String name,
+      URI configLocation) {
     return getConfiguration(loggerContext, null);
   }
 
   @Override
-  public Configuration getConfiguration(LoggerContext loggerContext, ConfigurationSource configurationSource) {
+  public Configuration getConfiguration(LoggerContext loggerContext,
+      ConfigurationSource configurationSource) {
     if (!isActive) {
       LOGGER.warn("Apollo log4j2 plugin is not enabled, please check your configuration");
       return null;
@@ -74,8 +75,10 @@ public class ApolloClientConfigurationFactory extends ConfigurationFactory {
 
     ConfigFile configFile = ConfigService.getConfigFile("log4j2", ConfigFileFormat.XML);
 
-    if (configFile == null || configFile.getContent() == null || configFile.getContent().isEmpty()) {
-      LOGGER.warn("Apollo log4j2 plugin is enabled, but no log4j2.xml namespace or content found in Apollo");
+    if (configFile == null || configFile.getContent() == null
+        || configFile.getContent().isEmpty()) {
+      LOGGER.warn(
+          "Apollo log4j2 plugin is enabled, but no log4j2.xml namespace or content found in Apollo");
       return null;
     }
 
@@ -87,7 +90,8 @@ public class ApolloClientConfigurationFactory extends ConfigurationFactory {
     }
 
     // TODO add ConfigFileChangeListener, dynamic load log4j2.xml in runtime
-    LOGGER.info("Apollo log4j2 plugin is enabled, loading log4j2.xml from Apollo, content:\n{}", configFile.getContent());
+    LOGGER.info("Apollo log4j2 plugin is enabled, loading log4j2.xml from Apollo, content:\n{}",
+        configFile.getContent());
     return new XmlConfiguration(loggerContext, configurationSource);
   }
 }

@@ -28,7 +28,8 @@ import com.google.common.collect.Tables;
 public class DefaultConfigFactoryManager implements ConfigFactoryManager {
   private ConfigRegistry m_registry;
 
-  private Table<String, String, ConfigFactory> m_factories = Tables.synchronizedTable(HashBasedTable.create());
+  private Table<String, String, ConfigFactory> m_factories =
+      Tables.synchronizedTable(HashBasedTable.create());
 
   private ConfigUtil m_configUtil;
 

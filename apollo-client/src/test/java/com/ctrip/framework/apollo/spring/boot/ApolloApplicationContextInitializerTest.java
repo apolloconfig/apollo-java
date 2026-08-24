@@ -67,7 +67,8 @@ public class ApolloApplicationContextInitializerTest {
 
     when(environment.getProperty(ApolloClientSystemConsts.APP_ID)).thenReturn(someAppId);
     when(environment.getProperty(ConfigConsts.APOLLO_CLUSTER_KEY)).thenReturn(someCluster);
-    when(environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR)).thenReturn(someCacheDir);
+    when(environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR))
+        .thenReturn(someCacheDir);
     when(environment.getProperty(ConfigConsts.APOLLO_META_KEY)).thenReturn(someApolloMeta);
 
     apolloApplicationContextInitializer.initializeSystemProperty(environment);
@@ -99,7 +100,8 @@ public class ApolloApplicationContextInitializerTest {
 
     when(environment.getProperty(ApolloClientSystemConsts.APP_ID)).thenReturn(anotherAppId);
     when(environment.getProperty(ConfigConsts.APOLLO_CLUSTER_KEY)).thenReturn(anotherCluster);
-    when(environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR)).thenReturn(anotherCacheDir);
+    when(environment.getProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR))
+        .thenReturn(anotherCacheDir);
     when(environment.getProperty(ConfigConsts.APOLLO_META_KEY)).thenReturn(anotherApolloMeta);
 
     apolloApplicationContextInitializer.initializeSystemProperty(environment);
@@ -132,7 +134,8 @@ public class ApolloApplicationContextInitializerTest {
 
     apolloApplicationContextInitializer.initialize(environment);
 
-    assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME));
+    assertTrue(
+        propertySources.contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME));
     assertFalse(propertySources.iterator().next() instanceof CachedCompositePropertySource);
 
     ConfigUtil configUtil = new ConfigUtil();
@@ -144,7 +147,8 @@ public class ApolloApplicationContextInitializerTest {
 
     apolloApplicationContextInitializer.initialize(environment);
 
-    assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME));
+    assertTrue(
+        propertySources.contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME));
     assertTrue(propertySources.iterator().next() instanceof CachedCompositePropertySource);
   }
 
@@ -155,11 +159,12 @@ public class ApolloApplicationContextInitializerTest {
     ConfigurableEnvironment environment = mock(ConfigurableEnvironment.class);
 
     MutablePropertySources propertySources = new MutablePropertySources();
-    propertySources.addLast(new PropertiesPropertySource(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, properties));
+    propertySources.addLast(new PropertiesPropertySource(
+        StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, properties));
 
     when(environment.getPropertySources()).thenReturn(propertySources);
     when(environment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
-            ConfigConsts.NAMESPACE_APPLICATION)).thenReturn("");
+        ConfigConsts.NAMESPACE_APPLICATION)).thenReturn("");
     ConfigUtil configUtil = new ConfigUtil();
     configUtil = spy(configUtil);
     when(configUtil.isOverrideSystemProperties()).thenReturn(false);
@@ -167,7 +172,9 @@ public class ApolloApplicationContextInitializerTest {
 
     apolloApplicationContextInitializer.initialize(environment);
 
-    assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME));
-    assertEquals(propertySources.iterator().next().getName(), StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
+    assertTrue(
+        propertySources.contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME));
+    assertEquals(propertySources.iterator().next().getName(),
+        StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
   }
 }

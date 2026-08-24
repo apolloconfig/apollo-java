@@ -33,12 +33,12 @@ import org.slf4j.Logger;
 /**
  * @author Rawven
  */
-public class PrometheusApolloClientMetricsExporter extends
-    AbstractApolloClientMetricsExporter implements ApolloClientMetricsExporter {
+public class PrometheusApolloClientMetricsExporter extends AbstractApolloClientMetricsExporter
+    implements ApolloClientMetricsExporter {
 
   private static final String PROMETHEUS = "prometheus";
-  private final Logger logger = DeferredLoggerFactory.getLogger(
-      PrometheusApolloClientMetricsExporter.class);
+  private final Logger logger =
+      DeferredLoggerFactory.getLogger(PrometheusApolloClientMetricsExporter.class);
   protected CollectorRegistry registry;
   protected Map<String, Collector.Describable> map;
 
@@ -57,17 +57,13 @@ public class PrometheusApolloClientMetricsExporter extends
   @Override
   public void registerOrUpdateCounterSample(String name, Map<String, String> tags,
       double incrValue) {
-    Counter counter = (Counter) map.computeIfAbsent(name,
-        key -> createCounter(key, tags));
+    Counter counter = (Counter) map.computeIfAbsent(name, key -> createCounter(key, tags));
     counter.labels(tags.values().toArray(new String[0])).inc(incrValue);
   }
 
   private Counter createCounter(String name, Map<String, String> tags) {
-    return Counter.build()
-        .name(name)
-        .help("apollo counter metrics")
-        .labelNames(tags.keySet().toArray(new String[0]))
-        .register(registry);
+    return Counter.build().name(name).help("apollo counter metrics")
+        .labelNames(tags.keySet().toArray(new String[0])).register(registry);
   }
 
   @Override
@@ -77,11 +73,8 @@ public class PrometheusApolloClientMetricsExporter extends
   }
 
   private Gauge createGauge(String name, Map<String, String> tags) {
-    return Gauge.build()
-        .name(name)
-        .help("apollo gauge metrics")
-        .labelNames(tags.keySet().toArray(new String[0]))
-        .register(registry);
+    return Gauge.build().name(name).help("apollo gauge metrics")
+        .labelNames(tags.keySet().toArray(new String[0])).register(registry);
   }
 
 
@@ -97,4 +90,3 @@ public class PrometheusApolloClientMetricsExporter extends
     }
   }
 }
-  

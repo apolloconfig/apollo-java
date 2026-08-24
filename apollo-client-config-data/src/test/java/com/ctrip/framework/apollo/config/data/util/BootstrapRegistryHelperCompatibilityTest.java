@@ -37,12 +37,14 @@ public class BootstrapRegistryHelperCompatibilityTest {
     Object bootstrapContext = newDefaultBootstrapContext();
 
     BootstrapRegistryHelper.registerIfAbsent(bootstrapContext, String.class, "apollo");
-    BootstrapRegistryHelper.registerIfAbsentFromSupplier(bootstrapContext, Integer.class, () -> 100);
+    BootstrapRegistryHelper.registerIfAbsentFromSupplier(bootstrapContext, Integer.class,
+        () -> 100);
 
     assertEquals("apollo", BootstrapRegistryHelper.get(bootstrapContext, String.class));
-    assertEquals(Integer.valueOf(100), BootstrapRegistryHelper.get(bootstrapContext, Integer.class));
-    assertEquals(Boolean.TRUE, BootstrapRegistryHelper.getOrElse(bootstrapContext, Boolean.class,
-        Boolean.TRUE));
+    assertEquals(Integer.valueOf(100),
+        BootstrapRegistryHelper.get(bootstrapContext, Integer.class));
+    assertEquals(Boolean.TRUE,
+        BootstrapRegistryHelper.getOrElse(bootstrapContext, Boolean.class, Boolean.TRUE));
   }
 
   @Test
@@ -55,8 +57,7 @@ public class BootstrapRegistryHelperCompatibilityTest {
     assertSame(bootstrapContext, eventBootstrapContext);
 
     ConfigDataLoaderContext loaderContext = (ConfigDataLoaderContext) Proxy.newProxyInstance(
-        ConfigDataLoaderContext.class.getClassLoader(),
-        new Class[]{ConfigDataLoaderContext.class},
+        ConfigDataLoaderContext.class.getClassLoader(), new Class[] {ConfigDataLoaderContext.class},
         (proxy, method, args) -> {
           if ("getBootstrapContext".equals(method.getName())) {
             return bootstrapContext;
@@ -69,19 +70,20 @@ public class BootstrapRegistryHelperCompatibilityTest {
 
   @Test
   public void testSpringBoot4PresenceDetection() {
-    boolean expected = ClassUtils
-        .isPresent("org.springframework.boot.bootstrap.ConfigurableBootstrapContext",
+    boolean expected =
+        ClassUtils.isPresent("org.springframework.boot.bootstrap.ConfigurableBootstrapContext",
             BootstrapRegistryHelperCompatibilityTest.class.getClassLoader());
     assertEquals(expected, BootstrapRegistryHelper.isSpringBoot4Present());
   }
 
-  private ApplicationStartingEvent newApplicationStartingEvent(
-      Object bootstrapContext, SpringApplication springApplication) throws Exception {
+  private ApplicationStartingEvent newApplicationStartingEvent(Object bootstrapContext,
+      SpringApplication springApplication) throws Exception {
     for (Constructor<?> constructor : ApplicationStartingEvent.class.getConstructors()) {
       Class<?>[] parameterTypes = constructor.getParameterTypes();
-      if (parameterTypes.length == 3 && SpringApplication.class.isAssignableFrom(parameterTypes[1])) {
-        return (ApplicationStartingEvent) constructor
-            .newInstance(bootstrapContext, springApplication, new String[0]);
+      if (parameterTypes.length == 3
+          && SpringApplication.class.isAssignableFrom(parameterTypes[1])) {
+        return (ApplicationStartingEvent) constructor.newInstance(bootstrapContext,
+            springApplication, new String[0]);
       }
     }
     throw new IllegalStateException("Unsupported ApplicationStartingEvent constructor signature");

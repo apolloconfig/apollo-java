@@ -56,8 +56,8 @@ public class ApolloClientMonitorEventPublisherTest {
   @Test
   public void testPublish_WhenClientMonitorEnabled_CollectorSupportsEvent() {
     when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
-    when(mockCollectorManager.getApolloClientMonitorEventListeners()).thenReturn(Collections.singletonList(
-        mockListener));
+    when(mockCollectorManager.getApolloClientMonitorEventListeners())
+        .thenReturn(Collections.singletonList(mockListener));
     when(mockListener.isSupported(mockEvent)).thenReturn(true);
 
     ApolloClientMonitorEventPublisher.publish(mockEvent);
@@ -68,7 +68,8 @@ public class ApolloClientMonitorEventPublisherTest {
   @Test
   public void testPublish_WhenClientMonitorEnabled_CollectorDoesNotSupportEvent() {
     when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
-    when(mockCollectorManager.getApolloClientMonitorEventListeners()).thenReturn(Collections.singletonList(mockListener));
+    when(mockCollectorManager.getApolloClientMonitorEventListeners())
+        .thenReturn(Collections.singletonList(mockListener));
     when(mockListener.isSupported(mockEvent)).thenReturn(false);
 
     ApolloClientMonitorEventPublisher.publish(mockEvent);

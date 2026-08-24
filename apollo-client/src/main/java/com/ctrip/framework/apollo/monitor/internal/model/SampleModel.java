@@ -70,4 +70,3 @@ public class SampleModel {
     this.value.set(value);
   }
 }
-

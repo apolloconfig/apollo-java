@@ -32,8 +32,8 @@ import com.google.common.base.Strings;
  */
 public class NamespaceHandler extends NamespaceHandlerSupport {
 
-  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(",").omitEmptyStrings()
-      .trimResults();
+  private static final Splitter NAMESPACE_SPLITTER =
+      Splitter.on(",").omitEmptyStrings().trimResults();
 
   @Override
   public void init() {
@@ -55,7 +55,7 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
     private String resolveNamespaces(Element element) {
       String namespaces = element.getAttribute("namespaces");
       if (Strings.isNullOrEmpty(namespaces)) {
-        //default to application
+        // default to application
         return ConfigConsts.NAMESPACE_APPLICATION;
       }
       return SystemPropertyUtils.resolvePlaceholders(namespaces);

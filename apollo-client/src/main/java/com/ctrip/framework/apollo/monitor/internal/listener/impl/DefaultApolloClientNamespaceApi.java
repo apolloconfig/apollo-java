@@ -41,19 +41,17 @@ import org.slf4j.Logger;
 /**
  * @author Rawven
  */
-public class DefaultApolloClientNamespaceApi extends
-    AbstractApolloClientMonitorEventListener implements
-    ApolloClientNamespaceMonitorApi, ApolloClientJmxNamespaceMBean {
+public class DefaultApolloClientNamespaceApi extends AbstractApolloClientMonitorEventListener
+    implements ApolloClientNamespaceMonitorApi, ApolloClientJmxNamespaceMBean {
 
-  private static final Logger logger = DeferredLoggerFactory.getLogger(
-      DefaultApolloClientNamespaceApi.class);
+  private static final Logger logger =
+      DeferredLoggerFactory.getLogger(DefaultApolloClientNamespaceApi.class);
   private final ConfigManager configManager;
   private final Map<String, NamespaceMetrics> namespaces = Maps.newConcurrentMap();
   private final Set<String> namespace404 = Sets.newCopyOnWriteArraySet();
   private final Set<String> namespaceTimeout = Sets.newCopyOnWriteArraySet();
 
-  public DefaultApolloClientNamespaceApi(ConfigManager configManager
-  ) {
+  public DefaultApolloClientNamespaceApi(ConfigManager configManager) {
     super(TAG_NAMESPACE);
     this.configManager = configManager;
   }
@@ -79,8 +77,8 @@ public class DefaultApolloClientNamespaceApi extends
   private void handleNormalNamespace(String namespace, ApolloClientMonitorEvent event) {
     namespace404.remove(namespace);
     namespaceTimeout.remove(namespace);
-    NamespaceMetrics namespaceMetrics = namespaces.computeIfAbsent(namespace,
-        k -> new NamespaceMetrics());
+    NamespaceMetrics namespaceMetrics =
+        namespaces.computeIfAbsent(namespace, k -> new NamespaceMetrics());
     collectMetrics(event, namespaceMetrics, namespace);
   }
 
@@ -118,7 +116,7 @@ public class DefaultApolloClientNamespaceApi extends
   private void handleUsageEvent(NamespaceMetrics namespaceMetrics, String namespace) {
     namespaceMetrics.incrementUsageCount();
     createOrUpdateCounterSample(ApolloClientMonitorConstant.METRICS_NAMESPACE_USAGE,
-        new String[]{NAMESPACE}, new String[]{namespace}, 1);
+        new String[] {NAMESPACE}, new String[] {namespace}, 1);
   }
 
   private void handleUpdateTimeEvent(ApolloClientMonitorEvent event,
@@ -142,23 +140,17 @@ public class DefaultApolloClientNamespaceApi extends
   public void export0() {
     namespaces.forEach((namespace, metrics) -> {
       // update NamespaceMetrics
-      createOrUpdateGaugeSample(
-          METRICS_NAMESPACE_FIRST_LOAD_SPEND,
-          new String[]{NAMESPACE}, new String[]{namespace},
-          metrics.getFirstLoadTimeSpendInMs());
+      createOrUpdateGaugeSample(METRICS_NAMESPACE_FIRST_LOAD_SPEND, new String[] {NAMESPACE},
+          new String[] {namespace}, metrics.getFirstLoadTimeSpendInMs());
 
-      createOrUpdateGaugeSample(
-          METRICS_NAMESPACE_ITEM_NUM,
-          new String[]{NAMESPACE}, new String[]{namespace},
-          configManager.getConfig(namespace).getPropertyNames().size());
+      createOrUpdateGaugeSample(METRICS_NAMESPACE_ITEM_NUM, new String[] {NAMESPACE},
+          new String[] {namespace}, configManager.getConfig(namespace).getPropertyNames().size());
     });
 
-    //  update NamespaceStatus metrics
-    createOrUpdateGaugeSample(METRICS_NAMESPACE_NOT_FOUND,
-        namespace404.size());
+    // update NamespaceStatus metrics
+    createOrUpdateGaugeSample(METRICS_NAMESPACE_NOT_FOUND, namespace404.size());
 
-    createOrUpdateGaugeSample(METRICS_NAMESPACE_TIMEOUT,
-        namespaceTimeout.size());
+    createOrUpdateGaugeSample(METRICS_NAMESPACE_TIMEOUT, namespaceTimeout.size());
   }
 
   @Override
@@ -183,7 +175,7 @@ public class DefaultApolloClientNamespaceApi extends
       NamespaceMetricsString namespaceMetricsString = new NamespaceMetricsString();
       namespaceMetricsString.setFirstLoadTimeSpendInMs(metrics.getFirstLoadTimeSpendInMs());
       DateUtil.formatLocalDateTime(metrics.getLatestUpdateTime())
-              .ifPresent(namespaceMetricsString::setLatestUpdateTime);
+          .ifPresent(namespaceMetricsString::setLatestUpdateTime);
       namespaceMetricsString.setUsageCount(metrics.getUsageCount());
       namespaceMetricsString.setReleaseKey(metrics.getReleaseKey());
       namespaceMetricsStringMap.put(namespace, namespaceMetricsString);

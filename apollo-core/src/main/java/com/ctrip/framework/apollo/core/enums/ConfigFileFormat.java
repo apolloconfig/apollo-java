@@ -91,8 +91,7 @@ public enum ConfigFileFormat {
     final String cleansedName = getWellFormedName(value);
 
     return Stream.of(ConfigFileFormat.values())
-        .filter(item -> cleansedName.equalsIgnoreCase(item.getValue()))
-        .findFirst()
+        .filter(item -> cleansedName.equalsIgnoreCase(item.getValue())).findFirst()
         .orElseThrow(() -> new IllegalArgumentException(value + " can not map enum"));
   }
 

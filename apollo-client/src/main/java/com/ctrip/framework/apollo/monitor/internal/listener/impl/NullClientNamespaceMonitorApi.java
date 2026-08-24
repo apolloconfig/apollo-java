@@ -25,8 +25,8 @@ import java.util.Map;
 /**
  * @author Rawven
  */
-public class NullClientNamespaceMonitorApi implements ApolloClientNamespaceMonitorApi,
-    ApolloClientJmxNamespaceMBean {
+public class NullClientNamespaceMonitorApi
+    implements ApolloClientNamespaceMonitorApi, ApolloClientJmxNamespaceMBean {
 
   @Override
   public Map<String, NamespaceMetrics> getNamespaceMetrics() {

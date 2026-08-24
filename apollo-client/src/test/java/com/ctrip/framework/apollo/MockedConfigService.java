@@ -57,29 +57,12 @@ public class MockedConfigService implements AutoCloseable {
     Runnable runnable = () -> {
       MockedConfigService mockedConfigService = new MockedConfigService(10000);
       mockedConfigService.init();
-      mockedConfigService.mockMetaServer(
-          true,
-          new ServiceDTO()
-      );
-      mockedConfigService.mockConfigs(
-          true,
-          200,
-          new ApolloConfig()
-      );
-      mockedConfigService.mockLongPollNotifications(
-          false,
-          1000, 200, Lists.newArrayList(new ApolloConfigNotification("someNamespace", 1))
-      );
-      mockedConfigService.mockConfigs(
-          false,
-          200,
-          new ApolloConfig()
-      );
-      mockedConfigService.mockConfigs(
-          false,
-          200,
-          null
-      );
+      mockedConfigService.mockMetaServer(true, new ServiceDTO());
+      mockedConfigService.mockConfigs(true, 200, new ApolloConfig());
+      mockedConfigService.mockLongPollNotifications(false, 1000, 200,
+          Lists.newArrayList(new ApolloConfigNotification("someNamespace", 1)));
+      mockedConfigService.mockConfigs(false, 200, new ApolloConfig());
+      mockedConfigService.mockConfigs(false, 200, null);
     };
     Thread thread = new Thread(runnable);
     thread.start();
@@ -90,61 +73,48 @@ public class MockedConfigService implements AutoCloseable {
     this.server = ClientAndServer.startClientAndServer(port);
   }
 
-  public void mockMetaServer(ServiceDTO ... serviceDTOList) {
+  public void mockMetaServer(ServiceDTO... serviceDTOList) {
     mockMetaServer(false, serviceDTOList);
   }
 
   /**
    * @param serviceDTOList apollo meta server's response
    */
-  public void mockMetaServer(boolean failedAtFirstTime, ServiceDTO ... serviceDTOList) {
-    RequestDefinition requestDefinition = HttpRequest.request("GET")
-        .withPath(META_SERVER_PATH);
+  public void mockMetaServer(boolean failedAtFirstTime, ServiceDTO... serviceDTOList) {
+    RequestDefinition requestDefinition = HttpRequest.request("GET").withPath(META_SERVER_PATH);
 
     // need clear
     server.clear(requestDefinition);
 
     if (failedAtFirstTime) {
-      server.when(requestDefinition, Times.exactly(1))
-          .respond(HttpResponse.response()
-              .withStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-              .withContentType(MediaType.JSON_UTF_8)
-          );
+      server.when(requestDefinition, Times.exactly(1)).respond(
+          HttpResponse.response().withStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+              .withContentType(MediaType.JSON_UTF_8));
     }
 
     String body = gson.toJson(Lists.newArrayList(serviceDTOList));
     server.when(requestDefinition)
-        .respond(HttpResponse.response()
-            .withStatusCode(HttpServletResponse.SC_OK)
-            .withContentType(MediaType.JSON_UTF_8)
-            .withBody(body)
-        );
+        .respond(HttpResponse.response().withStatusCode(HttpServletResponse.SC_OK)
+            .withContentType(MediaType.JSON_UTF_8).withBody(body));
   }
 
   /**
    * simulate timeout
    */
-  public void mockMetaSeverWithDelay(long milliseconds, ServiceDTO ... serviceDTOList) {
-    RequestDefinition requestDefinition = HttpRequest.request("GET")
-        .withPath(META_SERVER_PATH);
+  public void mockMetaSeverWithDelay(long milliseconds, ServiceDTO... serviceDTOList) {
+    RequestDefinition requestDefinition = HttpRequest.request("GET").withPath(META_SERVER_PATH);
 
     // need clear
     server.clear(requestDefinition);
 
     String body = gson.toJson(Lists.newArrayList(serviceDTOList));
     server.when(requestDefinition)
-        .respond(HttpResponse.response()
-            .withDelay(TimeUnit.MILLISECONDS, milliseconds)
-            .withStatusCode(HttpServletResponse.SC_OK)
-            .withContentType(MediaType.JSON_UTF_8)
-            .withBody(body)
-        );
+        .respond(HttpResponse.response().withDelay(TimeUnit.MILLISECONDS, milliseconds)
+            .withStatusCode(HttpServletResponse.SC_OK).withContentType(MediaType.JSON_UTF_8)
+            .withBody(body));
   }
 
-  public void mockConfigs(
-      int mockedStatusCode,
-      ApolloConfig apolloConfig
-  ) {
+  public void mockConfigs(int mockedStatusCode, ApolloConfig apolloConfig) {
     mockConfigs(false, mockedStatusCode, apolloConfig);
   }
 
@@ -153,45 +123,25 @@ public class MockedConfigService implements AutoCloseable {
    * @param mockedStatusCode http status code
    * @param apolloConfig apollo config server's response
    */
-  public void mockConfigs(
-      boolean failedAtFirstTime,
-      int mockedStatusCode,
-      ApolloConfig apolloConfig
-  ) {
+  public void mockConfigs(boolean failedAtFirstTime, int mockedStatusCode,
+      ApolloConfig apolloConfig) {
     mockConfigs(failedAtFirstTime, mockedStatusCode, apolloConfig, "/configs/.*");
   }
 
-  public void mockConfigs(
-      String appId,
-      String cluster,
-      String namespace,
-      int mockedStatusCode,
-      ApolloConfig apolloConfig
-  ) {
+  public void mockConfigs(String appId, String cluster, String namespace, int mockedStatusCode,
+      ApolloConfig apolloConfig) {
     mockConfigs(false, appId, cluster, namespace, mockedStatusCode, apolloConfig);
   }
 
-  public void mockConfigs(
-      boolean failedAtFirstTime,
-      String appId,
-      String cluster,
-      String namespace,
-      int mockedStatusCode,
-      ApolloConfig apolloConfig
-  ) {
-    String path = String.format("/configs/%s/%s/%s.*",
-        Pattern.quote(appId),
-        Pattern.quote(cluster),
+  public void mockConfigs(boolean failedAtFirstTime, String appId, String cluster, String namespace,
+      int mockedStatusCode, ApolloConfig apolloConfig) {
+    String path = String.format("/configs/%s/%s/%s.*", Pattern.quote(appId), Pattern.quote(cluster),
         Pattern.quote(namespace));
     mockConfigs(failedAtFirstTime, mockedStatusCode, apolloConfig, path);
   }
 
-  private void mockConfigs(
-      boolean failedAtFirstTime,
-      int mockedStatusCode,
-      ApolloConfig apolloConfig,
-      String path
-  ) {
+  private void mockConfigs(boolean failedAtFirstTime, int mockedStatusCode,
+      ApolloConfig apolloConfig, String path) {
     // cannot use /configs/* as the path, because mock server will treat * as a wildcard
     RequestDefinition requestDefinition = HttpRequest.request("GET").withPath(path);
 
@@ -199,37 +149,24 @@ public class MockedConfigService implements AutoCloseable {
     server.clear(requestDefinition);
 
     if (failedAtFirstTime) {
-      server.when(requestDefinition, Times.exactly(1))
-          .respond(HttpResponse.response()
-              .withStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-              .withContentType(MediaType.JSON_UTF_8)
-          );
+      server.when(requestDefinition, Times.exactly(1)).respond(
+          HttpResponse.response().withStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+              .withContentType(MediaType.JSON_UTF_8));
     }
 
     String body = gson.toJson(apolloConfig);
-    server.when(requestDefinition)
-        .respond(HttpResponse.response()
-            .withStatusCode(mockedStatusCode)
-            .withContentType(MediaType.JSON_UTF_8)
-            .withBody(body)
-        );
+    server.when(requestDefinition).respond(HttpResponse.response().withStatusCode(mockedStatusCode)
+        .withContentType(MediaType.JSON_UTF_8).withBody(body));
   }
 
-  public void mockLongPollNotifications(
-      final long pollResultTimeOutInMS,
-      final int statusCode,
-      final List<ApolloConfigNotification> result
-  ) {
-    mockLongPollNotifications(
-        false, pollResultTimeOutInMS, statusCode, result);
+  public void mockLongPollNotifications(final long pollResultTimeOutInMS, final int statusCode,
+      final List<ApolloConfigNotification> result) {
+    mockLongPollNotifications(false, pollResultTimeOutInMS, statusCode, result);
   }
 
-  public void mockLongPollNotifications(
-      final boolean failedAtFirstTime,
-      final long pollResultTimeOutInMS,
-      final int statusCode,
-      final List<ApolloConfigNotification> result
-  ) {
+  public void mockLongPollNotifications(final boolean failedAtFirstTime,
+      final long pollResultTimeOutInMS, final int statusCode,
+      final List<ApolloConfigNotification> result) {
     // match all parameters
     final String path = "/notifications/v2?.*";
     RequestDefinition requestDefinition = HttpRequest.request("GET").withPath(path);
@@ -238,21 +175,15 @@ public class MockedConfigService implements AutoCloseable {
     server.clear(requestDefinition);
 
     if (failedAtFirstTime) {
-      server.when(requestDefinition, Times.exactly(1))
-          .respond(HttpResponse.response()
-              .withStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-              .withContentType(MediaType.JSON_UTF_8)
-          );
+      server.when(requestDefinition, Times.exactly(1)).respond(
+          HttpResponse.response().withStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+              .withContentType(MediaType.JSON_UTF_8));
     }
 
     String body = gson.toJson(result);
-    server.when(requestDefinition)
-        .respond(HttpResponse.response()
-            .withStatusCode(statusCode)
-            .withContentType(MediaType.JSON_UTF_8)
-            .withBody(body)
-            .withDelay(TimeUnit.MILLISECONDS, pollResultTimeOutInMS)
-        );
+    server.when(requestDefinition).respond(
+        HttpResponse.response().withStatusCode(statusCode).withContentType(MediaType.JSON_UTF_8)
+            .withBody(body).withDelay(TimeUnit.MILLISECONDS, pollResultTimeOutInMS));
   }
 
   @Override

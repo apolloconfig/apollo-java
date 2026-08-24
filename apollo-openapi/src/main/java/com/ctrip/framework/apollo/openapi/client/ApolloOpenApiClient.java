@@ -55,15 +55,17 @@ public class ApolloOpenApiClient {
   private final NamespaceOpenApiService namespaceService;
   private final ClusterOpenApiService clusterService;
   private final InstanceOpenApiService instanceService;
-  private static final Gson GSON = new GsonBuilder().setDateFormat(ApolloOpenApiConstants.JSON_DATE_FORMAT).create();
+  private static final Gson GSON =
+      new GsonBuilder().setDateFormat(ApolloOpenApiConstants.JSON_DATE_FORMAT).create();
 
   private ApolloOpenApiClient(String portalUrl, String token, RequestConfig requestConfig,
       int retryCount, IdempotentHttpMethod[] idempotentHttpMethods) {
     this.portalUrl = portalUrl;
     this.token = token;
     CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig)
-        .setRetryHandler(retryCount > 0 ?
-            new ApolloStandardHttpRequestRetryHandler(retryCount, idempotentHttpMethods) : null)
+        .setRetryHandler(retryCount > 0
+            ? new ApolloStandardHttpRequestRetryHandler(retryCount, idempotentHttpMethods)
+            : null)
         .setDefaultHeaders(Lists.newArrayList(new BasicHeader("Authorization", token))).build();
 
     String baseUrl = this.portalUrl + ApolloOpenApiConstants.OPEN_API_V1_PREFIX;
@@ -125,7 +127,8 @@ public class ApolloOpenApiClient {
    * Get the namespaces
    * @since 2.4.0
    */
-  public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail) {
+  public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName,
+      boolean fillItemDetail) {
     return namespaceService.getNamespaces(appId, env, clusterName, fillItemDetail);
   }
 
@@ -134,7 +137,8 @@ public class ApolloOpenApiClient {
    * Get the namespaces with extendInfo
    * @since 2.6.0
    */
-  public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName, boolean fillItemDetail,  boolean extendInfo) {
+  public List<OpenNamespaceDTO> getNamespaces(String appId, String env, String clusterName,
+      boolean fillItemDetail, boolean extendInfo) {
     return namespaceService.getNamespaces(appId, env, clusterName, fillItemDetail, extendInfo);
   }
 
@@ -156,7 +160,8 @@ public class ApolloOpenApiClient {
     return clusterService.createCluster(env, openClusterDTO);
   }
 
-  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName) {
+  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName,
+      String namespaceName) {
     return namespaceService.getNamespace(appId, env, clusterName, namespaceName);
   }
 
@@ -164,7 +169,8 @@ public class ApolloOpenApiClient {
    * Get the namespace
    * @since 2.4.0
    */
-  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail) {
+  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName,
+      String namespaceName, boolean fillItemDetail) {
     return namespaceService.getNamespace(appId, env, clusterName, namespaceName, fillItemDetail);
   }
 
@@ -172,8 +178,10 @@ public class ApolloOpenApiClient {
    * Get the namespace with extendInfo
    * @since 2.6.0
    */
-  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName, String namespaceName, boolean fillItemDetail,  boolean extendInfo) {
-    return namespaceService.getNamespace(appId, env, clusterName, namespaceName, fillItemDetail, extendInfo);
+  public OpenNamespaceDTO getNamespace(String appId, String env, String clusterName,
+      String namespaceName, boolean fillItemDetail, boolean extendInfo) {
+    return namespaceService.getNamespace(appId, env, clusterName, namespaceName, fillItemDetail,
+        extendInfo);
   }
 
   /**
@@ -186,7 +194,8 @@ public class ApolloOpenApiClient {
   /**
    * Get the namespace lock
    */
-  public OpenNamespaceLockDTO getNamespaceLock(String appId, String env, String clusterName, String namespaceName) {
+  public OpenNamespaceLockDTO getNamespaceLock(String appId, String env, String clusterName,
+      String namespaceName) {
     return namespaceService.getNamespaceLock(appId, env, clusterName, namespaceName);
   }
 
@@ -197,7 +206,8 @@ public class ApolloOpenApiClient {
    *
    * @since 1.2.0
    */
-  public OpenItemDTO getItem(String appId, String env, String clusterName, String namespaceName, String key) {
+  public OpenItemDTO getItem(String appId, String env, String clusterName, String namespaceName,
+      String key) {
     return itemService.getItem(appId, env, clusterName, namespaceName, key);
   }
 
@@ -205,7 +215,7 @@ public class ApolloOpenApiClient {
    * Paging get configs
    */
   public OpenPageDTO<OpenItemDTO> findItemsByNamespace(String appId, String env, String clusterName,
-                                                       String namespaceName, int page, int size) {
+      String namespaceName, int page, int size) {
     return itemService.findItemsByNamespace(appId, env, clusterName, namespaceName, page, size);
   }
 
@@ -221,14 +231,16 @@ public class ApolloOpenApiClient {
   /**
    * Update config
    */
-  public void updateItem(String appId, String env, String clusterName, String namespaceName, OpenItemDTO itemDTO) {
+  public void updateItem(String appId, String env, String clusterName, String namespaceName,
+      OpenItemDTO itemDTO) {
     itemService.updateItem(appId, env, clusterName, namespaceName, itemDTO);
   }
 
   /**
    * Create config if not exists or update config if already exists
    */
-  public void createOrUpdateItem(String appId, String env, String clusterName, String namespaceName, OpenItemDTO itemDTO) {
+  public void createOrUpdateItem(String appId, String env, String clusterName, String namespaceName,
+      OpenItemDTO itemDTO) {
     itemService.createOrUpdateItem(appId, env, clusterName, namespaceName, itemDTO);
   }
 
@@ -237,8 +249,8 @@ public class ApolloOpenApiClient {
    *
    * @param operator the user who removes the item
    */
-  public void removeItem(String appId, String env, String clusterName, String namespaceName, String key,
-      String operator) {
+  public void removeItem(String appId, String env, String clusterName, String namespaceName,
+      String key, String operator) {
     itemService.removeItem(appId, env, clusterName, namespaceName, key, operator);
   }
 
@@ -246,15 +258,16 @@ public class ApolloOpenApiClient {
    * publish namespace
    * @return the released configurations
    */
-  public OpenReleaseDTO publishNamespace(String appId, String env, String clusterName, String namespaceName,
-      NamespaceReleaseDTO releaseDTO) {
+  public OpenReleaseDTO publishNamespace(String appId, String env, String clusterName,
+      String namespaceName, NamespaceReleaseDTO releaseDTO) {
     return releaseService.publishNamespace(appId, env, clusterName, namespaceName, releaseDTO);
   }
 
   /**
    * @return the latest active release information or <code>null</code> if not found
    */
-  public OpenReleaseDTO getLatestActiveRelease(String appId, String env, String clusterName, String namespaceName) {
+  public OpenReleaseDTO getLatestActiveRelease(String appId, String env, String clusterName,
+      String namespaceName) {
     return releaseService.getLatestActiveRelease(appId, env, clusterName, namespaceName);
   }
 
@@ -272,7 +285,8 @@ public class ApolloOpenApiClient {
    * Get instance count by namespace
    * @since 2.5.0
    */
-  public int getInstanceCountByNamespace(String appId, String env, String clusterName, String namespaceName) {
+  public int getInstanceCountByNamespace(String appId, String env, String clusterName,
+      String namespaceName) {
     return instanceService.getInstanceCountByNamespace(appId, env, clusterName, namespaceName);
   }
 
@@ -341,15 +355,20 @@ public class ApolloOpenApiClient {
     /**
      * @param idempotentHttpMethods idempotent HTTP methods will directly execute retries when exception
      */
-    public ApolloOpenApiClientBuilder withIdempotentHttpMethods(IdempotentHttpMethod... idempotentHttpMethods) {
+    public ApolloOpenApiClientBuilder withIdempotentHttpMethods(
+        IdempotentHttpMethod... idempotentHttpMethods) {
       this.idempotentHttpMethods = idempotentHttpMethods;
       return this;
     }
 
     public ApolloOpenApiClient build() {
-      Preconditions.checkArgument(!Strings.isNullOrEmpty(portalUrl), "Portal url should not be null or empty!");
-      Preconditions.checkArgument(portalUrl.startsWith("http://") || portalUrl.startsWith("https://"), "Portal url should start with http:// or https://" );
-      Preconditions.checkArgument(!Strings.isNullOrEmpty(token), "Token should not be null or empty!");
+      Preconditions.checkArgument(!Strings.isNullOrEmpty(portalUrl),
+          "Portal url should not be null or empty!");
+      Preconditions.checkArgument(
+          portalUrl.startsWith("http://") || portalUrl.startsWith("https://"),
+          "Portal url should start with http:// or https://");
+      Preconditions.checkArgument(!Strings.isNullOrEmpty(token),
+          "Token should not be null or empty!");
 
       if (connectTimeout < 0) {
         connectTimeout = ApolloOpenApiConstants.DEFAULT_CONNECT_TIMEOUT;
@@ -362,7 +381,8 @@ public class ApolloOpenApiClient {
       RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(connectTimeout)
           .setSocketTimeout(readTimeout).build();
 
-      return new ApolloOpenApiClient(portalUrl, token, requestConfig, retryCount, idempotentHttpMethods);
+      return new ApolloOpenApiClient(portalUrl, token, requestConfig, retryCount,
+          idempotentHttpMethods);
     }
   }
 }

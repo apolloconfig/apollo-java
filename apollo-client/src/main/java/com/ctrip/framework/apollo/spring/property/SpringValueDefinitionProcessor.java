@@ -50,7 +50,8 @@ import com.google.common.collect.Multimap;
 public class SpringValueDefinitionProcessor implements BeanDefinitionRegistryPostProcessor {
   private static final Map<BeanDefinitionRegistry, Multimap<String, SpringValueDefinition>> beanName2SpringValueDefinitions =
       Maps.newConcurrentMap();
-  private static final Set<BeanDefinitionRegistry> PROPERTY_VALUES_PROCESSED_BEAN_FACTORIES = Sets.newConcurrentHashSet();
+  private static final Set<BeanDefinitionRegistry> PROPERTY_VALUES_PROCESSED_BEAN_FACTORIES =
+      Sets.newConcurrentHashSet();
 
   private final ConfigUtil configUtil;
   private final PlaceholderHelper placeholderHelper;
@@ -61,19 +62,23 @@ public class SpringValueDefinitionProcessor implements BeanDefinitionRegistryPos
   }
 
   @Override
-  public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+  public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
+      throws BeansException {
     if (configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()) {
       processPropertyValues(registry);
     }
   }
 
   @Override
-  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+      throws BeansException {
 
   }
 
-  public static Multimap<String, SpringValueDefinition> getBeanName2SpringValueDefinitions(BeanDefinitionRegistry registry) {
-    return beanName2SpringValueDefinitions.computeIfAbsent(registry, k -> LinkedListMultimap.create());
+  public static Multimap<String, SpringValueDefinition> getBeanName2SpringValueDefinitions(
+      BeanDefinitionRegistry registry) {
+    return beanName2SpringValueDefinitions.computeIfAbsent(registry,
+        k -> LinkedListMultimap.create());
   }
 
   private void processPropertyValues(BeanDefinitionRegistry beanRegistry) {
@@ -86,7 +91,8 @@ public class SpringValueDefinitionProcessor implements BeanDefinitionRegistryPos
       beanName2SpringValueDefinitions.put(beanRegistry, LinkedListMultimap.create());
     }
 
-    Multimap<String, SpringValueDefinition> springValueDefinitions = beanName2SpringValueDefinitions.get(beanRegistry);
+    Multimap<String, SpringValueDefinition> springValueDefinitions =
+        beanName2SpringValueDefinitions.get(beanRegistry);
 
     String[] beanNames = beanRegistry.getBeanDefinitionNames();
     for (String beanName : beanNames) {
@@ -106,7 +112,8 @@ public class SpringValueDefinitionProcessor implements BeanDefinitionRegistryPos
         }
 
         for (String key : keys) {
-          springValueDefinitions.put(beanName, new SpringValueDefinition(key, placeholder, propertyValue.getName()));
+          springValueDefinitions.put(beanName,
+              new SpringValueDefinition(key, placeholder, propertyValue.getName()));
         }
       }
     }

@@ -42,228 +42,229 @@ import java.util.Properties;
  * @author dyx1234
  */
 public class K8sConfigMapConfigRepository extends AbstractConfigRepository
-        implements RepositoryChangeListener {
-    private static final Logger logger = DeferredLoggerFactory.getLogger(K8sConfigMapConfigRepository.class);
-    private final String appId;
-    private final String namespace;
-    private String configMapName;
-    private String configMapKey;
-    private final String k8sNamespace;
-    private final ConfigUtil configUtil;
-    private final KubernetesManager kubernetesManager;
-    private volatile Properties configMapProperties;
-    private volatile ConfigRepository upstream;
-    private volatile ConfigSourceType sourceType = ConfigSourceType.CONFIGMAP;
-    private static final Gson GSON = new Gson();
+    implements RepositoryChangeListener {
+  private static final Logger logger =
+      DeferredLoggerFactory.getLogger(K8sConfigMapConfigRepository.class);
+  private final String appId;
+  private final String namespace;
+  private String configMapName;
+  private String configMapKey;
+  private final String k8sNamespace;
+  private final ConfigUtil configUtil;
+  private final KubernetesManager kubernetesManager;
+  private volatile Properties configMapProperties;
+  private volatile ConfigRepository upstream;
+  private volatile ConfigSourceType sourceType = ConfigSourceType.CONFIGMAP;
+  private static final Gson GSON = new Gson();
 
-    public K8sConfigMapConfigRepository(String appId, String namespace, ConfigRepository upstream) {
-        this.appId = appId;
-        this.namespace = namespace;
-        configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-        kubernetesManager = ApolloInjector.getInstance(KubernetesManager.class);
-        k8sNamespace = configUtil.getK8sNamespace();
+  public K8sConfigMapConfigRepository(String appId, String namespace, ConfigRepository upstream) {
+    this.appId = appId;
+    this.namespace = namespace;
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    kubernetesManager = ApolloInjector.getInstance(KubernetesManager.class);
+    k8sNamespace = configUtil.getK8sNamespace();
 
-        this.setConfigMapKey(configUtil.getCluster(), namespace);
-        this.setConfigMapName(configUtil.getAppId(), false);
-        this.setUpstreamRepository(upstream);
+    this.setConfigMapKey(configUtil.getCluster(), namespace);
+    this.setConfigMapName(configUtil.getAppId(), false);
+    this.setUpstreamRepository(upstream);
+  }
+
+  private void setConfigMapKey(String cluster, String namespace) {
+    // cluster: User Definition >idc>default
+    if (StringUtils.isBlank(cluster)) {
+      configMapKey = EscapeUtil.createConfigMapKey("default", namespace);
+      return;
+    }
+    configMapKey = EscapeUtil.createConfigMapKey(cluster, namespace);
+  }
+
+  private void setConfigMapName(String appId, boolean syncImmediately) {
+    Preconditions.checkNotNull(appId, "AppId cannot be null");
+    configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
+    this.checkConfigMapName(configMapName);
+    if (syncImmediately) {
+      this.sync();
+    }
+  }
+
+  private void checkConfigMapName(String configMapName) {
+    if (StringUtils.isBlank(configMapName)) {
+      throw new IllegalArgumentException("ConfigMap name cannot be null");
+    }
+    if (kubernetesManager.checkConfigMapExist(k8sNamespace, configMapName)) {
+      return;
+    }
+    // Create an empty configmap, write the new value in the update event
+    Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "createK8sConfigMap");
+    transaction.addData("configMapName", configMapName);
+    try {
+      kubernetesManager.createConfigMap(k8sNamespace, configMapName, null);
+      transaction.setStatus(Transaction.SUCCESS);
+    } catch (Throwable ex) {
+      Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+      transaction.setStatus(ex);
+      throw new ApolloConfigException("Create configmap failed!", ex);
+    } finally {
+      transaction.complete();
+    }
+  }
+
+  @Override
+  public Properties getConfig() {
+    if (configMapProperties == null) {
+      sync();
+    }
+    Properties result = propertiesFactory.getPropertiesInstance();
+    result.putAll(configMapProperties);
+    return result;
+  }
+
+  /**
+   * Update the memory when the configuration center changes
+   *
+   * @param upstreamConfigRepository the upstream repo
+   */
+  @Override
+  public void setUpstreamRepository(ConfigRepository upstreamConfigRepository) {
+    if (upstreamConfigRepository == null) {
+      return;
+    }
+    // clear previous listener
+    if (upstream != null) {
+      upstream.removeChangeListener(this);
+    }
+    upstream = upstreamConfigRepository;
+    upstreamConfigRepository.addChangeListener(this);
+  }
+
+  @Override
+  public ConfigSourceType getSourceType() {
+    return sourceType;
+  }
+
+  /**
+   * Sync the configmap
+   */
+  @Override
+  protected void sync() {
+    // Chain recovery, first read from upstream data source
+    boolean syncFromUpstreamResultSuccess = trySyncFromUpstream();
+
+    if (syncFromUpstreamResultSuccess) {
+      return;
     }
 
-    private void setConfigMapKey(String cluster, String namespace) {
-        // cluster: User Definition >idc>default
-        if (StringUtils.isBlank(cluster)) {
-            configMapKey = EscapeUtil.createConfigMapKey("default", namespace);
-            return;
-        }
-        configMapKey = EscapeUtil.createConfigMapKey(cluster, namespace);
+    Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "syncK8sConfigMap");
+    Throwable exception = null;
+    try {
+      configMapProperties = loadFromK8sConfigMap();
+      sourceType = ConfigSourceType.CONFIGMAP;
+      transaction.setStatus(Transaction.SUCCESS);
+    } catch (Throwable ex) {
+      Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
+      transaction.setStatus(ex);
+      exception = ex;
+    } finally {
+      transaction.complete();
     }
 
-    private void setConfigMapName(String appId, boolean syncImmediately) {
-        Preconditions.checkNotNull(appId, "AppId cannot be null");
-        configMapName = ConfigConsts.APOLLO_CONFIG_CACHE + appId;
-        this.checkConfigMapName(configMapName);
-        if (syncImmediately) {
-            this.sync();
-        }
+    if (configMapProperties == null) {
+      sourceType = ConfigSourceType.NONE;
+      throw new ApolloConfigException("Load config from Kubernetes ConfigMap failed!", exception);
     }
+  }
 
-    private void checkConfigMapName(String configMapName) {
-        if (StringUtils.isBlank(configMapName)) {
-            throw new IllegalArgumentException("ConfigMap name cannot be null");
-        }
-        if (kubernetesManager.checkConfigMapExist(k8sNamespace, configMapName)) {
-            return;
-        }
-        // Create an empty configmap, write the new value in the update event
-        Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "createK8sConfigMap");
-        transaction.addData("configMapName", configMapName);
-        try {
-            kubernetesManager.createConfigMap(k8sNamespace, configMapName, null);
-            transaction.setStatus(Transaction.SUCCESS);
-        } catch (Throwable ex) {
-            Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
-            transaction.setStatus(ex);
-            throw new ApolloConfigException("Create configmap failed!", ex);
-        } finally {
-            transaction.complete();
-        }
+  Properties loadFromK8sConfigMap() {
+    Preconditions.checkNotNull(configMapName, "ConfigMap name cannot be null");
+
+    try {
+      String jsonConfig =
+          kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
+
+      // Convert jsonConfig to properties
+      Properties properties = propertiesFactory.getPropertiesInstance();
+      if (jsonConfig != null && !jsonConfig.isEmpty()) {
+        Type type = new TypeToken<Map<String, String>>() {}.getType();
+        Map<String, String> configMap = GSON.fromJson(jsonConfig, type);
+        configMap.forEach(properties::setProperty);
+      }
+      return properties;
+    } catch (Exception ex) {
+      Tracer.logError(ex);
+      throw new ApolloConfigException(
+          String.format("Load config from Kubernetes ConfigMap %s failed!", configMapName), ex);
     }
+  }
 
-    @Override
-    public Properties getConfig() {
-        if (configMapProperties == null) {
-            sync();
-        }
-        Properties result = propertiesFactory.getPropertiesInstance();
-        result.putAll(configMapProperties);
-        return result;
+  private boolean trySyncFromUpstream() {
+    if (upstream == null) {
+      return false;
     }
-
-    /**
-     * Update the memory when the configuration center changes
-     *
-     * @param upstreamConfigRepository the upstream repo
-     */
-    @Override
-    public void setUpstreamRepository(ConfigRepository upstreamConfigRepository) {
-        if (upstreamConfigRepository == null) {
-            return;
-        }
-        //clear previous listener
-        if (upstream != null) {
-            upstream.removeChangeListener(this);
-        }
-        upstream = upstreamConfigRepository;
-        upstreamConfigRepository.addChangeListener(this);
+    try {
+      updateConfigMapProperties(upstream.getConfig(), upstream.getSourceType());
+      return true;
+    } catch (Throwable ex) {
+      Tracer.logError(ex);
+      logger.warn("Sync config from upstream repository {} failed, reason: {}", upstream.getClass(),
+          ExceptionUtil.getDetailMessage(ex));
     }
+    return false;
+  }
 
-    @Override
-    public ConfigSourceType getSourceType() {
-        return sourceType;
+  private synchronized void updateConfigMapProperties(Properties newProperties,
+      ConfigSourceType sourceType) {
+    this.sourceType = sourceType;
+    if (newProperties == null || newProperties.equals(configMapProperties)) {
+      return;
     }
+    this.configMapProperties = newProperties;
+    persistConfigMap(configMapProperties);
+  }
 
-    /**
-     * Sync the configmap
-     */
-    @Override
-    protected void sync() {
-        // Chain recovery, first read from upstream data source
-        boolean syncFromUpstreamResultSuccess = trySyncFromUpstream();
+  @Override
+  public void onRepositoryChange(String namespace, Properties newProperties) {
+    this.onRepositoryChange(appId, namespace, newProperties);
+  }
 
-        if (syncFromUpstreamResultSuccess) {
-            return;
-        }
-
-        Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "syncK8sConfigMap");
-        Throwable exception = null;
-        try {
-            configMapProperties = loadFromK8sConfigMap();
-            sourceType = ConfigSourceType.CONFIGMAP;
-            transaction.setStatus(Transaction.SUCCESS);
-        } catch (Throwable ex) {
-            Tracer.logEvent("ApolloConfigException", ExceptionUtil.getDetailMessage(ex));
-            transaction.setStatus(ex);
-            exception = ex;
-        } finally {
-            transaction.complete();
-        }
-
-        if (configMapProperties == null) {
-            sourceType = ConfigSourceType.NONE;
-            throw new ApolloConfigException(
-                    "Load config from Kubernetes ConfigMap failed!", exception);
-        }
+  /**
+   * Update the memory
+   *
+   * @param namespace     the namespace of this repository change
+   * @param newProperties the properties after change
+   */
+  @Override
+  public void onRepositoryChange(String appId, String namespace, Properties newProperties) {
+    if (newProperties == null || newProperties.equals(configMapProperties)) {
+      return;
     }
+    Properties newFileProperties = propertiesFactory.getPropertiesInstance();
+    newFileProperties.putAll(newProperties);
+    updateConfigMapProperties(newFileProperties, upstream.getSourceType());
+    this.fireRepositoryChange(appId, namespace, newProperties);
+  }
 
-    Properties loadFromK8sConfigMap() {
-        Preconditions.checkNotNull(configMapName, "ConfigMap name cannot be null");
+  void persistConfigMap(Properties properties) {
+    Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "persistK8sConfigMap");
+    transaction.addData("configMapName", configMapName);
+    transaction.addData("k8sNamespace", k8sNamespace);
+    try {
+      // Convert properties to a JSON string using Gson
+      String jsonConfig = GSON.toJson(properties);
+      Map<String, String> data = new HashMap<>();
+      data.put(configMapKey, jsonConfig);
 
-        try {
-            String jsonConfig = kubernetesManager.getValueFromConfigMap(k8sNamespace, configMapName, configMapKey);
-
-            // Convert jsonConfig to properties
-            Properties properties = propertiesFactory.getPropertiesInstance();
-            if (jsonConfig != null && !jsonConfig.isEmpty()) {
-                Type type = new TypeToken<Map<String, String>>() {}.getType();
-                Map<String, String> configMap = GSON.fromJson(jsonConfig, type);
-                configMap.forEach(properties::setProperty);
-            }
-            return properties;
-        } catch (Exception ex) {
-            Tracer.logError(ex);
-            throw new ApolloConfigException(String
-                    .format("Load config from Kubernetes ConfigMap %s failed!", configMapName), ex);
-        }
+      // update configmap
+      kubernetesManager.updateConfigMap(k8sNamespace, configMapName, data);
+      transaction.setStatus(Transaction.SUCCESS);
+    } catch (Exception ex) {
+      ApolloConfigException exception = new ApolloConfigException(
+          String.format("Persist config to Kubernetes ConfigMap %s failed!", configMapName), ex);
+      Tracer.logError(exception);
+      transaction.setStatus(exception);
+      logger.error("Persist config to Kubernetes ConfigMap failed!", exception);
+    } finally {
+      transaction.complete();
     }
-
-    private boolean trySyncFromUpstream() {
-        if (upstream == null) {
-            return false;
-        }
-        try {
-            updateConfigMapProperties(upstream.getConfig(), upstream.getSourceType());
-            return true;
-        } catch (Throwable ex) {
-            Tracer.logError(ex);
-            logger.warn("Sync config from upstream repository {} failed, reason: {}", upstream.getClass(),
-                    ExceptionUtil.getDetailMessage(ex));
-        }
-        return false;
-    }
-
-    private synchronized void updateConfigMapProperties(Properties newProperties, ConfigSourceType sourceType) {
-        this.sourceType = sourceType;
-        if (newProperties == null || newProperties.equals(configMapProperties)) {
-            return;
-        }
-        this.configMapProperties = newProperties;
-        persistConfigMap(configMapProperties);
-    }
-
-    @Override
-    public void onRepositoryChange(String namespace, Properties newProperties) {
-        this.onRepositoryChange(appId, namespace, newProperties);
-    }
-
-    /**
-     * Update the memory
-     *
-     * @param namespace     the namespace of this repository change
-     * @param newProperties the properties after change
-     */
-    @Override
-    public void onRepositoryChange(String appId, String namespace, Properties newProperties) {
-        if (newProperties == null || newProperties.equals(configMapProperties)) {
-            return;
-        }
-        Properties newFileProperties = propertiesFactory.getPropertiesInstance();
-        newFileProperties.putAll(newProperties);
-        updateConfigMapProperties(newFileProperties, upstream.getSourceType());
-        this.fireRepositoryChange(appId, namespace, newProperties);
-    }
-
-    void persistConfigMap(Properties properties) {
-        Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "persistK8sConfigMap");
-        transaction.addData("configMapName", configMapName);
-        transaction.addData("k8sNamespace", k8sNamespace);
-        try {
-            // Convert properties to a JSON string using Gson
-            String jsonConfig = GSON.toJson(properties);
-            Map<String, String> data = new HashMap<>();
-            data.put(configMapKey, jsonConfig);
-
-            // update configmap
-            kubernetesManager.updateConfigMap(k8sNamespace, configMapName, data);
-            transaction.setStatus(Transaction.SUCCESS);
-        } catch (Exception ex) {
-            ApolloConfigException exception =
-                    new ApolloConfigException(
-                            String.format("Persist config to Kubernetes ConfigMap %s failed!", configMapName), ex);
-            Tracer.logError(exception);
-            transaction.setStatus(exception);
-            logger.error("Persist config to Kubernetes ConfigMap failed!", exception);
-        } finally {
-            transaction.complete();
-        }
-    }
+  }
 
 }

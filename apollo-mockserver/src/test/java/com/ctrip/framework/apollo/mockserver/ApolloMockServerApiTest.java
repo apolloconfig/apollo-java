@@ -173,8 +173,7 @@ public class ApolloMockServerApiTest {
     embeddedApollo.deleteProperty(appIdB, anotherNamespace, "key1");
 
     deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);
-    while (System.currentTimeMillis() < deadline
-        && configB.getProperty("key1", null) != null) {
+    while (System.currentTimeMillis() < deadline && configB.getProperty("key1", null) != null) {
       Thread.sleep(100);
     }
 

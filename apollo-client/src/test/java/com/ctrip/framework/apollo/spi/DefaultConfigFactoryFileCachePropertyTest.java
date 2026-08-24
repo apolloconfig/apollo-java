@@ -54,9 +54,10 @@ public class DefaultConfigFactoryFileCachePropertyTest {
   public void testCreateFileEnableConfigRepository() throws Exception {
     LocalFileConfigRepository someLocalConfigRepository = mock(LocalFileConfigRepository.class);
     when(someConfigUtil.isPropertyFileCacheEnabled()).thenReturn(true);
-    doReturn(someLocalConfigRepository).when(configFactory)
-        .createLocalConfigRepository(someAppId, someNamespace);
-    ConfigRepository configRepository = configFactory.createConfigRepository(someAppId, someNamespace);
+    doReturn(someLocalConfigRepository).when(configFactory).createLocalConfigRepository(someAppId,
+        someNamespace);
+    ConfigRepository configRepository =
+        configFactory.createConfigRepository(someAppId, someNamespace);
     assertSame(someLocalConfigRepository, configRepository);
     verify(configFactory, times(1)).createLocalConfigRepository(someAppId, someNamespace);
     verify(configFactory, never()).createRemoteConfigRepository(someAppId, someNamespace);
@@ -66,9 +67,10 @@ public class DefaultConfigFactoryFileCachePropertyTest {
   public void testCreateFileDisableConfigRepository() throws Exception {
     RemoteConfigRepository someRemoteConfigRepository = mock(RemoteConfigRepository.class);
     when(someConfigUtil.isPropertyFileCacheEnabled()).thenReturn(false);
-    doReturn(someRemoteConfigRepository).when(configFactory)
-        .createRemoteConfigRepository(someAppId, someNamespace);
-    ConfigRepository configRepository = configFactory.createConfigRepository(someAppId, someNamespace);
+    doReturn(someRemoteConfigRepository).when(configFactory).createRemoteConfigRepository(someAppId,
+        someNamespace);
+    ConfigRepository configRepository =
+        configFactory.createConfigRepository(someAppId, someNamespace);
     assertSame(someRemoteConfigRepository, configRepository);
     verify(configFactory, never()).createLocalConfigRepository(someAppId, someNamespace);
     verify(configFactory, times(1)).createRemoteConfigRepository(someAppId, someNamespace);

@@ -41,9 +41,10 @@ public class ApolloClientEnvironmentVariablesCompatibleTest {
 
   @Test
   public void testEnvironmentVariablesCompatible() throws Exception {
-    SystemLambda.withEnvironmentVariable(
-        ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES,
-        "test-2/cacheDir")
+    SystemLambda
+        .withEnvironmentVariable(
+            ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR_ENVIRONMENT_VARIABLES,
+            "test-2/cacheDir")
         .and(ApolloClientSystemConsts.DEPRECATED_APOLLO_ACCESS_KEY_SECRET_ENVIRONMENT_VARIABLES,
             "test-2-secret")
         .and(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES,

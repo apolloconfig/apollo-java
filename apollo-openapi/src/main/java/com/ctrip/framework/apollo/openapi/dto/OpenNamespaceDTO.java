@@ -102,19 +102,12 @@ public class OpenNamespaceDTO extends BaseDTO {
 
   @Override
   public String toString() {
-    return "OpenNamespaceDTO{" +
-        "appId='" + appId + '\'' +
-        ", clusterName='" + clusterName + '\'' +
-        ", namespaceName='" + namespaceName + '\'' +
-        ", comment='" + comment + '\'' +
-        ", format='" + format + '\'' +
-        ", isPublic=" + isPublic +
-        ", items=" + items +
-        ", extendInfo=" + extendInfo +
-        ", dataChangeCreatedBy='" + dataChangeCreatedBy + '\'' +
-        ", dataChangeLastModifiedBy='" + dataChangeLastModifiedBy + '\'' +
-        ", dataChangeCreatedTime=" + dataChangeCreatedTime +
-        ", dataChangeLastModifiedTime=" + dataChangeLastModifiedTime +
-        '}';
+    return "OpenNamespaceDTO{" + "appId='" + appId + '\'' + ", clusterName='" + clusterName + '\''
+        + ", namespaceName='" + namespaceName + '\'' + ", comment='" + comment + '\'' + ", format='"
+        + format + '\'' + ", isPublic=" + isPublic + ", items=" + items + ", extendInfo="
+        + extendInfo + ", dataChangeCreatedBy='" + dataChangeCreatedBy + '\''
+        + ", dataChangeLastModifiedBy='" + dataChangeLastModifiedBy + '\''
+        + ", dataChangeCreatedTime=" + dataChangeCreatedTime + ", dataChangeLastModifiedTime="
+        + dataChangeLastModifiedTime + '}';
   }
 }

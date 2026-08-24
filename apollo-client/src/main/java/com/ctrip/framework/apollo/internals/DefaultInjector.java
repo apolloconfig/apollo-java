@@ -55,7 +55,8 @@ public class DefaultInjector implements Injector {
       m_injector = Guice.createInjector(new ApolloModule());
       m_customizers = ServiceBootstrap.loadAllOrdered(ApolloInjectorCustomizer.class);
     } catch (Throwable ex) {
-      ApolloConfigException exception = new ApolloConfigException("Unable to initialize Guice Injector!", ex);
+      ApolloConfigException exception =
+          new ApolloConfigException("Unable to initialize Guice Injector!", ex);
       Tracer.logError(exception);
       throw exception;
     }
@@ -87,7 +88,7 @@ public class DefaultInjector implements Injector {
           return instance;
         }
       }
-      //Guice does not support get instance by type and name
+      // Guice does not support get instance by type and name
       return null;
     } catch (Throwable ex) {
       Tracer.logError(ex);
@@ -111,7 +112,8 @@ public class DefaultInjector implements Injector {
       bind(PropertiesFactory.class).to(DefaultPropertiesFactory.class).in(Singleton.class);
       bind(ConfigMonitor.class).to(DefaultConfigMonitor.class).in(Singleton.class);
       bind(ApolloClientMonitorContext.class).in(Singleton.class);
-      bind(ApolloClientMetricsExporterFactory.class).to(DefaultApolloClientMetricsExporterFactory.class).in(Singleton.class);
+      bind(ApolloClientMetricsExporterFactory.class)
+          .to(DefaultApolloClientMetricsExporterFactory.class).in(Singleton.class);
     }
   }
 }

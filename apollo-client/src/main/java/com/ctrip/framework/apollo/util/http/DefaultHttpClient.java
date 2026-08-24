@@ -87,7 +87,7 @@ public class DefaultHttpClient implements HttpClient {
   }
 
   private <T> HttpResponse<T> doGetWithSerializeFunction(HttpRequest httpRequest,
-                                                         Function<String, T> serializeFunction) {
+      Function<String, T> serializeFunction) {
     InputStreamReader isr = null;
     InputStreamReader esr = null;
     int statusCode;
@@ -137,7 +137,7 @@ public class DefaultHttpClient implements HttpClient {
           try {
             CharStreams.toString(esr);
           } catch (IOException ioe) {
-            //ignore
+            // ignore
           }
         }
 

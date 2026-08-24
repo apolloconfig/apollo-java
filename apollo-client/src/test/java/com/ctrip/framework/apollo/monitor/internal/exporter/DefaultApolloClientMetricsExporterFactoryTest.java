@@ -70,7 +70,8 @@ public class DefaultApolloClientMetricsExporterFactoryTest {
     when(configUtil.isClientMonitorJmxEnabled()).thenReturn(true);
     when(configUtil.getMonitorExternalExportPeriod()).thenReturn(1000L);
     when(monitorEventListener.getName()).thenReturn("testMBean");
-    List<ApolloClientMonitorEventListener> collectors = Collections.singletonList(monitorEventListener);
+    List<ApolloClientMonitorEventListener> collectors =
+        Collections.singletonList(monitorEventListener);
 
     ApolloClientMetricsExporter result = factory.getMetricsReporter(collectors);
 

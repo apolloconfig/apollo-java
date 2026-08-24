@@ -40,8 +40,8 @@ public class ConfigChange {
    * @param newValue the value after change
    * @param changeType the change type
    */
-  public ConfigChange(String appId, String namespace, String propertyName, String oldValue, String newValue,
-                      PropertyChangeType changeType) {
+  public ConfigChange(String appId, String namespace, String propertyName, String oldValue,
+      String newValue, PropertyChangeType changeType) {
     this.appId = appId;
     this.namespace = namespace;
     this.propertyName = propertyName;
@@ -49,6 +49,7 @@ public class ConfigChange {
     this.newValue = newValue;
     this.changeType = changeType;
   }
+
   public String getPropertyName() {
     return propertyName;
   }

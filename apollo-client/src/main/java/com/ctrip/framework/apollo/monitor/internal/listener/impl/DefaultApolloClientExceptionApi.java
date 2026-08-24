@@ -37,9 +37,8 @@ import java.util.stream.Collectors;
 /**
  * @author Rawven
  */
-public class DefaultApolloClientExceptionApi extends
-    AbstractApolloClientMonitorEventListener implements
-    ApolloClientExceptionMonitorApi, ApolloClientJmxExceptionMBean {
+public class DefaultApolloClientExceptionApi extends AbstractApolloClientMonitorEventListener
+    implements ApolloClientExceptionMonitorApi, ApolloClientJmxExceptionMBean {
 
   private final AtomicInteger exceptionCountFromStartup = new AtomicInteger(0);
   private final Queue<ApolloConfigException> exceptionsQueue;
@@ -47,8 +46,8 @@ public class DefaultApolloClientExceptionApi extends
   public DefaultApolloClientExceptionApi(ConfigUtil configUtil) {
     super(TAG_ERROR);
     int monitorExceptionQueueSize = configUtil.getMonitorExceptionQueueSize();
-    EvictingQueue<ApolloConfigException> evictingQueue = EvictingQueue.create(
-        monitorExceptionQueueSize);
+    EvictingQueue<ApolloConfigException> evictingQueue =
+        EvictingQueue.create(monitorExceptionQueueSize);
     exceptionsQueue = Queues.synchronizedQueue(evictingQueue);
   }
 
@@ -74,8 +73,7 @@ public class DefaultApolloClientExceptionApi extends
 
   @Override
   public List<String> getApolloConfigExceptionDetails() {
-    return exceptionsQueue.stream()
-        .map(ApolloConfigException::getMessage)
+    return exceptionsQueue.stream().map(ApolloConfigException::getMessage)
         .collect(Collectors.toList());
   }
 }

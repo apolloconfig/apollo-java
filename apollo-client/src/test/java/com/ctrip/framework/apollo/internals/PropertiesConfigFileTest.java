@@ -82,7 +82,8 @@ public class PropertiesConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    PropertiesConfigFile configFile = new PropertiesConfigFile(someAppId, someNamespace, configRepository);
+    PropertiesConfigFile configFile =
+        new PropertiesConfigFile(someAppId, someNamespace, configRepository);
 
     assertEquals(ConfigFileFormat.Properties, configFile.getConfigFileFormat());
     assertEquals(someNamespace, configFile.getNamespace());
@@ -94,7 +95,8 @@ public class PropertiesConfigFileTest {
   public void testWhenHasNoContent() throws Exception {
     when(configRepository.getConfig()).thenReturn(null);
 
-    PropertiesConfigFile configFile = new PropertiesConfigFile(someAppId, someNamespace, configRepository);
+    PropertiesConfigFile configFile =
+        new PropertiesConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -104,7 +106,8 @@ public class PropertiesConfigFileTest {
   public void testWhenConfigRepositoryHasError() throws Exception {
     when(configRepository.getConfig()).thenThrow(new RuntimeException("someError"));
 
-    PropertiesConfigFile configFile = new PropertiesConfigFile(someAppId, someNamespace, configRepository);
+    PropertiesConfigFile configFile =
+        new PropertiesConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -120,7 +123,8 @@ public class PropertiesConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    PropertiesConfigFile configFile = new PropertiesConfigFile(someAppId, someNamespace, configRepository);
+    PropertiesConfigFile configFile =
+        new PropertiesConfigFile(someAppId, someNamespace, configRepository);
 
     assertTrue(configFile.getContent().contains(String.format("%s=%s", someKey, someValue)));
 
@@ -159,7 +163,8 @@ public class PropertiesConfigFileTest {
 
     when(configRepository.getConfig()).thenThrow(new RuntimeException("someError"));
 
-    PropertiesConfigFile configFile = new PropertiesConfigFile(someAppId, someNamespace, configRepository);
+    PropertiesConfigFile configFile =
+        new PropertiesConfigFile(someAppId, someNamespace, configRepository);
 
     assertFalse(configFile.hasContent());
     assertNull(configFile.getContent());
@@ -179,9 +184,10 @@ public class PropertiesConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    PropertiesConfigFile configFile = new PropertiesConfigFile(someAppId, someNamespace, configRepository);
+    PropertiesConfigFile configFile =
+        new PropertiesConfigFile(someAppId, someNamespace, configRepository);
 
-    assertEquals(configFile.asProperties(),someProperties);
+    assertEquals(configFile.asProperties(), someProperties);
     assertEquals(ConfigFileFormat.Properties, configFile.getConfigFileFormat());
     assertEquals(someNamespace, configFile.getNamespace());
     assertTrue(configFile.hasContent());
@@ -194,9 +200,10 @@ public class PropertiesConfigFileTest {
 
     when(configRepository.getConfig()).thenReturn(someProperties);
 
-    PropertiesConfigFile configFile = new PropertiesConfigFile(someAppId, someNamespace, configRepository);
+    PropertiesConfigFile configFile =
+        new PropertiesConfigFile(someAppId, someNamespace, configRepository);
 
-    assertEquals(configFile.asProperties(),someProperties);
+    assertEquals(configFile.asProperties(), someProperties);
     assertEquals(ConfigFileFormat.Properties, configFile.getConfigFileFormat());
     assertEquals(someNamespace, configFile.getNamespace());
     assertFalse(configFile.hasContent());

@@ -40,12 +40,11 @@ import org.slf4j.Logger;
 /**
  * @author Rawven
  */
-public class DefaultApolloClientBootstrapArgsApi extends
-    AbstractApolloClientMonitorEventListener implements
-    ApolloClientBootstrapArgsMonitorApi, ApolloClientJmxBootstrapArgsMBean {
+public class DefaultApolloClientBootstrapArgsApi extends AbstractApolloClientMonitorEventListener
+    implements ApolloClientBootstrapArgsMonitorApi, ApolloClientJmxBootstrapArgsMBean {
 
-  private static final Logger logger = DeferredLoggerFactory.getLogger(
-      DefaultApolloClientBootstrapArgsApi.class);
+  private static final Logger logger =
+      DeferredLoggerFactory.getLogger(DefaultApolloClientBootstrapArgsApi.class);
   private final Map<String, Object> bootstrapArgs = Maps.newHashMap();
   private final Map<String, String> bootstrapArgsString = Maps.newHashMap();
 
@@ -63,14 +62,14 @@ public class DefaultApolloClientBootstrapArgsApi extends
     putAttachmentValue(APOLLO_OVERRIDE_SYSTEM_PROPERTIES, configUtil.isOverrideSystemProperties());
     putAttachmentValue(APOLLO_CACHE_DIR, configUtil.getDefaultLocalCacheDir());
     putAttachmentValue(APOLLO_CLUSTER, configUtil.getCluster());
-    putAttachmentValue(APOLLO_CONFIG_SERVICE,
-        System.getProperty(APOLLO_CONFIG_SERVICE));
+    putAttachmentValue(APOLLO_CONFIG_SERVICE, System.getProperty(APOLLO_CONFIG_SERVICE));
     putAttachmentValue(APOLLO_CLIENT_MONITOR_EXTERNAL_TYPE, configUtil.getMonitorExternalType());
     putAttachmentValue(APOLLO_CLIENT_MONITOR_ENABLED, configUtil.isClientMonitorEnabled());
     putAttachmentValue(APOLLO_CLIENT_MONITOR_EXTERNAL_EXPORT_PERIOD,
         configUtil.getMonitorExternalExportPeriod());
     putAttachmentValue(APOLLO_META, configUtil.getMetaServerDomainName());
-    putAttachmentValue(APOLLO_PROPERTY_NAMES_CACHE_ENABLE, configUtil.isPropertyNamesCacheEnabled());
+    putAttachmentValue(APOLLO_PROPERTY_NAMES_CACHE_ENABLE,
+        configUtil.isPropertyNamesCacheEnabled());
     putAttachmentValue(APOLLO_PROPERTY_ORDER_ENABLE, configUtil.isPropertiesOrderEnabled());
     putAttachmentValue(APOLLO_CLIENT_MONITOR_JMX_ENABLED, configUtil.isClientMonitorJmxEnabled());
     putAttachmentValue(APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE,
@@ -79,8 +78,8 @@ public class DefaultApolloClientBootstrapArgsApi extends
     putAttachmentValue(ENV, configUtil.getApolloEnv());
     putAttachmentValue(VERSION, Apollo.VERSION);
     DateUtil.formatLocalDateTime(LocalDateTime.now())
-            .ifPresent(s -> putAttachmentValue(META_FRESH, s));
-    putAttachmentValue(CONFIG_SERVICE_URL,"");
+        .ifPresent(s -> putAttachmentValue(META_FRESH, s));
+    putAttachmentValue(CONFIG_SERVICE_URL, "");
   }
 
   @Override
@@ -92,9 +91,9 @@ public class DefaultApolloClientBootstrapArgsApi extends
       logger.warn("Unhandled event name: {}", argName);
     }
   }
-  
+
   private void putAttachmentValue(String argName, Object value) {
-    if(StringUtils.isBlank(argName) || value == null) {
+    if (StringUtils.isBlank(argName) || value == null) {
       return;
     }
     bootstrapArgs.put(argName, value);

@@ -90,7 +90,7 @@ public class LocalFileConfigRepositoryTest {
     recursiveDelete(someBaseDir);
   }
 
-  //helper method to clean created files
+  // helper method to clean created files
   private void recursiveDelete(File file) {
     if (!file.exists()) {
       return;
@@ -135,7 +135,8 @@ public class LocalFileConfigRepositoryTest {
 
     Files.write(defaultKey + "=" + someValue, file, Charsets.UTF_8);
 
-    LocalFileConfigRepository localRepo = new LocalFileConfigRepository(someAppId, someNamespace, upstreamRepo);
+    LocalFileConfigRepository localRepo =
+        new LocalFileConfigRepository(someAppId, someNamespace, upstreamRepo);
     localRepo.setLocalCacheDir(someBaseDir, true);
 
     Properties properties = localRepo.getConfig();
@@ -166,8 +167,7 @@ public class LocalFileConfigRepositoryTest {
 
     Properties someProperties = localRepo.getConfig();
 
-    LocalFileConfigRepository
-        anotherLocalRepoWithNoFallback =
+    LocalFileConfigRepository anotherLocalRepoWithNoFallback =
         new LocalFileConfigRepository(someAppId, someNamespace);
     anotherLocalRepoWithNoFallback.setLocalCacheDir(someBaseDir, true);
 
@@ -205,7 +205,8 @@ public class LocalFileConfigRepositoryTest {
 
     final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
 
-    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace), captor.capture());
+    verify(someListener, times(1)).onRepositoryChange(eq(someAppId), eq(someNamespace),
+        captor.capture());
 
     assertEquals(anotherProperties, captor.getValue());
     assertEquals(anotherSourceType, localFileConfigRepository.getSourceType());

@@ -66,8 +66,8 @@ public class YamlParser {
     LoaderOptions loadingConfig = new LoaderOptions();
     loadingConfig.setAllowDuplicateKeys(false);
     DumperOptions dumperOptions = new DumperOptions();
-    return new Yaml(new SafeConstructor(loadingConfig),
-            new Representer(dumperOptions), dumperOptions, loadingConfig);
+    return new Yaml(new SafeConstructor(loadingConfig), new Representer(dumperOptions),
+        dumperOptions, loadingConfig);
   }
 
   private boolean process(MatchCallback callback, Yaml yaml, String content) {
@@ -81,7 +81,8 @@ public class YamlParser {
       }
     }
     if (logger.isDebugEnabled()) {
-      logger.debug("Loaded {} document{} from YAML resource: {}", count, count > 1 ? "s" : "", content);
+      logger.debug("Loaded {} document{} from YAML resource: {}", count, count > 1 ? "s" : "",
+          content);
     }
     return (count > 0);
   }
@@ -130,7 +131,8 @@ public class YamlParser {
     return result;
   }
 
-  private void buildFlattenedMap(Map<String, Object> result, Map<String, Object> source, String path) {
+  private void buildFlattenedMap(Map<String, Object> result, Map<String, Object> source,
+      String path) {
     for (Map.Entry<String, Object> entry : source.entrySet()) {
       String key = entry.getKey();
       if (!StringUtils.isBlank(path)) {

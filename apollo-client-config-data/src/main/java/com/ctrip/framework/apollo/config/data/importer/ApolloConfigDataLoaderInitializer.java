@@ -55,9 +55,8 @@ class ApolloConfigDataLoaderInitializer {
 
   private final Object bootstrapContext;
 
-  public ApolloConfigDataLoaderInitializer(DeferredLogFactory logFactory,
-      Binder binder, BindHandler bindHandler,
-      Object bootstrapContext) {
+  public ApolloConfigDataLoaderInitializer(DeferredLogFactory logFactory, Binder binder,
+      BindHandler bindHandler, Object bootstrapContext) {
     this.logFactory = logFactory;
     this.log = logFactory.getLog(ApolloConfigDataLoaderInitializer.class);
     this.binder = binder;
@@ -101,20 +100,18 @@ class ApolloConfigDataLoaderInitializer {
   }
 
   private void initApolloClientInternal() {
-    new ApolloClientSystemPropertyInitializer(this.logFactory)
-        .initializeSystemProperty(this.binder, this.bindHandler);
-    new ApolloClientExtensionInitializeFactory(this.logFactory,
-        this.bootstrapContext).initializeExtension(this.binder, this.bindHandler);
+    new ApolloClientSystemPropertyInitializer(this.logFactory).initializeSystemProperty(this.binder,
+        this.bindHandler);
+    new ApolloClientExtensionInitializeFactory(this.logFactory, this.bootstrapContext)
+        .initializeExtension(this.binder, this.bindHandler);
     DeferredLogger.enable();
-    ApolloConfigDataInjectorCustomizer.register(ConfigFactory.class,
-        PureApolloConfigFactory::new);
+    ApolloConfigDataInjectorCustomizer.register(ConfigFactory.class, PureApolloConfigFactory::new);
   }
 
   private boolean forceDisableApolloBootstrap() {
     boolean bootstrapEnabled = this.binder
         .bind(this.camelCasedToKebabCase(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED),
-            Bindable.of(Boolean.class),
-            this.bindHandler)
+            Bindable.of(Boolean.class), this.bindHandler)
         .orElse(false);
     if (bootstrapEnabled) {
       this.log.warn(Slf4jLogMessageFormatter.format(
@@ -122,12 +119,9 @@ class ApolloConfigDataLoaderInitializer {
           PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED));
       return true;
     }
-    boolean bootstrapEagerLoadEnabled = this.binder
-        .bind(this.camelCasedToKebabCase(
-            PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED),
-            Bindable.of(Boolean.class),
-            this.bindHandler)
-        .orElse(false);
+    boolean bootstrapEagerLoadEnabled = this.binder.bind(
+        this.camelCasedToKebabCase(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED),
+        Bindable.of(Boolean.class), this.bindHandler).orElse(false);
     if (bootstrapEagerLoadEnabled) {
       this.log.warn(Slf4jLogMessageFormatter.format(
           "apollo bootstrap eager load is force disabled. please don't configure the property [{}=true] and [spring.config.import=apollo://...] at the same time",

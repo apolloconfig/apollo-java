@@ -56,8 +56,8 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
   private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
 
   static {
-    m_executorService = Executors.newCachedThreadPool(ApolloThreadFactory
-        .create("ConfigFile", true));
+    m_executorService =
+        Executors.newCachedThreadPool(ApolloThreadFactory.create("ConfigFile", true));
   }
 
   public AbstractConfigFile(String appId, String namespace, ConfigRepository configRepository) {
@@ -75,11 +75,11 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
       m_sourceType = m_configRepository.getSourceType();
     } catch (Throwable ex) {
       Tracer.logError(ex);
-      logger.warn("Init Apollo Config File failed - namespace: {}, reason: {}.",
-          m_namespace, ExceptionUtil.getDetailMessage(ex));
+      logger.warn("Init Apollo Config File failed - namespace: {}, reason: {}.", m_namespace,
+          ExceptionUtil.getDetailMessage(ex));
     } finally {
-      //register the change listener no matter config repository is working or not
-      //so that whenever config repository is recovered, config could get changed
+      // register the change listener no matter config repository is working or not
+      // so that whenever config repository is recovered, config could get changed
       m_configRepository.addChangeListener(this);
     }
   }
@@ -102,7 +102,8 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
   }
 
   @Override
-  public synchronized void onRepositoryChange(String appId, String namespace, Properties newProperties) {
+  public synchronized void onRepositoryChange(String appId, String namespace,
+      Properties newProperties) {
     if (newProperties.equals(m_configProperties.get())) {
       return;
     }
@@ -124,7 +125,8 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
       changeType = PropertyChangeType.DELETED;
     }
 
-    this.fireConfigChange(new ConfigFileChangeEvent(m_appId, m_namespace, oldValue, newValue, changeType));
+    this.fireConfigChange(
+        new ConfigFileChangeEvent(m_appId, m_namespace, oldValue, newValue, changeType));
 
     Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
   }
@@ -152,7 +154,8 @@ public abstract class AbstractConfigFile implements ConfigFile, RepositoryChange
         @Override
         public void run() {
           String listenerName = listener.getClass().getName();
-          Transaction transaction = Tracer.newTransaction("Apollo.ConfigFileChangeListener", listenerName);
+          Transaction transaction =
+              Tracer.newTransaction("Apollo.ConfigFileChangeListener", listenerName);
           try {
             listener.onChange(changeEvent);
             transaction.setStatus(Transaction.SUCCESS);

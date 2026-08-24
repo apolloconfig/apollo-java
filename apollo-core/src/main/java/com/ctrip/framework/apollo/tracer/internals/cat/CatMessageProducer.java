@@ -36,18 +36,17 @@ public class CatMessageProducer implements MessageProducer {
 
   @Override
   public void logEvent(String type, String name) {
-      Cat.logEvent(type, name);
+    Cat.logEvent(type, name);
   }
 
   @Override
   public void logEvent(String type, String name, String status, String nameValuePairs) {
-    Cat.logEvent(type, name,
-          status, nameValuePairs);
+    Cat.logEvent(type, name, status, nameValuePairs);
   }
 
   @Override
   public void logMetricsForCount(String name) {
-     Cat.logMetricForCount(name);
+    Cat.logMetricForCount(name);
   }
 
   @Override

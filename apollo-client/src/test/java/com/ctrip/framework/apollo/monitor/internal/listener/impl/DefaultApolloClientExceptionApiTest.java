@@ -38,7 +38,8 @@ public class DefaultApolloClientExceptionApiTest {
     int someQueueSize = 10;
     ConfigUtil configUtil = mock(ConfigUtil.class);
     when(configUtil.getMonitorExceptionQueueSize()).thenReturn(someQueueSize);
-    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE, String.valueOf(someQueueSize));
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE,
+        String.valueOf(someQueueSize));
     exceptionApi = new DefaultApolloClientExceptionApi(configUtil);
   }
 
@@ -91,8 +92,8 @@ public class DefaultApolloClientExceptionApiTest {
   public void testCollect0_HandlesMaxQueueSize() {
     for (int i = 0; i < 10; i++) {
       ApolloClientMonitorEvent event = mock(ApolloClientMonitorEvent.class);
-      when(event.getAttachmentValue(THROWABLE)).thenReturn(
-          new ApolloConfigException("Exception " + i));
+      when(event.getAttachmentValue(THROWABLE))
+          .thenReturn(new ApolloConfigException("Exception " + i));
       exceptionApi.collect0(event);
     }
 
@@ -100,8 +101,8 @@ public class DefaultApolloClientExceptionApiTest {
 
     // Add one more to exceed the size.
     ApolloClientMonitorEvent overflowEvent = mock(ApolloClientMonitorEvent.class);
-    when(overflowEvent.getAttachmentValue(THROWABLE)).thenReturn(
-        new ApolloConfigException("Overflow Exception"));
+    when(overflowEvent.getAttachmentValue(THROWABLE))
+        .thenReturn(new ApolloConfigException("Overflow Exception"));
     exceptionApi.collect0(overflowEvent);
 
     assertEquals(10, exceptionApi.getApolloConfigExceptionList().size());

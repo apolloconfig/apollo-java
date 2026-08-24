@@ -76,7 +76,8 @@ public class SpringAnnotationCompatibilityTest {
     assertEquals(5001, probe.getTimeout());
     assertEquals("from-public", probe.getPublicValue());
     assertEquals("from-yaml", probe.getYamlMarker());
-    assertEquals("from-another-app", probe.getAnotherAppConfig().getProperty("compat.origin", null));
+    assertEquals("from-another-app",
+        probe.getAnotherAppConfig().getProperty("compat.origin", null));
     assertEquals("5001", probe.getApplicationConfig().getProperty("compat.timeout", null));
     assertEquals("from-public", probe.getPublicNamespaceConfig().getProperty("public.key", null));
     assertEquals("from-yaml", probe.getYamlNamespaceConfig().getProperty("yaml.marker", null));
@@ -93,12 +94,14 @@ public class SpringAnnotationCompatibilityTest {
     Config publicConfig = ConfigService.getConfig("TEST1.apollo");
     Properties publicProperties = SpringCompatibilityTestSupport.copyConfigProperties(publicConfig);
     publicProperties.setProperty("public.key", "from-public-updated");
-    SpringCompatibilityTestSupport.applyConfigChange(publicConfig, "TEST1.apollo", publicProperties);
+    SpringCompatibilityTestSupport.applyConfigChange(publicConfig, "TEST1.apollo",
+        publicProperties);
 
     Config yamlConfig = ConfigService.getConfig("application.yaml");
     Properties yamlProperties = SpringCompatibilityTestSupport.copyConfigProperties(yamlConfig);
     yamlProperties.setProperty("yaml.marker", "from-yaml-updated");
-    SpringCompatibilityTestSupport.applyConfigChange(yamlConfig, "application.yaml", yamlProperties);
+    SpringCompatibilityTestSupport.applyConfigChange(yamlConfig, "application.yaml",
+        yamlProperties);
 
     Properties anotherAppProperties =
         SpringCompatibilityTestSupport.copyConfigProperties(probe.getAnotherAppConfig());
@@ -131,20 +134,22 @@ public class SpringAnnotationCompatibilityTest {
             && apolloEventListenerProbe.hasNamespace("application.yaml"));
 
     SpringCompatibilityTestSupport.waitForCondition("public value should be updated",
-        () -> "from-public-updated".equals(
-            probe.getPublicNamespaceConfig().getProperty("public.key", null)));
+        () -> "from-public-updated"
+            .equals(probe.getPublicNamespaceConfig().getProperty("public.key", null)));
     SpringCompatibilityTestSupport.waitForCondition("yaml marker should be updated",
-        () -> "from-yaml-updated".equals(
-            probe.getYamlNamespaceConfig().getProperty("yaml.marker", null)));
+        () -> "from-yaml-updated"
+            .equals(probe.getYamlNamespaceConfig().getProperty("yaml.marker", null)));
     SpringCompatibilityTestSupport.waitForCondition("application config should be updated",
         () -> "5002".equals(probe.getApplicationConfig().getProperty("compat.timeout", null)));
     SpringCompatibilityTestSupport.waitForCondition("another app config should be updated",
-        () -> "changed-origin".equals(probe.getAnotherAppConfig().getProperty("compat.origin", null)));
+        () -> "changed-origin"
+            .equals(probe.getAnotherAppConfig().getProperty("compat.origin", null)));
   }
 
   @Configuration
   @EnableApolloConfig(value = {"application", "TEST1.apollo", "application.yaml"},
-      multipleConfigs = {@MultipleConfig(appId = ANOTHER_APP_ID, namespaces = {"application"}, order = 9)})
+      multipleConfigs = {
+          @MultipleConfig(appId = ANOTHER_APP_ID, namespaces = {"application"}, order = 9)})
   static class TestConfiguration {
 
     @Bean
@@ -221,8 +226,7 @@ public class SpringAnnotationCompatibilityTest {
       yamlNamespaceEvents.offer(event);
     }
 
-    @ApolloConfigChangeListener(appId = ANOTHER_APP_ID,
-        interestedKeyPrefixes = {"compat.origin"})
+    @ApolloConfigChangeListener(appId = ANOTHER_APP_ID, interestedKeyPrefixes = {"compat.origin"})
     private void onAnotherAppChange(ConfigChangeEvent event) {
       anotherAppEvents.offer(event);
     }
@@ -263,11 +267,13 @@ public class SpringAnnotationCompatibilityTest {
       return defaultEvents.poll(timeout, unit);
     }
 
-    ConfigChangeEvent pollPublicNamespaceEvent(long timeout, TimeUnit unit) throws InterruptedException {
+    ConfigChangeEvent pollPublicNamespaceEvent(long timeout, TimeUnit unit)
+        throws InterruptedException {
       return publicNamespaceEvents.poll(timeout, unit);
     }
 
-    ConfigChangeEvent pollYamlNamespaceEvent(long timeout, TimeUnit unit) throws InterruptedException {
+    ConfigChangeEvent pollYamlNamespaceEvent(long timeout, TimeUnit unit)
+        throws InterruptedException {
       return yamlNamespaceEvents.poll(timeout, unit);
     }
 

@@ -37,19 +37,19 @@ public class ConfigService {
   private volatile ConfigMonitor m_configMonitor;
   private volatile ConfigManager m_configManager;
   private volatile ConfigRegistry m_configRegistry;
-  
+
   private ConfigMonitor getMonitor() {
-      getManager();
-      if (m_configMonitor == null) {
-            synchronized (this) {
-                if (m_configMonitor == null) {
-                  m_configMonitor = ApolloInjector.getInstance(ConfigMonitor.class);
-                }
-            }
+    getManager();
+    if (m_configMonitor == null) {
+      synchronized (this) {
+        if (m_configMonitor == null) {
+          m_configMonitor = ApolloInjector.getInstance(ConfigMonitor.class);
+        }
       }
-      return m_configMonitor;
+    }
+    return m_configMonitor;
   }
-  
+
   private ConfigManager getManager() {
     if (m_configManager == null) {
       synchronized (this) {
@@ -114,8 +114,8 @@ public class ConfigService {
     return s_instance.getManager().getConfigFile(appId, namespace, configFileFormat);
   }
 
-  public static ConfigMonitor getConfigMonitor(){
-      return s_instance.getMonitor();
+  public static ConfigMonitor getConfigMonitor() {
+    return s_instance.getMonitor();
   }
 
   static void setConfig(Config config) {
@@ -140,8 +140,9 @@ public class ConfigService {
 
       @Override
       public Config create(String appId, String namespace) {
-        if(!StringUtils.equals(appId, m_configUtil.getAppId())){
-          throw new IllegalArgumentException("Provided appId '" + appId + "' does not match the default appId '" + m_configUtil.getAppId() + "'");
+        if (!StringUtils.equals(appId, m_configUtil.getAppId())) {
+          throw new IllegalArgumentException("Provided appId '" + appId
+              + "' does not match the default appId '" + m_configUtil.getAppId() + "'");
         }
         return config;
       }
@@ -152,7 +153,8 @@ public class ConfigService {
       }
 
       @Override
-      public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+      public ConfigFile createConfigFile(String appId, String namespace,
+          ConfigFileFormat configFileFormat) {
         return null;
       }
 

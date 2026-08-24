@@ -61,7 +61,7 @@ public interface MessageProducer extends Ordered {
    * @param name        metrics name
    */
   default void logMetricsForCount(String name) {
-      //do nothing
+    // do nothing
   }
 
   /**

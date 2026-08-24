@@ -46,7 +46,8 @@ public class EmbeddedApollo extends ExternalResource {
   /**
    * Add new property or update existed property for the specified appId and namespace.
    */
-  public void addOrModifyProperty(String appId, String namespace, String someKey, String someValue) {
+  public void addOrModifyProperty(String appId, String namespace, String someKey,
+      String someValue) {
     apollo.addOrModifyProperty(appId, namespace, someKey, someValue);
   }
 
