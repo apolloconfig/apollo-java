@@ -30,9 +30,9 @@ import java.util.List;
 public enum NetworkInterfaceManager {
   INSTANCE;
 
-  private InetAddress m_local;
+  private InetAddress local;
 
-  private InetAddress m_localHost;
+  private InetAddress localHost;
 
   NetworkInterfaceManager() {
     load();
@@ -78,17 +78,17 @@ public enum NetworkInterfaceManager {
   }
 
   public String getLocalHostAddress() {
-    return m_local.getHostAddress();
+    return local.getHostAddress();
   }
 
   public String getLocalHostName() {
     try {
-      if (null == m_localHost) {
-        m_localHost = InetAddress.getLocalHost();
+      if (null == localHost) {
+        localHost = InetAddress.getLocalHost();
       }
-      return m_localHost.getHostName();
+      return localHost.getHostName();
     } catch (UnknownHostException e) {
-      return m_local.getHostName();
+      return local.getHostName();
     }
   }
 
@@ -107,7 +107,7 @@ public enum NetworkInterfaceManager {
 
     if (ip != null) {
       try {
-        m_local = InetAddress.getByName(ip);
+        local = InetAddress.getByName(ip);
         return;
       } catch (Exception e) {
         System.err.println(e);
@@ -118,14 +118,14 @@ public enum NetworkInterfaceManager {
     try {
       Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
       if (interfaces == null) {
-        m_local = InetAddress.getLoopbackAddress();
+        local = InetAddress.getLoopbackAddress();
         return;
       }
       List<NetworkInterface> nis = Collections.list(interfaces);
       //sort the network interfaces according to the index asc
       nis.sort(Comparator.comparingInt(NetworkInterface::getIndex));
       List<InetAddress> addresses = new ArrayList<>();
-      InetAddress local = null;
+      InetAddress resolvedAddress = null;
 
       try {
         for (NetworkInterface ni : nis) {
@@ -133,18 +133,18 @@ public enum NetworkInterfaceManager {
             addresses.addAll(Collections.list(ni.getInetAddresses()));
           }
         }
-        local = findValidateIp(addresses);
+        resolvedAddress = findValidateIp(addresses);
       } catch (Exception e) {
         // ignore
       }
-      if (local != null) {
-        m_local = local;
+      if (resolvedAddress != null) {
+        local = resolvedAddress;
         return;
       }
     } catch (SocketException e) {
       // ignore it
     }
 
-    m_local = InetAddress.getLoopbackAddress();
+    local = InetAddress.getLoopbackAddress();
   }
 }

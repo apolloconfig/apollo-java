@@ -34,7 +34,7 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractConfigRepository implements ConfigRepository {
   private static final Logger logger = LoggerFactory.getLogger(AbstractConfigRepository.class);
-  private List<RepositoryChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
+  private List<RepositoryChangeListener> listeners = Lists.newCopyOnWriteArrayList();
   protected PropertiesFactory propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
 
   protected boolean trySync() {
@@ -54,18 +54,18 @@ public abstract class AbstractConfigRepository implements ConfigRepository {
 
   @Override
   public void addChangeListener(RepositoryChangeListener listener) {
-    if (!m_listeners.contains(listener)) {
-      m_listeners.add(listener);
+    if (!listeners.contains(listener)) {
+      listeners.add(listener);
     }
   }
 
   @Override
   public void removeChangeListener(RepositoryChangeListener listener) {
-    m_listeners.remove(listener);
+    listeners.remove(listener);
   }
 
   protected void fireRepositoryChange(String appId, String namespace, Properties newProperties) {
-    for (RepositoryChangeListener listener : m_listeners) {
+    for (RepositoryChangeListener listener : listeners) {
       try {
         listener.onRepositoryChange(appId, namespace, newProperties);
       } catch (Throwable ex) {

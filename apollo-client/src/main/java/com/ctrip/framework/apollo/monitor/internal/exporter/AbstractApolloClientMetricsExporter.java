@@ -33,14 +33,14 @@ import org.slf4j.Logger;
  */
 public abstract class AbstractApolloClientMetricsExporter implements ApolloClientMetricsExporter {
 
-  public static final ScheduledExecutorService m_executorService;
+  public static final ScheduledExecutorService executorService;
   private static final Logger log = DeferredLoggerFactory.getLogger(
       AbstractApolloClientMetricsExporter.class);
   private static final long INITIAL_DELAY = 5L;
   private static final int THREAD_POOL_SIZE = 1;
 
   static {
-    m_executorService = Executors.newScheduledThreadPool(THREAD_POOL_SIZE,
+    executorService = Executors.newScheduledThreadPool(THREAD_POOL_SIZE,
         ApolloThreadFactory.create(ApolloClientMetricsExporter.class.getName(), true));
   }
 
@@ -62,7 +62,7 @@ public abstract class AbstractApolloClientMetricsExporter implements ApolloClien
   protected abstract void doInit();
 
   private void initScheduleMetricsCollectSync(long collectPeriod) {
-    m_executorService.scheduleAtFixedRate(() -> {
+    executorService.scheduleAtFixedRate(() -> {
       try {
         updateMetricsData();
       } catch (Throwable ex) {

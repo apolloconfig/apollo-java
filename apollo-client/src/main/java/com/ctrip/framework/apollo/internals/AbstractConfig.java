@@ -53,38 +53,38 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class AbstractConfig implements Config {
   private static final Logger logger = LoggerFactory.getLogger(AbstractConfig.class);
 
-  protected static final ExecutorService m_executorService;
+  protected static final ExecutorService executorService;
 
-  private final List<ConfigChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
-  private final Map<ConfigChangeListener, Set<String>> m_interestedKeys =
+  private final List<ConfigChangeListener> listeners = Lists.newCopyOnWriteArrayList();
+  private final Map<ConfigChangeListener, Set<String>> interestedKeys =
       Collections.synchronizedMap(new IdentityHashMap<>());
-  private final Map<ConfigChangeListener, Set<String>> m_interestedKeyPrefixes =
+  private final Map<ConfigChangeListener, Set<String>> interestedKeyPrefixes =
       Collections.synchronizedMap(new IdentityHashMap<>());
-  private final ConfigUtil m_configUtil;
-  private volatile Cache<String, Integer> m_integerCache;
-  private volatile Cache<String, Long> m_longCache;
-  private volatile Cache<String, Short> m_shortCache;
-  private volatile Cache<String, Float> m_floatCache;
-  private volatile Cache<String, Double> m_doubleCache;
-  private volatile Cache<String, Byte> m_byteCache;
-  private volatile Cache<String, Boolean> m_booleanCache;
-  private volatile Cache<String, Date> m_dateCache;
-  private volatile Cache<String, Long> m_durationCache;
-  private final Map<String, Cache<String, String[]>> m_arrayCache;
+  private final ConfigUtil configUtil;
+  private volatile Cache<String, Integer> integerCache;
+  private volatile Cache<String, Long> longCache;
+  private volatile Cache<String, Short> shortCache;
+  private volatile Cache<String, Float> floatCache;
+  private volatile Cache<String, Double> doubleCache;
+  private volatile Cache<String, Byte> byteCache;
+  private volatile Cache<String, Boolean> booleanCache;
+  private volatile Cache<String, Date> dateCache;
+  private volatile Cache<String, Long> durationCache;
+  private final Map<String, Cache<String, String[]>> arrayCache;
   private final List<Cache> allCaches;
-  private final AtomicLong m_configVersion; //indicate config version
+  private final AtomicLong configVersion; //indicate config version
 
   protected PropertiesFactory propertiesFactory;
 
   static {
-    m_executorService = Executors.newCachedThreadPool(ApolloThreadFactory
+    executorService = Executors.newCachedThreadPool(ApolloThreadFactory
         .create("Config", true));
   }
 
   public AbstractConfig() {
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-    m_configVersion = new AtomicLong();
-    m_arrayCache = Maps.newConcurrentMap();
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    configVersion = new AtomicLong();
+    arrayCache = Maps.newConcurrentMap();
     allCaches = Lists.newArrayList();
     propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
   }
@@ -102,35 +102,35 @@ public abstract class AbstractConfig implements Config {
   @Override
   public void addChangeListener(ConfigChangeListener listener, Set<String> interestedKeys, Set<String> interestedKeyPrefixes) {
     if (!containsListenerInstance(listener)) {
-      m_listeners.add(listener);
+      listeners.add(listener);
       if (interestedKeys != null && !interestedKeys.isEmpty()) {
-        m_interestedKeys.put(listener, Sets.newHashSet(interestedKeys));
+        this.interestedKeys.put(listener, Sets.newHashSet(interestedKeys));
       }
       if (interestedKeyPrefixes != null && !interestedKeyPrefixes.isEmpty()) {
-        m_interestedKeyPrefixes.put(listener, Sets.newHashSet(interestedKeyPrefixes));
+        this.interestedKeyPrefixes.put(listener, Sets.newHashSet(interestedKeyPrefixes));
       }
     }
   }
 
   @Override
   public boolean removeChangeListener(ConfigChangeListener listener) {
-    m_interestedKeys.remove(listener);
-    m_interestedKeyPrefixes.remove(listener);
-    return m_listeners.removeIf(addedListener -> addedListener == listener);
+    interestedKeys.remove(listener);
+    interestedKeyPrefixes.remove(listener);
+    return listeners.removeIf(addedListener -> addedListener == listener);
   }
 
   @Override
   public Integer getIntProperty(String key, Integer defaultValue) {
     try {
-      if (m_integerCache == null) {
+      if (integerCache == null) {
         synchronized (this) {
-          if (m_integerCache == null) {
-            m_integerCache = newCache();
+          if (integerCache == null) {
+            integerCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_INT_FUNCTION, m_integerCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_INT_FUNCTION, integerCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getIntProperty for %s failed, return default value %d", key,
@@ -142,15 +142,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public Long getLongProperty(String key, Long defaultValue) {
     try {
-      if (m_longCache == null) {
+      if (longCache == null) {
         synchronized (this) {
-          if (m_longCache == null) {
-            m_longCache = newCache();
+          if (longCache == null) {
+            longCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_LONG_FUNCTION, m_longCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_LONG_FUNCTION, longCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getLongProperty for %s failed, return default value %d", key,
@@ -162,15 +162,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public Short getShortProperty(String key, Short defaultValue) {
     try {
-      if (m_shortCache == null) {
+      if (shortCache == null) {
         synchronized (this) {
-          if (m_shortCache == null) {
-            m_shortCache = newCache();
+          if (shortCache == null) {
+            shortCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_SHORT_FUNCTION, m_shortCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_SHORT_FUNCTION, shortCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getShortProperty for %s failed, return default value %d", key,
@@ -182,15 +182,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public Float getFloatProperty(String key, Float defaultValue) {
     try {
-      if (m_floatCache == null) {
+      if (floatCache == null) {
         synchronized (this) {
-          if (m_floatCache == null) {
-            m_floatCache = newCache();
+          if (floatCache == null) {
+            floatCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_FLOAT_FUNCTION, m_floatCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_FLOAT_FUNCTION, floatCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getFloatProperty for %s failed, return default value %f", key,
@@ -202,15 +202,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public Double getDoubleProperty(String key, Double defaultValue) {
     try {
-      if (m_doubleCache == null) {
+      if (doubleCache == null) {
         synchronized (this) {
-          if (m_doubleCache == null) {
-            m_doubleCache = newCache();
+          if (doubleCache == null) {
+            doubleCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_DOUBLE_FUNCTION, m_doubleCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_DOUBLE_FUNCTION, doubleCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getDoubleProperty for %s failed, return default value %f", key,
@@ -222,15 +222,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public Byte getByteProperty(String key, Byte defaultValue) {
     try {
-      if (m_byteCache == null) {
+      if (byteCache == null) {
         synchronized (this) {
-          if (m_byteCache == null) {
-            m_byteCache = newCache();
+          if (byteCache == null) {
+            byteCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_BYTE_FUNCTION, m_byteCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_BYTE_FUNCTION, byteCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getByteProperty for %s failed, return default value %d", key,
@@ -242,15 +242,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public Boolean getBooleanProperty(String key, Boolean defaultValue) {
     try {
-      if (m_booleanCache == null) {
+      if (booleanCache == null) {
         synchronized (this) {
-          if (m_booleanCache == null) {
-            m_booleanCache = newCache();
+          if (booleanCache == null) {
+            booleanCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_BOOLEAN_FUNCTION, m_booleanCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_BOOLEAN_FUNCTION, booleanCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getBooleanProperty for %s failed, return default value %b", key,
@@ -262,15 +262,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public String[] getArrayProperty(String key, final String delimiter, String[] defaultValue) {
     try {
-      if (!m_arrayCache.containsKey(delimiter)) {
+      if (!arrayCache.containsKey(delimiter)) {
         synchronized (this) {
-          if (!m_arrayCache.containsKey(delimiter)) {
-            m_arrayCache.put(delimiter, this.newCache());
+          if (!arrayCache.containsKey(delimiter)) {
+            arrayCache.put(delimiter, this.newCache());
           }
         }
       }
 
-      Cache<String, String[]> cache = m_arrayCache.get(delimiter);
+      Cache<String, String[]> cache = arrayCache.get(delimiter);
       String[] result = cache.getIfPresent(key);
 
       if (result != null) {
@@ -310,15 +310,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public Date getDateProperty(String key, Date defaultValue) {
     try {
-      if (m_dateCache == null) {
+      if (dateCache == null) {
         synchronized (this) {
-          if (m_dateCache == null) {
-            m_dateCache = newCache();
+          if (dateCache == null) {
+            dateCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_DATE_FUNCTION, m_dateCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_DATE_FUNCTION, dateCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getDateProperty for %s failed, return default value %s", key,
@@ -365,15 +365,15 @@ public abstract class AbstractConfig implements Config {
   @Override
   public long getDurationProperty(String key, long defaultValue) {
     try {
-      if (m_durationCache == null) {
+      if (durationCache == null) {
         synchronized (this) {
-          if (m_durationCache == null) {
-            m_durationCache = newCache();
+          if (durationCache == null) {
+            durationCache = newCache();
           }
         }
       }
 
-      return getValueFromCache(key, Functions.TO_DURATION_FUNCTION, m_durationCache, defaultValue);
+      return getValueFromCache(key, Functions.TO_DURATION_FUNCTION, durationCache, defaultValue);
     } catch (Throwable ex) {
       Tracer.logError(new ApolloConfigException(
           String.format("getDurationProperty for %s failed, return default value %d", key,
@@ -411,7 +411,7 @@ public abstract class AbstractConfig implements Config {
   }
 
   private <T> T getValueAndStoreToCache(String key, Function<String, T> parser, Cache<String, T> cache, T defaultValue) {
-    long currentConfigVersion = m_configVersion.get();
+    long currentConfigVersion = configVersion.get();
     String value = getProperty(key, null);
 
     if (value != null) {
@@ -419,7 +419,7 @@ public abstract class AbstractConfig implements Config {
 
       if (result != null) {
         synchronized (this) {
-          if (m_configVersion.get() == currentConfigVersion) {
+          if (configVersion.get() == currentConfigVersion) {
             cache.put(key, result);
           }
         }
@@ -432,8 +432,8 @@ public abstract class AbstractConfig implements Config {
 
   private <T> Cache<String, T> newCache() {
     Cache<String, T> cache = CacheBuilder.newBuilder()
-        .maximumSize(m_configUtil.getMaxConfigCacheSize())
-        .expireAfterAccess(m_configUtil.getConfigCacheExpireTime(), m_configUtil.getConfigCacheExpireTimeUnit())
+        .maximumSize(configUtil.getMaxConfigCacheSize())
+        .expireAfterAccess(configUtil.getConfigCacheExpireTime(), configUtil.getConfigCacheExpireTimeUnit())
         .build();
     allCaches.add(cache);
     return cache;
@@ -449,7 +449,7 @@ public abstract class AbstractConfig implements Config {
           c.invalidateAll();
         }
       }
-      m_configVersion.incrementAndGet();
+      configVersion.incrementAndGet();
     }
   }
 
@@ -484,7 +484,7 @@ public abstract class AbstractConfig implements Config {
 
   private List<ConfigChangeListener> findMatchedConfigChangeListeners(Set<String> changedKeys) {
     final List<ConfigChangeListener> configChangeListeners = new ArrayList<>();
-    for (ConfigChangeListener configChangeListener : this.m_listeners) {
+    for (ConfigChangeListener configChangeListener : this.listeners) {
       // check whether the listener is interested in this change event
       if (this.isConfigChangeListenerInterested(configChangeListener, changedKeys)) {
         configChangeListeners.add(configChangeListener);
@@ -494,7 +494,7 @@ public abstract class AbstractConfig implements Config {
   }
 
   private void notifyAsync(final ConfigChangeListener listener, final ConfigChangeEvent changeEvent) {
-    m_executorService.submit(new Runnable() {
+    executorService.submit(new Runnable() {
       @Override
       public void run() {
         String listenerName = listener.getClass().getName();
@@ -514,8 +514,8 @@ public abstract class AbstractConfig implements Config {
   }
 
   private boolean isConfigChangeListenerInterested(ConfigChangeListener configChangeListener, Set<String> changedKeys) {
-    Set<String> interestedKeys = m_interestedKeys.get(configChangeListener);
-    Set<String> interestedKeyPrefixes = m_interestedKeyPrefixes.get(configChangeListener);
+    Set<String> interestedKeys = this.interestedKeys.get(configChangeListener);
+    Set<String> interestedKeyPrefixes = this.interestedKeyPrefixes.get(configChangeListener);
 
     if ((interestedKeys == null || interestedKeys.isEmpty())
         && (interestedKeyPrefixes == null || interestedKeyPrefixes.isEmpty())) {
@@ -546,8 +546,8 @@ public abstract class AbstractConfig implements Config {
   private Set<String> resolveInterestedChangedKeys(ConfigChangeListener configChangeListener, Set<String> changedKeys) {
     Set<String> interestedChangedKeys = new HashSet<>();
 
-    if (this.m_interestedKeys.containsKey(configChangeListener)) {
-      Set<String> interestedKeys = this.m_interestedKeys.get(configChangeListener);
+    if (this.interestedKeys.containsKey(configChangeListener)) {
+      Set<String> interestedKeys = this.interestedKeys.get(configChangeListener);
       for (String interestedKey : interestedKeys) {
         if (changedKeys.contains(interestedKey)) {
           interestedChangedKeys.add(interestedKey);
@@ -555,8 +555,8 @@ public abstract class AbstractConfig implements Config {
       }
     }
 
-    if (this.m_interestedKeyPrefixes.containsKey(configChangeListener)) {
-      Set<String> interestedKeyPrefixes = this.m_interestedKeyPrefixes.get(configChangeListener);
+    if (this.interestedKeyPrefixes.containsKey(configChangeListener)) {
+      Set<String> interestedKeyPrefixes = this.interestedKeyPrefixes.get(configChangeListener);
       for (String interestedKeyPrefix : interestedKeyPrefixes) {
         for (String changedKey : changedKeys) {
           if (changedKey.startsWith(interestedKeyPrefix)) {
@@ -612,7 +612,7 @@ public abstract class AbstractConfig implements Config {
   }
 
   private boolean containsListenerInstance(ConfigChangeListener listener) {
-    for (ConfigChangeListener configChangeListener : m_listeners) {
+    for (ConfigChangeListener configChangeListener : listeners) {
       if (configChangeListener == listener) {
         return true;
       }

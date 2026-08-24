@@ -30,7 +30,7 @@ public abstract class Foundation {
   private static final Logger logger = LoggerFactory.getLogger(Foundation.class);
   private static final Object LOCK = new Object();
 
-  private static volatile ProviderManager s_manager;
+  private static volatile ProviderManager manager;
 
   // Encourage early initialization and fail early if it happens.
   static {
@@ -39,21 +39,21 @@ public abstract class Foundation {
 
   private static ProviderManager getManager() {
     try {
-      if (s_manager == null) {
+      if (manager == null) {
         // Double locking to make sure only one thread initializes ProviderManager.
         synchronized (LOCK) {
-          if (s_manager == null) {
-            s_manager = ServiceBootstrap.loadPrimary(ProviderManager.class);
-            s_manager.initialize();
+          if (manager == null) {
+            manager = ServiceBootstrap.loadPrimary(ProviderManager.class);
+            manager.initialize();
           }
         }
       }
 
-      return s_manager;
+      return manager;
     } catch (Throwable ex) {
-      s_manager = new NullProviderManager();
+      manager = new NullProviderManager();
       logger.error("Initialize ProviderManager failed.", ex);
-      return s_manager;
+      return manager;
     }
   }
 

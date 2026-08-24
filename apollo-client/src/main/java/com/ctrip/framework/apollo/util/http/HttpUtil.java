@@ -27,13 +27,13 @@ import java.lang.reflect.Type;
 @Deprecated
 public class HttpUtil implements HttpClient {
 
-  private HttpClient m_httpClient;
+  private HttpClient httpClient;
 
   /**
    * Constructor.
    */
   public HttpUtil() {
-    m_httpClient = new DefaultHttpClient();
+    httpClient = new DefaultHttpClient();
   }
 
   /**
@@ -46,7 +46,7 @@ public class HttpUtil implements HttpClient {
    */
   @Override
   public <T> HttpResponse<T> doGet(HttpRequest httpRequest, final Class<T> responseType) {
-    return m_httpClient.doGet(httpRequest, responseType);
+    return httpClient.doGet(httpRequest, responseType);
   }
 
   /**
@@ -59,6 +59,6 @@ public class HttpUtil implements HttpClient {
    */
   @Override
   public <T> HttpResponse<T> doGet(HttpRequest httpRequest, final Type responseType) {
-    return m_httpClient.doGet(httpRequest, responseType);
+    return httpClient.doGet(httpRequest, responseType);
   }
 }

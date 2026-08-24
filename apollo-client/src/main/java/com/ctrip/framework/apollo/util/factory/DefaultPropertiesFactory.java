@@ -28,15 +28,15 @@ import java.util.Properties;
  */
 public class DefaultPropertiesFactory implements PropertiesFactory {
 
-  private ConfigUtil m_configUtil;
+  private ConfigUtil configUtil;
 
   public DefaultPropertiesFactory() {
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   @Override
   public Properties getPropertiesInstance() {
-    if (m_configUtil.isPropertiesOrderEnabled()) {
+    if (configUtil.isPropertiesOrderEnabled()) {
       return new OrderedProperties();
     } else {
       return new Properties();

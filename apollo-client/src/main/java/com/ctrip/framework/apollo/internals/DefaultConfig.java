@@ -50,14 +50,14 @@ import com.google.common.util.concurrent.RateLimiter;
 public class DefaultConfig extends AbstractConfig implements RepositoryChangeListener {
 
   private static final Logger logger = DeferredLoggerFactory.getLogger(DefaultConfig.class);
-  private final String m_appId;
-  private final String m_namespace;
-  private final Properties m_resourceProperties;
-  private final AtomicReference<Properties> m_configProperties;
-  private final ConfigRepository m_configRepository;
-  private final RateLimiter m_warnLogRateLimiter;
+  private final String appId;
+  private final String namespace;
+  private final Properties resourceProperties;
+  private final AtomicReference<Properties> configProperties;
+  private final ConfigRepository configRepository;
+  private final RateLimiter warnLogRateLimiter;
 
-  private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
+  private volatile ConfigSourceType sourceType = ConfigSourceType.NONE;
 
   /**
    * Constructor.
@@ -80,27 +80,27 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
     if (appId == null) {
       appId = ApolloInjector.getInstance(ConfigUtil.class).getAppId();
     }
-    m_appId = appId;
-    m_namespace = namespace;
-    m_resourceProperties = loadFromResource(m_appId, m_namespace);
-    m_configRepository = configRepository;
-    m_configProperties = new AtomicReference<>();
-    m_warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
+    this.appId = appId;
+    this.namespace = namespace;
+    this.resourceProperties = loadFromResource(this.appId, this.namespace);
+    this.configRepository = configRepository;
+    this.configProperties = new AtomicReference<>();
+    this.warnLogRateLimiter = RateLimiter.create(0.017); // 1 warning log output per minute
     initialize();
   }
 
   private void initialize() {
     try {
-      m_configRepository.initialize();
-      updateConfig(m_configRepository.getConfig(), m_configRepository.getSourceType());
+      configRepository.initialize();
+      updateConfig(configRepository.getConfig(), configRepository.getSourceType());
     } catch (Throwable ex) {
       Tracer.logError(ex);
       logger.warn("Init Apollo Local Config failed - namespace: {}, reason: {}.",
-          m_namespace, ExceptionUtil.getDetailMessage(ex));
+          namespace, ExceptionUtil.getDetailMessage(ex));
     } finally {
       //register the change listener no matter config repository is working or not
       //so that whenever config repository is recovered, config could get changed
-      m_configRepository.addChangeListener(this);
+      configRepository.addChangeListener(this);
     }
   }
 
@@ -111,7 +111,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @return value
    */
   protected String getPropertyFromRepository(String key) {
-    Properties properties = m_configProperties.get();
+    Properties properties = configProperties.get();
     if (properties != null) {
       return properties.getProperty(key);
     }
@@ -125,7 +125,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @return value
    */
   protected String getPropertyFromAdditional(String key) {
-    Properties properties = this.m_resourceProperties;
+    Properties properties = this.resourceProperties;
     if (properties != null) {
       return properties.getProperty(key);
     }
@@ -138,10 +138,10 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @param value value
    */
   protected void tryWarnLog(String value) {
-    if (value == null && m_configProperties.get() == null && m_warnLogRateLimiter.tryAcquire()) {
+    if (value == null && configProperties.get() == null && warnLogRateLimiter.tryAcquire()) {
       logger.warn(
           "Could not load config for namespace {} from Apollo, please check whether the configs are released in Apollo! Return default value now!",
-          m_namespace);
+          namespace);
     }
   }
 
@@ -151,7 +151,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @return property names
    */
   protected Set<String> getPropertyNamesFromRepository() {
-    Properties properties = m_configProperties.get();
+    Properties properties = configProperties.get();
     if (properties == null) {
       return Collections.emptySet();
     }
@@ -164,7 +164,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @return property names
    */
   protected Set<String> getPropertyNamesFromAdditional() {
-    Properties properties = m_resourceProperties;
+    Properties properties = resourceProperties;
     if (properties == null) {
       return Collections.emptySet();
     }
@@ -220,7 +220,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   @Override
   public ConfigSourceType getSourceType() {
-    return m_sourceType;
+    return sourceType;
   }
 
   private Set<String> stringPropertyNames(Properties properties) {
@@ -238,16 +238,16 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   @Override
   public synchronized void onRepositoryChange(String namespace, Properties newProperties) {
-    this.onRepositoryChange(m_appId, m_namespace, newProperties);
+    this.onRepositoryChange(this.appId, this.namespace, newProperties);
   }
 
   @Override
   public synchronized void onRepositoryChange(String appId, String namespace, Properties newProperties) {
-    if (newProperties.equals(m_configProperties.get())) {
+    if (newProperties.equals(configProperties.get())) {
       return;
     }
 
-    ConfigSourceType sourceType = m_configRepository.getSourceType();
+    ConfigSourceType sourceType = configRepository.getSourceType();
     Properties newConfigProperties = propertiesFactory.getPropertiesInstance();
     newConfigProperties.putAll(newProperties);
 
@@ -259,20 +259,20 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
       return;
     }
 
-    this.fireConfigChange(m_appId, m_namespace, actualChanges);
+    this.fireConfigChange(this.appId, this.namespace, actualChanges);
 
-    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
+    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, this.namespace);
   }
 
   private void updateConfig(Properties newConfigProperties, ConfigSourceType sourceType) {
-    m_configProperties.set(newConfigProperties);
-    m_sourceType = sourceType;
+    configProperties.set(newConfigProperties);
+    this.sourceType = sourceType;
   }
 
   private Map<String, ConfigChange> updateAndCalcConfigChanges(Properties newConfigProperties,
       ConfigSourceType sourceType) {
     List<ConfigChange> configChanges =
-        calcPropertyChanges(m_appId, m_namespace, m_configProperties.get(), newConfigProperties);
+        calcPropertyChanges(appId, namespace, configProperties.get(), newConfigProperties);
 
     ImmutableMap.Builder<String, ConfigChange> actualChanges =
         new ImmutableMap.Builder<>();
@@ -284,7 +284,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
       change.setOldValue(this.getProperty(change.getPropertyName(), change.getOldValue()));
     }
 
-    //2. update m_configProperties
+    //2. update configProperties
     updateConfig(newConfigProperties, sourceType);
     clearConfigCache();
 

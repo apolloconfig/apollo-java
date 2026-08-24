@@ -39,12 +39,12 @@ class InterestedConfigChangeEvent extends ConfigChangeEvent {
    * @see ApolloConfigChangeListener#interestedKeys()
    * @see ApolloConfigChangeListener#interestedKeyPrefixes()
    */
-  private final Set<String> m_interestedChangedKeys;
+  private final Set<String> interestedChangedKeys;
 
   public InterestedConfigChangeEvent(String appId, String namespace,
       Map<String, ConfigChange> changes, Set<String> interestedChangedKeys) {
     super(appId, namespace, changes);
-    this.m_interestedChangedKeys = interestedChangedKeys;
+    this.interestedChangedKeys = interestedChangedKeys;
   }
 
   /**
@@ -52,6 +52,6 @@ class InterestedConfigChangeEvent extends ConfigChangeEvent {
    */
   @Override
   public Set<String> interestedChangedKeys() {
-    return Collections.unmodifiableSet(this.m_interestedChangedKeys);
+    return Collections.unmodifiableSet(this.interestedChangedKeys);
   }
 }

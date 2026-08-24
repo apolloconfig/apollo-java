@@ -28,38 +28,38 @@ import org.slf4j.LoggerFactory;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultConfigRegistry implements ConfigRegistry {
-  private static final Logger s_logger = LoggerFactory.getLogger(DefaultConfigRegistry.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultConfigRegistry.class);
 
-  private ConfigUtil m_configUtil;
+  private ConfigUtil configUtil;
 
-  private Table<String, String, ConfigFactory> m_instances = Tables.synchronizedTable(
+  private Table<String, String, ConfigFactory> instances = Tables.synchronizedTable(
       HashBasedTable.create());
 
   public DefaultConfigRegistry() {
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   @Override
   public void register(String namespace, ConfigFactory factory) {
-    register(m_configUtil.getAppId(), namespace, factory);
+    register(configUtil.getAppId(), namespace, factory);
   }
 
   @Override
   public void register(String appId, String namespace, ConfigFactory factory) {
-    if (m_instances.contains(appId, namespace)) {
-      s_logger.warn("ConfigFactory({}-{}) is overridden by {}!", appId, namespace, factory.getClass());
+    if (instances.contains(appId, namespace)) {
+      logger.warn("ConfigFactory({}-{}) is overridden by {}!", appId, namespace, factory.getClass());
     }
 
-    m_instances.put(appId, namespace, factory);
+    instances.put(appId, namespace, factory);
   }
 
   @Override
   public ConfigFactory getFactory(String namespace) {
-    return getFactory(m_configUtil.getAppId(), namespace);
+    return getFactory(configUtil.getAppId(), namespace);
   }
 
   @Override
   public ConfigFactory getFactory(String appId, String namespace) {
-    return m_instances.get(appId, namespace);
+    return instances.get(appId, namespace);
   }
 }

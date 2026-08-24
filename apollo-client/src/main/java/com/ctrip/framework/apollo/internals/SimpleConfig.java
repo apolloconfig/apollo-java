@@ -40,11 +40,11 @@ import com.google.common.collect.Maps;
  */
 public class SimpleConfig extends AbstractConfig implements RepositoryChangeListener {
   private static final Logger logger = LoggerFactory.getLogger(SimpleConfig.class);
-  private final String m_appId;
-  private final String m_namespace;
-  private final ConfigRepository m_configRepository;
-  private volatile Properties m_configProperties;
-  private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
+  private final String appId;
+  private final String namespace;
+  private final ConfigRepository configRepository;
+  private volatile Properties configProperties;
+  private volatile ConfigSourceType sourceType = ConfigSourceType.NONE;
 
   /**
    * Constructor.
@@ -67,63 +67,63 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
     if (appId == null) {
       appId = ApolloInjector.getInstance(ConfigUtil.class).getAppId();
     }
-    m_appId = appId;
-    m_namespace = namespace;
-    m_configRepository = configRepository;
+    this.appId = appId;
+    this.namespace = namespace;
+    this.configRepository = configRepository;
     this.initialize();
   }
 
   private void initialize() {
     try {
-      updateConfig(m_configRepository.getConfig(), m_configRepository.getSourceType());
+      updateConfig(configRepository.getConfig(), configRepository.getSourceType());
     } catch (Throwable ex) {
       Tracer.logError(ex);
-      logger.warn("Init Apollo Simple Config failed - namespace: {}, reason: {}", m_namespace,
+      logger.warn("Init Apollo Simple Config failed - namespace: {}, reason: {}", namespace,
           ExceptionUtil.getDetailMessage(ex));
     } finally {
       //register the change listener no matter config repository is working or not
       //so that whenever config repository is recovered, config could get changed
-      m_configRepository.addChangeListener(this);
+      configRepository.addChangeListener(this);
     }
   }
 
   @Override
   public String getProperty(String key, String defaultValue) {
-    if (m_configProperties == null) {
+    if (configProperties == null) {
       logger.warn("Could not load config from Apollo, always return default value!");
       return defaultValue;
     }
-    return this.m_configProperties.getProperty(key, defaultValue);
+    return this.configProperties.getProperty(key, defaultValue);
   }
 
   @Override
   public Set<String> getPropertyNames() {
-    if (m_configProperties == null) {
+    if (configProperties == null) {
       return Collections.emptySet();
     }
 
-    return m_configProperties.stringPropertyNames();
+    return configProperties.stringPropertyNames();
   }
 
   @Override
   public ConfigSourceType getSourceType() {
-    return m_sourceType;
+    return sourceType;
   }
 
   @Override
   public synchronized void onRepositoryChange(String namespace, Properties newProperties) {
-    this.onRepositoryChange(m_appId, namespace, newProperties);
+    this.onRepositoryChange(appId, namespace, newProperties);
   }
 
   @Override
   public synchronized void onRepositoryChange(String appId, String namespace, Properties newProperties) {
-    if (newProperties.equals(m_configProperties)) {
+    if (newProperties.equals(configProperties)) {
       return;
     }
     Properties newConfigProperties = propertiesFactory.getPropertiesInstance();
     newConfigProperties.putAll(newProperties);
 
-    List<ConfigChange> changes = calcPropertyChanges(appId, namespace, m_configProperties, newConfigProperties);
+    List<ConfigChange> changes = calcPropertyChanges(appId, namespace, configProperties, newConfigProperties);
     Map<String, ConfigChange> changeMap = Maps.uniqueIndex(changes,
         new Function<ConfigChange, String>() {
           @Override
@@ -132,16 +132,16 @@ public class SimpleConfig extends AbstractConfig implements RepositoryChangeList
           }
         });
 
-    updateConfig(newConfigProperties, m_configRepository.getSourceType());
+    updateConfig(newConfigProperties, configRepository.getSourceType());
     clearConfigCache();
 
-    this.fireConfigChange(appId, m_namespace, changeMap);
+    this.fireConfigChange(appId, this.namespace, changeMap);
 
-    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, m_namespace);
+    Tracer.logEvent(APOLLO_CLIENT_CONFIGCHANGES, this.namespace);
   }
 
   private void updateConfig(Properties newConfigProperties, ConfigSourceType sourceType) {
-    m_configProperties = newConfigProperties;
-    m_sourceType = sourceType;
+    configProperties = newConfigProperties;
+    this.sourceType = sourceType;
   }
 }

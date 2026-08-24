@@ -160,12 +160,12 @@ public class ConfigServiceTest {
   }
 
   private static class MockConfig extends AbstractConfig {
-    private final String m_appId;
-    private final String m_namespace;
+    private final String appId;
+    private final String namespace;
 
     public MockConfig(String appId, String namespace) {
-      m_appId = appId;
-      m_namespace = namespace;
+      this.appId = appId;
+      this.namespace = namespace;
     }
 
     @Override
@@ -174,7 +174,7 @@ public class ConfigServiceTest {
         return null;
       }
 
-      return m_appId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + m_namespace + ":" + key;
+      return appId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + namespace + ":" + key;
     }
 
     @Override
@@ -189,26 +189,26 @@ public class ConfigServiceTest {
   }
 
   private static class MockConfigFile implements ConfigFile {
-    private ConfigFileFormat m_configFileFormat;
-    private String m_appId;
-    private String m_namespace;
+    private ConfigFileFormat configFileFormat;
+    private String appId;
+    private String namespace;
 
     public MockConfigFile(String namespace,
                           ConfigFileFormat configFileFormat) {
-      m_namespace = namespace;
-      m_configFileFormat = configFileFormat;
+      this.namespace = namespace;
+      this.configFileFormat = configFileFormat;
     }
 
     public MockConfigFile(String appId, String namespace,
                           ConfigFileFormat configFileFormat) {
-      m_appId = appId;
-      m_namespace = namespace;
-      m_configFileFormat = configFileFormat;
+      this.appId = appId;
+      this.namespace = namespace;
+      this.configFileFormat = configFileFormat;
     }
 
     @Override
     public String getContent() {
-      return m_namespace + ":" + m_configFileFormat.getValue();
+      return namespace + ":" + configFileFormat.getValue();
     }
 
     @Override
@@ -218,17 +218,17 @@ public class ConfigServiceTest {
 
     @Override
     public String getAppId() {
-      return m_appId;
+      return appId;
     }
 
     @Override
     public String getNamespace() {
-      return m_namespace;
+      return namespace;
     }
 
     @Override
     public ConfigFileFormat getConfigFileFormat() {
-      return m_configFileFormat;
+      return configFileFormat;
     }
 
     @Override
@@ -270,22 +270,22 @@ public class ConfigServiceTest {
   }
 
   private static class MockPropertiesCompatibleConfigFile implements PropertiesCompatibleConfigFile {
-    private final String m_appId;
-    private final String m_namespace;
-    private final ConfigFileFormat m_configFileFormat;
+    private final String appId;
+    private final String namespace;
+    private final ConfigFileFormat configFileFormat;
 
     public MockPropertiesCompatibleConfigFile(String appId, String namespace,
         ConfigFileFormat configFileFormat) {
-      m_appId = appId;
-      m_namespace = namespace;
-      m_configFileFormat = configFileFormat;
+      this.appId = appId;
+      this.namespace = namespace;
+      this.configFileFormat = configFileFormat;
     }
 
     @Override
     public Properties asProperties() {
       Properties properties = new Properties();
       // echo the appId so it is observable through the resulting Config
-      properties.setProperty("appId", m_appId);
+      properties.setProperty("appId", appId);
       return properties;
     }
 
@@ -301,17 +301,17 @@ public class ConfigServiceTest {
 
     @Override
     public String getAppId() {
-      return m_appId;
+      return appId;
     }
 
     @Override
     public String getNamespace() {
-      return m_namespace;
+      return namespace;
     }
 
     @Override
     public ConfigFileFormat getConfigFileFormat() {
-      return m_configFileFormat;
+      return configFileFormat;
     }
 
     @Override

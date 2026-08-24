@@ -33,45 +33,45 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ConfigService {
-  private static final ConfigService s_instance = new ConfigService();
-  private volatile ConfigMonitor m_configMonitor;
-  private volatile ConfigManager m_configManager;
-  private volatile ConfigRegistry m_configRegistry;
+  private static final ConfigService instance = new ConfigService();
+  private volatile ConfigMonitor configMonitor;
+  private volatile ConfigManager configManager;
+  private volatile ConfigRegistry configRegistry;
   
   private ConfigMonitor getMonitor() {
       getManager();
-      if (m_configMonitor == null) {
+      if (configMonitor == null) {
             synchronized (this) {
-                if (m_configMonitor == null) {
-                  m_configMonitor = ApolloInjector.getInstance(ConfigMonitor.class);
+                if (configMonitor == null) {
+                  configMonitor = ApolloInjector.getInstance(ConfigMonitor.class);
                 }
             }
       }
-      return m_configMonitor;
+      return configMonitor;
   }
   
   private ConfigManager getManager() {
-    if (m_configManager == null) {
+    if (configManager == null) {
       synchronized (this) {
-        if (m_configManager == null) {
-          m_configManager = ApolloInjector.getInstance(ConfigManager.class);
+        if (configManager == null) {
+          configManager = ApolloInjector.getInstance(ConfigManager.class);
           ConfigMonitorInitializer.initialize();
         }
       }
     }
-    return m_configManager;
+    return configManager;
   }
 
   private ConfigRegistry getRegistry() {
-    if (m_configRegistry == null) {
+    if (configRegistry == null) {
       synchronized (this) {
-        if (m_configRegistry == null) {
-          m_configRegistry = ApolloInjector.getInstance(ConfigRegistry.class);
+        if (configRegistry == null) {
+          configRegistry = ApolloInjector.getInstance(ConfigRegistry.class);
         }
       }
     }
 
-    return m_configRegistry;
+    return configRegistry;
   }
 
   /**
@@ -90,15 +90,15 @@ public class ConfigService {
    * @return config instance
    */
   public static Config getConfig(String namespace) {
-    return s_instance.getManager().getConfig(namespace);
+    return instance.getManager().getConfig(namespace);
   }
 
   public static Config getConfig(String appId, String namespace) {
-    return s_instance.getManager().getConfig(appId, namespace);
+    return instance.getManager().getConfig(appId, namespace);
   }
 
   public static ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
-    return s_instance.getManager().getConfigFile(namespace, configFileFormat);
+    return instance.getManager().getConfigFile(namespace, configFileFormat);
   }
 
   /**
@@ -111,11 +111,11 @@ public class ConfigService {
    */
   public static ConfigFile getConfigFile(String appId, String namespace,
       ConfigFileFormat configFileFormat) {
-    return s_instance.getManager().getConfigFile(appId, namespace, configFileFormat);
+    return instance.getManager().getConfigFile(appId, namespace, configFileFormat);
   }
 
   public static ConfigMonitor getConfigMonitor(){
-      return s_instance.getMonitor();
+      return instance.getMonitor();
   }
 
   static void setConfig(Config config) {
@@ -129,9 +129,9 @@ public class ConfigService {
    * @param config    the config instance
    */
   static void setConfig(String namespace, final Config config) {
-    s_instance.getRegistry().register(namespace, new ConfigFactory() {
+    instance.getRegistry().register(namespace, new ConfigFactory() {
 
-      private final ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+      private final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
       @Override
       public Config create(String namespace) {
@@ -140,8 +140,8 @@ public class ConfigService {
 
       @Override
       public Config create(String appId, String namespace) {
-        if(!StringUtils.equals(appId, m_configUtil.getAppId())){
-          throw new IllegalArgumentException("Provided appId '" + appId + "' does not match the default appId '" + m_configUtil.getAppId() + "'");
+        if(!StringUtils.equals(appId, configUtil.getAppId())){
+          throw new IllegalArgumentException("Provided appId '" + appId + "' does not match the default appId '" + configUtil.getAppId() + "'");
         }
         return config;
       }
@@ -170,14 +170,14 @@ public class ConfigService {
    * @param factory   the factory instance
    */
   static void setConfigFactory(String namespace, ConfigFactory factory) {
-    s_instance.getRegistry().register(namespace, factory);
+    instance.getRegistry().register(namespace, factory);
   }
 
   // for test only
   static void reset() {
-    synchronized (s_instance) {
-      s_instance.m_configManager = null;
-      s_instance.m_configRegistry = null;
+    synchronized (instance) {
+      instance.configManager = null;
+      instance.configRegistry = null;
     }
   }
 }

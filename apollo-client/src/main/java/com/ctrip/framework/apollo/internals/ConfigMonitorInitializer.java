@@ -49,10 +49,10 @@ public class ConfigMonitorInitializer {
   private static final ApolloClientMonitorContext MONITOR_CONTEXT = ApolloInjector.getInstance(
       ApolloClientMonitorContext.class);
   protected static volatile boolean hasInitialized = false;
-  private static ConfigUtil m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+  private static ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   public static void initialize() {
-    if (m_configUtil.isClientMonitorEnabled() && !hasInitialized) {
+    if (configUtil.isClientMonitorEnabled() && !hasInitialized) {
       synchronized (ConfigMonitorInitializer.class) {
         if (!hasInitialized) {
           doInit();
@@ -70,7 +70,7 @@ public class ConfigMonitorInitializer {
 
 
   private static void initializeJmxMonitoring() {
-    if (m_configUtil.isClientMonitorJmxEnabled()) {
+    if (configUtil.isClientMonitorJmxEnabled()) {
       MONITOR_CONTEXT.getApolloClientMonitorEventListeners().forEach(metricsListener ->
           ApolloClientJmxMBeanRegister.register(
               MBEAN_NAME + metricsListener.getName(), metricsListener)
@@ -82,14 +82,14 @@ public class ConfigMonitorInitializer {
     ConfigManager configManager = ApolloInjector.getInstance(
         ConfigManager.class);
     DefaultApolloClientBootstrapArgsApi defaultApolloClientBootstrapArgsApi = new DefaultApolloClientBootstrapArgsApi(
-        m_configUtil);
-    DefaultApolloClientExceptionApi defaultApolloClientExceptionApi = new DefaultApolloClientExceptionApi(m_configUtil);
+        configUtil);
+    DefaultApolloClientExceptionApi defaultApolloClientExceptionApi = new DefaultApolloClientExceptionApi(configUtil);
     DefaultApolloClientNamespaceApi defaultApolloClientNamespaceApi = new DefaultApolloClientNamespaceApi(
         configManager);
     DefaultApolloClientThreadPoolApi defaultApolloClientThreadPoolApi = new DefaultApolloClientThreadPoolApi(
-        RemoteConfigRepository.m_executorService,
-        AbstractConfig.m_executorService, AbstractConfigFile.m_executorService,
-        AbstractApolloClientMetricsExporter.m_executorService);
+        RemoteConfigRepository.executorService,
+        AbstractConfig.executorService, AbstractConfigFile.executorService,
+        AbstractApolloClientMetricsExporter.executorService);
 
     MONITOR_CONTEXT.setApolloClientBootstrapArgsMonitorApi(defaultApolloClientBootstrapArgsApi);
     MONITOR_CONTEXT.setApolloClientExceptionMonitorApi(defaultApolloClientExceptionApi);
@@ -103,7 +103,7 @@ public class ConfigMonitorInitializer {
 
   private static void initializeMetricsExporter(
   ) {
-    if (StringUtils.isBlank(m_configUtil.getMonitorExternalType())) {
+    if (StringUtils.isBlank(configUtil.getMonitorExternalType())) {
       return;
     }
     ApolloClientMetricsExporterFactory exporterFactory = ApolloInjector.getInstance(
@@ -118,7 +118,7 @@ public class ConfigMonitorInitializer {
   public static ApolloClientMessageProducerComposite initializeMessageProducerComposite() {
     List<MessageProducer> producers = ServiceBootstrap.loadAllOrdered(MessageProducer.class);
 
-    if (m_configUtil.isClientMonitorEnabled()) {
+    if (configUtil.isClientMonitorEnabled()) {
       producers.add(new ApolloClientMonitorMessageProducer());
     }
 
@@ -136,7 +136,7 @@ public class ConfigMonitorInitializer {
   // for test only
   protected static void reset() {
     hasInitialized = false;
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   }
 }

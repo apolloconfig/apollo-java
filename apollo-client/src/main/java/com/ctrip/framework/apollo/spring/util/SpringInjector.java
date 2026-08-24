@@ -27,15 +27,15 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 public class SpringInjector {
-  private static volatile Injector s_injector;
+  private static volatile Injector injector;
   private static final Object lock = new Object();
 
   private static Injector getInjector() {
-    if (s_injector == null) {
+    if (injector == null) {
       synchronized (lock) {
-        if (s_injector == null) {
+        if (injector == null) {
           try {
-            s_injector = Guice.createInjector(new SpringModule());
+            injector = Guice.createInjector(new SpringModule());
           } catch (Throwable ex) {
             ApolloConfigException exception = new ApolloConfigException("Unable to initialize Apollo Spring Injector!", ex);
             Tracer.logError(exception);
@@ -45,7 +45,7 @@ public class SpringInjector {
       }
     }
 
-    return s_injector;
+    return injector;
   }
 
   public static <T> T getInstance(Class<T> clazz) {

@@ -26,33 +26,33 @@ import com.google.common.collect.Tables;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultConfigFactoryManager implements ConfigFactoryManager {
-  private ConfigRegistry m_registry;
+  private ConfigRegistry registry;
 
-  private Table<String, String, ConfigFactory> m_factories = Tables.synchronizedTable(HashBasedTable.create());
+  private Table<String, String, ConfigFactory> factories = Tables.synchronizedTable(HashBasedTable.create());
 
-  private ConfigUtil m_configUtil;
+  private ConfigUtil configUtil;
 
   public DefaultConfigFactoryManager() {
-    m_registry = ApolloInjector.getInstance(ConfigRegistry.class);
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    registry = ApolloInjector.getInstance(ConfigRegistry.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   @Override
   public ConfigFactory getFactory(String namespace) {
-    return getFactory(m_configUtil.getAppId(), namespace);
+    return getFactory(configUtil.getAppId(), namespace);
   }
 
   @Override
   public ConfigFactory getFactory(String appId, String namespace) {
     // step 1: check hacked factory
-    ConfigFactory factory = m_registry.getFactory(appId, namespace);
+    ConfigFactory factory = registry.getFactory(appId, namespace);
 
     if (factory != null) {
       return factory;
     }
 
     // step 2: check cache
-    factory = m_factories.get(appId, namespace);
+    factory = factories.get(appId, namespace);
 
     if (factory != null) {
       return factory;
@@ -68,7 +68,7 @@ public class DefaultConfigFactoryManager implements ConfigFactoryManager {
     // step 4: check default config factory
     factory = ApolloInjector.getInstance(ConfigFactory.class);
 
-    m_factories.put(appId, namespace, factory);
+    factories.put(appId, namespace, factory);
 
     // factory should not be null
     return factory;

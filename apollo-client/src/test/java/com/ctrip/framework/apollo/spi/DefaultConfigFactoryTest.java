@@ -97,7 +97,7 @@ public class DefaultConfigFactoryTest {
     LocalFileConfigRepository localFileConfigRepository =
         defaultConfigFactory.createLocalConfigRepository(someAppId, someNamespace);
 
-    assertNull(ReflectionTestUtils.getField(localFileConfigRepository, "m_upstream"));
+    assertNull(ReflectionTestUtils.getField(localFileConfigRepository, "upstream"));
   }
 
   @Test

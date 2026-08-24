@@ -25,15 +25,15 @@ import com.ctrip.framework.foundation.internals.ServiceBootstrap;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ApolloInjector {
-  private static volatile Injector s_injector;
+  private static volatile Injector injector;
   private static final Object lock = new Object();
 
   private static Injector getInjector() {
-    if (s_injector == null) {
+    if (injector == null) {
       synchronized (lock) {
-        if (s_injector == null) {
+        if (injector == null) {
           try {
-            s_injector = ServiceBootstrap.loadPrimary(Injector.class);
+            injector = ServiceBootstrap.loadPrimary(Injector.class);
           } catch (Throwable ex) {
             ApolloConfigException exception = new ApolloConfigException("Unable to initialize Apollo Injector!", ex);
             Tracer.logError(exception);
@@ -43,7 +43,7 @@ public class ApolloInjector {
       }
     }
 
-    return s_injector;
+    return injector;
   }
 
   public static <T> T getInstance(Class<T> clazz) {

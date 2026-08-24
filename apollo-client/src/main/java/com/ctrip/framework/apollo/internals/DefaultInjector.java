@@ -47,13 +47,13 @@ import java.util.List;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultInjector implements Injector {
-  private final com.google.inject.Injector m_injector;
-  private final List<ApolloInjectorCustomizer> m_customizers;
+  private final com.google.inject.Injector injector;
+  private final List<ApolloInjectorCustomizer> customizers;
 
   public DefaultInjector() {
     try {
-      m_injector = Guice.createInjector(new ApolloModule());
-      m_customizers = ServiceBootstrap.loadAllOrdered(ApolloInjectorCustomizer.class);
+      injector = Guice.createInjector(new ApolloModule());
+      customizers = ServiceBootstrap.loadAllOrdered(ApolloInjectorCustomizer.class);
     } catch (Throwable ex) {
       ApolloConfigException exception = new ApolloConfigException("Unable to initialize Guice Injector!", ex);
       Tracer.logError(exception);
@@ -64,13 +64,13 @@ public class DefaultInjector implements Injector {
   @Override
   public <T> T getInstance(Class<T> clazz) {
     try {
-      for (ApolloInjectorCustomizer customizer : m_customizers) {
+      for (ApolloInjectorCustomizer customizer : customizers) {
         T instance = customizer.getInstance(clazz);
         if (instance != null) {
           return instance;
         }
       }
-      return m_injector.getInstance(clazz);
+      return injector.getInstance(clazz);
     } catch (Throwable ex) {
       Tracer.logError(ex);
       throw new ApolloConfigException(
@@ -81,7 +81,7 @@ public class DefaultInjector implements Injector {
   @Override
   public <T> T getInstance(Class<T> clazz, String name) {
     try {
-      for (ApolloInjectorCustomizer customizer : m_customizers) {
+      for (ApolloInjectorCustomizer customizer : customizers) {
         T instance = customizer.getInstance(clazz, name);
         if (instance != null) {
           return instance;

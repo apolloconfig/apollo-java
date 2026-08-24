@@ -34,26 +34,26 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PropertiesConfigFile extends AbstractConfigFile implements
     PropertiesCompatibleConfigFile {
 
-  protected AtomicReference<String> m_contentCache;
+  protected AtomicReference<String> contentCache;
 
   public PropertiesConfigFile(String appId, String namespace,
       ConfigRepository configRepository) {
     super(appId, namespace, configRepository);
-    m_contentCache = new AtomicReference<>();
+    contentCache = new AtomicReference<>();
   }
 
   @Override
   protected void update(Properties newProperties) {
-    m_configProperties.set(newProperties);
-    m_contentCache.set(null);
+    configProperties.set(newProperties);
+    contentCache.set(null);
   }
 
   @Override
   public String getContent() {
-    if (m_contentCache.get() == null) {
-      m_contentCache.set(doGetContent());
+    if (contentCache.get() == null) {
+      contentCache.set(doGetContent());
     }
-    return m_contentCache.get();
+    return contentCache.get();
   }
 
   String doGetContent() {
@@ -62,12 +62,12 @@ public class PropertiesConfigFile extends AbstractConfigFile implements
     }
 
     try {
-      return PropertiesUtil.toString(m_configProperties.get());
+      return PropertiesUtil.toString(configProperties.get());
     } catch (Throwable ex) {
       ApolloConfigException exception =
           new ApolloConfigException(String
               .format("Parse properties file content failed for namespace: %s, cause: %s",
-                  m_namespace, ExceptionUtil.getDetailMessage(ex)));
+                  namespace, ExceptionUtil.getDetailMessage(ex)));
       Tracer.logError(exception);
       throw exception;
     }
@@ -75,7 +75,7 @@ public class PropertiesConfigFile extends AbstractConfigFile implements
 
   @Override
   public boolean hasContent() {
-    return m_configProperties.get() != null && !m_configProperties.get().isEmpty();
+    return configProperties.get() != null && !configProperties.get().isEmpty();
   }
 
   @Override
@@ -85,6 +85,6 @@ public class PropertiesConfigFile extends AbstractConfigFile implements
 
   @Override
   public Properties asProperties() {
-      return this.hasContent() ? m_configProperties.get() : propertiesFactory.getPropertiesInstance();
+      return this.hasContent() ? configProperties.get() : propertiesFactory.getPropertiesInstance();
   }
 }

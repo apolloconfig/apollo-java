@@ -96,7 +96,7 @@ public class RemoteConfigLongPollServiceTest {
     remoteConfigLongPollService = new RemoteConfigLongPollService();
 
     responseType =
-        (Type) ReflectionTestUtils.getField(remoteConfigLongPollService, "m_responseType");
+        (Type) ReflectionTestUtils.getField(remoteConfigLongPollService, "responseType");
 
 
   }

@@ -85,7 +85,7 @@ public class YamlConfigFile extends PlainTextConfigFile implements PropertiesCom
       return ApolloInjector.getInstance(YamlParser.class).yamlToProperties(getContent());
     } catch (Throwable ex) {
       ApolloConfigException exception = new ApolloConfigException(
-          "Parse yaml file content failed for namespace: " + m_namespace, ex);
+          "Parse yaml file content failed for namespace: " + namespace, ex);
       Tracer.logError(exception);
       throw exception;
     }

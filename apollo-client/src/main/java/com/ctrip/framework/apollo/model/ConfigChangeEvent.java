@@ -25,9 +25,9 @@ import java.util.Set;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ConfigChangeEvent {
-  private final String m_appId;
-  private final String m_namespace;
-  private final Map<String, ConfigChange> m_changes;
+  private final String appId;
+  private final String namespace;
+  private final Map<String, ConfigChange> changes;
   /**
    * Constructor.
    * @param namespace the namespace of this change
@@ -35,9 +35,9 @@ public class ConfigChangeEvent {
    */
   public ConfigChangeEvent(String appId, String namespace,
                            Map<String, ConfigChange> changes) {
-    this.m_appId = appId;
-    this.m_namespace = namespace;
-    this.m_changes = changes;
+    this.appId = appId;
+    this.namespace = namespace;
+    this.changes = changes;
   }
 
   /**
@@ -45,7 +45,7 @@ public class ConfigChangeEvent {
    * @return the list of the keys
    */
   public Set<String> changedKeys() {
-    return m_changes.keySet();
+    return changes.keySet();
   }
 
   /**
@@ -63,7 +63,7 @@ public class ConfigChangeEvent {
    * @return the change instance
    */
   public ConfigChange getChange(String key) {
-    return m_changes.get(key);
+    return changes.get(key);
   }
 
   /**
@@ -72,7 +72,7 @@ public class ConfigChangeEvent {
    * @return true if the key is changed, false otherwise.
    */
   public boolean isChanged(String key) {
-    return m_changes.containsKey(key);
+    return changes.containsKey(key);
   }
 
   /**
@@ -80,7 +80,7 @@ public class ConfigChangeEvent {
    * @return the namespace
    */
   public String getAppId() {
-    return m_appId;
+    return appId;
   }
 
   /**
@@ -88,6 +88,6 @@ public class ConfigChangeEvent {
    * @return the namespace
    */
   public String getNamespace() {
-    return m_namespace;
+    return namespace;
   }
 }

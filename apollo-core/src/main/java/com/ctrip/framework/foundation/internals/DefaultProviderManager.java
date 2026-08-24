@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultProviderManager implements ProviderManager {
   private static final Logger logger = LoggerFactory.getLogger(DefaultProviderManager.class);
-  private Map<Class<? extends Provider>, Provider> m_providers = new LinkedHashMap<>();
+  private Map<Class<? extends Provider>, Provider> providers = new LinkedHashMap<>();
 
   @Override
   public void initialize() {
@@ -51,13 +51,13 @@ public class DefaultProviderManager implements ProviderManager {
   }
 
   public synchronized void register(Provider provider) {
-    m_providers.put(provider.getType(), provider);
+    providers.put(provider.getType(), provider);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Provider> T provider(Class<T> clazz) {
-    Provider provider = m_providers.get(clazz);
+    Provider provider = providers.get(clazz);
 
     if (provider != null) {
       return (T) provider;
@@ -69,7 +69,7 @@ public class DefaultProviderManager implements ProviderManager {
 
   @Override
   public String getProperty(String name, String defaultValue) {
-    for (Provider provider : m_providers.values()) {
+    for (Provider provider : providers.values()) {
       String value = provider.getProperty(name, null);
 
       if (value != null) {
@@ -83,8 +83,8 @@ public class DefaultProviderManager implements ProviderManager {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(512);
-    if (null != m_providers) {
-      for (Map.Entry<Class<? extends Provider>, Provider> entry : m_providers.entrySet()) {
+    if (null != providers) {
+      for (Map.Entry<Class<? extends Provider>, Provider> entry : providers.entrySet()) {
         sb.append(entry.getValue()).append("\n");
       }
     }

@@ -20,19 +20,19 @@ package com.ctrip.framework.apollo.util.http;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class HttpResponse<T> {
-  private final int m_statusCode;
-  private final T m_body;
+  private final int statusCode;
+  private final T body;
 
   public HttpResponse(int statusCode, T body) {
-    this.m_statusCode = statusCode;
-    this.m_body = body;
+    this.statusCode = statusCode;
+    this.body = body;
   }
 
   public int getStatusCode() {
-    return m_statusCode;
+    return statusCode;
   }
 
   public T getBody() {
-    return m_body;
+    return body;
   }
 }

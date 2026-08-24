@@ -33,19 +33,19 @@ public abstract class PlainTextConfigFile extends AbstractConfigFile {
     if (!this.hasContent()) {
       return null;
     }
-    return m_configProperties.get().getProperty(ConfigConsts.CONFIG_FILE_CONTENT_KEY);
+    return configProperties.get().getProperty(ConfigConsts.CONFIG_FILE_CONTENT_KEY);
   }
 
   @Override
   public boolean hasContent() {
-    if (m_configProperties.get() == null) {
+    if (configProperties.get() == null) {
       return false;
     }
-    return m_configProperties.get().containsKey(ConfigConsts.CONFIG_FILE_CONTENT_KEY);
+    return configProperties.get().containsKey(ConfigConsts.CONFIG_FILE_CONTENT_KEY);
   }
 
   @Override
   protected void update(Properties newProperties) {
-    m_configProperties.set(newProperties);
+    configProperties.set(newProperties);
   }
 }

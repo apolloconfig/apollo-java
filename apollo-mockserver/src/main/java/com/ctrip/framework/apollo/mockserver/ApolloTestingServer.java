@@ -313,16 +313,16 @@ public class ApolloTestingServer implements AutoCloseable {
     private static void prepareLongPollingService() throws Exception {
         RemoteConfigLongPollService longPollService =
             ApolloInjector.getInstance(RemoteConfigLongPollService.class);
-        AtomicBoolean stopped = (AtomicBoolean) getLongPollField(longPollService, "m_longPollingStopped");
+        AtomicBoolean stopped = (AtomicBoolean) getLongPollField(longPollService, "longPollingStopped");
         stopped.set(false);
     }
 
     @SuppressWarnings("unchecked")
     private static void clearLongPollingState(RemoteConfigLongPollService longPollService) throws Exception {
-        ((Map<String, Boolean>) getLongPollField(longPollService, "m_longPollStarted")).clear();
-        ((Map<String, ?>) getLongPollField(longPollService, "m_longPollNamespaces")).clear();
-        ((Table<String, String, Long>) getLongPollField(longPollService, "m_notifications")).clear();
-        ((Map<String, ?>) getLongPollField(longPollService, "m_remoteNotificationMessages")).clear();
+        ((Map<String, Boolean>) getLongPollField(longPollService, "longPollStarted")).clear();
+        ((Map<String, ?>) getLongPollField(longPollService, "longPollNamespaces")).clear();
+        ((Table<String, String, Long>) getLongPollField(longPollService, "notifications")).clear();
+        ((Map<String, ?>) getLongPollField(longPollService, "remoteNotificationMessages")).clear();
     }
 
     private static Object getLongPollField(RemoteConfigLongPollService longPollService, String fieldName)

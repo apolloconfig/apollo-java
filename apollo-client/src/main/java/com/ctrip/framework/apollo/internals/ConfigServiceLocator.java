@@ -55,18 +55,18 @@ import com.google.gson.reflect.TypeToken;
 
 public class ConfigServiceLocator {
   private static final Logger logger = DeferredLoggerFactory.getLogger(ConfigServiceLocator.class);
-  private HttpClient m_httpClient;
-  private ConfigUtil m_configUtil;
-  private AtomicReference<List<ServiceDTO>> m_configServices;
-  private Type m_responseType;
-  private ScheduledExecutorService m_executorService;
+  private HttpClient httpClient;
+  private ConfigUtil configUtil;
+  private AtomicReference<List<ServiceDTO>> configServices;
+  private Type responseType;
+  private ScheduledExecutorService executorService;
   /**
-   * forbid submit multiple task to {@link #m_executorService}，
+   * forbid submit multiple task to {@link #executorService}，
    * <p>
    * so use this AtomicBoolean as a signal
    */
   protected AtomicBoolean discoveryTaskQueueMark;
-  private RateLimiter m_discoveryRateLimiter;
+  private RateLimiter discoveryRateLimiter;
   private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
   private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
 
@@ -75,15 +75,15 @@ public class ConfigServiceLocator {
    */
   public ConfigServiceLocator() {
     List<ServiceDTO> initial = Lists.newArrayList();
-    m_configServices = new AtomicReference<>(initial);
-    m_responseType = new TypeToken<List<ServiceDTO>>() {
+    configServices = new AtomicReference<>(initial);
+    responseType = new TypeToken<List<ServiceDTO>>() {
     }.getType();
-    m_httpClient = ApolloInjector.getInstance(HttpClient.class);
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-    this.m_executorService = Executors.newScheduledThreadPool(1,
+    httpClient = ApolloInjector.getInstance(HttpClient.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    this.executorService = Executors.newScheduledThreadPool(1,
         ApolloThreadFactory.create("ConfigServiceLocator", true));
     this.discoveryTaskQueueMark = new AtomicBoolean(false);
-    this.m_discoveryRateLimiter = RateLimiter.create(m_configUtil.getDiscoveryQPS());
+    this.discoveryRateLimiter = RateLimiter.create(configUtil.getDiscoveryQPS());
     initConfigServices();
   }
 
@@ -167,7 +167,7 @@ public class ConfigServiceLocator {
   }
 
   void doSubmitUpdateTask() {
-    m_executorService.submit(() -> {
+    executorService.submit(() -> {
       boolean needUpdate = this.discoveryTaskQueueMark.getAndSet(false);
       if (needUpdate) {
         this.tryUpdateConfigServices();
@@ -191,7 +191,7 @@ public class ConfigServiceLocator {
    * @return the services dto
    */
   public List<ServiceDTO> getConfigServices() {
-    if (m_configServices.get().isEmpty()) {
+    if (configServices.get().isEmpty()) {
       trySubmitUpdateTask();
       // quick fail
       throw new ApolloConfigException(
@@ -201,7 +201,7 @@ public class ConfigServiceLocator {
       );
     }
 
-    return m_configServices.get();
+    return configServices.get();
   }
 
   private boolean tryUpdateConfigServices() {
@@ -215,7 +215,7 @@ public class ConfigServiceLocator {
   }
 
   private void schedulePeriodicRefresh() {
-    this.m_executorService.scheduleAtFixedRate(
+    this.executorService.scheduleAtFixedRate(
         new Runnable() {
           @Override
           public void run() {
@@ -223,12 +223,12 @@ public class ConfigServiceLocator {
             Tracer.logEvent(APOLLO_META_SERVICE, "periodicRefresh");
             tryUpdateConfigServices();
           }
-        }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
-        m_configUtil.getRefreshIntervalTimeUnit());
+        }, configUtil.getRefreshInterval(), configUtil.getRefreshInterval(),
+        configUtil.getRefreshIntervalTimeUnit());
   }
 
   synchronized boolean tryAcquireForUpdate() {
-    return this.m_discoveryRateLimiter.tryAcquire();
+    return this.discoveryRateLimiter.tryAcquire();
   }
 
   private synchronized void updateConfigServices() {
@@ -240,8 +240,8 @@ public class ConfigServiceLocator {
 
     HttpRequest request = new HttpRequest(url);
 
-    request.setConnectTimeout(m_configUtil.getDiscoveryConnectTimeout());
-    request.setReadTimeout(m_configUtil.getDiscoveryReadTimeout());
+    request.setConnectTimeout(configUtil.getDiscoveryConnectTimeout());
+    request.setReadTimeout(configUtil.getDiscoveryReadTimeout());
 
     int maxRetries = 2;
     Throwable exception = null;
@@ -250,7 +250,7 @@ public class ConfigServiceLocator {
       Transaction transaction = Tracer.newTransaction("Apollo.MetaService", "getConfigService");
       transaction.addData("Url", url);
       try {
-        HttpResponse<List<ServiceDTO>> response = m_httpClient.doGet(request, m_responseType);
+        HttpResponse<List<ServiceDTO>> response = httpClient.doGet(request, responseType);
         transaction.setStatus(Transaction.SUCCESS);
         List<ServiceDTO> services = response.getBody();
         if (services == null || services.isEmpty()) {
@@ -268,7 +268,7 @@ public class ConfigServiceLocator {
       }
 
       try {
-        m_configUtil.getOnErrorRetryIntervalTimeUnit().sleep(m_configUtil.getOnErrorRetryInterval());
+        configUtil.getOnErrorRetryIntervalTimeUnit().sleep(configUtil.getOnErrorRetryInterval());
       } catch (InterruptedException ex) {
         //ignore
       }
@@ -279,14 +279,14 @@ public class ConfigServiceLocator {
   }
 
   private void setConfigServices(List<ServiceDTO> services) {
-    m_configServices.set(services);
+    configServices.set(services);
     logConfigServices(services);
   }
 
   private String assembleMetaServiceUrl() {
-    String domainName = m_configUtil.getMetaServerDomainName();
-    String appId = m_configUtil.getAppId();
-    String localIp = m_configUtil.getLocalIp();
+    String domainName = configUtil.getMetaServerDomainName();
+    String appId = configUtil.getAppId();
+    String localIp = configUtil.getLocalIp();
 
     Map<String, String> queryParams = Maps.newHashMap();
     queryParams.put("appId", queryParamEscaper.escape(appId));

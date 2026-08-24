@@ -73,19 +73,19 @@ public class RemoteConfigLongPollService {
   private static final long INIT_NOTIFICATION_ID = ConfigConsts.NOTIFICATION_ID_PLACEHOLDER;
   //90 seconds, should be longer than server side's long polling timeout, which is now 60 seconds
   private static final int LONG_POLLING_READ_TIMEOUT = 90 * 1000;
-  private final ExecutorService m_longPollingService;
-  private final AtomicBoolean m_longPollingStopped;
-  private SchedulePolicy m_longPollFailSchedulePolicyInSecond;
-  private RateLimiter m_longPollRateLimiter;
-  private final ConcurrentMap<String, Boolean> m_longPollStarted;
-  private final Map<String, Multimap<String, RemoteConfigRepository>> m_longPollNamespaces;
-  private final Table<String, String, Long> m_notifications;
-  private final Map<String, ApolloNotificationMessages> m_remoteNotificationMessages;//namespaceName -> watchedKey -> notificationId
-  private Type m_responseType;
+  private final ExecutorService longPollingService;
+  private final AtomicBoolean longPollingStopped;
+  private SchedulePolicy longPollFailSchedulePolicyInSecond;
+  private RateLimiter longPollRateLimiter;
+  private final ConcurrentMap<String, Boolean> longPollStarted;
+  private final Map<String, Multimap<String, RemoteConfigRepository>> longPollNamespaces;
+  private final Table<String, String, Long> notifications;
+  private final Map<String, ApolloNotificationMessages> remoteNotificationMessages;//namespaceName -> watchedKey -> notificationId
+  private Type responseType;
   private static final Gson GSON = new Gson();
-  private ConfigUtil m_configUtil;
-  private HttpClient m_httpClient;
-  private ConfigServiceLocator m_serviceLocator;
+  private ConfigUtil configUtil;
+  private HttpClient httpClient;
+  private ConfigServiceLocator serviceLocator;
   private final ConfigServiceLoadBalancerClient configServiceLoadBalancerClient = ServiceBootstrap.loadPrimary(
       ConfigServiceLoadBalancerClient.class);
 
@@ -93,45 +93,45 @@ public class RemoteConfigLongPollService {
    * Constructor.
    */
   public RemoteConfigLongPollService() {
-    m_longPollFailSchedulePolicyInSecond = new ExponentialSchedulePolicy(1, 120); //in second
-    m_longPollingStopped = new AtomicBoolean(false);
-    m_longPollingService = Executors.newCachedThreadPool(
+    longPollFailSchedulePolicyInSecond = new ExponentialSchedulePolicy(1, 120); //in second
+    longPollingStopped = new AtomicBoolean(false);
+    longPollingService = Executors.newCachedThreadPool(
         ApolloThreadFactory.create("RemoteConfigLongPollService", true));
-    m_longPollStarted = new ConcurrentHashMap<>();
-    m_longPollNamespaces = Maps.newConcurrentMap();
-    m_notifications = Tables.synchronizedTable(HashBasedTable.<String, String, Long>create());
-    m_remoteNotificationMessages = Maps.newConcurrentMap();
-    m_responseType = new TypeToken<List<ApolloConfigNotification>>() {
+    longPollStarted = new ConcurrentHashMap<>();
+    longPollNamespaces = Maps.newConcurrentMap();
+    notifications = Tables.synchronizedTable(HashBasedTable.<String, String, Long>create());
+    remoteNotificationMessages = Maps.newConcurrentMap();
+    responseType = new TypeToken<List<ApolloConfigNotification>>() {
     }.getType();
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-    m_httpClient = ApolloInjector.getInstance(HttpClient.class);
-    m_serviceLocator = ApolloInjector.getInstance(ConfigServiceLocator.class);
-    m_longPollRateLimiter = RateLimiter.create(m_configUtil.getLongPollQPS());
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    httpClient = ApolloInjector.getInstance(HttpClient.class);
+    serviceLocator = ApolloInjector.getInstance(ConfigServiceLocator.class);
+    longPollRateLimiter = RateLimiter.create(configUtil.getLongPollQPS());
   }
 
   public boolean submit(String appId, String namespace, RemoteConfigRepository remoteConfigRepository) {
-    Multimap<String, RemoteConfigRepository> repositoryMultimap = m_longPollNamespaces.computeIfAbsent(
+    Multimap<String, RemoteConfigRepository> repositoryMultimap = longPollNamespaces.computeIfAbsent(
                    appId, k -> Multimaps.synchronizedSetMultimap(HashMultimap.create()));
     boolean result = repositoryMultimap.put(namespace, remoteConfigRepository);
-    m_notifications.put(appId, namespace, INIT_NOTIFICATION_ID);
-    if (m_longPollStarted.get(appId) == null) {
+    notifications.put(appId, namespace, INIT_NOTIFICATION_ID);
+    if (longPollStarted.get(appId) == null) {
       startLongPolling(appId);
     }
     return result;
   }
 
   private void startLongPolling(String sysAppId) {
-    if (Boolean.TRUE.equals(m_longPollStarted.putIfAbsent(sysAppId, true))) {
+    if (Boolean.TRUE.equals(longPollStarted.putIfAbsent(sysAppId, true))) {
       //already started
       return;
     }
     try {
       final String appId = sysAppId;
-      final String cluster = m_configUtil.getCluster();
-      final String dataCenter = m_configUtil.getDataCenter();
-      final String secret = m_configUtil.getAccessKeySecret(appId);
-      final long longPollingInitialDelayInMills = m_configUtil.getLongPollingInitialDelayInMills();
-      m_longPollingService.submit(new Runnable() {
+      final String cluster = configUtil.getCluster();
+      final String dataCenter = configUtil.getDataCenter();
+      final String secret = configUtil.getAccessKeySecret(appId);
+      final long longPollingInitialDelayInMills = configUtil.getLongPollingInitialDelayInMills();
+      longPollingService.submit(new Runnable() {
         @Override
         public void run() {
           if (longPollingInitialDelayInMills > 0) {
@@ -146,7 +146,7 @@ public class RemoteConfigLongPollService {
         }
       });
     } catch (Throwable ex) {
-      m_longPollStarted.remove(sysAppId);
+      longPollStarted.remove(sysAppId);
       ApolloConfigException exception =
           new ApolloConfigException("Schedule long polling refresh failed", ex);
       Tracer.logError(exception);
@@ -155,13 +155,13 @@ public class RemoteConfigLongPollService {
   }
 
   void stopLongPollingRefresh() {
-    this.m_longPollingStopped.compareAndSet(false, true);
+    this.longPollingStopped.compareAndSet(false, true);
   }
 
   private void doLongPollingRefresh(String appId, String cluster, String dataCenter, String secret) {
     ServiceDTO lastServiceDto = null;
-    while (!m_longPollingStopped.get() && !Thread.currentThread().isInterrupted()) {
-      if (!m_longPollRateLimiter.tryAcquire(5, TimeUnit.SECONDS)) {
+    while (!longPollingStopped.get() && !Thread.currentThread().isInterrupted()) {
+      if (!longPollRateLimiter.tryAcquire(5, TimeUnit.SECONDS)) {
         //wait at most 5 seconds
         try {
           TimeUnit.SECONDS.sleep(5);
@@ -177,7 +177,7 @@ public class RemoteConfigLongPollService {
 
         url =
             assembleLongPollRefreshUrl(lastServiceDto.getHomepageUrl(), appId, cluster, dataCenter,
-                m_notifications.row(appId));
+                notifications.row(appId));
 
         logger.debug("Long polling from {}", url);
 
@@ -191,7 +191,7 @@ public class RemoteConfigLongPollService {
         transaction.addData("Url", url);
 
         final HttpResponse<List<ApolloConfigNotification>> response =
-            m_httpClient.doGet(request, m_responseType);
+            httpClient.doGet(request, responseType);
 
         logger.debug("Long polling response: {}, url: {}", response.getStatusCode(), url);
         if (response.getStatusCode() == 200 && response.getBody() != null) {
@@ -206,14 +206,14 @@ public class RemoteConfigLongPollService {
           lastServiceDto = null;
         }
 
-        m_longPollFailSchedulePolicyInSecond.success();
+        longPollFailSchedulePolicyInSecond.success();
         transaction.addData("StatusCode", response.getStatusCode());
         transaction.setStatus(Transaction.SUCCESS);
       } catch (Throwable ex) {
         lastServiceDto = null;
         Tracer.logEvent(APOLLO_CONFIG_EXCEPTION, ExceptionUtil.getDetailMessage(ex));
         transaction.setStatus(ex);
-        long sleepTimeInSecond = m_longPollFailSchedulePolicyInSecond.fail();
+        long sleepTimeInSecond = longPollFailSchedulePolicyInSecond.fail();
         if (ex.getCause() instanceof SocketTimeoutException) {
           Tracer.logEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT, assembleNamespaces(appId));
         }
@@ -235,7 +235,7 @@ public class RemoteConfigLongPollService {
     if (notifications == null || notifications.isEmpty()) {
       return;
     }
-    Multimap<String, RemoteConfigRepository> namespaceRepositories = m_longPollNamespaces.get(appId);
+    Multimap<String, RemoteConfigRepository> namespaceRepositories = longPollNamespaces.get(appId);
     if (namespaceRepositories == null) {
          return;
     }
@@ -244,7 +244,7 @@ public class RemoteConfigLongPollService {
       //create a new list to avoid ConcurrentModificationException
       List<RemoteConfigRepository> toBeNotified =
                Lists.newArrayList(namespaceRepositories.get(namespaceName));
-      ApolloNotificationMessages originalMessages = m_remoteNotificationMessages.get(namespaceName);
+      ApolloNotificationMessages originalMessages = remoteNotificationMessages.get(namespaceName);
       ApolloNotificationMessages remoteMessages = originalMessages == null ? null : originalMessages.clone();
       //since .properties are filtered out by default, so we need to check if there is any listener for it
       toBeNotified.addAll(namespaceRepositories.get(
@@ -265,14 +265,14 @@ public class RemoteConfigLongPollService {
         continue;
       }
       String namespaceName = notification.getNamespaceName();
-      if (m_notifications.contains(appId, namespaceName)) {
-        m_notifications.put(appId, namespaceName, notification.getNotificationId());
+      if (notifications.contains(appId, namespaceName)) {
+        notifications.put(appId, namespaceName, notification.getNotificationId());
       }
       //since .properties are filtered out by default, so we need to check if there is notification with .properties suffix
       String namespaceNameWithPropertiesSuffix =
           String.format("%s.%s", namespaceName, ConfigFileFormat.Properties.getValue());
-      if (m_notifications.contains(appId, namespaceNameWithPropertiesSuffix)) {
-        m_notifications.put(appId, namespaceNameWithPropertiesSuffix, notification.getNotificationId());
+      if (notifications.contains(appId, namespaceNameWithPropertiesSuffix)) {
+        notifications.put(appId, namespaceNameWithPropertiesSuffix, notification.getNotificationId());
       }
     }
   }
@@ -288,10 +288,10 @@ public class RemoteConfigLongPollService {
       }
 
       ApolloNotificationMessages localRemoteMessages =
-          m_remoteNotificationMessages.get(notification.getNamespaceName());
+          remoteNotificationMessages.get(notification.getNamespaceName());
       if (localRemoteMessages == null) {
         localRemoteMessages = new ApolloNotificationMessages();
-        m_remoteNotificationMessages.put(notification.getNamespaceName(), localRemoteMessages);
+        remoteNotificationMessages.put(notification.getNamespaceName(), localRemoteMessages);
       }
 
       localRemoteMessages.mergeFrom(notification.getMessages());
@@ -299,7 +299,7 @@ public class RemoteConfigLongPollService {
   }
 
   private String assembleNamespaces(String appId) {
-    Multimap<String, RemoteConfigRepository> namespaceRepositories = m_longPollNamespaces.get(appId);
+    Multimap<String, RemoteConfigRepository> namespaceRepositories = longPollNamespaces.get(appId);
     if (namespaceRepositories == null) {
       return "";
     }
@@ -317,7 +317,7 @@ public class RemoteConfigLongPollService {
     if (!Strings.isNullOrEmpty(dataCenter)) {
       queryParams.put("dataCenter", queryParamEscaper.escape(dataCenter));
     }
-    String localIp = m_configUtil.getLocalIp();
+    String localIp = configUtil.getLocalIp();
     if (!Strings.isNullOrEmpty(localIp)) {
       queryParams.put("ip", queryParamEscaper.escape(localIp));
     }
@@ -345,7 +345,7 @@ public class RemoteConfigLongPollService {
   }
 
   private List<ServiceDTO> getConfigServices() {
-    List<ServiceDTO> services = m_serviceLocator.getConfigServices();
+    List<ServiceDTO> services = serviceLocator.getConfigServices();
     if (services.isEmpty()) {
       throw new ApolloConfigException("No available config service");
     }

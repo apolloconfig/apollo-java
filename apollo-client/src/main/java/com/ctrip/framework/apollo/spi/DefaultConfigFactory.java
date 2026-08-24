@@ -57,15 +57,15 @@ import org.slf4j.LoggerFactory;
 public class DefaultConfigFactory implements ConfigFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultConfigFactory.class);
-  private final ConfigUtil m_configUtil;
+  private final ConfigUtil configUtil;
 
   public DefaultConfigFactory() {
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   @Override
   public Config create(String namespace) {
-    return this.create(m_configUtil.getAppId(), namespace);
+    return this.create(configUtil.getAppId(), namespace);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class DefaultConfigFactory implements ConfigFactory {
 
   @Override
   public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
-    return this.createConfigFile(m_configUtil.getAppId(), namespace, configFileFormat);
+    return this.createConfigFile(configUtil.getAppId(), namespace, configFileFormat);
   }
 
   protected Config createRepositoryConfig(String appId, String namespace, ConfigRepository configRepository) {
@@ -122,9 +122,9 @@ public class DefaultConfigFactory implements ConfigFactory {
   }
 
   ConfigRepository createConfigRepository(String appId, String namespace) {
-    if (m_configUtil.isPropertyKubernetesCacheEnabled()) {
+    if (configUtil.isPropertyKubernetesCacheEnabled()) {
       return createConfigMapConfigRepository(appId, namespace);
-    } else if (m_configUtil.isPropertyFileCacheEnabled()) {
+    } else if (configUtil.isPropertyFileCacheEnabled()) {
       return createLocalConfigRepository(appId, namespace);
     }
     return createRemoteConfigRepository(appId, namespace);
@@ -138,7 +138,7 @@ public class DefaultConfigFactory implements ConfigFactory {
    * @return the newly created repository for the given namespace
    */
   LocalFileConfigRepository createLocalConfigRepository(String appId, String namespace) {
-    if (m_configUtil.isInLocalMode()) {
+    if (configUtil.isInLocalMode()) {
       logger.warn(
           "==== Apollo is in local mode! Won't pull configs from remote server for namespace {} ! ====",
           namespace);

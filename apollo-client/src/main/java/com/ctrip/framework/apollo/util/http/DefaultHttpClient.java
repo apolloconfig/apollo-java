@@ -36,14 +36,14 @@ import java.util.Map;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultHttpClient implements HttpClient {
-  private ConfigUtil m_configUtil;
+  private ConfigUtil configUtil;
   private static final Gson GSON = new Gson();
 
   /**
    * Constructor.
    */
   public DefaultHttpClient() {
-    m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
+    configUtil = ApolloInjector.getInstance(ConfigUtil.class);
   }
 
   /**
@@ -105,12 +105,12 @@ public class DefaultHttpClient implements HttpClient {
 
       int connectTimeout = httpRequest.getConnectTimeout();
       if (connectTimeout < 0) {
-        connectTimeout = m_configUtil.getConnectTimeout();
+        connectTimeout = configUtil.getConnectTimeout();
       }
 
       int readTimeout = httpRequest.getReadTimeout();
       if (readTimeout < 0) {
-        readTimeout = m_configUtil.getReadTimeout();
+        readTimeout = configUtil.getReadTimeout();
       }
 
       conn.setConnectTimeout(connectTimeout);

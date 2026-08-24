@@ -255,12 +255,12 @@ public class ConfigDataIntegrationTest {
   }
 
   private static void clearApolloClientCaches() throws Exception {
-    clearField(ApolloInjector.getInstance(ConfigManager.class), "m_configs");
-    clearField(ApolloInjector.getInstance(ConfigManager.class), "m_configLocks");
-    clearField(ApolloInjector.getInstance(ConfigManager.class), "m_configFiles");
-    clearField(ApolloInjector.getInstance(ConfigManager.class), "m_configFileLocks");
-    clearField(ApolloInjector.getInstance(ConfigFactoryManager.class), "m_factories");
-    clearField(ApolloInjector.getInstance(ConfigRegistry.class), "m_instances");
+    clearField(ApolloInjector.getInstance(ConfigManager.class), "configs");
+    clearField(ApolloInjector.getInstance(ConfigManager.class), "configLocks");
+    clearField(ApolloInjector.getInstance(ConfigManager.class), "configFiles");
+    clearField(ApolloInjector.getInstance(ConfigManager.class), "configFileLocks");
+    clearField(ApolloInjector.getInstance(ConfigFactoryManager.class), "factories");
+    clearField(ApolloInjector.getInstance(ConfigRegistry.class), "instances");
   }
 
   @SuppressWarnings("unchecked")
