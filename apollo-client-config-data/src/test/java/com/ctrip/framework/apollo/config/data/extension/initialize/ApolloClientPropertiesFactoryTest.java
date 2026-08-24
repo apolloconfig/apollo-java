@@ -39,8 +39,8 @@ public class ApolloClientPropertiesFactoryTest {
     MapConfigurationPropertySource propertySource = new MapConfigurationPropertySource(map);
     Binder binder = new Binder(propertySource);
     ApolloClientPropertiesFactory factory = new ApolloClientPropertiesFactory();
-    ApolloClientProperties apolloClientProperties = factory
-        .createApolloClientProperties(binder, null);
+    ApolloClientProperties apolloClientProperties =
+        factory.createApolloClientProperties(binder, null);
 
     Assert.assertEquals(apolloClientProperties.getExtension().getEnabled(), true);
     Assert.assertEquals(apolloClientProperties.getExtension().getMessagingType(),

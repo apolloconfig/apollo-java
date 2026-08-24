@@ -104,8 +104,8 @@ public abstract class AbstractSpringIntegrationTest {
 
     InputStream inputStream = classLoader.getResourceAsStream(filePath);
     Objects.requireNonNull(inputStream, filePath + " may be not exist under src/test/resources/");
-    String yamlContent = CharStreams
-        .toString(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+    String yamlContent =
+        CharStreams.toString(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
     Properties properties = new Properties();
     properties.setProperty(ConfigConsts.CONFIG_FILE_CONTENT_KEY, yamlContent);
@@ -113,13 +113,15 @@ public abstract class AbstractSpringIntegrationTest {
     return properties;
   }
 
-  protected static YamlConfigFile prepareYamlConfigFile(String appId, String namespaceNameWithFormat, Properties properties) {
+  protected static YamlConfigFile prepareYamlConfigFile(String appId,
+      String namespaceNameWithFormat, Properties properties) {
     ConfigRepository configRepository = mock(ConfigRepository.class);
 
     when(configRepository.getConfig()).thenReturn(properties);
 
     // spy it for testing after
-    YamlConfigFile configFile = spy(new YamlConfigFile(appId, namespaceNameWithFormat, configRepository));
+    YamlConfigFile configFile =
+        spy(new YamlConfigFile(appId, namespaceNameWithFormat, configRepository));
 
     mockConfigFile(appId, namespaceNameWithFormat, configFile);
 
@@ -152,9 +154,10 @@ public abstract class AbstractSpringIntegrationTest {
     return properties;
   }
 
-  protected Date assembleDate(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+  protected Date assembleDate(int year, int month, int day, int hour, int minute, int second,
+      int millisecond) {
     Calendar date = Calendar.getInstance();
-    date.set(year, month - 1, day, hour, minute, second); //Month in Calendar is 0 based
+    date.set(year, month - 1, day, hour, minute, second); // Month in Calendar is 0 based
     date.set(Calendar.MILLISECOND, millisecond);
 
     return date.getTime();
@@ -169,14 +172,15 @@ public abstract class AbstractSpringIntegrationTest {
     CONFIG_FILE_REGISTRY.put(namespaceNameWithFormat, configFile);
   }
 
-  protected static void mockConfigFile(String appId,String namespaceNameWithFormat, ConfigFile configFile) {
+  protected static void mockConfigFile(String appId, String namespaceNameWithFormat,
+      ConfigFile configFile) {
     CONFIG_FILE_REGISTRY.put(appId + "+" + namespaceNameWithFormat, configFile);
   }
 
   protected static void doSetUp() throws Exception {
-    //as ConfigService is singleton, so we must manually clear its container
+    // as ConfigService is singleton, so we must manually clear its container
     ReflectionUtils.invokeMethod(CONFIG_SERVICE_RESET, null);
-    //as PropertySourcesProcessor has some static variables, so we must manually clear them
+    // as PropertySourcesProcessor has some static variables, so we must manually clear them
     ReflectionUtils.invokeMethod(PROPERTY_SOURCES_PROCESSOR_RESET, null);
 
     MockConfigUtil configUtil = new MockConfigUtil();
@@ -226,8 +230,10 @@ public abstract class AbstractSpringIntegrationTest {
     }
 
     @Override
-    public ConfigFile getConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
-      ConfigFile configFile = CONFIG_FILE_REGISTRY.get(String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue()));
+    public ConfigFile getConfigFile(String appId, String namespace,
+        ConfigFileFormat configFileFormat) {
+      ConfigFile configFile = CONFIG_FILE_REGISTRY
+          .get(String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue()));
       if (configFile != null) {
         return configFile;
       }

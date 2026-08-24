@@ -33,12 +33,10 @@ final class DeferredLogCache {
 
   public static final int MAX_LOG_SIZE = 1000;
   private static final AtomicInteger LOG_INDEX = new AtomicInteger(0);
-  private static final Cache<Integer, Line> LOG_CACHE = CacheBuilder.newBuilder()
-      .maximumSize(MAX_LOG_SIZE)
-      .build();
+  private static final Cache<Integer, Line> LOG_CACHE =
+      CacheBuilder.newBuilder().maximumSize(MAX_LOG_SIZE).build();
 
-  private DeferredLogCache() {
-  }
+  private DeferredLogCache() {}
 
 
   public static void debug(Logger logger, String message, Throwable throwable) {

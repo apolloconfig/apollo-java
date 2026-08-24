@@ -47,5 +47,5 @@ public class NullClientThreadPoolMonitorApiTest {
     assertNotNull(info);
     assertEquals(0, info.getPoolSize());
   }
-  
+
 }

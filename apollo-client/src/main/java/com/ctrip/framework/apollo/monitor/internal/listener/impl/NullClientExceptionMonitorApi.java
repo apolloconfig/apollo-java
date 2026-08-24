@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * @author Rawven
  */
-public class NullClientExceptionMonitorApi implements ApolloClientExceptionMonitorApi,
-    ApolloClientJmxExceptionMBean {
+public class NullClientExceptionMonitorApi
+    implements ApolloClientExceptionMonitorApi, ApolloClientJmxExceptionMBean {
 
   @Override
   public List<Exception> getApolloConfigExceptionList() {

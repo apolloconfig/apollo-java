@@ -14,18 +14,6 @@
  * limitations under the License.
  *
  */
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
- * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
- * to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
 package com.ctrip.framework.foundation.internals.io;
 
 import java.io.Serializable;
@@ -55,21 +43,23 @@ public class ByteOrderMark implements Serializable {
 
   /**
    * UTF-32BE BOM (Big-Endian)
-   * 
+   *
    * @since 2.2
    */
-  public static final ByteOrderMark UTF_32BE = new ByteOrderMark("UTF-32BE", 0x00, 0x00, 0xFE, 0xFF);
+  public static final ByteOrderMark UTF_32BE =
+      new ByteOrderMark("UTF-32BE", 0x00, 0x00, 0xFE, 0xFF);
 
   /**
    * UTF-32LE BOM (Little-Endian)
-   * 
+   *
    * @since 2.2
    */
-  public static final ByteOrderMark UTF_32LE = new ByteOrderMark("UTF-32LE", 0xFF, 0xFE, 0x00, 0x00);
+  public static final ByteOrderMark UTF_32LE =
+      new ByteOrderMark("UTF-32LE", 0xFF, 0xFE, 0x00, 0x00);
 
   /**
    * Unicode BOM character; external form depends on the encoding.
-   * 
+   *
    * @see <a href="http://unicode.org/faq/utf_bom.html#BOM">Byte Order Mark (BOM) FAQ</a>
    * @since 2.5
    */
@@ -201,5 +191,3 @@ public class ByteOrderMark implements Serializable {
   }
 
 }
-
-

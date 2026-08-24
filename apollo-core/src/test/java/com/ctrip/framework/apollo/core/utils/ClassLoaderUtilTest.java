@@ -137,8 +137,8 @@ public class ClassLoaderUtilTest {
     ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(contextClassLoader);
-      Class<?> isolatedClassLoaderUtil = newIsolatedClassLoader().loadClass(
-          ClassLoaderUtil.class.getName());
+      Class<?> isolatedClassLoaderUtil =
+          newIsolatedClassLoader().loadClass(ClassLoaderUtil.class.getName());
       Method getClassPath = isolatedClassLoaderUtil.getMethod("getClassPath");
       return (String) getClassPath.invoke(null);
     } finally {
@@ -173,8 +173,9 @@ public class ClassLoaderUtilTest {
   }
 
   private byte[] readClassBytes(String classFile) throws IOException {
-    try (InputStream inputStream = ClassLoaderUtil.class.getClassLoader().getResourceAsStream(
-        classFile);
+    try (
+        InputStream inputStream =
+            ClassLoaderUtil.class.getClassLoader().getResourceAsStream(classFile);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
       assertNotNull(inputStream);
 

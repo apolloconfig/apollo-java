@@ -50,8 +50,8 @@ import org.springframework.util.CollectionUtils;
 public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
     ApplicationListener<ApolloConfigChangeEvent>, ApplicationContextAware {
 
-  private static final Logger logger = LoggerFactory.getLogger(
-      AutoUpdateConfigChangeListener.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(AutoUpdateConfigChangeListener.class);
 
   private final boolean typeConverterHasConvertIfNecessaryWithFieldParameter;
   private ConfigurableBeanFactory beanFactory;
@@ -62,7 +62,8 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
   private final ConfigUtil configUtil;
 
   public AutoUpdateConfigChangeListener() {
-    this.typeConverterHasConvertIfNecessaryWithFieldParameter = testTypeConverterHasConvertIfNecessaryWithFieldParameter();
+    this.typeConverterHasConvertIfNecessaryWithFieldParameter =
+        testTypeConverterHasConvertIfNecessaryWithFieldParameter();
     this.placeholderHelper = SpringInjector.getInstance(PlaceholderHelper.class);
     this.springValueRegistry = SpringInjector.getInstance(SpringValueRegistry.class);
     this.datePatternGsonMap = new ConcurrentHashMap<>();
@@ -109,21 +110,23 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
    */
   private Object resolvePropertyValue(SpringValue springValue) {
     // value will never be null, as @Value and @ApolloJsonValue will not allow that
-    Object value = placeholderHelper
-        .resolvePropertyValue(beanFactory, springValue.getBeanName(), springValue.getPlaceholder());
+    Object value = placeholderHelper.resolvePropertyValue(beanFactory, springValue.getBeanName(),
+        springValue.getPlaceholder());
 
     if (springValue.isJson()) {
-      ApolloJsonValue apolloJsonValue = springValue.isField() ?
-              springValue.getField().getAnnotation(ApolloJsonValue.class) :
-              springValue.getMethodParameter().getMethodAnnotation(ApolloJsonValue.class);
-      String datePattern = apolloJsonValue != null ? apolloJsonValue.datePattern() : StringUtils.EMPTY;
+      ApolloJsonValue apolloJsonValue =
+          springValue.isField() ? springValue.getField().getAnnotation(ApolloJsonValue.class)
+              : springValue.getMethodParameter().getMethodAnnotation(ApolloJsonValue.class);
+      String datePattern =
+          apolloJsonValue != null ? apolloJsonValue.datePattern() : StringUtils.EMPTY;
       value = parseJsonValue((String) value, springValue.getGenericType(), datePattern);
     } else {
       if (springValue.isField()) {
-        // org.springframework.beans.TypeConverter#convertIfNecessary(java.lang.Object, java.lang.Class, java.lang.reflect.Field) is available from Spring 3.2.0+
+        // org.springframework.beans.TypeConverter#convertIfNecessary(java.lang.Object,
+        // java.lang.Class, java.lang.reflect.Field) is available from Spring 3.2.0+
         if (typeConverterHasConvertIfNecessaryWithFieldParameter) {
-          value = this.typeConverter
-              .convertIfNecessary(value, springValue.getTargetType(), springValue.getField());
+          value = this.typeConverter.convertIfNecessary(value, springValue.getTargetType(),
+              springValue.getField());
         } else {
           value = this.typeConverter.convertIfNecessary(value, springValue.getTargetType());
         }
@@ -138,7 +141,8 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
 
   private Object parseJsonValue(String json, Type targetType, String datePattern) {
     try {
-      return datePatternGsonMap.computeIfAbsent(datePattern, this::buildGson).fromJson(json, targetType);
+      return datePatternGsonMap.computeIfAbsent(datePattern, this::buildGson).fromJson(json,
+          targetType);
     } catch (Throwable ex) {
       logger.error("Parsing json '{}' to type {} failed!", json, targetType, ex);
       throw ex;
@@ -164,7 +168,8 @@ public class AutoUpdateConfigChangeListener implements ConfigChangeListener,
 
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    //it is safe enough to cast as all known application context is derived from ConfigurableApplicationContext
+    // it is safe enough to cast as all known application context is derived from
+    // ConfigurableApplicationContext
     this.beanFactory = ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
     this.typeConverter = this.beanFactory.getTypeConverter();
   }

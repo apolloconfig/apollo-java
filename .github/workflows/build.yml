@@ -46,6 +46,30 @@ jobs:
     - name: Compile
       run: mvn -B clean compile -Dmaven.gitcommitid.skip=true
 
+  code-style-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 8
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-spotless-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-spotless-
+          ${{ runner.os }}-maven-
+    - name: Code Style Check
+      run: mvn -B spotless:check -Dmaven.gitcommitid.skip=true
+    - name: Code Style Check (compat-tests reactor)
+      run: mvn -B -f apollo-compat-tests/pom.xml spotless:check -Dmaven.gitcommitid.skip=true
+
   unit-integration-pr:
     runs-on: ubuntu-latest
     steps:

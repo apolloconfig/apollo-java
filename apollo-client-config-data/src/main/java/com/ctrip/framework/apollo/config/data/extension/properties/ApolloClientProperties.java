@@ -33,15 +33,12 @@ public class ApolloClientProperties {
     return extension;
   }
 
-  public void setExtension(
-      ApolloClientExtensionProperties extension) {
+  public void setExtension(ApolloClientExtensionProperties extension) {
     this.extension = extension;
   }
 
   @Override
   public String toString() {
-    return "ApolloClientProperties{" +
-        "extension=" + extension +
-        '}';
+    return "ApolloClientProperties{" + "extension=" + extension + '}';
   }
 }

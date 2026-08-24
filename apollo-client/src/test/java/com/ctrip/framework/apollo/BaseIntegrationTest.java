@@ -86,30 +86,17 @@ public abstract class BaseIntegrationTest {
     this.mockedConfigService.mockMetaServer(failedAtFirstTime, someServiceDTO);
   }
 
-  public void mockConfigs(
-      int mockedStatusCode,
-      ApolloConfig apolloConfig
-  ) {
+  public void mockConfigs(int mockedStatusCode, ApolloConfig apolloConfig) {
     this.mockConfigs(false, mockedStatusCode, apolloConfig);
   }
 
-  public void mockConfigs(
-      boolean failedAtFirstTime,
-      int mockedStatusCode,
-      ApolloConfig apolloConfig
-  ) {
-    this.mockedConfigService.mockConfigs(
-        failedAtFirstTime, mockedStatusCode, apolloConfig
-    );
+  public void mockConfigs(boolean failedAtFirstTime, int mockedStatusCode,
+      ApolloConfig apolloConfig) {
+    this.mockedConfigService.mockConfigs(failedAtFirstTime, mockedStatusCode, apolloConfig);
   }
 
-  public void mockConfigs(
-      String appId,
-      String cluster,
-      String namespace,
-      int mockedStatusCode,
-      ApolloConfig apolloConfig
-  ) {
+  public void mockConfigs(String appId, String cluster, String namespace, int mockedStatusCode,
+      ApolloConfig apolloConfig) {
     this.mockedConfigService.mockConfigs(appId, cluster, namespace, mockedStatusCode, apolloConfig);
   }
 
@@ -124,14 +111,14 @@ public abstract class BaseIntegrationTest {
     propertiesOrderEnabled = false;
 
     port = findFreePort();
-    metaServiceUrl = configServiceURL =  "http://localhost:" + port;
+    metaServiceUrl = configServiceURL = "http://localhost:" + port;
 
     System.setProperty(ConfigConsts.APOLLO_META_KEY, metaServiceUrl);
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
 
     MockConfigUtil mockConfigUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
-    configDir = new File(mockConfigUtil.getDefaultLocalCacheDir(someAppId)+ "/config-cache");
+    configDir = new File(mockConfigUtil.getDefaultLocalCacheDir(someAppId) + "/config-cache");
 
     if (configDir.exists()) {
       configDir.delete();
@@ -142,12 +129,12 @@ public abstract class BaseIntegrationTest {
   @AfterEach
   public void tearDown() throws Exception {
     // get the instance will trigger long poll task execute, so move it from setup to tearDown
-    RemoteConfigLongPollService remoteConfigLongPollService
-        = ApolloInjector.getInstance(RemoteConfigLongPollService.class);
+    RemoteConfigLongPollService remoteConfigLongPollService =
+        ApolloInjector.getInstance(RemoteConfigLongPollService.class);
     ReflectionTestUtils.invokeMethod(remoteConfigLongPollService, "stopLongPollingRefresh");
     recursiveDelete(configDir);
 
-    //as ConfigService is singleton, so we must manually clear its container
+    // as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
     MockInjector.reset();
     System.clearProperty(ConfigConsts.APOLLO_META_KEY);
@@ -207,13 +194,9 @@ public abstract class BaseIntegrationTest {
         .join(someAppId, someClusterName, namespace));
   }
 
-  protected ApolloConfig assembleApolloConfig(
-      String namespace,
-      String releaseKey,
-      Map<String, String> configurations
-  ) {
-    ApolloConfig apolloConfig =
-        new ApolloConfig(someAppId, someClusterName, namespace, releaseKey);
+  protected ApolloConfig assembleApolloConfig(String namespace, String releaseKey,
+      Map<String, String> configurations) {
+    ApolloConfig apolloConfig = new ApolloConfig(someAppId, someClusterName, namespace, releaseKey);
 
     apolloConfig.setConfigurations(configurations);
 
@@ -290,7 +273,7 @@ public abstract class BaseIntegrationTest {
     @Override
     public String getDefaultLocalCacheDir(String appId) {
       String path = ClassLoaderUtil.getClassPath() + "/" + appId;
-      if(isOSWindows()){
+      if (isOSWindows()) {
         // because there is an extra / in front of the windows system
         path = Paths.get(path.substring(1)).toString();
       }

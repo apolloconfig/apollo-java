@@ -22,8 +22,7 @@ import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
  * @author Jason Song(song_s@ctrip.com)
  */
 public class JsonConfigFile extends PlainTextConfigFile {
-  public JsonConfigFile(String appId, String namespace,
-                        ConfigRepository configRepository) {
+  public JsonConfigFile(String appId, String namespace, ConfigRepository configRepository) {
     super(appId, namespace, configRepository);
   }
 

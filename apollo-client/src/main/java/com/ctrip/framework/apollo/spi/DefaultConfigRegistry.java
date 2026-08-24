@@ -32,8 +32,8 @@ public class DefaultConfigRegistry implements ConfigRegistry {
 
   private ConfigUtil m_configUtil;
 
-  private Table<String, String, ConfigFactory> m_instances = Tables.synchronizedTable(
-      HashBasedTable.create());
+  private Table<String, String, ConfigFactory> m_instances =
+      Tables.synchronizedTable(HashBasedTable.create());
 
   public DefaultConfigRegistry() {
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
@@ -47,7 +47,8 @@ public class DefaultConfigRegistry implements ConfigRegistry {
   @Override
   public void register(String appId, String namespace, ConfigFactory factory) {
     if (m_instances.contains(appId, namespace)) {
-      s_logger.warn("ConfigFactory({}-{}) is overridden by {}!", appId, namespace, factory.getClass());
+      s_logger.warn("ConfigFactory({}-{}) is overridden by {}!", appId, namespace,
+          factory.getClass());
     }
 
     m_instances.put(appId, namespace, factory);

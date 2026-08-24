@@ -57,15 +57,15 @@ import org.springframework.util.ReflectionUtils;
  *
  * @author Jason Song(song_s@ctrip.com)
  */
-public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFactoryAware,
-    EnvironmentAware {
+public class ApolloAnnotationProcessor extends ApolloProcessor
+    implements BeanFactoryAware, EnvironmentAware {
 
   private static final Logger logger = LoggerFactory.getLogger(ApolloAnnotationProcessor.class);
 
   private static final String NAMESPACE_DELIMITER = ",";
 
-  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(NAMESPACE_DELIMITER)
-      .omitEmptyStrings().trimResults();
+  private static final Splitter NAMESPACE_SPLITTER =
+      Splitter.on(NAMESPACE_DELIMITER).omitEmptyStrings().trimResults();
   private static final Map<String, Gson> DATEPATTERN_GSON_MAP = new ConcurrentHashMap<>();
 
   private final ConfigUtil configUtil;
@@ -117,8 +117,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
   }
 
   private void processApolloConfigChangeListener(final Object bean, final Method method) {
-    ApolloConfigChangeListener annotation = AnnotationUtils
-        .findAnnotation(method, ApolloConfigChangeListener.class);
+    ApolloConfigChangeListener annotation =
+        AnnotationUtils.findAnnotation(method, ApolloConfigChangeListener.class);
     if (annotation == null) {
       return;
     }
@@ -136,7 +136,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
     String[] namespaces = annotation.value();
     String[] annotatedInterestedKeys = annotation.interestedKeys();
     String[] annotatedInterestedKeyPrefixes = annotation.interestedKeyPrefixes();
-    ConfigChangeListener configChangeListener = changeEvent -> ReflectionUtils.invokeMethod(method, bean, changeEvent);
+    ConfigChangeListener configChangeListener =
+        changeEvent -> ReflectionUtils.invokeMethod(method, bean, changeEvent);
 
     Set<String> interestedKeys =
         annotatedInterestedKeys.length > 0 ? Sets.newHashSet(annotatedInterestedKeys) : null;
@@ -195,8 +196,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
     boolean accessible = field.isAccessible();
     field.setAccessible(true);
-    ReflectionUtils
-        .setField(field, bean, parseJsonValue((String) propertyValue, field.getGenericType(), datePattern));
+    ReflectionUtils.setField(field, bean,
+        parseJsonValue((String) propertyValue, field.getGenericType(), datePattern));
     field.setAccessible(accessible);
 
     if (configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()) {
@@ -229,7 +230,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
     boolean accessible = method.isAccessible();
     method.setAccessible(true);
-    ReflectionUtils.invokeMethod(method, bean, parseJsonValue((String) propertyValue, types[0], datePattern));
+    ReflectionUtils.invokeMethod(method, bean,
+        parseJsonValue((String) propertyValue, types[0], datePattern));
     method.setAccessible(accessible);
 
     if (configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()) {
@@ -244,8 +246,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   @Nullable
   private Object resolvePropertyValue(String beanName, String placeHolder) {
-    Object propertyValue = placeholderHelper
-        .resolvePropertyValue(this.configurableBeanFactory, beanName, placeHolder);
+    Object propertyValue =
+        placeholderHelper.resolvePropertyValue(this.configurableBeanFactory, beanName, placeHolder);
 
     // propertyValue will never be null, as @ApolloJsonValue will not allow that
     if (!(propertyValue instanceof String)) {
@@ -257,7 +259,8 @@ public class ApolloAnnotationProcessor extends ApolloProcessor implements BeanFa
 
   private Object parseJsonValue(String json, Type targetType, String datePattern) {
     try {
-      return DATEPATTERN_GSON_MAP.computeIfAbsent(datePattern, this::buildGson).fromJson(json, targetType);
+      return DATEPATTERN_GSON_MAP.computeIfAbsent(datePattern, this::buildGson).fromJson(json,
+          targetType);
     } catch (Throwable ex) {
       logger.error("Parsing json '{}' to type {} failed!", json, targetType, ex);
       throw ex;

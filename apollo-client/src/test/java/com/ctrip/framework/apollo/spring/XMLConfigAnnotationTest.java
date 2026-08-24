@@ -58,7 +58,8 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
     mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
-    TestApolloConfigBean1 bean = getBean("spring/XmlConfigAnnotationTest1.xml", TestApolloConfigBean1.class);
+    TestApolloConfigBean1 bean =
+        getBean("spring/XmlConfigAnnotationTest1.xml", TestApolloConfigBean1.class);
 
     assertEquals(applicationConfig, bean.getConfig());
     assertEquals(applicationConfig, bean.getAnotherConfig());
@@ -106,10 +107,10 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
     ConfigChangeEvent someEvent = mock(ConfigChangeEvent.class);
     ConfigChangeEvent anotherEvent = mock(ConfigChangeEvent.class);
 
-    TestApolloConfigChangeListenerBean1 bean = getBean("spring/XmlConfigAnnotationTest3.xml",
-        TestApolloConfigChangeListenerBean1.class);
+    TestApolloConfigChangeListenerBean1 bean =
+        getBean("spring/XmlConfigAnnotationTest3.xml", TestApolloConfigChangeListenerBean1.class);
 
-    //PropertySourcesProcessor add listeners to listen config changed of all namespace
+    // PropertySourcesProcessor add listeners to listen config changed of all namespace
     assertEquals(4, applicationListeners.size());
     assertEquals(1, fxApolloListeners.size());
 
@@ -156,17 +157,18 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
     mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, applicationConfig);
     mockConfig(someAppId, FX_APOLLO_NAMESPACE, fxApolloConfig);
 
-    TestApolloConfigChangeListenerWithInterestedKeysBean bean = getBean(
-        "spring/XmlConfigAnnotationTest6.xml", TestApolloConfigChangeListenerWithInterestedKeysBean.class);
+    TestApolloConfigChangeListenerWithInterestedKeysBean bean =
+        getBean("spring/XmlConfigAnnotationTest6.xml",
+            TestApolloConfigChangeListenerWithInterestedKeysBean.class);
 
     final ArgumentCaptor<Set> applicationConfigInterestedKeys = ArgumentCaptor.forClass(Set.class);
     final ArgumentCaptor<Set> fxApolloConfigInterestedKeys = ArgumentCaptor.forClass(Set.class);
 
-    verify(applicationConfig, times(2))
-        .addChangeListener(any(ConfigChangeListener.class), applicationConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
+    verify(applicationConfig, times(2)).addChangeListener(any(ConfigChangeListener.class),
+        applicationConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
 
-    verify(fxApolloConfig, times(1))
-        .addChangeListener(any(ConfigChangeListener.class), fxApolloConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
+    verify(fxApolloConfig, times(1)).addChangeListener(any(ConfigChangeListener.class),
+        fxApolloConfigInterestedKeys.capture(), Mockito.nullable(Set.class));
 
     assertEquals(2, applicationConfigInterestedKeys.getAllValues().size());
 
@@ -178,7 +180,8 @@ public class XMLConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
     assertEquals(1, fxApolloConfigInterestedKeys.getAllValues().size());
 
-    assertEquals(Collections.singletonList(Sets.newHashSet("anotherKey")), fxApolloConfigInterestedKeys.getAllValues());
+    assertEquals(Collections.singletonList(Sets.newHashSet("anotherKey")),
+        fxApolloConfigInterestedKeys.getAllValues());
   }
 
   private <T> T getBean(String xmlLocation, Class<T> beanClass) {

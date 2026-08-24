@@ -84,9 +84,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     mockConfigs(someAppId, someClusterName, defaultNamespace, HttpServletResponse.SC_OK,
         assembleApolloConfigForApp(someAppId, defaultNamespace,
             ImmutableMap.of("key.from.default", "value-default")));
-    mockConfigs(FALLBACK_ANOTHER_APP_ID, someClusterName, defaultNamespace, HttpServletResponse.SC_OK,
-        assembleApolloConfigForApp(FALLBACK_ANOTHER_APP_ID, defaultNamespace,
-            ImmutableMap.of("key.from.another", "value-another")));
+    mockConfigs(FALLBACK_ANOTHER_APP_ID, someClusterName, defaultNamespace,
+        HttpServletResponse.SC_OK, assembleApolloConfigForApp(FALLBACK_ANOTHER_APP_ID,
+            defaultNamespace, ImmutableMap.of("key.from.another", "value-another")));
     mockConfigs(someAppId, someClusterName, PUBLIC_NAMESPACE, HttpServletResponse.SC_OK,
         assembleApolloConfigForApp(someAppId, PUBLIC_NAMESPACE,
             ImmutableMap.of("key.from.public", "value-public")));
@@ -112,9 +112,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     mockConfigs(someAppId, someClusterName, defaultNamespace, HttpServletResponse.SC_OK,
         assembleApolloConfigForApp(someAppId, defaultNamespace,
             ImmutableMap.of(MULTI_APP_KEY, "value-from-default-app")));
-    mockConfigs(MULTI_APP_ANOTHER_APP_ID, someClusterName, defaultNamespace, HttpServletResponse.SC_OK,
-        assembleApolloConfigForApp(MULTI_APP_ANOTHER_APP_ID, defaultNamespace,
-            ImmutableMap.of(MULTI_APP_KEY, "value-from-another-app")));
+    mockConfigs(MULTI_APP_ANOTHER_APP_ID, someClusterName, defaultNamespace,
+        HttpServletResponse.SC_OK, assembleApolloConfigForApp(MULTI_APP_ANOTHER_APP_ID,
+            defaultNamespace, ImmutableMap.of(MULTI_APP_KEY, "value-from-another-app")));
 
     Config defaultAppConfig = ConfigService.getConfig(someAppId, defaultNamespace);
     Config anotherAppConfig = ConfigService.getConfig(MULTI_APP_ANOTHER_APP_ID, defaultNamespace);
@@ -130,12 +130,11 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     mockConfigs(someAppId, someClusterName, defaultNamespace, HttpServletResponse.SC_OK,
         assembleApolloConfigForApp(someAppId, defaultNamespace,
             ImmutableMap.of(MULTI_APP_KEY, "default-v1")));
-    mockConfigs(MULTI_APP_ANOTHER_APP_ID, someClusterName, defaultNamespace, HttpServletResponse.SC_OK,
-        assembleApolloConfigForApp(MULTI_APP_ANOTHER_APP_ID, defaultNamespace,
-            ImmutableMap.of(MULTI_APP_KEY, "another-v1")));
+    mockConfigs(MULTI_APP_ANOTHER_APP_ID, someClusterName, defaultNamespace,
+        HttpServletResponse.SC_OK, assembleApolloConfigForApp(MULTI_APP_ANOTHER_APP_ID,
+            defaultNamespace, ImmutableMap.of(MULTI_APP_KEY, "another-v1")));
     mockedConfigService.mockLongPollNotifications(50, HttpServletResponse.SC_OK,
-        Lists.newArrayList(
-            new ApolloConfigNotification(defaultNamespace, 1L)));
+        Lists.newArrayList(new ApolloConfigNotification(defaultNamespace, 1L)));
 
     Config defaultAppConfig = ConfigService.getConfig(someAppId, defaultNamespace);
     Config anotherAppConfig = ConfigService.getConfig(MULTI_APP_ANOTHER_APP_ID, defaultNamespace);
@@ -149,13 +148,12 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     defaultAppConfig.addChangeListener(futureListener(defaultAppFuture));
     anotherAppConfig.addChangeListener(futureListener(anotherAppFuture));
 
-    mockConfigs(MULTI_APP_ANOTHER_APP_ID, someClusterName, defaultNamespace, HttpServletResponse.SC_OK,
-        assembleApolloConfigForApp(MULTI_APP_ANOTHER_APP_ID, defaultNamespace,
-            ImmutableMap.of(MULTI_APP_KEY, "another-v2")));
+    mockConfigs(MULTI_APP_ANOTHER_APP_ID, someClusterName, defaultNamespace,
+        HttpServletResponse.SC_OK, assembleApolloConfigForApp(MULTI_APP_ANOTHER_APP_ID,
+            defaultNamespace, ImmutableMap.of(MULTI_APP_KEY, "another-v2")));
 
     mockedConfigService.mockLongPollNotifications(50, HttpServletResponse.SC_OK,
-        Lists.newArrayList(
-            new ApolloConfigNotification(defaultNamespace, 2L)));
+        Lists.newArrayList(new ApolloConfigNotification(defaultNamespace, 2L)));
 
     ConfigChangeEvent anotherAppChangeEvent = anotherAppFuture.get(5, TimeUnit.SECONDS);
     assertNotNull(anotherAppChangeEvent);
@@ -187,12 +185,12 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
             ImmutableMap.of(ConfigConsts.CONFIG_FILE_CONTENT_KEY,
                 "redis:\n  cache:\n    enabled: true\n    commandTimeout: 30\n")));
     mockedConfigService.mockLongPollNotifications(50, HttpServletResponse.SC_OK,
-        Lists.newArrayList(
-            new ApolloConfigNotification(propertiesNamespace, 1L),
+        Lists.newArrayList(new ApolloConfigNotification(propertiesNamespace, 1L),
             new ApolloConfigNotification(xmlNamespace, 1L),
             new ApolloConfigNotification(yamlNamespace, 1L)));
 
-    ConfigFile propertiesFile = ConfigService.getConfigFile("application", ConfigFileFormat.Properties);
+    ConfigFile propertiesFile =
+        ConfigService.getConfigFile("application", ConfigFileFormat.Properties);
     ConfigFile xmlFile = ConfigService.getConfigFile("datasources", ConfigFileFormat.XML);
     ConfigFile yamlFile = ConfigService.getConfigFile("application", ConfigFileFormat.YAML);
 
@@ -233,8 +231,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
                 "redis:\n  cache:\n    enabled: false\n    commandTimeout: 45\n")));
 
     mockedConfigService.mockLongPollNotifications(50, HttpServletResponse.SC_OK,
-        Lists.newArrayList(
-            new ApolloConfigNotification(xmlNamespace, 2L),
+        Lists.newArrayList(new ApolloConfigNotification(xmlNamespace, 2L),
             new ApolloConfigNotification(yamlNamespace, 2L)));
 
     ConfigFileChangeEvent xmlChange = xmlChangeFuture.get(5, TimeUnit.SECONDS);
@@ -246,8 +243,8 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
 
     assertEquals("application.yaml", yamlChange.getNamespace());
     assertEquals(PropertyChangeType.MODIFIED, yamlChange.getChangeType());
-    Properties yamlPropertiesAfterRefresh = ((PropertiesCompatibleConfigFile) yamlFile)
-        .asProperties();
+    Properties yamlPropertiesAfterRefresh =
+        ((PropertiesCompatibleConfigFile) yamlFile).asProperties();
     assertEquals("false", yamlPropertiesAfterRefresh.getProperty("redis.cache.enabled"));
     assertEquals("45", yamlPropertiesAfterRefresh.getProperty("redis.cache.commandTimeout"));
   }
@@ -452,7 +449,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
 
       @Override
       public void onChange(ConfigChangeEvent changeEvent) {
-        //only need to assert once
+        // only need to assert once
         if (counter.incrementAndGet() > 1) {
           return;
         }
@@ -491,9 +488,8 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     MockedConfigService mockedConfigService = newMockedConfigService();
     mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
     mockedConfigService.mockLongPollNotifications(pollTimeoutInMS, HttpServletResponse.SC_OK,
-            Lists.newArrayList(
-                new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId))
-        );
+        Lists.newArrayList(
+            new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId)));
 
     Config config = ConfigService.getAppConfig();
     assertEquals(someValue, config.getProperty(someKey, null));
@@ -551,11 +547,9 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     // notify
-    mockedConfigService.mockLongPollNotifications(
-        false, pollTimeoutInMS, HttpServletResponse.SC_OK,
+    mockedConfigService.mockLongPollNotifications(false, pollTimeoutInMS, HttpServletResponse.SC_OK,
         Lists.newArrayList(
-            new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId))
-    );
+            new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId)));
 
     longPollFinished.get(5000, TimeUnit.MILLISECONDS);
 
@@ -607,12 +601,10 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     mockConfigs(HttpServletResponse.SC_OK, apolloConfig);
 
     // notify
-    mockedConfigService.mockLongPollNotifications(
-        false, pollTimeoutInMS, HttpServletResponse.SC_OK,
+    mockedConfigService.mockLongPollNotifications(false, pollTimeoutInMS, HttpServletResponse.SC_OK,
         Lists.newArrayList(
             new ApolloConfigNotification(apolloConfig.getNamespaceName(), someNotificationId),
-            new ApolloConfigNotification(someOtherNamespace, someNotificationId))
-    );
+            new ApolloConfigNotification(someOtherNamespace, someNotificationId)));
 
     longPollFinished.get(5000, TimeUnit.MILLISECONDS);
     someOtherNamespacelongPollFinished.get(5000, TimeUnit.MILLISECONDS);
@@ -626,18 +618,14 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     return assembleApolloConfigForApp(someAppId, defaultNamespace, configurations);
   }
 
-  private ApolloConfig assembleApolloConfigForApp(
-      String appId, String namespace, Map<String, String> configurations) {
-    ApolloConfig apolloConfig =
-        new ApolloConfig(appId, someClusterName, namespace, someReleaseKey);
+  private ApolloConfig assembleApolloConfigForApp(String appId, String namespace,
+      Map<String, String> configurations) {
+    ApolloConfig apolloConfig = new ApolloConfig(appId, someClusterName, namespace, someReleaseKey);
     apolloConfig.setConfigurations(configurations);
     return apolloConfig;
   }
 
-  private String resolveValueByFallbackOrder(
-      String key,
-      Config appConfig,
-      Config anotherAppConfig,
+  private String resolveValueByFallbackOrder(String key, Config appConfig, Config anotherAppConfig,
       Config publicConfig) {
     String value = appConfig.getProperty(key, DEFAULT_VALUE);
     if (DEFAULT_VALUE.equals(value)) {

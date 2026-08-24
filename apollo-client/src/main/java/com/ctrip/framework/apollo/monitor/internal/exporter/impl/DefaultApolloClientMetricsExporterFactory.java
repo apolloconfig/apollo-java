@@ -32,11 +32,11 @@ import org.slf4j.Logger;
 /**
  * @author Rawven
  */
-public class DefaultApolloClientMetricsExporterFactory implements
-    ApolloClientMetricsExporterFactory {
+public class DefaultApolloClientMetricsExporterFactory
+    implements ApolloClientMetricsExporterFactory {
 
-  private static final Logger logger = DeferredLoggerFactory.getLogger(
-      DefaultApolloClientMetricsExporterFactory.class);
+  private static final Logger logger =
+      DeferredLoggerFactory.getLogger(DefaultApolloClientMetricsExporterFactory.class);
   private final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
 
   @Override
@@ -48,15 +48,14 @@ public class DefaultApolloClientMetricsExporterFactory implements
 
   private ApolloClientMetricsExporter findAndInitializeExporter(
       List<ApolloClientMonitorEventListener> listeners, String externalSystemType) {
-    List<ApolloClientMetricsExporter> exporters = ServiceBootstrap.loadAllOrdered(
-        ApolloClientMetricsExporter.class);
+    List<ApolloClientMetricsExporter> exporters =
+        ServiceBootstrap.loadAllOrdered(ApolloClientMetricsExporter.class);
     if (StringUtils.isEmpty(externalSystemType)) {
       return null;
     }
-    ApolloClientMetricsExporter reporter = exporters.stream()
-        .filter(metricsExporter -> metricsExporter.isSupport(externalSystemType))
-        .findFirst()
-        .orElse(null);
+    ApolloClientMetricsExporter reporter =
+        exporters.stream().filter(metricsExporter -> metricsExporter.isSupport(externalSystemType))
+            .findFirst().orElse(null);
 
     if (reporter != null) {
       reporter.init(listeners, configUtil.getMonitorExternalExportPeriod());

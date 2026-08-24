@@ -64,8 +64,8 @@ public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigData
     ApolloConfigDataLoaderInitializer apolloConfigDataLoaderInitializer =
         BootstrapRegistryHelper.get(bootstrapContext, ApolloConfigDataLoaderInitializer.class);
     // init apollo client
-    List<PropertySource<?>> initialPropertySourceList = apolloConfigDataLoaderInitializer
-        .initApolloClient();
+    List<PropertySource<?>> initialPropertySourceList =
+        apolloConfigDataLoaderInitializer.initApolloClient();
     // load config
     BootstrapRegistryHelper.registerIfAbsentFromSupplier(bootstrapContext,
         ConfigPropertySourceFactory.class,
@@ -74,8 +74,8 @@ public class ApolloConfigDataLoader implements ConfigDataLoader<ApolloConfigData
         BootstrapRegistryHelper.get(bootstrapContext, ConfigPropertySourceFactory.class);
     String namespace = resource.getNamespace();
     Config config = ConfigService.getConfig(namespace);
-    ConfigPropertySource configPropertySource = configPropertySourceFactory
-        .getConfigPropertySource(namespace, config);
+    ConfigPropertySource configPropertySource =
+        configPropertySourceFactory.getConfigPropertySource(namespace, config);
     List<PropertySource<?>> propertySourceList = new ArrayList<>();
     propertySourceList.add(configPropertySource);
     propertySourceList.addAll(initialPropertySourceList);

@@ -117,7 +117,7 @@ public class YamlConfigFileTest {
     assertSame(someContent, configFile.getContent());
     assertSame(yamlProperties, configFile.asProperties());
 
-    String[] actualArrays = configFile.asProperties().keySet().toArray(new String[]{});
+    String[] actualArrays = configFile.asProperties().keySet().toArray(new String[] {});
     String[] expectedArrays = {"someKey", "someKey2"};
     assertArrayEquals(expectedArrays, actualArrays);
   }

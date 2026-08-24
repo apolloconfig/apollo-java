@@ -56,20 +56,15 @@ class ApolloOpenApiClientIntegrationTest {
 
   ApolloOpenApiClient newClient() {
     String someUrl = "http://localhost:8070";
-//    String someToken = "0627b87948c30517157e8b2a9565e473b5a97323a50128f584838ed10559d3fd";
+    // String someToken = "0627b87948c30517157e8b2a9565e473b5a97323a50128f584838ed10559d3fd";
     String someToken = "9d0a241e9cb2300f302a875b1195340b2b6f56373cf5ca5d006a3f4e1a46b3ef";
 
-    return ApolloOpenApiClient.newBuilder()
-        .withPortalUrl(someUrl)
-        .withToken(someToken)
-        .withReadTimeout(2000 * 1000)
-        .withConnectTimeout(2000 * 1000)
-        .withRetryCount(3)
-        .withIdempotentHttpMethods(IdempotentHttpMethod.safe())
-        .build();
+    return ApolloOpenApiClient.newBuilder().withPortalUrl(someUrl).withToken(someToken)
+        .withReadTimeout(2000 * 1000).withConnectTimeout(2000 * 1000).withRetryCount(3)
+        .withIdempotentHttpMethods(IdempotentHttpMethod.safe()).build();
   }
 
-  void createApp(String appId, String ownerName, boolean assignAppRoleToSelf, String ... admins) {
+  void createApp(String appId, String ownerName, boolean assignAppRoleToSelf, String... admins) {
     {
       OpenAppDTO app = new OpenAppDTO();
       app.setName("openapi create app 测试名字 " + appId);
@@ -82,7 +77,8 @@ class ApolloOpenApiClientIntegrationTest {
       req.setApp(app);
       req.setAdmins(new HashSet<>(Arrays.asList(admins)));
       req.setAssignAppRoleToSelf(assignAppRoleToSelf);
-      log.info("create app {}, ownerName {} assignAppRoleToSelf {}", appId, ownerName, assignAppRoleToSelf);
+      log.info("create app {}, ownerName {} assignAppRoleToSelf {}", appId, ownerName,
+          assignAppRoleToSelf);
       client.createApp(req);
     }
   }
@@ -107,9 +103,8 @@ class ApolloOpenApiClientIntegrationTest {
   @Disabled("only for integration test")
   public void testCreateAppButHaveNoAppRole() {
     // create app
-    final String appIdSuffix = LocalDateTime.now().format(
-        DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss")
-    );
+    final String appIdSuffix =
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss"));
     final String appId = "openapi-create-app-" + appIdSuffix;
     final String ownerName = "test-create-release1";
     createApp(appId, ownerName, false, "user-test-xxx1", "user-test-xxx2");
@@ -140,9 +135,8 @@ class ApolloOpenApiClientIntegrationTest {
   @Disabled("only for integration test")
   public void testCreateAppThenCreateClusterCreateNamespaceThenRelease() {
     // create app
-    final String appIdSuffix = LocalDateTime.now().format(
-        DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss")
-    );
+    final String appIdSuffix =
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss"));
     final String appId = "openapi-create-app-" + appIdSuffix;
     final String ownerName = "test-create-release1";
     createApp(appId, ownerName, true, "user-test-xxx1", "user-test-xxx2");
@@ -186,9 +180,7 @@ class ApolloOpenApiClientIntegrationTest {
       itemDTO.setKey("k1");
       itemDTO.setValue("v1");
       itemDTO.setDataChangeCreatedBy(ownerName);
-      client.createOrUpdateItem(
-          appId, env, clusterName, namespaceName, itemDTO
-      );
+      client.createOrUpdateItem(appId, env, clusterName, namespaceName, itemDTO);
     }
     // k2=v2
     {
@@ -196,9 +188,7 @@ class ApolloOpenApiClientIntegrationTest {
       itemDTO.setKey("k2");
       itemDTO.setValue("v2");
       itemDTO.setDataChangeCreatedBy(ownerName);
-      client.createOrUpdateItem(
-          appId, env, clusterName, namespaceName, itemDTO
-      );
+      client.createOrUpdateItem(appId, env, clusterName, namespaceName, itemDTO);
     }
 
     // release namespace
@@ -213,8 +203,7 @@ class ApolloOpenApiClientIntegrationTest {
 
     // read then namespace
     {
-      OpenNamespaceDTO namespaceDTO
-          = client.getNamespace(appId, env, clusterName, namespaceName);
+      OpenNamespaceDTO namespaceDTO = client.getNamespace(appId, env, clusterName, namespaceName);
       List<OpenItemDTO> items = namespaceDTO.getItems();
       Map<String, String> map = new HashMap<>(16);
       for (OpenItemDTO item : items) {

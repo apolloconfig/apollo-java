@@ -27,7 +27,7 @@ public enum IdempotentHttpMethod {
    * Usually, these methods are idempotent
    */
   public static IdempotentHttpMethod[] safe() {
-    return new IdempotentHttpMethod[]{GET, HEAD, OPTIONS, TRACE};
+    return new IdempotentHttpMethod[] {GET, HEAD, OPTIONS, TRACE};
   }
 
   /**
@@ -35,6 +35,6 @@ public enum IdempotentHttpMethod {
    * requests can yield different responses—such as a 404 on a second delete
    */
   public static IdempotentHttpMethod[] standard() {
-    return new IdempotentHttpMethod[]{GET, HEAD, PUT, DELETE, OPTIONS, TRACE};
+    return new IdempotentHttpMethod[] {GET, HEAD, PUT, DELETE, OPTIONS, TRACE};
   }
 }

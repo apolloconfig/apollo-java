@@ -84,16 +84,16 @@ public class ApolloApiCompatibilityTest {
     Config publicConfig = ConfigService.getConfig("TEST1.apollo");
     Config yamlConfig = ConfigService.getConfig("application.yaml");
 
-    assertEquals("from-default-app",
-        resolveValueByFallback("primary.key", appConfig, anotherAppConfig, publicConfig, yamlConfig));
-    assertEquals("from-another-app",
-        resolveValueByFallback("fallback.only", appConfig, anotherAppConfig, publicConfig, yamlConfig));
-    assertEquals("from-public-namespace",
-        resolveValueByFallback("public.only", appConfig, anotherAppConfig, publicConfig, yamlConfig));
+    assertEquals("from-default-app", resolveValueByFallback("primary.key", appConfig,
+        anotherAppConfig, publicConfig, yamlConfig));
+    assertEquals("from-another-app", resolveValueByFallback("fallback.only", appConfig,
+        anotherAppConfig, publicConfig, yamlConfig));
+    assertEquals("from-public-namespace", resolveValueByFallback("public.only", appConfig,
+        anotherAppConfig, publicConfig, yamlConfig));
     assertEquals("from-yaml-namespace",
         resolveValueByFallback("yaml.only", appConfig, anotherAppConfig, publicConfig, yamlConfig));
-    assertEquals(DEFAULT_VALUE,
-        resolveValueByFallback("missing.key", appConfig, anotherAppConfig, publicConfig, yamlConfig));
+    assertEquals(DEFAULT_VALUE, resolveValueByFallback("missing.key", appConfig, anotherAppConfig,
+        publicConfig, yamlConfig));
   }
 
   @Test
@@ -115,7 +115,8 @@ public class ApolloApiCompatibilityTest {
       }
     });
 
-    EMBEDDED_APOLLO.addOrModifyProperty(ANOTHER_APP_ID, "application", "fallback.only", "another-updated");
+    EMBEDDED_APOLLO.addOrModifyProperty(ANOTHER_APP_ID, "application", "fallback.only",
+        "another-updated");
 
     ConfigChangeEvent anotherChangeEvent = anotherFuture.get(5, TimeUnit.SECONDS);
     assertNotNull(anotherChangeEvent.getChange("fallback.only"));
@@ -139,8 +140,8 @@ public class ApolloApiCompatibilityTest {
     assertEquals("35", yamlProperties.getProperty("redis.cache.commandTimeout"));
   }
 
-  private static String resolveValueByFallback(String key, Config appConfig, Config anotherAppConfig,
-      Config publicConfig, Config yamlConfig) {
+  private static String resolveValueByFallback(String key, Config appConfig,
+      Config anotherAppConfig, Config publicConfig, Config yamlConfig) {
     String value = appConfig.getProperty(key, DEFAULT_VALUE);
     if (!DEFAULT_VALUE.equals(value)) {
       return value;

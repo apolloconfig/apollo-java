@@ -69,12 +69,14 @@ public class SpringXmlCompatibilityTest {
     Config publicConfig = ConfigService.getConfig("TEST1.apollo");
     Properties publicProperties = SpringCompatibilityTestSupport.copyConfigProperties(publicConfig);
     publicProperties.setProperty("public.key", "from-public-xml-updated");
-    SpringCompatibilityTestSupport.applyConfigChange(publicConfig, "TEST1.apollo", publicProperties);
+    SpringCompatibilityTestSupport.applyConfigChange(publicConfig, "TEST1.apollo",
+        publicProperties);
 
     Config yamlConfig = ConfigService.getConfig("application.yaml");
     Properties yamlProperties = SpringCompatibilityTestSupport.copyConfigProperties(yamlConfig);
     yamlProperties.setProperty("yaml.marker", "from-yaml-xml-updated");
-    SpringCompatibilityTestSupport.applyConfigChange(yamlConfig, "application.yaml", yamlProperties);
+    SpringCompatibilityTestSupport.applyConfigChange(yamlConfig, "application.yaml",
+        yamlProperties);
 
     SpringCompatibilityTestSupport.waitForCondition("xml timeout should be updated",
         () -> xmlBean.getTimeout() == 5199);

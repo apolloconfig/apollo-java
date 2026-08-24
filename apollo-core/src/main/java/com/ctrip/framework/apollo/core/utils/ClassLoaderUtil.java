@@ -56,7 +56,8 @@ public class ClassLoaderUtil {
     return classPath;
   }
 
-  static String resolveClassPath(ClassLoader classLoader, String defaultClassPath) throws Exception {
+  static String resolveClassPath(ClassLoader classLoader, String defaultClassPath)
+      throws Exception {
     URL url = classLoader.getResource("");
     if (url == null || !"file".equalsIgnoreCase(url.getProtocol())) {
       return defaultClassPath;

@@ -19,7 +19,6 @@ package com.ctrip.framework.apollo.monitor.internal.listener.impl;
 import static org.junit.Assert.*;
 
 import com.ctrip.framework.apollo.monitor.api.ApolloClientNamespaceMonitorApi.NamespaceMetrics;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 

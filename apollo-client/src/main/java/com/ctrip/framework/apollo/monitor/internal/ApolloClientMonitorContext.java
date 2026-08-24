@@ -36,11 +36,16 @@ import java.util.List;
  */
 public class ApolloClientMonitorContext {
 
-  private ApolloClientExceptionMonitorApi apolloClientExceptionMonitorApi = new NullClientExceptionMonitorApi();
-  private ApolloClientNamespaceMonitorApi apolloClientNamespaceMonitorApi = new NullClientNamespaceMonitorApi();
-  private ApolloClientBootstrapArgsMonitorApi apolloClientBootstrapArgsMonitorApi = new NullClientBootstrapArgsMonitorApi();
-  private ApolloClientThreadPoolMonitorApi apolloClientThreadPoolMonitorApi = new NullClientThreadPoolMonitorApi();
-  private ApolloClientMetricsExporter apolloClientMetricsExporter = new NullApolloClientMetricsExporter();
+  private ApolloClientExceptionMonitorApi apolloClientExceptionMonitorApi =
+      new NullClientExceptionMonitorApi();
+  private ApolloClientNamespaceMonitorApi apolloClientNamespaceMonitorApi =
+      new NullClientNamespaceMonitorApi();
+  private ApolloClientBootstrapArgsMonitorApi apolloClientBootstrapArgsMonitorApi =
+      new NullClientBootstrapArgsMonitorApi();
+  private ApolloClientThreadPoolMonitorApi apolloClientThreadPoolMonitorApi =
+      new NullClientThreadPoolMonitorApi();
+  private ApolloClientMetricsExporter apolloClientMetricsExporter =
+      new NullApolloClientMetricsExporter();
   private List<ApolloClientMonitorEventListener> listener = Lists.newArrayList();
 
   public void addApolloClientMonitorEventListener(ApolloClientMonitorEventListener listener) {

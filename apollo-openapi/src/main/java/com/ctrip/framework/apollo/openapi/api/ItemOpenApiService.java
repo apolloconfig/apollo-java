@@ -40,6 +40,6 @@ public interface ItemOpenApiService {
       String operator);
 
   OpenPageDTO<OpenItemDTO> findItemsByNamespace(String appId, String env, String clusterName,
-                                                String namespaceName, int page, int size);
+      String namespaceName, int page, int size);
 
 }

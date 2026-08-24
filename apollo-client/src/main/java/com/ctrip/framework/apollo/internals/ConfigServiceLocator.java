@@ -76,8 +76,7 @@ public class ConfigServiceLocator {
   public ConfigServiceLocator() {
     List<ServiceDTO> initial = Lists.newArrayList();
     m_configServices = new AtomicReference<>(initial);
-    m_responseType = new TypeToken<List<ServiceDTO>>() {
-    }.getType();
+    m_responseType = new TypeToken<List<ServiceDTO>>() {}.getType();
     m_httpClient = ApolloInjector.getInstance(HttpClient.class);
     m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
     this.m_executorService = Executors.newScheduledThreadPool(1,
@@ -106,11 +105,13 @@ public class ConfigServiceLocator {
     String configServices = System.getProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE);
     if (Strings.isNullOrEmpty(configServices)) {
       // 2. Get from OS environment variable
-      configServices = System.getenv(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES);
+      configServices =
+          System.getenv(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES);
     }
     if (Strings.isNullOrEmpty(configServices)) {
       // 3. Get from server.properties
-      configServices = Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE, null);
+      configServices =
+          Foundation.server().getProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE, null);
     }
     if (Strings.isNullOrEmpty(configServices)) {
       // 4. Get from deprecated config
@@ -121,7 +122,9 @@ public class ConfigServiceLocator {
       return null;
     }
 
-    logger.info("Located config services from apollo.config-service configuration: {}, will not refresh config services from remote meta service!", configServices);
+    logger.info(
+        "Located config services from apollo.config-service configuration: {}, will not refresh config services from remote meta service!",
+        configServices);
 
     // mock service dto list
     String[] configServiceUrls = configServices.split(",");
@@ -142,22 +145,26 @@ public class ConfigServiceLocator {
   @SuppressWarnings("deprecation")
   private String getDeprecatedCustomizedConfigService() {
     // 1. Get from System Property
-    String configServices = System.getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE);
+    String configServices =
+        System.getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE);
     if (!Strings.isNullOrEmpty(configServices)) {
       DeprecatedPropertyNotifyUtil.warn(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE,
           ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE);
     }
     if (Strings.isNullOrEmpty(configServices)) {
       // 2. Get from OS environment variable
-      configServices = System.getenv(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES);
+      configServices = System
+          .getenv(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES);
       if (!Strings.isNullOrEmpty(configServices)) {
-        DeprecatedPropertyNotifyUtil.warn(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES,
+        DeprecatedPropertyNotifyUtil.warn(
+            ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES,
             ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE_ENVIRONMENT_VARIABLES);
       }
     }
     if (Strings.isNullOrEmpty(configServices)) {
       // 3. Get from server.properties
-      configServices = Foundation.server().getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE, null);
+      configServices = Foundation.server()
+          .getProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE, null);
       if (!Strings.isNullOrEmpty(configServices)) {
         DeprecatedPropertyNotifyUtil.warn(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE,
             ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE);
@@ -194,11 +201,9 @@ public class ConfigServiceLocator {
     if (m_configServices.get().isEmpty()) {
       trySubmitUpdateTask();
       // quick fail
-      throw new ApolloConfigException(
-          "No available config service, "
-              + "server side maybe crash or network cannot connect to server from this ip, "
-              + "one of meta service url is " + assembleMetaServiceUrl()
-      );
+      throw new ApolloConfigException("No available config service, "
+          + "server side maybe crash or network cannot connect to server from this ip, "
+          + "one of meta service url is " + assembleMetaServiceUrl());
     }
 
     return m_configServices.get();
@@ -209,21 +214,20 @@ public class ConfigServiceLocator {
       updateConfigServices();
       return true;
     } catch (Throwable ex) {
-      //ignore
+      // ignore
     }
     return false;
   }
 
   private void schedulePeriodicRefresh() {
-    this.m_executorService.scheduleAtFixedRate(
-        new Runnable() {
-          @Override
-          public void run() {
-            logger.debug("refresh config services");
-            Tracer.logEvent(APOLLO_META_SERVICE, "periodicRefresh");
-            tryUpdateConfigServices();
-          }
-        }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
+    this.m_executorService.scheduleAtFixedRate(new Runnable() {
+      @Override
+      public void run() {
+        logger.debug("refresh config services");
+        Tracer.logEvent(APOLLO_META_SERVICE, "periodicRefresh");
+        tryUpdateConfigServices();
+      }
+    }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
         m_configUtil.getRefreshIntervalTimeUnit());
   }
 
@@ -268,14 +272,15 @@ public class ConfigServiceLocator {
       }
 
       try {
-        m_configUtil.getOnErrorRetryIntervalTimeUnit().sleep(m_configUtil.getOnErrorRetryInterval());
+        m_configUtil.getOnErrorRetryIntervalTimeUnit()
+            .sleep(m_configUtil.getOnErrorRetryInterval());
       } catch (InterruptedException ex) {
-        //ignore
+        // ignore
       }
     }
 
-    throw new ApolloConfigException(
-        String.format("Get config services failed from %s", url), exception);
+    throw new ApolloConfigException(String.format("Get config services failed from %s", url),
+        exception);
   }
 
   private void setConfigServices(List<ServiceDTO> services) {

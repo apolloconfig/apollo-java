@@ -14,18 +14,6 @@
  * limitations under the License.
  *
  */
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
- * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
- * to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
 package com.ctrip.framework.foundation.internals.io;
 
 
@@ -140,20 +128,21 @@ public class BOMInputStream extends ProxyInputStream {
   /**
    * Compares ByteOrderMark objects in descending length order.
    */
-  private static final Comparator<ByteOrderMark> ByteOrderMarkLengthComparator = new Comparator<ByteOrderMark>() {
+  private static final Comparator<ByteOrderMark> ByteOrderMarkLengthComparator =
+      new Comparator<ByteOrderMark>() {
 
-    public int compare(final ByteOrderMark bom1, final ByteOrderMark bom2) {
-      final int len1 = bom1.length();
-      final int len2 = bom2.length();
-      if (len1 > len2) {
-        return EOF;
-      }
-      if (len2 > len1) {
-        return 1;
-      }
-      return 0;
-    }
-  };
+        public int compare(final ByteOrderMark bom1, final ByteOrderMark bom2) {
+          final int len1 = bom1.length();
+          final int len2 = bom2.length();
+          if (len1 > len2) {
+            return EOF;
+          }
+          if (len2 > len1) {
+            return 1;
+          }
+          return 0;
+        }
+      };
 
   /**
    * Constructs a new BOM InputStream that detects the specified BOMs and optionally includes them.
@@ -162,13 +151,15 @@ public class BOMInputStream extends ProxyInputStream {
    * @param include true to include the specified BOMs or false to exclude them
    * @param boms The BOMs to detect and optionally exclude
    */
-  public BOMInputStream(final InputStream delegate, final boolean include, final ByteOrderMark... boms) {
+  public BOMInputStream(final InputStream delegate, final boolean include,
+      final ByteOrderMark... boms) {
     super(delegate);
     if (boms == null || boms.length == 0) {
       throw new IllegalArgumentException("No BOMs specified");
     }
     this.include = include;
-    // Sort the BOMs to match the longest BOM first because some BOMs have the same starting two bytes.
+    // Sort the BOMs to match the longest BOM first because some BOMs have the same starting two
+    // bytes.
     Arrays.sort(boms, ByteOrderMarkLengthComparator);
     this.boms = Arrays.asList(boms);
 

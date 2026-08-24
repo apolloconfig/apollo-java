@@ -88,7 +88,7 @@ public abstract class Tracer {
           type, name, status, nameValuePairs, ex);
     }
   }
-  
+
   public static void logMetricsForCount(String name) {
     try {
       getProducer().logMetricsForCount(name);

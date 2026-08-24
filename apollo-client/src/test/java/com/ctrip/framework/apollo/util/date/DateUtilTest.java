@@ -23,20 +23,20 @@ import java.util.Optional;
 
 public class DateUtilTest {
 
-    @Test
-    public void testFormatLocalDateTime_validDate() {
-        LocalDateTime dateTime = LocalDateTime.of(2024, 12, 1, 10, 30, 0);
-        
-        Optional<String> formattedDate = DateUtil.formatLocalDateTime(dateTime);
+  @Test
+  public void testFormatLocalDateTime_validDate() {
+    LocalDateTime dateTime = LocalDateTime.of(2024, 12, 1, 10, 30, 0);
 
-        assertTrue(formattedDate.isPresent()); 
-        assertEquals("2024-12-01 10:30:00", formattedDate.get());
-    }
+    Optional<String> formattedDate = DateUtil.formatLocalDateTime(dateTime);
 
-    @Test
-    public void testFormatLocalDateTime_nullDate() {
-        Optional<String> result = DateUtil.formatLocalDateTime(null);
-        
-        assertFalse(result.isPresent()); 
-    }
+    assertTrue(formattedDate.isPresent());
+    assertEquals("2024-12-01 10:30:00", formattedDate.get());
+  }
+
+  @Test
+  public void testFormatLocalDateTime_nullDate() {
+    Optional<String> result = DateUtil.formatLocalDateTime(null);
+
+    assertFalse(result.isPresent());
+  }
 }

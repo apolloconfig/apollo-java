@@ -18,9 +18,10 @@ package com.ctrip.framework.apollo.openapi.api;
 
 public interface InstanceOpenApiService {
 
-    /**
-     * Return instance count by namespace
-     * @since 2.5.0
-     */
-    int getInstanceCountByNamespace(String appId, String env, String clusterName, String namespaceName);
+  /**
+   * Return instance count by namespace
+   * @since 2.5.0
+   */
+  int getInstanceCountByNamespace(String appId, String env, String clusterName,
+      String namespaceName);
 }

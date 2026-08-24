@@ -45,19 +45,20 @@ public class StringUtils {
   }
 
 
-  public static boolean isContainEmpty(String... args){
-    if (args == null){
+  public static boolean isContainEmpty(String... args) {
+    if (args == null) {
       return false;
     }
 
-    for (String arg: args){
-      if (arg == null || "".equals(arg)){
+    for (String arg : args) {
+      if (arg == null || "".equals(arg)) {
         return true;
       }
     }
 
     return false;
   }
+
   /**
    * <p>
    * Checks if a String is whitespace, empty ("") or null.

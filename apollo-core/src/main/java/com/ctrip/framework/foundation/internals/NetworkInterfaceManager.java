@@ -122,7 +122,7 @@ public enum NetworkInterfaceManager {
         return;
       }
       List<NetworkInterface> nis = Collections.list(interfaces);
-      //sort the network interfaces according to the index asc
+      // sort the network interfaces according to the index asc
       nis.sort(Comparator.comparingInt(NetworkInterface::getIndex));
       List<InetAddress> addresses = new ArrayList<>();
       InetAddress local = null;

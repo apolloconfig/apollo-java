@@ -41,11 +41,13 @@ public class DefaultConfigManager implements ConfigManager {
 
   private ConfigUtil m_configUtil;
 
-  private Table<String, String, Config> m_configs = Tables.synchronizedTable(HashBasedTable.create());
+  private Table<String, String, Config> m_configs =
+      Tables.synchronizedTable(HashBasedTable.create());
 
   private Map<String, Object> m_configLocks = Maps.newConcurrentMap();
 
-  private Table<String, String, ConfigFile> m_configFiles = Tables.synchronizedTable(HashBasedTable.create());
+  private Table<String, String, ConfigFile> m_configFiles =
+      Tables.synchronizedTable(HashBasedTable.create());
 
   private Map<String, Object> m_configFileLocks = Maps.newConcurrentMap();
 
@@ -59,13 +61,14 @@ public class DefaultConfigManager implements ConfigManager {
   public Config getConfig(String namespace) {
     return getConfig(m_configUtil.getAppId(), namespace);
   }
-    
+
   @Override
   public Config getConfig(String appId, String namespace) {
     Config config = m_configs.get(appId, namespace);
 
     if (config == null) {
-      Object lock = m_configLocks.computeIfAbsent(String.format("%s.%s", appId, namespace), key -> new Object());
+      Object lock = m_configLocks.computeIfAbsent(String.format("%s.%s", appId, namespace),
+          key -> new Object());
       synchronized (lock) {
         config = m_configs.get(appId, namespace);
 
@@ -90,9 +93,11 @@ public class DefaultConfigManager implements ConfigManager {
   }
 
   @Override
-  public ConfigFile getConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+  public ConfigFile getConfigFile(String appId, String namespace,
+      ConfigFileFormat configFileFormat) {
     String namespaceFileName = String.format("%s.%s", namespace, configFileFormat.getValue());
-    String lockNamespaceFileName = String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue());
+    String lockNamespaceFileName =
+        String.format("%s+%s.%s", appId, namespace, configFileFormat.getValue());
     ConfigFile configFile = m_configFiles.get(appId, namespaceFileName);
 
     if (configFile == null) {

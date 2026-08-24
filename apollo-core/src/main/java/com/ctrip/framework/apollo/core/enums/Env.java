@@ -34,7 +34,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Jason Song(song_s@ctrip.com)
  */
-public enum Env{
+public enum Env {
   LOCAL, DEV, FWS, FAT, UAT, LPT, PRO, TOOLS, UNKNOWN;
 
   public static Env fromString(String env) {

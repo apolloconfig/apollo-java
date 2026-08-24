@@ -42,9 +42,8 @@ public class ApolloDeferredLoggerApplicationListenerTest {
     ApolloDeferredLoggerApplicationListener listener =
         new ApolloDeferredLoggerApplicationListener();
     ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
-    ApplicationContextInitializedEvent event =
-        new ApplicationContextInitializedEvent(new SpringApplication(Object.class), new String[0],
-            context);
+    ApplicationContextInitializedEvent event = new ApplicationContextInitializedEvent(
+        new SpringApplication(Object.class), new String[0], context);
 
     listener.onApplicationEvent(event);
   }
@@ -55,9 +54,8 @@ public class ApolloDeferredLoggerApplicationListenerTest {
     ApolloDeferredLoggerApplicationListener listener =
         new ApolloDeferredLoggerApplicationListener();
     ConfigurableApplicationContext context = mock(ConfigurableApplicationContext.class);
-    ApplicationFailedEvent event =
-        new ApplicationFailedEvent(new SpringApplication(Object.class), new String[0], context,
-            new IllegalStateException("test"));
+    ApplicationFailedEvent event = new ApplicationFailedEvent(new SpringApplication(Object.class),
+        new String[0], context, new IllegalStateException("test"));
 
     listener.onApplicationEvent(event);
   }

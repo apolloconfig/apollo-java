@@ -89,7 +89,8 @@ public class Parsers {
       try {
         return dateFormat.parse(text.trim());
       } catch (ParseException e) {
-        throw new ParserException("Error when parsing date(" + dateFormat.toPattern() + ") from " + text, e);
+        throw new ParserException(
+            "Error when parsing date(" + dateFormat.toPattern() + ") from " + text, e);
       }
     }
 
@@ -101,9 +102,9 @@ public class Parsers {
   public enum DurationParser {
     INSTANCE;
 
-    private static final Pattern PATTERN =
-        Pattern.compile("(?:([0-9]+)D)?(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+)S)?(?:([0-9]+)(?:MS)?)?",
-            Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN = Pattern.compile(
+        "(?:([0-9]+)D)?(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+)S)?(?:([0-9]+)(?:MS)?)?",
+        Pattern.CASE_INSENSITIVE);
 
     private static final int HOURS_PER_DAY = 24;
     private static final int MINUTES_PER_HOUR = 60;
@@ -121,14 +122,16 @@ public class Parsers {
         String minuteMatch = matcher.group(3);
         String secondMatch = matcher.group(4);
         String fractionMatch = matcher.group(5);
-        if (dayMatch != null || hourMatch != null || minuteMatch != null || secondMatch != null || fractionMatch != null) {
+        if (dayMatch != null || hourMatch != null || minuteMatch != null || secondMatch != null
+            || fractionMatch != null) {
           int daysAsMilliSecs = parseNumber(dayMatch, MILLIS_PER_DAY);
           int hoursAsMilliSecs = parseNumber(hourMatch, MILLIS_PER_HOUR);
           int minutesAsMilliSecs = parseNumber(minuteMatch, MILLIS_PER_MINUTE);
           int secondsAsMilliSecs = parseNumber(secondMatch, MILLIS_PER_SECOND);
           int milliseconds = parseNumber(fractionMatch, 1);
 
-          return daysAsMilliSecs + hoursAsMilliSecs + minutesAsMilliSecs + secondsAsMilliSecs + milliseconds;
+          return daysAsMilliSecs + hoursAsMilliSecs + minutesAsMilliSecs + secondsAsMilliSecs
+              + milliseconds;
         }
       }
       throw new ParserException(String.format("Text %s cannot be parsed to duration)", text));

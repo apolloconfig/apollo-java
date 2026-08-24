@@ -26,8 +26,7 @@ public class ApolloClientMonitorEventFactory {
 
   private static volatile ApolloClientMonitorEventFactory INSTANCE;
 
-  private ApolloClientMonitorEventFactory() {
-  }
+  private ApolloClientMonitorEventFactory() {}
 
   public static ApolloClientMonitorEventFactory getInstance() {
     if (INSTANCE == null) {

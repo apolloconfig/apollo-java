@@ -37,18 +37,11 @@ import java.util.List;
  */
 public class ApolloClientMonitorMessageProducer implements MessageProducer {
 
-  public static final List<String> TAGS = Collections.unmodifiableList(Arrays.asList(
-      APOLLO_CLIENT_CONFIGCHANGES,
-      APOLLO_CONFIG_EXCEPTION,
-      APOLLO_META_SERVICE,
-      APOLLO_CONFIG_SERVICES,
-      APOLLO_CLIENT_VERSION,
-      APOLLO_CONFIGSERVICE,
-      APOLLO_CLIENT_CONFIGMETA,
-      APOLLO_CLIENT_NAMESPACE_TIMEOUT,
-      APOLLO_CLIENT_NAMESPACE_USAGE,
-      APOLLO_CLIENT_NAMESPACE_NOT_FOUND
-  ));
+  public static final List<String> TAGS = Collections
+      .unmodifiableList(Arrays.asList(APOLLO_CLIENT_CONFIGCHANGES, APOLLO_CONFIG_EXCEPTION,
+          APOLLO_META_SERVICE, APOLLO_CONFIG_SERVICES, APOLLO_CLIENT_VERSION, APOLLO_CONFIGSERVICE,
+          APOLLO_CLIENT_CONFIGMETA, APOLLO_CLIENT_NAMESPACE_TIMEOUT, APOLLO_CLIENT_NAMESPACE_USAGE,
+          APOLLO_CLIENT_NAMESPACE_NOT_FOUND));
 
   @Override
   public void logError(Throwable cause) {
@@ -107,74 +100,59 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
 
 
   private void publishErrorEvent(Throwable cause) {
-    ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance().createEvent(TAG_ERROR)
-            .withTag(TAG_ERROR)
-            .putAttachment(THROWABLE, cause));
+    ApolloClientMonitorEventPublisher.publish(ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(TAG_ERROR).withTag(TAG_ERROR).putAttachment(THROWABLE, cause));
   }
 
   private void publishConfigChangeEvent(String name) {
-    ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance()
-            .createEvent(METRICS_NAMESPACE_LATEST_UPDATE_TIME)
-            .putAttachment(NAMESPACE, name)
-            .withTag(TAG_NAMESPACE));
+    ApolloClientMonitorEventPublisher.publish(ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(METRICS_NAMESPACE_LATEST_UPDATE_TIME).putAttachment(NAMESPACE, name)
+        .withTag(TAG_NAMESPACE));
   }
 
   private void publishMetaServiceEvent() {
-    ApolloClientMonitorEventPublisher.publish(
-            ApolloClientMonitorEventFactory.getInstance().createEvent(META_FRESH)
-                    .withTag(TAG_BOOTSTRAP)
-                    .putAttachment(META_FRESH, DateUtil.formatLocalDateTime(LocalDateTime.now()).orElse("")));
+    ApolloClientMonitorEventPublisher.publish(ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(META_FRESH).withTag(TAG_BOOTSTRAP)
+        .putAttachment(META_FRESH, DateUtil.formatLocalDateTime(LocalDateTime.now()).orElse("")));
   }
 
   private void publishConfigServiceEvent(String name) {
-    ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance().createEvent(CONFIG_SERVICE_URL)
-            .withTag(TAG_BOOTSTRAP)
-            .putAttachment(CONFIG_SERVICE_URL, name));
+    ApolloClientMonitorEventPublisher
+        .publish(ApolloClientMonitorEventFactory.getInstance().createEvent(CONFIG_SERVICE_URL)
+            .withTag(TAG_BOOTSTRAP).putAttachment(CONFIG_SERVICE_URL, name));
   }
 
   private void publishClientVersionEvent(String name) {
-    ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance().createEvent(VERSION)
-            .withTag(TAG_BOOTSTRAP)
-            .putAttachment(VERSION, name));
+    ApolloClientMonitorEventPublisher.publish(ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(VERSION).withTag(TAG_BOOTSTRAP).putAttachment(VERSION, name));
   }
 
   private void publishNamespaceTimeoutEvent(String name) {
     ApolloClientMonitorEventPublisher.publish(
         ApolloClientMonitorEventFactory.getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_TIMEOUT)
-            .putAttachment(NAMESPACE, name)
-            .withTag(TAG_NAMESPACE));
+            .putAttachment(NAMESPACE, name).withTag(TAG_NAMESPACE));
   }
 
   private void publishNamespaceNotFoundEvent(String name) {
     ApolloClientMonitorEventPublisher.publish(
         ApolloClientMonitorEventFactory.getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_NOT_FOUND)
-            .withTag(TAG_NAMESPACE)
-            .putAttachment(NAMESPACE, name));
+            .withTag(TAG_NAMESPACE).putAttachment(NAMESPACE, name));
   }
 
   private void handleClientConfigEvent(String type, String name) {
     String namespace = type.substring(APOLLO_CLIENT_CONFIGS.length());
-    ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance().createEvent(NAMESPACE_RELEASE_KEY)
-            .withTag(TAG_NAMESPACE)
-            .putAttachment(NAMESPACE_RELEASE_KEY, name)
-            .putAttachment(NAMESPACE, namespace));
+    ApolloClientMonitorEventPublisher.publish(ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(NAMESPACE_RELEASE_KEY).withTag(TAG_NAMESPACE)
+        .putAttachment(NAMESPACE_RELEASE_KEY, name).putAttachment(NAMESPACE, namespace));
   }
 
   private void handleFirstLoadTimeEvent(String type, String name) {
     String[] split = type.split(":");
     String namespace = split[1];
     long firstLoadTime = Long.parseLong(name);
-    ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance()
-            .createEvent(APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND)
-            .putAttachment(NAMESPACE, namespace)
-            .putAttachment(TIMESTAMP, firstLoadTime)
-            .withTag(TAG_NAMESPACE));
+    ApolloClientMonitorEventPublisher.publish(ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(APOLLO_CLIENT_NAMESPACE_FIRST_LOAD_SPEND).putAttachment(NAMESPACE, namespace)
+        .putAttachment(TIMESTAMP, firstLoadTime).withTag(TAG_NAMESPACE));
   }
 
   @Override
@@ -187,10 +165,8 @@ public class ApolloClientMonitorMessageProducer implements MessageProducer {
     String[] split = name.split(":");
     if (split.length == 2 && APOLLO_CLIENT_NAMESPACE_USAGE.equals(split[0])) {
       ApolloClientMonitorEventPublisher.publish(
-          ApolloClientMonitorEventFactory.getInstance()
-              .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
-              .putAttachment(NAMESPACE, split[1])
-              .withTag(TAG_NAMESPACE));
+          ApolloClientMonitorEventFactory.getInstance().createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
+              .putAttachment(NAMESPACE, split[1]).withTag(TAG_NAMESPACE));
     }
   }
 

@@ -39,7 +39,7 @@ public class ExceptionUtil {
 
     int counter = 0;
     Throwable current = ex;
-    //retrieve up to 10 causes
+    // retrieve up to 10 causes
     while (current.getCause() != null && counter < 10) {
       Throwable next = current.getCause();
       causes.add(next);
@@ -52,11 +52,8 @@ public class ExceptionUtil {
         counter--;
         continue;
       }
-      builder.append(" [Cause: ")
-              .append(cause.getClass().getSimpleName())
-              .append("(")
-              .append(cause.getMessage())
-              .append(")");
+      builder.append(" [Cause: ").append(cause.getClass().getSimpleName()).append("(")
+          .append(cause.getMessage()).append(")");
     }
 
     builder.append(Strings.repeat("]", counter));

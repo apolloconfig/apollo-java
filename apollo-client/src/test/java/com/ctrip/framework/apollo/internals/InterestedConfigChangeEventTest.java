@@ -67,13 +67,15 @@ public class InterestedConfigChangeEventTest {
     });
 
     UnsupportedOperationConfig config = new UnsupportedOperationConfig();
-    config.addChangeListener(configChangeListener, Collections.singleton("key-nothing"), Collections.singleton(keyPrefix));
+    config.addChangeListener(configChangeListener, Collections.singleton("key-nothing"),
+        Collections.singleton(keyPrefix));
 
 
     Map<String, ConfigChange> changes = new HashMap<>();
-    changes.put(key, new ConfigChange(someAppId, namespace, key, "123", "456", PropertyChangeType.MODIFIED));
-    changes.put(anotherKey,
-        new ConfigChange(someAppId, namespace, anotherKey, null, "someValue", PropertyChangeType.ADDED));
+    changes.put(key,
+        new ConfigChange(someAppId, namespace, key, "123", "456", PropertyChangeType.MODIFIED));
+    changes.put(anotherKey, new ConfigChange(someAppId, namespace, anotherKey, null, "someValue",
+        PropertyChangeType.ADDED));
     config.fireConfigChange(someAppId, namespace, changes);
 
     onChangeFuture.get(500, TimeUnit.MILLISECONDS);

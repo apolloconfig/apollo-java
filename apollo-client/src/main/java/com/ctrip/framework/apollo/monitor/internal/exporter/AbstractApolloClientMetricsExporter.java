@@ -34,8 +34,8 @@ import org.slf4j.Logger;
 public abstract class AbstractApolloClientMetricsExporter implements ApolloClientMetricsExporter {
 
   public static final ScheduledExecutorService m_executorService;
-  private static final Logger log = DeferredLoggerFactory.getLogger(
-      AbstractApolloClientMetricsExporter.class);
+  private static final Logger log =
+      DeferredLoggerFactory.getLogger(AbstractApolloClientMetricsExporter.class);
   private static final long INITIAL_DELAY = 5L;
   private static final int THREAD_POOL_SIZE = 1;
 

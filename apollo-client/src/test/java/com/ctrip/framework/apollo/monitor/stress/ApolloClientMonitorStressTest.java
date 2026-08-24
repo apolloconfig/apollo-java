@@ -48,9 +48,7 @@ public class ApolloClientMonitorStressTest {
   @Test
   @JUnitPerfTest(threads = 50, durationMs = 10000, warmUpMs = 1000, maxExecutionsPerSecond = 1000)
   public void testPublishEvent() {
-    ApolloClientMonitorEventPublisher.publish(
-        ApolloClientMonitorEventFactory.getInstance()
-            .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE)
-            .putAttachment(NAMESPACE, "application"));
+    ApolloClientMonitorEventPublisher.publish(ApolloClientMonitorEventFactory.getInstance()
+        .createEvent(APOLLO_CLIENT_NAMESPACE_USAGE).putAttachment(NAMESPACE, "application"));
   }
 }

@@ -34,8 +34,8 @@ import org.springframework.util.StringUtils;
 /**
  * @author vdisk <vdisk@foxmail.com>
  */
-public class ApolloConfigDataLocationResolver implements
-    ConfigDataLocationResolver<ApolloConfigDataResource>, Ordered {
+public class ApolloConfigDataLocationResolver
+    implements ConfigDataLocationResolver<ApolloConfigDataResource>, Ordered {
 
   private static final String PREFIX = "apollo://";
 

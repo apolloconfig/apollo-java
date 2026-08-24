@@ -51,7 +51,7 @@ public class ConfigServiceTest {
 
   @After
   public void tearDown() throws Exception {
-    //as ConfigService is singleton, so we must manually clear its container
+    // as ConfigService is singleton, so we must manually clear its container
     ConfigService.reset();
     MockInjector.reset();
     ReflectionTestUtils.invokeMethod(MetaDomainConsts.class, "reset");
@@ -65,7 +65,9 @@ public class ConfigServiceTest {
 
     Config config = ConfigService.getAppConfig();
 
-    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey, config.getProperty(someKey, null));
+    assertEquals(
+        someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey,
+        config.getProperty(someKey, null));
     assertEquals(null, config.getProperty("unknown", null));
   }
 
@@ -76,8 +78,8 @@ public class ConfigServiceTest {
 
     Config config = ConfigService.getAppConfig();
 
-    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + ConfigConsts.NAMESPACE_APPLICATION + ":" + someKey,
-        config.getProperty(someKey, null));
+    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR
+        + ConfigConsts.NAMESPACE_APPLICATION + ":" + someKey, config.getProperty(someKey, null));
   }
 
   @Test
@@ -88,7 +90,9 @@ public class ConfigServiceTest {
 
     Config config = ConfigService.getConfig(someNamespace);
 
-    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey, config.getProperty(someKey, null));
+    assertEquals(
+        someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey,
+        config.getProperty(someKey, null));
     assertEquals(null, config.getProperty("unknown", null));
   }
 
@@ -102,7 +106,8 @@ public class ConfigServiceTest {
     ConfigFile configFile = ConfigService.getConfigFile(someNamespace, someConfigFileFormat);
 
     assertEquals(someNamespaceFileName, configFile.getNamespace());
-    assertEquals(someNamespaceFileName + ":" + someConfigFileFormat.getValue(), configFile.getContent());
+    assertEquals(someNamespaceFileName + ":" + someConfigFileFormat.getValue(),
+        configFile.getContent());
   }
 
   @Test
@@ -114,7 +119,8 @@ public class ConfigServiceTest {
 
     Config config = ConfigService.getConfig(customAppId, someNamespace);
 
-    assertEquals(customAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey,
+    assertEquals(
+        customAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + someNamespace + ":" + someKey,
         config.getProperty(someKey, null));
   }
 
@@ -127,7 +133,8 @@ public class ConfigServiceTest {
         String.format("%s.%s", someNamespace, someConfigFileFormat.getValue());
     MockInjector.setInstance(ConfigFactory.class, someNamespaceFileName, new MockConfigFactory());
 
-    ConfigFile configFile = ConfigService.getConfigFile(customAppId, someNamespace, someConfigFileFormat);
+    ConfigFile configFile =
+        ConfigService.getConfigFile(customAppId, someNamespace, someConfigFileFormat);
 
     assertEquals(customAppId, configFile.getAppId());
     assertEquals(someNamespaceFileName, configFile.getNamespace());
@@ -144,15 +151,17 @@ public class ConfigServiceTest {
     // Exercise the real DefaultConfigFactory path for a non-properties namespace, i.e.
     // create(appId, "mock.yml") -> createPropertiesCompatibleFileConfigRepository(...) ->
     // ConfigService.getConfigFile(appId, "mock", YML). Only createConfigFile is stubbed (to avoid
-    // hitting a remote repository); it echoes the appId it receives into the resulting properties so
+    // hitting a remote repository); it echoes the appId it receives into the resulting properties
+    // so
     // the assertion below fails if DefaultConfigFactory ever drops the custom appId again.
-    MockInjector.setInstance(ConfigFactory.class, someNamespaceFileName, new DefaultConfigFactory() {
-      @Override
-      public ConfigFile createConfigFile(String appId, String namespace,
-          ConfigFileFormat configFileFormat) {
-        return new MockPropertiesCompatibleConfigFile(appId, namespace, configFileFormat);
-      }
-    });
+    MockInjector.setInstance(ConfigFactory.class, someNamespaceFileName,
+        new DefaultConfigFactory() {
+          @Override
+          public ConfigFile createConfigFile(String appId, String namespace,
+              ConfigFileFormat configFileFormat) {
+            return new MockPropertiesCompatibleConfigFile(appId, namespace, configFileFormat);
+          }
+        });
 
     Config config = ConfigService.getConfig(customAppId, someNamespaceFileName);
 
@@ -193,14 +202,12 @@ public class ConfigServiceTest {
     private String m_appId;
     private String m_namespace;
 
-    public MockConfigFile(String namespace,
-                          ConfigFileFormat configFileFormat) {
+    public MockConfigFile(String namespace, ConfigFileFormat configFileFormat) {
       m_namespace = namespace;
       m_configFileFormat = configFileFormat;
     }
 
-    public MockConfigFile(String appId, String namespace,
-                          ConfigFileFormat configFileFormat) {
+    public MockConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
       m_appId = appId;
       m_namespace = namespace;
       m_configFileFormat = configFileFormat;
@@ -264,12 +271,14 @@ public class ConfigServiceTest {
     }
 
     @Override
-    public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+    public ConfigFile createConfigFile(String appId, String namespace,
+        ConfigFileFormat configFileFormat) {
       return new MockConfigFile(appId, namespace, configFileFormat);
     }
   }
 
-  private static class MockPropertiesCompatibleConfigFile implements PropertiesCompatibleConfigFile {
+  private static class MockPropertiesCompatibleConfigFile
+      implements PropertiesCompatibleConfigFile {
     private final String m_appId;
     private final String m_namespace;
     private final ConfigFileFormat m_configFileFormat;

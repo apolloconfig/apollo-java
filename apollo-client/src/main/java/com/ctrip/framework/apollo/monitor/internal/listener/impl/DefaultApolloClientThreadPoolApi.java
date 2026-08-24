@@ -33,18 +33,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * @author Rawven
  */
-public class DefaultApolloClientThreadPoolApi extends
-    AbstractApolloClientMonitorEventListener implements
-    ApolloClientThreadPoolMonitorApi, ApolloClientJmxThreadPoolMBean {
+public class DefaultApolloClientThreadPoolApi extends AbstractApolloClientMonitorEventListener
+    implements ApolloClientThreadPoolMonitorApi, ApolloClientJmxThreadPoolMBean {
 
-  public static final String REMOTE_CONFIG_REPOSITORY = RemoteConfigRepository.class.getSimpleName();
+  public static final String REMOTE_CONFIG_REPOSITORY =
+      RemoteConfigRepository.class.getSimpleName();
   public static final String ABSTRACT_CONFIG = AbstractConfig.class.getSimpleName();
   public static final String ABSTRACT_CONFIG_FILE = AbstractConfigFile.class.getSimpleName();
-  public static final String METRICS_EXPORTER = AbstractApolloClientMetricsExporter.class.getSimpleName();
+  public static final String METRICS_EXPORTER =
+      AbstractApolloClientMetricsExporter.class.getSimpleName();
   private final Map<String, ApolloThreadPoolInfo> executorMap = Maps.newHashMap();
 
-  public DefaultApolloClientThreadPoolApi(
-      ExecutorService remoteConfigRepositoryExecutorService,
+  public DefaultApolloClientThreadPoolApi(ExecutorService remoteConfigRepositoryExecutorService,
       ExecutorService abstractConfigExecutorService,
       ExecutorService abstractConfigFileExecutorService,
       ExecutorService metricsExporterExecutorService) {
@@ -67,30 +67,30 @@ public class DefaultApolloClientThreadPoolApi extends
   private void exportThreadPoolMetrics(ApolloThreadPoolInfo info, String threadPoolName) {
 
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_ACTIVE_TASK_COUNT,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         info.getActiveTaskCount());
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_QUEUE_SIZE,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         info.getQueueSize());
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_COMPLETED_TASK_COUNT,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         (double) info.getCompletedTaskCount());
-    createOrUpdateGaugeSample(METRICS_THREAD_POOL_POOL_SIZE, new String[]{METRICS_THREAD_POOL_NAME},
-        new String[]{threadPoolName}, info.getPoolSize());
+    createOrUpdateGaugeSample(METRICS_THREAD_POOL_POOL_SIZE,
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName}, info.getPoolSize());
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_TOTAL_TASK_COUNT,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         (double) info.getTotalTaskCount());
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_CORE_POOL_SIZE,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         info.getCorePoolSize());
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_MAXIMUM_POOL_SIZE,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         info.getMaximumPoolSize());
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_LARGEST_POOL_SIZE,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         info.getLargestPoolSize());
     createOrUpdateGaugeSample(METRICS_THREAD_POOL_QUEUE_REMAINING_CAPACITY,
-        new String[]{METRICS_THREAD_POOL_NAME}, new String[]{threadPoolName},
+        new String[] {METRICS_THREAD_POOL_NAME}, new String[] {threadPoolName},
         info.getQueueRemainingCapacity());
   }
 

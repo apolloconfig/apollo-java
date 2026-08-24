@@ -78,15 +78,14 @@ public class DefaultConfigFactory implements ConfigFactory {
     // should not create a PropertiesCompatibleFileConfigRepository for them
     // calling the method `createLocalConfigRepository(...)` is more suitable
     // for ConfigFileFormat.Properties
-    if (ConfigFileFormat.isPropertiesCompatible(format) &&
-            format != ConfigFileFormat.Properties) {
+    if (ConfigFileFormat.isPropertiesCompatible(format) && format != ConfigFileFormat.Properties) {
       configRepository = createPropertiesCompatibleFileConfigRepository(appId, namespace, format);
     } else {
       configRepository = createConfigRepository(appId, namespace);
     }
 
     logger.debug("Created a configuration repository of type [{}] for namespace [{}]",
-            configRepository.getClass().getName(), namespace);
+        configRepository.getClass().getName(), namespace);
 
     return this.createRepositoryConfig(appId, namespace, configRepository);
   }
@@ -96,12 +95,14 @@ public class DefaultConfigFactory implements ConfigFactory {
     return this.createConfigFile(m_configUtil.getAppId(), namespace, configFileFormat);
   }
 
-  protected Config createRepositoryConfig(String appId, String namespace, ConfigRepository configRepository) {
+  protected Config createRepositoryConfig(String appId, String namespace,
+      ConfigRepository configRepository) {
     return new DefaultConfig(appId, namespace, configRepository);
   }
 
   @Override
-  public ConfigFile createConfigFile(String appId, String namespace, ConfigFileFormat configFileFormat) {
+  public ConfigFile createConfigFile(String appId, String namespace,
+      ConfigFileFormat configFileFormat) {
     ConfigRepository configRepository = createConfigRepository(appId, namespace);
     switch (configFileFormat) {
       case Properties:
@@ -144,7 +145,8 @@ public class DefaultConfigFactory implements ConfigFactory {
           namespace);
       return new LocalFileConfigRepository(appId, namespace);
     }
-    return new LocalFileConfigRepository(appId, namespace, createRemoteConfigRepository(appId, namespace));
+    return new LocalFileConfigRepository(appId, namespace,
+        createRemoteConfigRepository(appId, namespace));
   }
 
   /**
@@ -153,8 +155,10 @@ public class DefaultConfigFactory implements ConfigFactory {
    * @return the newly created repository for the given namespace
    */
   private ConfigRepository createConfigMapConfigRepository(String appId, String namespace) {
-    return new K8sConfigMapConfigRepository(appId, namespace, createLocalConfigRepository(appId, namespace));
+    return new K8sConfigMapConfigRepository(appId, namespace,
+        createLocalConfigRepository(appId, namespace));
   }
+
   RemoteConfigRepository createRemoteConfigRepository(String appId, String namespace) {
     return new RemoteConfigRepository(appId, namespace);
   }
@@ -168,7 +172,8 @@ public class DefaultConfigFactory implements ConfigFactory {
     return new PropertiesCompatibleFileConfigRepository(configFile);
   }
 
-  // for namespaces whose format are not properties, the file extension must be present, e.g. application.yaml
+  // for namespaces whose format are not properties, the file extension must be present, e.g.
+  // application.yaml
   ConfigFileFormat determineFileFormat(String namespaceName) {
     String lowerCase = namespaceName.toLowerCase();
     for (ConfigFileFormat format : ConfigFileFormat.values()) {

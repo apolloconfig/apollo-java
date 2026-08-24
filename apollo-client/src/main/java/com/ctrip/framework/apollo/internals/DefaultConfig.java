@@ -66,7 +66,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
    * @param configRepository the config repository for this config instance
    */
   public DefaultConfig(String namespace, ConfigRepository configRepository) {
-    this(null, namespace , configRepository);
+    this(null, namespace, configRepository);
   }
 
   /**
@@ -95,11 +95,11 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
       updateConfig(m_configRepository.getConfig(), m_configRepository.getSourceType());
     } catch (Throwable ex) {
       Tracer.logError(ex);
-      logger.warn("Init Apollo Local Config failed - namespace: {}, reason: {}.",
-          m_namespace, ExceptionUtil.getDetailMessage(ex));
+      logger.warn("Init Apollo Local Config failed - namespace: {}, reason: {}.", m_namespace,
+          ExceptionUtil.getDetailMessage(ex));
     } finally {
-      //register the change listener no matter config repository is working or not
-      //so that whenever config repository is recovered, config could get changed
+      // register the change listener no matter config repository is working or not
+      // so that whenever config repository is recovered, config could get changed
       m_configRepository.addChangeListener(this);
     }
   }
@@ -202,7 +202,8 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   @Override
   public Set<String> getPropertyNames() {
-    // propertyNames include system property and system env might cause some compatibility issues, though that looks like the correct implementation.
+    // propertyNames include system property and system env might cause some compatibility issues,
+    // though that looks like the correct implementation.
     Set<String> fromRepository = this.getPropertyNamesFromRepository();
     Set<String> fromAdditional = this.getPropertyNamesFromAdditional();
     if (fromRepository == null || fromRepository.isEmpty()) {
@@ -211,8 +212,8 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
     if (fromAdditional == null || fromAdditional.isEmpty()) {
       return fromRepository;
     }
-    Set<String> propertyNames = Sets
-        .newLinkedHashSetWithExpectedSize(fromRepository.size() + fromAdditional.size());
+    Set<String> propertyNames =
+        Sets.newLinkedHashSetWithExpectedSize(fromRepository.size() + fromAdditional.size());
     propertyNames.addAll(fromRepository);
     propertyNames.addAll(fromAdditional);
     return propertyNames;
@@ -224,7 +225,8 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
   }
 
   private Set<String> stringPropertyNames(Properties properties) {
-    //jdk9以下版本Properties#enumerateStringProperties方法存在性能问题，keys() + get(k) 重复迭代, jdk9之后改为entrySet遍历.
+    // jdk9以下版本Properties#enumerateStringProperties方法存在性能问题，keys() + get(k) 重复迭代,
+    // jdk9之后改为entrySet遍历.
     Map<String, String> h = Maps.newLinkedHashMapWithExpectedSize(properties.size());
     for (Map.Entry<Object, Object> e : properties.entrySet()) {
       Object k = e.getKey();
@@ -242,7 +244,8 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
   }
 
   @Override
-  public synchronized void onRepositoryChange(String appId, String namespace, Properties newProperties) {
+  public synchronized void onRepositoryChange(String appId, String namespace,
+      Properties newProperties) {
     if (newProperties.equals(m_configProperties.get())) {
       return;
     }
@@ -251,10 +254,10 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
     Properties newConfigProperties = propertiesFactory.getPropertiesInstance();
     newConfigProperties.putAll(newProperties);
 
-    Map<String, ConfigChange> actualChanges = updateAndCalcConfigChanges(newConfigProperties,
-        sourceType);
+    Map<String, ConfigChange> actualChanges =
+        updateAndCalcConfigChanges(newConfigProperties, sourceType);
 
-    //check double checked result
+    // check double checked result
     if (actualChanges.isEmpty()) {
       return;
     }
@@ -274,21 +277,20 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
     List<ConfigChange> configChanges =
         calcPropertyChanges(m_appId, m_namespace, m_configProperties.get(), newConfigProperties);
 
-    ImmutableMap.Builder<String, ConfigChange> actualChanges =
-        new ImmutableMap.Builder<>();
+    ImmutableMap.Builder<String, ConfigChange> actualChanges = new ImmutableMap.Builder<>();
 
     /** === Double check since DefaultConfig has multiple config sources ==== **/
 
-    //1. use getProperty to update configChanges's old value
+    // 1. use getProperty to update configChanges's old value
     for (ConfigChange change : configChanges) {
       change.setOldValue(this.getProperty(change.getPropertyName(), change.getOldValue()));
     }
 
-    //2. update m_configProperties
+    // 2. update m_configProperties
     updateConfig(newConfigProperties, sourceType);
     clearConfigCache();
 
-    //3. use getProperty to update configChange's new value and calc the final changes
+    // 3. use getProperty to update configChange's new value and calc the final changes
     for (ConfigChange change : configChanges) {
       change.setNewValue(this.getProperty(change.getPropertyName(), change.getNewValue()));
       switch (change.getChangeType()) {
@@ -316,7 +318,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
           actualChanges.put(change.getPropertyName(), change);
           break;
         default:
-          //do nothing
+          // do nothing
           break;
       }
     }

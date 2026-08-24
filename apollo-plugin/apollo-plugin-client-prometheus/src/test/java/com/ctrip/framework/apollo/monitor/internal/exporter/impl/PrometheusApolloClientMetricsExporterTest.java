@@ -15,6 +15,7 @@
  *
  */
 package com.ctrip.framework.apollo.monitor.internal.exporter.impl;
+
 import static org.junit.Assert.*;
 
 import io.prometheus.client.Counter;
@@ -27,52 +28,52 @@ import java.util.Map;
 
 public class PrometheusApolloClientMetricsExporterTest {
 
-    private PrometheusApolloClientMetricsExporter exporter;
+  private PrometheusApolloClientMetricsExporter exporter;
 
-    @Before
-    public void setUp() {
-        exporter = new PrometheusApolloClientMetricsExporter();
-        exporter.doInit();
-    }
+  @Before
+  public void setUp() {
+    exporter = new PrometheusApolloClientMetricsExporter();
+    exporter.doInit();
+  }
 
-    @Test
-    public void testIsSupport() {
-        assertTrue(exporter.isSupport("prometheus"));
-        assertFalse(exporter.isSupport("other"));
-    }
+  @Test
+  public void testIsSupport() {
+    assertTrue(exporter.isSupport("prometheus"));
+    assertFalse(exporter.isSupport("other"));
+  }
 
-    @Test
-    public void testRegisterOrUpdateCounterSample() {
-        String name = "test_counter";
-        Map<String, String> tags = new HashMap<>();
-        tags.put("tag1", "value1");
+  @Test
+  public void testRegisterOrUpdateCounterSample() {
+    String name = "test_counter";
+    Map<String, String> tags = new HashMap<>();
+    tags.put("tag1", "value1");
 
-        exporter.registerOrUpdateCounterSample(name, tags, 1.0);
-        
-        Counter counter = (Counter) exporter.map.get(name);
-        
-        assertNotNull(counter);
-        assertEquals(1.0, counter.labels("value1").get(), 0.001);
-    }
+    exporter.registerOrUpdateCounterSample(name, tags, 1.0);
 
-    @Test
-    public void testRegisterOrUpdateGaugeSample() {
-        String name = "test_gauge";
-        Map<String, String> tags = new HashMap<>();
-        tags.put("tag2", "value2");
+    Counter counter = (Counter) exporter.map.get(name);
 
-        exporter.registerOrUpdateGaugeSample(name, tags, 3.0);
-        
-        Gauge gauge = (Gauge) exporter.map.get(name);
-        
-        assertNotNull(gauge);
-        assertEquals(3.0, gauge.labels("value2").get(), 0.001);
-    }
+    assertNotNull(counter);
+    assertEquals(1.0, counter.labels("value1").get(), 0.001);
+  }
 
-    @Test
-    public void testResponse() {
-        String response = exporter.response();
-        assertNotNull(response);
-        assertFalse(response.isEmpty());
-    }
+  @Test
+  public void testRegisterOrUpdateGaugeSample() {
+    String name = "test_gauge";
+    Map<String, String> tags = new HashMap<>();
+    tags.put("tag2", "value2");
+
+    exporter.registerOrUpdateGaugeSample(name, tags, 3.0);
+
+    Gauge gauge = (Gauge) exporter.map.get(name);
+
+    assertNotNull(gauge);
+    assertEquals(3.0, gauge.labels("value2").get(), 0.001);
+  }
+
+  @Test
+  public void testResponse() {
+    String response = exporter.response();
+    assertNotNull(response);
+    assertFalse(response.isEmpty());
+  }
 }

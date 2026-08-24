@@ -64,12 +64,12 @@ public class AbstractConfigTest {
 
       }
     });
-    abstractConfig
-        .addChangeListener(configChangeListener, Collections.singleton("cannot-be-match-key"));
+    abstractConfig.addChangeListener(configChangeListener,
+        Collections.singleton("cannot-be-match-key"));
 
     Map<String, ConfigChange> changes = new HashMap<>();
-    changes.put("key1",
-        new ConfigChange(someAppId, namespace, "key1", null, "new-value", PropertyChangeType.ADDED));
+    changes.put("key1", new ConfigChange(someAppId, namespace, "key1", null, "new-value",
+        PropertyChangeType.ADDED));
     ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(someAppId, namespace, changes);
 
     abstractConfig.fireConfigChange(configChangeEvent);
@@ -111,8 +111,8 @@ public class AbstractConfigTest {
     abstractConfig.addChangeListener(configChangeListener2, Collections.singleton(key));
 
     Map<String, ConfigChange> changes = new HashMap<>();
-    changes.put(key,
-        new ConfigChange(someAppId, namespace, key, "old-value", "new-value", PropertyChangeType.MODIFIED));
+    changes.put(key, new ConfigChange(someAppId, namespace, key, "old-value", "new-value",
+        PropertyChangeType.MODIFIED));
     ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(someAppId, namespace, changes);
 
     abstractConfig.fireConfigChange(configChangeEvent);
@@ -144,8 +144,10 @@ public class AbstractConfigTest {
 
     abstractConfig.fireConfigChange(someAppId, namespace, changes);
 
-    assertEquals(Collections.singleton(key), listener1.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
-    assertEquals(Collections.singleton(key), listener2.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
+    assertEquals(Collections.singleton(key),
+        listener1.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
+    assertEquals(Collections.singleton(key),
+        listener2.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
 
     assertEquals(1, listener1.changeCount.get());
     assertEquals(1, listener2.changeCount.get());
@@ -168,7 +170,8 @@ public class AbstractConfigTest {
 
     abstractConfig.fireConfigChange(someAppId, namespace, createSingleKeyChanges(namespace, key1));
 
-    assertEquals(Collections.singleton(key1), listener1.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
+    assertEquals(Collections.singleton(key1),
+        listener1.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
     assertThrows(TimeoutException.class, () -> listener2.awaitChange(200, TimeUnit.MILLISECONDS));
 
     listener1.resetChangeFuture();
@@ -177,7 +180,8 @@ public class AbstractConfigTest {
     abstractConfig.fireConfigChange(someAppId, namespace, createSingleKeyChanges(namespace, key2));
 
     assertThrows(TimeoutException.class, () -> listener1.awaitChange(200, TimeUnit.MILLISECONDS));
-    assertEquals(Collections.singleton(key2), listener2.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
+    assertEquals(Collections.singleton(key2),
+        listener2.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
 
     assertEquals(1, listener1.changeCount.get());
     assertEquals(1, listener2.changeCount.get());
@@ -201,7 +205,8 @@ public class AbstractConfigTest {
 
     abstractConfig.fireConfigChange(someAppId, namespace, createSingleKeyChanges(namespace, key));
 
-    assertEquals(Collections.singleton(key), listener1.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
+    assertEquals(Collections.singleton(key),
+        listener1.awaitChange(500, TimeUnit.MILLISECONDS).changedKeys());
     assertThrows(TimeoutException.class, () -> listener2.awaitChange(200, TimeUnit.MILLISECONDS));
 
     assertEquals(1, listener1.changeCount.get());
@@ -238,8 +243,8 @@ public class AbstractConfigTest {
     abstractConfig.addChangeListener(configChangeListener2, Collections.singleton(key));
 
     Map<String, ConfigChange> changes = new HashMap<>();
-    changes.put(key,
-        new ConfigChange(someAppId, namespace, key, "old-value", "new-value", PropertyChangeType.MODIFIED));
+    changes.put(key, new ConfigChange(someAppId, namespace, key, "old-value", "new-value",
+        PropertyChangeType.MODIFIED));
 
     abstractConfig.fireConfigChange(someAppId, namespace, changes);
 
@@ -323,8 +328,8 @@ public class AbstractConfigTest {
 
   private static Map<String, ConfigChange> createSingleKeyChanges(String namespace, String key) {
     Map<String, ConfigChange> changes = new HashMap<>();
-    changes.put(key,
-        new ConfigChange(someAppId, namespace, key, "old-value", "new-value", PropertyChangeType.MODIFIED));
+    changes.put(key, new ConfigChange(someAppId, namespace, key, "old-value", "new-value",
+        PropertyChangeType.MODIFIED));
     return changes;
   }
 }

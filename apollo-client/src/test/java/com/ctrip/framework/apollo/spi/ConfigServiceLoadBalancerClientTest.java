@@ -34,7 +34,8 @@ class ConfigServiceLoadBalancerClientTest {
     Iterator<ConfigServiceLoadBalancerClient> loadBalancerClientIterator =
         ServiceBootstrap.loadAll(ConfigServiceLoadBalancerClient.class);
     while (loadBalancerClientIterator.hasNext()) {
-      ConfigServiceLoadBalancerClient configServiceLoadBalancerClient = loadBalancerClientIterator.next();
+      ConfigServiceLoadBalancerClient configServiceLoadBalancerClient =
+          loadBalancerClientIterator.next();
       expectException(configServiceLoadBalancerClient);
     }
   }

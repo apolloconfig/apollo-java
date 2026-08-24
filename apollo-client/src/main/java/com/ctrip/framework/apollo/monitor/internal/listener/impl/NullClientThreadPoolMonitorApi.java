@@ -24,8 +24,8 @@ import java.util.Map;
 /**
  * @author Rawven
  */
-public class NullClientThreadPoolMonitorApi implements ApolloClientThreadPoolMonitorApi,
-    ApolloClientJmxThreadPoolMBean {
+public class NullClientThreadPoolMonitorApi
+    implements ApolloClientThreadPoolMonitorApi, ApolloClientJmxThreadPoolMBean {
 
   private final ApolloThreadPoolInfo NULL_THREAD_POOL_INFO = new ApolloThreadPoolInfo();
 

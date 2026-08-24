@@ -83,12 +83,13 @@ public class ApolloConfigDataLoaderInitializerTest {
     MapPropertySource mapPropertySource = (MapPropertySource) propertySources.get(1);
     assertEquals("false",
         mapPropertySource.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED));
-    assertEquals("false",
-        mapPropertySource.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED));
+    assertEquals("false", mapPropertySource
+        .getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED));
   }
 
   private void resetInitializedFlag() throws Exception {
-    Field initializedField = ApolloConfigDataLoaderInitializer.class.getDeclaredField("INITIALIZED");
+    Field initializedField =
+        ApolloConfigDataLoaderInitializer.class.getDeclaredField("INITIALIZED");
     initializedField.setAccessible(true);
     initializedField.setBoolean(null, false);
   }

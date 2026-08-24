@@ -17,7 +17,6 @@
 package com.ctrip.framework.apollo.internals;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +41,8 @@ public class ConfigServiceLocatorTest {
     String someConfigServiceUrl = " someConfigServiceUrl ";
     String anotherConfigServiceUrl = " anotherConfigServiceUrl ";
 
-    System.setProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE, someConfigServiceUrl + "," + anotherConfigServiceUrl);
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE,
+        someConfigServiceUrl + "," + anotherConfigServiceUrl);
 
     ConfigServiceLocator configServiceLocator = new ConfigServiceLocator();
 
@@ -74,9 +74,7 @@ public class ConfigServiceLocatorTest {
 
   @Test
   public void giveNoUsableConfigServiceThenThrowExceptionQuickly() {
-    ConfigServiceLocator configServiceLocator = Mockito.spy(
-        new ConfigServiceLocator()
-    );
+    ConfigServiceLocator configServiceLocator = Mockito.spy(new ConfigServiceLocator());
 
     Mockito.doNothing().when(configServiceLocator).doSubmitUpdateTask();
 
@@ -84,10 +82,8 @@ public class ConfigServiceLocatorTest {
     assertThrows(ApolloConfigException.class, () -> {
       configServiceLocator.getConfigServices();
     });
-    Mockito.verify(configServiceLocator, Mockito.times(1))
-        .trySubmitUpdateTask();
-    Mockito.verify(configServiceLocator, Mockito.times(1))
-        .doSubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(1)).trySubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(1)).doSubmitUpdateTask();
 
     // trigger 9 times in a short period, but only submit a task
     for (int i = 0; i < 9; i++) {
@@ -95,10 +91,8 @@ public class ConfigServiceLocatorTest {
         configServiceLocator.getConfigServices();
       });
     }
-    Mockito.verify(configServiceLocator, Mockito.times(10))
-        .trySubmitUpdateTask();
-    Mockito.verify(configServiceLocator, Mockito.times(1))
-        .doSubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(10)).trySubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(1)).doSubmitUpdateTask();
 
     // clear queue
     {
@@ -112,10 +106,8 @@ public class ConfigServiceLocatorTest {
         configServiceLocator.getConfigServices();
       });
     }
-    Mockito.verify(configServiceLocator, Mockito.times(20))
-        .trySubmitUpdateTask();
-    Mockito.verify(configServiceLocator, Mockito.times(2))
-        .doSubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(20)).trySubmitUpdateTask();
+    Mockito.verify(configServiceLocator, Mockito.times(2)).doSubmitUpdateTask();
 
   }
 

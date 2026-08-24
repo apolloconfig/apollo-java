@@ -27,7 +27,8 @@ public class RandomConfigServiceLoadBalancerClientTest {
 
   @Test
   public void chooseOneFrom() {
-    ConfigServiceLoadBalancerClient loadBalancerClient = new RandomConfigServiceLoadBalancerClient();
+    ConfigServiceLoadBalancerClient loadBalancerClient =
+        new RandomConfigServiceLoadBalancerClient();
     List<ServiceDTO> configServices = generateConfigServices();
     for (int i = 0; i < 100; i++) {
       ServiceDTO serviceDTO = loadBalancerClient.chooseOneFrom(configServices);

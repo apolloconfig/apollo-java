@@ -30,8 +30,8 @@ import com.ctrip.framework.apollo.monitor.api.ConfigMonitor;
  */
 public class DefaultConfigMonitor implements ConfigMonitor {
 
-  private final ApolloClientMonitorContext apolloClientMonitorContext = ApolloInjector.getInstance(
-      ApolloClientMonitorContext.class);
+  private final ApolloClientMonitorContext apolloClientMonitorContext =
+      ApolloInjector.getInstance(ApolloClientMonitorContext.class);
 
   @Override
   public ApolloClientThreadPoolMonitorApi getThreadPoolMonitorApi() {

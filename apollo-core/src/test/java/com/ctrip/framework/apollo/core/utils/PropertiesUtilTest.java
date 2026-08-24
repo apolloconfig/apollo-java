@@ -56,7 +56,7 @@ public class PropertiesUtilTest {
     PropertiesUtil.filterPropertiesComment(sb3);
     assertEquals("bbb", sb3.toString());
     assertNotEquals("#aaaaa" + System.lineSeparator() + "bbb", sb3.toString());
-    
+
     StringBuffer sb4 = new StringBuffer("#aaaa");
     PropertiesUtil.filterPropertiesComment(sb4);
     assertEquals("#aaaa", sb4.toString());

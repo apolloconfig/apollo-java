@@ -34,59 +34,59 @@ import static org.mockito.Mockito.when;
 
 public class ConfigMonitorInitializerTest {
 
-	@Mock
-	private ConfigUtil mockConfigUtil;
-	@Mock
-	private ApolloClientMonitorContext mockMonitorContext;
-	@Mock
-	private ApolloClientMetricsExporterFactory mockExporterFactory;
+  @Mock
+  private ConfigUtil mockConfigUtil;
+  @Mock
+  private ApolloClientMonitorContext mockMonitorContext;
+  @Mock
+  private ApolloClientMetricsExporterFactory mockExporterFactory;
 
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-		MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
-		MockInjector.setInstance(ApolloClientMonitorContext.class, mockMonitorContext);
-		MockInjector.setInstance(ApolloClientMetricsExporterFactory.class, mockExporterFactory);
-		resetConfigMonitorInitializer();
-	}
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    MockInjector.setInstance(ConfigUtil.class, mockConfigUtil);
+    MockInjector.setInstance(ApolloClientMonitorContext.class, mockMonitorContext);
+    MockInjector.setInstance(ApolloClientMetricsExporterFactory.class, mockExporterFactory);
+    resetConfigMonitorInitializer();
+  }
 
-	@After
-	public void tearDown() throws Exception {
-		MockInjector.reset();
-	}
+  @After
+  public void tearDown() throws Exception {
+    MockInjector.reset();
+  }
 
-	@Test
-	public void testInitializeWhenMonitorEnabledAndNotInitialized() {
-		when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
-		ConfigMonitorInitializer.initialize();
-		assertTrue(ConfigMonitorInitializer.hasInitialized);
-		//ConfigMonitorInitializer.53line + DefaultApolloClientBootstrapArgsApi.64line
-		verify(mockConfigUtil, times(2)).isClientMonitorEnabled();
-	}
+  @Test
+  public void testInitializeWhenMonitorEnabledAndNotInitialized() {
+    when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
+    ConfigMonitorInitializer.initialize();
+    assertTrue(ConfigMonitorInitializer.hasInitialized);
+    // ConfigMonitorInitializer.53line + DefaultApolloClientBootstrapArgsApi.64line
+    verify(mockConfigUtil, times(2)).isClientMonitorEnabled();
+  }
 
-	@Test
-	public void testInitializeWhenMonitorDisabled() {
-		when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(false);
-		ConfigMonitorInitializer.initialize();
-		assertFalse(ConfigMonitorInitializer.hasInitialized);
-	}
+  @Test
+  public void testInitializeWhenMonitorDisabled() {
+    when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(false);
+    ConfigMonitorInitializer.initialize();
+    assertFalse(ConfigMonitorInitializer.hasInitialized);
+  }
 
-	@Test
-	public void testInitializeWhenAlreadyInitialized() {
-		when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
-		ConfigMonitorInitializer.hasInitialized = true;
-		ConfigMonitorInitializer.initialize();
-		verify(mockConfigUtil, times(1)).isClientMonitorEnabled();
-	}
+  @Test
+  public void testInitializeWhenAlreadyInitialized() {
+    when(mockConfigUtil.isClientMonitorEnabled()).thenReturn(true);
+    ConfigMonitorInitializer.hasInitialized = true;
+    ConfigMonitorInitializer.initialize();
+    verify(mockConfigUtil, times(1)).isClientMonitorEnabled();
+  }
 
-	@Test
-	public void testReset() {
-		ConfigMonitorInitializer.reset();
-		assertFalse(ConfigMonitorInitializer.hasInitialized);
-	}
+  @Test
+  public void testReset() {
+    ConfigMonitorInitializer.reset();
+    assertFalse(ConfigMonitorInitializer.hasInitialized);
+  }
 
-	private void resetConfigMonitorInitializer() {
-		ConfigMonitorInitializer.reset();
-	}
+  private void resetConfigMonitorInitializer() {
+    ConfigMonitorInitializer.reset();
+  }
 
 }

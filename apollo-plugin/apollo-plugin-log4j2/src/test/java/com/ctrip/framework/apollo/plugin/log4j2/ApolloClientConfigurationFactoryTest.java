@@ -108,8 +108,8 @@ public class ApolloClientConfigurationFactoryTest {
 
   private static void registerConfigFile(String content) throws Exception {
     ConfigFactory factory = new StaticConfigFactory(content);
-    Method setFactoryMethod =
-        ConfigService.class.getDeclaredMethod("setConfigFactory", String.class, ConfigFactory.class);
+    Method setFactoryMethod = ConfigService.class.getDeclaredMethod("setConfigFactory",
+        String.class, ConfigFactory.class);
     setFactoryMethod.setAccessible(true);
     setFactoryMethod.invoke(null, LOG4J2_NAMESPACE, factory);
   }
@@ -190,7 +190,8 @@ public class ApolloClientConfigurationFactoryTest {
     private final ConfigFileFormat format;
     private final String content;
 
-    private StaticConfigFile(String appId, String namespace, ConfigFileFormat format, String content) {
+    private StaticConfigFile(String appId, String namespace, ConfigFileFormat format,
+        String content) {
       this.appId = appId;
       this.namespace = namespace;
       this.format = format;
@@ -223,8 +224,7 @@ public class ApolloClientConfigurationFactoryTest {
     }
 
     @Override
-    public void addChangeListener(ConfigFileChangeListener listener) {
-    }
+    public void addChangeListener(ConfigFileChangeListener listener) {}
 
     @Override
     public boolean removeChangeListener(ConfigFileChangeListener listener) {

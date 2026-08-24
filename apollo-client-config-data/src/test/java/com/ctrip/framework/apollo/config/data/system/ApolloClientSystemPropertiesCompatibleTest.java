@@ -41,8 +41,8 @@ public class ApolloClientSystemPropertiesCompatibleTest {
   @Test
   public void testSystemPropertiesCompatible() {
     System.setProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CACHE_DIR, "test-3/cacheDir");
-    System
-        .setProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_ACCESS_KEY_SECRET, "test-3-secret");
+    System.setProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_ACCESS_KEY_SECRET,
+        "test-3-secret");
     System.setProperty(ApolloClientSystemConsts.DEPRECATED_APOLLO_CONFIG_SERVICE,
         "https://test-3-config-service");
 

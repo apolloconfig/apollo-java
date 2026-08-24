@@ -62,9 +62,8 @@ public class ClusterOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpGet get = request.getValue();
 
-    assertEquals(String
-            .format("%s/envs/%s/apps/%s/clusters/%s", someBaseUrl, someEnv, someAppId, someCluster),
-        get.getURI().toString());
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters/%s", someBaseUrl, someEnv, someAppId,
+        someCluster), get.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)
@@ -94,8 +93,8 @@ public class ClusterOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpPost post = request.getValue();
 
-    assertEquals(String
-        .format("%s/envs/%s/apps/%s/clusters", someBaseUrl, someEnv, someAppId), post.getURI().toString());
+    assertEquals(String.format("%s/envs/%s/apps/%s/clusters", someBaseUrl, someEnv, someAppId),
+        post.getURI().toString());
 
     StringEntity entity = (StringEntity) post.getEntity();
 

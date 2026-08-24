@@ -26,18 +26,17 @@ import java.util.regex.Pattern;
  */
 public final class UrlUtils {
 
-    private static final String ILLEGAL_KEY_REGEX = "[/\\\\]+";
-    private static final Pattern ILLEGAL_KEY_PATTERN = Pattern.compile(ILLEGAL_KEY_REGEX,
-        Pattern.MULTILINE);
+  private static final String ILLEGAL_KEY_REGEX = "[/\\\\]+";
+  private static final Pattern ILLEGAL_KEY_PATTERN =
+      Pattern.compile(ILLEGAL_KEY_REGEX, Pattern.MULTILINE);
 
-    private UrlUtils() {
-    }
+  private UrlUtils() {}
 
-    public static boolean hasIllegalChar(String key) {
-        if (Strings.isNullOrEmpty(key)) {
-            return false;
-        }
-        Matcher matcher = ILLEGAL_KEY_PATTERN.matcher(key);
-        return matcher.find();
+  public static boolean hasIllegalChar(String key) {
+    if (Strings.isNullOrEmpty(key)) {
+      return false;
     }
+    Matcher matcher = ILLEGAL_KEY_PATTERN.matcher(key);
+    return matcher.find();
+  }
 }

@@ -40,12 +40,8 @@ public class DefaultApolloClientThreadPoolApiTest {
     abstractConfigExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     abstractConfigFileExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
     metricsExporterExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
-    threadPoolApi = new DefaultApolloClientThreadPoolApi(
-        remoteConfigExecutor,
-        abstractConfigExecutor,
-        abstractConfigFileExecutor,
-        metricsExporterExecutor
-    );
+    threadPoolApi = new DefaultApolloClientThreadPoolApi(remoteConfigExecutor,
+        abstractConfigExecutor, abstractConfigFileExecutor, metricsExporterExecutor);
   }
 
   @SneakyThrows

@@ -63,8 +63,8 @@ public class AppOpenApiServiceTest extends AbstractOpenApiServiceTest {
 
     HttpGet get = request.getValue();
 
-    assertEquals(String
-        .format("%s/apps/%s/envclusters", someBaseUrl, someAppId), get.getURI().toString());
+    assertEquals(String.format("%s/apps/%s/envclusters", someBaseUrl, someAppId),
+        get.getURI().toString());
   }
 
   @Test(expected = RuntimeException.class)

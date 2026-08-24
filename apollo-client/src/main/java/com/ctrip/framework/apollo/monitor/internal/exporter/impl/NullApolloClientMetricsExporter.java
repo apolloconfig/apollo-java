@@ -28,12 +28,11 @@ import org.slf4j.Logger;
  */
 public class NullApolloClientMetricsExporter implements ApolloClientMetricsExporter {
 
-  private static final Logger log = DeferredLoggerFactory.getLogger(
-      NullApolloClientMetricsExporter.class);
+  private static final Logger log =
+      DeferredLoggerFactory.getLogger(NullApolloClientMetricsExporter.class);
 
   @Override
-  public void init(List<ApolloClientMonitorEventListener> listeners, long collectPeriod) {
-  }
+  public void init(List<ApolloClientMonitorEventListener> listeners, long collectPeriod) {}
 
   @Override
   public boolean isSupport(String form) {

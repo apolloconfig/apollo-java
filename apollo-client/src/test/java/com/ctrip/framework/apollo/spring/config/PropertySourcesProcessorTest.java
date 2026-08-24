@@ -90,21 +90,23 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
 
     processor.postProcessBeanFactory(beanFactory);
 
-    ArgumentCaptor<CompositePropertySource> argumentCaptor = ArgumentCaptor.forClass(
-        CompositePropertySource.class);
+    ArgumentCaptor<CompositePropertySource> argumentCaptor =
+        ArgumentCaptor.forClass(CompositePropertySource.class);
     verify(propertySources).addFirst(argumentCaptor.capture());
 
     CompositePropertySource compositePropertySource = argumentCaptor.getValue();
     assertEquals(2, compositePropertySource.getPropertySources().size());
 
-    ConfigPropertySource propertySource = (ConfigPropertySource) Lists.newArrayList(
-        compositePropertySource.getPropertySources()).get(0);
-    ConfigPropertySource anotherPropertySource = (ConfigPropertySource) Lists.newArrayList(
-        compositePropertySource.getPropertySources()).get(1);
+    ConfigPropertySource propertySource = (ConfigPropertySource) Lists
+        .newArrayList(compositePropertySource.getPropertySources()).get(0);
+    ConfigPropertySource anotherPropertySource = (ConfigPropertySource) Lists
+        .newArrayList(compositePropertySource.getPropertySources()).get(1);
 
-    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + namespaceName, propertySource.getName());
+    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + namespaceName,
+        propertySource.getName());
     assertSame(config, propertySource.getSource());
-    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + anotherNamespaceName, anotherPropertySource.getName());
+    assertEquals(someAppId + ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR + anotherNamespaceName,
+        anotherPropertySource.getName());
     assertSame(anotherConfig, anotherPropertySource.getSource());
   }
 
@@ -119,15 +121,15 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
 
     processor.postProcessBeanFactory(beanFactory);
 
-    ArgumentCaptor<ConfigChangeListener> argumentCaptor = ArgumentCaptor.forClass(
-        ConfigChangeListener.class);
+    ArgumentCaptor<ConfigChangeListener> argumentCaptor =
+        ArgumentCaptor.forClass(ConfigChangeListener.class);
     verify(config).addChangeListener(argumentCaptor.capture());
 
     ConfigChangeListener listener = argumentCaptor.getValue();
     listener.onChange(someConfigChangeEvent);
 
-    ArgumentCaptor<ApolloConfigChangeEvent> eventCaptor = ArgumentCaptor.forClass(
-        ApolloConfigChangeEvent.class);
+    ArgumentCaptor<ApolloConfigChangeEvent> eventCaptor =
+        ArgumentCaptor.forClass(ApolloConfigChangeEvent.class);
     verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
 
     ApolloConfigChangeEvent event = eventCaptor.getValue();
@@ -143,11 +145,12 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     ConfigurableEnvironment environment = mock(ConfigurableEnvironment.class);
 
     MutablePropertySources propertySources = new MutablePropertySources();
-    propertySources.addLast(new PropertiesPropertySource(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, properties));
+    propertySources.addLast(new PropertiesPropertySource(
+        StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, properties));
 
     when(environment.getPropertySources()).thenReturn(propertySources);
     when(environment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
-            ConfigConsts.NAMESPACE_APPLICATION)).thenReturn("");
+        ConfigConsts.NAMESPACE_APPLICATION)).thenReturn("");
 
     ConfigUtil configUtil = new ConfigUtil();
     configUtil = spy(configUtil);
@@ -158,6 +161,7 @@ public class PropertySourcesProcessorTest extends AbstractSpringIntegrationTest 
     processor.postProcessBeanFactory(beanFactory);
 
     assertTrue(propertySources.contains(PropertySourcesConstants.APOLLO_PROPERTY_SOURCE_NAME));
-    assertEquals(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, propertySources.iterator().next().getName());
+    assertEquals(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+        propertySources.iterator().next().getName());
   }
 }

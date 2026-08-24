@@ -43,8 +43,7 @@ public class OpenApiPathBuilder {
   private static final String RELEASE_PATH = "releases";
 
   private final static List<String> SORTED_PATH_KEYS = Arrays.asList(ENVS_PATH, ENV_PATH, APPS_PATH,
-      CLUSTERS_PATH,
-      NAMESPACES_PATH, ITEMS_PATH, ENCODED_ITEMS_PATH, RELEASE_PATH);
+      CLUSTERS_PATH, NAMESPACES_PATH, ITEMS_PATH, ENCODED_ITEMS_PATH, RELEASE_PATH);
 
   private static final Escaper PATH_ESCAPER = UrlEscapers.urlPathSegmentEscaper();
   private static final Escaper QUERY_PARAM_ESCAPER = UrlEscapers.urlFormParameterEscaper();

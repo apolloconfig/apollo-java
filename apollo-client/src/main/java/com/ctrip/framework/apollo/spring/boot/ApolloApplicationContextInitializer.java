@@ -77,20 +77,19 @@ import org.springframework.core.env.StandardEnvironment;
  *  for example, you have defined logback-spring.xml in your project, and you want to inject some attributes into logback-spring.xml.
  *
  */
-public class ApolloApplicationContextInitializer implements
-    ApplicationContextInitializer<ConfigurableApplicationContext> , EnvironmentPostProcessor, Ordered {
+public class ApolloApplicationContextInitializer
+    implements ApplicationContextInitializer<ConfigurableApplicationContext>,
+    EnvironmentPostProcessor, Ordered {
   public static final int DEFAULT_ORDER = 0;
 
-  private static final Logger logger = LoggerFactory.getLogger(ApolloApplicationContextInitializer.class);
-  private static final Splitter NAMESPACE_SPLITTER = Splitter.on(",").omitEmptyStrings()
-      .trimResults();
+  private static final Logger logger =
+      LoggerFactory.getLogger(ApolloApplicationContextInitializer.class);
+  private static final Splitter NAMESPACE_SPLITTER =
+      Splitter.on(",").omitEmptyStrings().trimResults();
   public static final String[] APOLLO_SYSTEM_PROPERTIES = {ApolloClientSystemConsts.APP_ID,
-      ApolloClientSystemConsts.APOLLO_LABEL,
-      ApolloClientSystemConsts.APOLLO_CLUSTER,
-      ApolloClientSystemConsts.APOLLO_CACHE_DIR,
-      ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET,
-      ApolloClientSystemConsts.APOLLO_META,
-      ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE,
+      ApolloClientSystemConsts.APOLLO_LABEL, ApolloClientSystemConsts.APOLLO_CLUSTER,
+      ApolloClientSystemConsts.APOLLO_CACHE_DIR, ApolloClientSystemConsts.APOLLO_ACCESS_KEY_SECRET,
+      ApolloClientSystemConsts.APOLLO_META, ApolloClientSystemConsts.APOLLO_CONFIG_SERVICE,
       ApolloClientSystemConsts.APOLLO_PROPERTY_ORDER_ENABLE,
       ApolloClientSystemConsts.APOLLO_PROPERTY_NAMES_CACHE_ENABLE,
       ApolloClientSystemConsts.APOLLO_OVERRIDE_SYSTEM_PROPERTIES,
@@ -100,8 +99,8 @@ public class ApolloApplicationContextInitializer implements
       ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_JMX_ENABLED,
       ApolloClientSystemConsts.APOLLO_CLIENT_MONITOR_EXCEPTION_QUEUE_SIZE,};
 
-  private final ConfigPropertySourceFactory configPropertySourceFactory = SpringInjector
-      .getInstance(ConfigPropertySourceFactory.class);
+  private final ConfigPropertySourceFactory configPropertySourceFactory =
+      SpringInjector.getInstance(ConfigPropertySourceFactory.class);
 
   private int order = DEFAULT_ORDER;
 
@@ -109,8 +108,10 @@ public class ApolloApplicationContextInitializer implements
   public void initialize(ConfigurableApplicationContext context) {
     ConfigurableEnvironment environment = context.getEnvironment();
 
-    if (!environment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, Boolean.class, false)) {
-      logger.debug("Apollo bootstrap config is not enabled for context {}, see property: ${{}}", context, PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
+    if (!environment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, Boolean.class,
+        false)) {
+      logger.debug("Apollo bootstrap config is not enabled for context {}, see property: ${{}}",
+          context, PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
       return;
     }
     logger.debug("Apollo bootstrap config is enabled for context {}", context);
@@ -126,8 +127,10 @@ public class ApolloApplicationContextInitializer implements
    */
   protected void initialize(ConfigurableEnvironment environment) {
     final ConfigUtil configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-    if (environment.getPropertySources().contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME)) {
-      //already initialized, replay the logs that were printed before the logging system was initialized
+    if (environment.getPropertySources()
+        .contains(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME)) {
+      // already initialized, replay the logs that were printed before the logging system was
+      // initialized
       DeferredLogger.replayTo();
       if (configUtil.isOverrideSystemProperties()) {
         // ensure ApolloBootstrapPropertySources is still the first
@@ -136,25 +139,31 @@ public class ApolloApplicationContextInitializer implements
       return;
     }
 
-    String namespaces = environment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, ConfigConsts.NAMESPACE_APPLICATION);
+    String namespaces = environment.getProperty(
+        PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, ConfigConsts.NAMESPACE_APPLICATION);
     System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES, namespaces);
     logger.debug("Apollo bootstrap namespaces: {}", namespaces);
     List<String> namespaceList = NAMESPACE_SPLITTER.splitToList(namespaces);
 
     CompositePropertySource composite;
     if (configUtil.isPropertyNamesCacheEnabled()) {
-      composite = new CachedCompositePropertySource(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
+      composite = new CachedCompositePropertySource(
+          PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
     } else {
-      composite = new CompositePropertySource(PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
+      composite = new CompositePropertySource(
+          PropertySourcesConstants.APOLLO_BOOTSTRAP_PROPERTY_SOURCE_NAME);
     }
     for (String namespace : namespaceList) {
       Config config = ConfigService.getConfig(namespace);
 
-      composite.addPropertySource(configPropertySourceFactory.getConfigPropertySource(namespace, config));
+      composite.addPropertySource(
+          configPropertySourceFactory.getConfigPropertySource(namespace, config));
     }
     if (!configUtil.isOverrideSystemProperties()) {
-      if (environment.getPropertySources().contains(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME)) {
-        environment.getPropertySources().addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, composite);
+      if (environment.getPropertySources()
+          .contains(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME)) {
+        environment.getPropertySources()
+            .addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, composite);
         return;
       }
     }
@@ -170,7 +179,8 @@ public class ApolloApplicationContextInitializer implements
     }
   }
 
-  private void fillSystemPropertyFromEnvironment(ConfigurableEnvironment environment, String propertyName) {
+  private void fillSystemPropertyFromEnvironment(ConfigurableEnvironment environment,
+      String propertyName) {
     if (System.getProperty(propertyName) != null) {
       return;
     }
@@ -197,20 +207,26 @@ public class ApolloApplicationContextInitializer implements
    * @param springApplication
    */
   @Override
-  public void postProcessEnvironment(ConfigurableEnvironment configurableEnvironment, SpringApplication springApplication) {
+  public void postProcessEnvironment(ConfigurableEnvironment configurableEnvironment,
+      SpringApplication springApplication) {
 
     // should always initialize system properties like app.id in the first place
     initializeSystemProperty(configurableEnvironment);
 
-    Boolean eagerLoadEnabled = configurableEnvironment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED, Boolean.class, false);
-    System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED, String.valueOf(eagerLoadEnabled));
-    //EnvironmentPostProcessor should not be triggered if you don't want Apollo Loading before Logging System Initialization
+    Boolean eagerLoadEnabled = configurableEnvironment.getProperty(
+        PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED, Boolean.class, false);
+    System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED,
+        String.valueOf(eagerLoadEnabled));
+    // EnvironmentPostProcessor should not be triggered if you don't want Apollo Loading before
+    // Logging System Initialization
     if (!eagerLoadEnabled) {
       return;
     }
 
-    Boolean bootstrapEnabled = configurableEnvironment.getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, Boolean.class, false);
-    System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, String.valueOf(bootstrapEnabled));
+    Boolean bootstrapEnabled = configurableEnvironment
+        .getProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, Boolean.class, false);
+    System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED,
+        String.valueOf(bootstrapEnabled));
     if (bootstrapEnabled) {
       DeferredLogger.enable();
       initialize(configurableEnvironment);

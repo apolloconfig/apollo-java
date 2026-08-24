@@ -35,22 +35,26 @@ public class ApolloSpringApplicationRegisterListenerTest {
     Object bootstrapContext = newDefaultBootstrapContext();
     SpringApplication springApplication = new SpringApplication(Object.class);
 
-    ApplicationStartingEvent event = newApplicationStartingEvent(bootstrapContext, springApplication);
+    ApplicationStartingEvent event =
+        newApplicationStartingEvent(bootstrapContext, springApplication);
 
-    ApolloSpringApplicationRegisterListener listener = new ApolloSpringApplicationRegisterListener();
+    ApolloSpringApplicationRegisterListener listener =
+        new ApolloSpringApplicationRegisterListener();
     listener.onApplicationEvent(event);
 
-    SpringApplication registered = BootstrapRegistryHelper.get(bootstrapContext, SpringApplication.class);
+    SpringApplication registered =
+        BootstrapRegistryHelper.get(bootstrapContext, SpringApplication.class);
     assertSame(springApplication, registered);
   }
 
-  private ApplicationStartingEvent newApplicationStartingEvent(
-      Object bootstrapContext, SpringApplication springApplication) throws Exception {
+  private ApplicationStartingEvent newApplicationStartingEvent(Object bootstrapContext,
+      SpringApplication springApplication) throws Exception {
     for (Constructor<?> constructor : ApplicationStartingEvent.class.getConstructors()) {
       Class<?>[] parameterTypes = constructor.getParameterTypes();
-      if (parameterTypes.length == 3 && SpringApplication.class.isAssignableFrom(parameterTypes[1])) {
-        return (ApplicationStartingEvent) constructor
-            .newInstance(bootstrapContext, springApplication, new String[0]);
+      if (parameterTypes.length == 3
+          && SpringApplication.class.isAssignableFrom(parameterTypes[1])) {
+        return (ApplicationStartingEvent) constructor.newInstance(bootstrapContext,
+            springApplication, new String[0]);
       }
     }
     throw new IllegalStateException("Unsupported ApplicationStartingEvent constructor signature");

@@ -43,7 +43,8 @@ public class DefaultProviderManager implements ProviderManager {
     networkProvider.initialize();
     register(networkProvider);
 
-    // Load environment (fat, fws, uat, prod ...) and dc, from /opt/settings/server.properties, JVM property and/or OS
+    // Load environment (fat, fws, uat, prod ...) and dc, from /opt/settings/server.properties, JVM
+    // property and/or OS
     // environment variables.
     Provider serverProvider = new DefaultServerProvider();
     serverProvider.initialize();
@@ -62,7 +63,8 @@ public class DefaultProviderManager implements ProviderManager {
     if (provider != null) {
       return (T) provider;
     }
-    logger.error("No provider [{}] found in DefaultProviderManager, please make sure it is registered in DefaultProviderManager ",
+    logger.error(
+        "No provider [{}] found in DefaultProviderManager, please make sure it is registered in DefaultProviderManager ",
         clazz.getName());
     return (T) NullProviderManager.provider;
   }

@@ -24,37 +24,36 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
-public class InstanceOpenApiService extends AbstractOpenApiService implements
-        com.ctrip.framework.apollo.openapi.api.InstanceOpenApiService {
+public class InstanceOpenApiService extends AbstractOpenApiService
+    implements com.ctrip.framework.apollo.openapi.api.InstanceOpenApiService {
 
-    public InstanceOpenApiService(CloseableHttpClient client, String baseUrl, Gson gson) {
-        super(client, baseUrl, gson);
+  public InstanceOpenApiService(CloseableHttpClient client, String baseUrl, Gson gson) {
+    super(client, baseUrl, gson);
+  }
+
+  @Override
+  public int getInstanceCountByNamespace(String appId, String env, String clusterName,
+      String namespaceName) {
+    if (Strings.isNullOrEmpty(clusterName)) {
+      clusterName = ConfigConsts.CLUSTER_NAME_DEFAULT;
+    }
+    if (Strings.isNullOrEmpty(namespaceName)) {
+      namespaceName = ConfigConsts.NAMESPACE_APPLICATION;
     }
 
-    @Override
-    public int getInstanceCountByNamespace(String appId, String env, String clusterName, String namespaceName) {
-        if (Strings.isNullOrEmpty(clusterName)) {
-            clusterName = ConfigConsts.CLUSTER_NAME_DEFAULT;
-        }
-        if (Strings.isNullOrEmpty(namespaceName)) {
-            namespaceName = ConfigConsts.NAMESPACE_APPLICATION;
-        }
+    checkNotEmpty(appId, "App id");
+    checkNotEmpty(env, "Env");
 
-        checkNotEmpty(appId, "App id");
-        checkNotEmpty(env, "Env");
+    OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder().envsPathVal(env)
+        .appsPathVal(appId).clustersPathVal(clusterName).namespacesPathVal(namespaceName)
+        .customResource("instances");
 
-        OpenApiPathBuilder pathBuilder = OpenApiPathBuilder.newBuilder()
-                .envsPathVal(env)
-                .appsPathVal(appId)
-                .clustersPathVal(clusterName)
-                .namespacesPathVal(namespaceName)
-                .customResource("instances");
-
-        try (CloseableHttpResponse response = get(pathBuilder)) {
-            return gson.fromJson(EntityUtils.toString(response.getEntity()), Integer.class);
-        } catch (Throwable ex) {
-            throw new RuntimeException(String.format("Get instance count: appId: %s, cluster: %s, namespace: %s in env: %s failed",
-                    appId, clusterName, namespaceName, env), ex);
-        }
+    try (CloseableHttpResponse response = get(pathBuilder)) {
+      return gson.fromJson(EntityUtils.toString(response.getEntity()), Integer.class);
+    } catch (Throwable ex) {
+      throw new RuntimeException(String.format(
+          "Get instance count: appId: %s, cluster: %s, namespace: %s in env: %s failed", appId,
+          clusterName, namespaceName, env), ex);
     }
+  }
 }

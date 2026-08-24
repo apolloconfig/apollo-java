@@ -65,9 +65,8 @@ public class ApolloNotificationMessages {
     }
 
     for (Map.Entry<String, Long> entry : source.getDetails().entrySet()) {
-      //to make sure the notification id always grows bigger
-      if (this.has(entry.getKey()) &&
-          this.get(entry.getKey()) >= entry.getValue()) {
+      // to make sure the notification id always grows bigger
+      if (this.has(entry.getKey()) && this.get(entry.getKey()) >= entry.getValue()) {
         continue;
       }
       this.put(entry.getKey(), entry.getValue());

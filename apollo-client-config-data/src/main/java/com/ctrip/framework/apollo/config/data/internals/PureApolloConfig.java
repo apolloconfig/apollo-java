@@ -34,8 +34,7 @@ public class PureApolloConfig extends DefaultConfig implements RepositoryChangeL
    * @param namespace        the namespace of this config instance
    * @param configRepository the config repository for this config instance
    */
-  public PureApolloConfig(String namespace,
-      ConfigRepository configRepository) {
+  public PureApolloConfig(String namespace, ConfigRepository configRepository) {
     super(namespace, configRepository);
   }
 
@@ -46,8 +45,7 @@ public class PureApolloConfig extends DefaultConfig implements RepositoryChangeL
    * @param namespace        the namespace of this config instance
    * @param configRepository the config repository for this config instance
    */
-  public PureApolloConfig(String appId, String namespace,
-      ConfigRepository configRepository) {
+  public PureApolloConfig(String appId, String namespace, ConfigRepository configRepository) {
     super(appId, namespace, configRepository);
   }
 
@@ -68,7 +66,8 @@ public class PureApolloConfig extends DefaultConfig implements RepositoryChangeL
 
   @Override
   public Set<String> getPropertyNames() {
-    // pure apollo config only contains the property from repository and the property from additional
+    // pure apollo config only contains the property from repository and the property from
+    // additional
     Set<String> fromRepository = this.getPropertyNamesFromRepository();
     Set<String> fromAdditional = this.getPropertyNamesFromAdditional();
     if (CollectionUtils.isEmpty(fromRepository)) {
@@ -77,8 +76,8 @@ public class PureApolloConfig extends DefaultConfig implements RepositoryChangeL
     if (CollectionUtils.isEmpty(fromAdditional)) {
       return fromRepository;
     }
-    Set<String> propertyNames = Sets
-        .newLinkedHashSetWithExpectedSize(fromRepository.size() + fromAdditional.size());
+    Set<String> propertyNames =
+        Sets.newLinkedHashSetWithExpectedSize(fromRepository.size() + fromAdditional.size());
     propertyNames.addAll(fromRepository);
     propertyNames.addAll(fromAdditional);
     return propertyNames;
