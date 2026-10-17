@@ -32,6 +32,7 @@
     <modules>
         <module>apollo-plugin-log4j2</module>
         <module>apollo-plugin-client-prometheus</module>
+        <module>apollo-plugin-client-opentelemetry</module>
     </modules>
 
 </project>
