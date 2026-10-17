@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.build.ApolloInjector;
+import com.ctrip.framework.apollo.core.ApolloClientSystemConsts;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.config.data.injector.ApolloConfigDataInjectorCustomizer;
 import com.ctrip.framework.apollo.config.data.injector.ApolloMockInjectorCustomizer;
@@ -33,6 +34,7 @@ import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
 import com.ctrip.framework.apollo.spi.ConfigRegistry;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
 import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
+import com.ctrip.framework.foundation.Foundation;
 import com.google.common.collect.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -48,6 +50,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -67,14 +70,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ConfigDataIntegrationTest.TestConfiguration.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE,
-    properties = {"app.id=someAppId", "env=local",
+    properties = {"app.id=someAppId", "env=dev",
         "spring.config.import=apollo://application,apollo://TEST1.apollo,apollo://application.yaml",
         "listeners=application,TEST1.apollo,application.yaml"})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class ConfigDataIntegrationTest {
 
   private static final String TEST_APP_ID = "someAppId";
-  private static final String TEST_ENV = "local";
+  private static final String TEST_ENV = "dev";
+
+  private static final TemporaryFolder cacheDirectory =
+      TemporaryFolder.builder().assureDeletion().build();
 
   private static final EmbeddedApollo embeddedApollo = new EmbeddedApollo();
 
@@ -89,6 +95,10 @@ public class ConfigDataIntegrationTest {
       clearApolloSystemProperties();
       System.setProperty("app.id", TEST_APP_ID);
       System.setProperty("env", TEST_ENV);
+      System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR,
+          cacheDirectory.getRoot().getAbsolutePath());
+      // Foundation caches env separately from system properties and other Apollo singletons.
+      Foundation.server().initialize();
       resetApolloStaticState();
     }
 
@@ -101,13 +111,14 @@ public class ConfigDataIntegrationTest {
       } finally {
         restoreApolloSystemProperties(originalApolloSystemProperties);
         restoreOrClear("env", originalEnv);
+        Foundation.server().initialize();
       }
     }
   };
 
   @ClassRule
   public static final RuleChain apolloRuleChain =
-      RuleChain.outerRule(apolloStateResource).around(embeddedApollo);
+      RuleChain.outerRule(cacheDirectory).around(apolloStateResource).around(embeddedApollo);
 
   @Before
   public void beforeEach() {
@@ -120,6 +131,8 @@ public class ConfigDataIntegrationTest {
     clearApolloSystemProperties();
     System.setProperty("app.id", TEST_APP_ID);
     System.setProperty("env", TEST_ENV);
+    System.setProperty(ApolloClientSystemConsts.APOLLO_CACHE_DIR,
+        cacheDirectory.getRoot().getAbsolutePath());
   }
 
   @Autowired

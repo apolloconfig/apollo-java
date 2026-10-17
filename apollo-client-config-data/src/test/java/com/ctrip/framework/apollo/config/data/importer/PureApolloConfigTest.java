@@ -22,6 +22,7 @@ import com.ctrip.framework.apollo.config.data.injector.ApolloMockInjectorCustomi
 import com.ctrip.framework.apollo.config.data.internals.PureApolloConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.DefaultConfigFactory;
+import com.ctrip.framework.foundation.Foundation;
 import com.github.stefanbirkner.systemlambda.SystemLambda;
 import org.junit.After;
 import org.junit.Assert;
@@ -33,16 +34,31 @@ import org.junit.Test;
  */
 public class PureApolloConfigTest {
 
+  private String originalEnv;
+  private String originalProfiles;
+
   @Before
   public void before() {
+    originalEnv = System.getProperty("env");
+    originalProfiles = System.getProperty("spring.profiles.active");
     System.setProperty("env", "local");
+    Foundation.server().initialize();
   }
 
   @After
   public void after() {
-    System.clearProperty("spring.profiles.active");
-    System.clearProperty("env");
     ApolloMockInjectorCustomizer.clear();
+    restoreOrClear("spring.profiles.active", originalProfiles);
+    restoreOrClear("env", originalEnv);
+    Foundation.server().initialize();
+  }
+
+  private static void restoreOrClear(String key, String value) {
+    if (value == null) {
+      System.clearProperty(key);
+    } else {
+      System.setProperty(key, value);
+    }
   }
 
   @Test
