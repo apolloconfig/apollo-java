@@ -79,6 +79,8 @@ public class ApolloTestingServer implements AutoCloseable {
 
   private boolean closed;
 
+  private boolean bridgeAcquired;
+
   static {
     try {
       System.setProperty("apollo.longPollingInitialDelayInMills", "0");
@@ -140,6 +142,38 @@ public class ApolloTestingServer implements AutoCloseable {
       logger.error("stop apollo server error", e);
     } finally {
       closed = true;
+    }
+  }
+
+  /**
+   * Installs the JUL-to-SLF4J bridge for MockWebServer logs on the currently active server.
+   * Callers must pair every call with {@link #releaseJulBridge()}.
+   *
+   * <p>A failed installation propagates without acquiring ownership and attempts to restore the
+   * original JUL state. If rollback also fails, the cleanup exception is suppressed on the
+   * installation exception and recovery state is retained for a later acquisition to retry.
+   * Releasing an instance whose acquisition failed is a no-op.
+   *
+   * <p>If another owner's final release is incomplete, acquisition throws until that owner
+   * successfully retries {@link #releaseJulBridge()}.
+   */
+  public void acquireJulBridge() {
+    if (!bridgeAcquired) {
+      JulSlf4jBridge.install();
+      bridgeAcquired = true;
+    }
+  }
+
+  /**
+   * Releases the JUL-to-SLF4J bridge acquired by {@link #acquireJulBridge()}.
+   *
+   * <p>A failed release keeps this instance owning the bridge, so calling this method again
+   * retries the teardown.
+   */
+  public void releaseJulBridge() {
+    if (bridgeAcquired) {
+      JulSlf4jBridge.uninstall();
+      bridgeAcquired = false;
     }
   }
 
