@@ -115,4 +115,49 @@
 		</dependency>
 		<!-- end of test -->
 	</dependencies>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<configuration>
+						<sourcepath>${project.build.sourceDirectory}${path.separator}${project.basedir}/src/compile-only/java</sourcepath>
+						<sourceFileExcludes>
+							<sourceFileExclude>org/springframework/boot/**</sourceFileExclude>
+						</sourceFileExcludes>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<configuration>
+							<compilerArgs>
+								<!-- Resolve the Boot 4 SPI signature on Java 8 without emitting its class. -->
+								<arg>-implicit:none</arg>
+								<arg>-sourcepath</arg>
+								<arg>${project.basedir}/src/compile-only/java</arg>
+							</compilerArgs>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-cli</id>
+						<configuration>
+							<compilerArgs>
+								<arg>-implicit:none</arg>
+								<arg>-sourcepath</arg>
+								<arg>${project.basedir}/src/compile-only/java</arg>
+							</compilerArgs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

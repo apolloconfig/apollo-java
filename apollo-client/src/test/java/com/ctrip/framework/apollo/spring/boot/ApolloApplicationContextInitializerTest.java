@@ -30,6 +30,7 @@ import com.ctrip.framework.apollo.util.ConfigUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -54,6 +55,11 @@ public class ApolloApplicationContextInitializerTest {
     System.clearProperty(ConfigConsts.APOLLO_META_KEY);
 
     MockInjector.reset();
+  }
+
+  @Test
+  public void remainsAssignableToTheLegacyEnvironmentPostProcessor() {
+    assertTrue(EnvironmentPostProcessor.class.isInstance(apolloApplicationContextInitializer));
   }
 
   @Test

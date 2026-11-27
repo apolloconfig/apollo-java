@@ -19,8 +19,10 @@ package com.ctrip.framework.apollo.spring;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.core.ConfigConsts;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfig;
+import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
 import com.ctrip.framework.apollo.spring.config.PropertySourcesConstants;
 import com.google.common.collect.Sets;
+import java.util.Collections;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -30,17 +32,20 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.support.SpringFactoriesLoader;
+import org.springframework.core.Ordered;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -401,11 +406,12 @@ public class BootstrapConfigTest {
     }
   }
 
-  @RunWith(SpringJUnit4ClassRunner.class)
-  @SpringBootTest(classes = ConfigurationWithoutConditionalOnProperty.class)
-  @DirtiesContext
   public static class TestWithBootstrapEnabledAndEagerLoadEnabled
       extends AbstractSpringIntegrationTest {
+
+    private static final String EAGER_PROPERTY = "apollo.test.eager-property";
+    private static final String PROBE_ENABLED = "apollo.test.bootstrap-probe.enabled";
+    private static final String PROBE_VALUE = "apollo.test.bootstrap-probe.value";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -413,8 +419,12 @@ public class BootstrapConfigTest {
 
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED, "true");
       System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED, "true");
+      System.setProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES,
+          ConfigConsts.NAMESPACE_APPLICATION);
 
       Config config = mock(Config.class);
+      when(config.getPropertyNames()).thenReturn(Collections.singleton(EAGER_PROPERTY));
+      when(config.getProperty(EAGER_PROPERTY, null)).thenReturn("from-apollo");
 
       mockConfig(someAppId, ConfigConsts.NAMESPACE_APPLICATION, config);
     }
@@ -423,23 +433,39 @@ public class BootstrapConfigTest {
     public static void afterClass() {
       System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED);
       System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_EAGER_LOAD_ENABLED);
+      System.clearProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_NAMESPACES);
 
       doTearDown();
     }
 
     @Test
-    public void test() {
-      List<String> names = SpringFactoriesLoader.loadFactoryNames(EnvironmentPostProcessor.class,
-          getClass().getClassLoader());
-      boolean containsApollo = false;
-      for (String name : names) {
-        if (name
-            .equals("com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer")) {
-          containsApollo = true;
-          break;
+    public void testLoadsBootstrapPropertiesBeforeLaterEnvironmentPostProcessors() {
+      SpringApplication application =
+          new SpringApplication(ConfigurationWithoutConditionalOnProperty.class);
+      application.setWebApplicationType(WebApplicationType.NONE);
+      application.setDefaultProperties(Collections.singletonMap(PROBE_ENABLED, true));
+
+      try (ConfigurableApplicationContext context = application.run()) {
+        Assert.assertEquals("from-apollo", context.getEnvironment().getProperty(PROBE_VALUE));
+      }
+    }
+
+    public static class BootstrapProbe implements EnvironmentPostProcessor, Ordered {
+
+      @Override
+      public int getOrder() {
+        return ApolloApplicationContextInitializer.DEFAULT_ORDER + 1;
+      }
+
+      @Override
+      public void postProcessEnvironment(ConfigurableEnvironment environment,
+          SpringApplication application) {
+        if (environment.getProperty(PROBE_ENABLED, Boolean.class, false)) {
+          String observedValue = environment.getProperty(EAGER_PROPERTY, "missing");
+          environment.getPropertySources().addFirst(new MapPropertySource("apolloBootstrapProbe",
+              Collections.singletonMap(PROBE_VALUE, observedValue)));
         }
       }
-      Assert.assertTrue(containsApollo);
     }
   }
 

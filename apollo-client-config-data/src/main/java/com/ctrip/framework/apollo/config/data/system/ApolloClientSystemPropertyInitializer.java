@@ -17,7 +17,7 @@
 package com.ctrip.framework.apollo.config.data.system;
 
 import com.ctrip.framework.apollo.config.data.util.Slf4jLogMessageFormatter;
-import com.ctrip.framework.apollo.spring.boot.ApolloApplicationContextInitializer;
+import com.ctrip.framework.apollo.spring.boot.ApolloBootstrapInitializer;
 import org.apache.commons.logging.Log;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -37,7 +37,7 @@ public class ApolloClientSystemPropertyInitializer {
   }
 
   public void initializeSystemProperty(Binder binder, BindHandler bindHandler) {
-    for (String propertyName : ApolloApplicationContextInitializer.APOLLO_SYSTEM_PROPERTIES) {
+    for (String propertyName : ApolloBootstrapInitializer.APOLLO_SYSTEM_PROPERTIES) {
       this.fillSystemPropertyFromBinder(propertyName, propertyName, binder, bindHandler);
     }
   }
