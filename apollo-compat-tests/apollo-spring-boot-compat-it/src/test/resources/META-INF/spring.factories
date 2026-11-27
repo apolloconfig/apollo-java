@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+com.ctrip.framework.apollo.compat.springboot.ApolloBoot4BootstrapCompatibilityTest$LaterProcessor
